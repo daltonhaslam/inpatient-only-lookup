@@ -80,6 +80,12 @@ class Parse(unittest.TestCase):
             with self.assertRaises(parse.ParseError):
                 parse.code_table(path, "2099 Addendum B.xlsx")
 
+    def test_utf16_workbook_part_is_refused(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = workbook_zip(directory, strings=STRINGS.encode("utf-16"))
+            with self.assertRaises(parse.ParseError):
+                parse.code_table(path, "2099 Addendum B.xlsx")
+
     def test_tab_delimited_text_with_title_rows(self):
         rows = ["\tAddendum E\t\t", "HCPCS Code\tShort Descriptor\tCI\tSI"] + ["%05d\tx\t\tC" % n for n in range(100, 160)]
         with tempfile.TemporaryDirectory() as directory:

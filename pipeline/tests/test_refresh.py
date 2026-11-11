@@ -123,11 +123,14 @@ class Adopt(unittest.TestCase):
 
     def test_reposted_rule_file_replaces_the_copy_on_file(self):
         old = {"id": "addenda-2027", "kind": "rule_addenda", "cy": 2027, "rule": "CMS-1850-FC", "url": "https://www.cms.gov/files/zip/old.zip", "landing": "x", "sha256": "old"}
+        fetch.raw_path(old).parent.mkdir(parents=True)
+        fetch.raw_path(old).write_bytes(b"old bytes")
         manifest = {"sources": [old]}
         refresh.adopt(manifest, dict(old, url="https://www.cms.gov/files/zip/new.zip", sha256=None), b"new bytes")
         self.assertEqual(len(manifest["sources"]), 1)
         self.assertEqual(manifest["sources"][0]["url"], "https://www.cms.gov/files/zip/new.zip")
         self.assertEqual(manifest["sources"][0]["sha256"], fetch.sha256(b"new bytes"))
+        self.assertEqual((fetch.RAW / "addenda-2027" / "old.zip.prev").read_bytes(), b"old bytes")
 
 
 class Replaced(unittest.TestCase):
@@ -138,9 +141,36 @@ class Replaced(unittest.TestCase):
             {"id": "addenda-2026", "kind": "rule_addenda", "cy": 2026, "url": "u3", "sha256": fetch.sha256(b"old")},
             {"id": "fr-1", "kind": "fr_text", "url": "u4", "sha256": "x"},
         ]
-        served = {"u1": b"same", "u2": b"new", "u3": b"new", "u4": b"new"}
-        changed = refresh.replaced_in_place(sources, served.get)
-        self.assertEqual([(source["id"], data) for source, data in changed], [("addenda-2027", b"new")])
+        new_rule = table_zip("2027 FR Addendum E.csv")
+        served = {"u1": b"same", "u2": new_rule, "u3": new_rule, "u4": new_rule}
+        changed, problems = refresh.replaced_in_place(sources, served.get)
+        self.assertEqual([(source["id"], data) for source, data in changed], [("addenda-2027", new_rule)])
+        self.assertEqual(problems, [])
+
+    def test_an_error_page_at_the_old_address_is_a_problem_not_a_replacement(self):
+        sources = [
+            {"id": "b-2026-10", "kind": "addendum_b", "effective": "2026-10-01", "url": "u1", "sha256": "pinned"},
+            {"id": "addenda-2027", "kind": "rule_addenda", "cy": 2027, "url": "u2", "sha256": "pinned"},
+        ]
+        served = {"u1": b"<html>Page not found</html>", "u2": table_zip("2027 FR Addendum E.csv")}
+        changed, problems = refresh.replaced_in_place(sources, served.get, skip={"addenda-2027"})
+        self.assertEqual(changed, [])
+        self.assertEqual(len(problems), 1)
+        self.assertIn("b-2026-10", problems[0])
+
+    def test_malformed_candidates_are_rejected_not_fatal(self):
+        utf16 = io.BytesIO()
+        with zipfile.ZipFile(utf16, "w") as archive:
+            archive.writestr("2026 Addendum B.txt", "HCPCS Code\tSI\n00100\tC\n".encode("utf-16"))
+        for data in (b"", b"PK\x03\x04 truncated", utf16.getvalue(), table_zip("2026 Addendum B.csv", count=3)):
+            self.assertFalse(refresh.is_table(data, "addendum_b"))
+
+    def test_list_change_names_the_codes(self):
+        old = table_zip("2026 October Addendum B.csv", count=60)
+        new = table_zip("2026 October Addendum B.csv", count=62)
+        line = refresh.list_change({"kind": "addendum_b"}, old, new)
+        self.assertIn("+2", line)
+        self.assertIn("00160", line)
 
 
 if __name__ == "__main__":

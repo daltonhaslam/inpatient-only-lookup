@@ -77,19 +77,37 @@ def quarter_of(text):
     return "%s-%s" % (match.group(1) or match.group(3), MONTHS[match.group(2).lower()])
 
 
-def is_table(data, kind):
-    """True if these bytes are a zip holding the table a source of this kind must have."""
+def read_table(data, kind):
+    """The table a source of this kind must hold, parsed from raw bytes: {code: SI}, or None if
+    the bytes are not that table (an error page, the wrong zip, a damaged file)."""
     with tempfile.TemporaryDirectory() as directory:
         path = Path(directory) / "candidate.zip"
         path.write_bytes(data)
         if not zipfile.is_zipfile(path):
-            return False
+            return None
         try:
             # __wrapped__: the uncached parser, so a temporary path never enters the cache.
-            parse.code_table.__wrapped__(path, parse.pick_member(path, history.MEMBERS[kind][_PROOF[kind]]))
-        except (parse.ParseError, zipfile.BadZipFile, KeyError, ValueError):
-            return False
-    return True
+            return parse.code_table.__wrapped__(path, parse.pick_member(path, history.MEMBERS[kind][_PROOF[kind]]))
+        except Exception:    # whatever a malformed file raises, it is simply not the table
+            return None
+
+
+def is_table(data, kind):
+    return read_table(data, kind) is not None
+
+
+def list_change(source, old_bytes, new_bytes):
+    """One line on how an Addendum B's inpatient-only codes differ between two copies of it."""
+    if source["kind"] != "addendum_b":
+        return ""
+    old, new = read_table(old_bytes, "addendum_b"), read_table(new_bytes, "addendum_b")
+    if old is None or new is None:
+        return ""
+    before, after = history.ipo_codes(old), history.ipo_codes(new)
+    if before == after:
+        return "      inpatient-only codes unchanged (%d)" % len(after)
+    return "      inpatient-only codes: +%d %s  -%d %s" % (
+        len(after - before), sorted(after - before)[:12], len(before - after), sorted(before - after)[:12])
 
 
 def discover_quarters(manifest, get, grab):
@@ -197,9 +215,9 @@ def adopt(manifest, source, data):
         sources.append(source)
         what = "CORRECTION: replaces %s" % current["id"]
     else:
-        fetch.raw_path(existing).unlink(missing_ok=True)
+        keep_previous(fetch.raw_path(existing))
         existing.update(source)
-        what = "RE-POSTED by CMS at a new address; replaces the copy on file"
+        what = "RE-POSTED by CMS at a new address; replaces the copy on file (kept as .prev)"
     path = fetch.raw_path(source)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(data)
@@ -214,14 +232,31 @@ def recent_sources(sources):
             if s.get("effective") in quarters or (s["kind"] in ("rule_addenda", "removal_file") and s["cy"] == newest)]
 
 
-def replaced_in_place(sources, grab):
-    """[(source, new bytes)] for recent files whose bytes at the same address no longer match the pin."""
-    changed = []
+def replaced_in_place(sources, grab, skip=()):
+    """Recent files whose bytes at the same address no longer match the pin.
+
+    Returns ([(source, new bytes)], [problems]). New bytes count only if they are still the table
+    the source is supposed to be: an address that now serves an error page is a problem to look
+    at, never a replacement. `skip` holds ids being replaced by a newly found file this run.
+    """
+    changed, problems = [], []
     for source in recent_sources(sources):
+        if source["id"] in skip:
+            continue
         data = grab(source["url"])
-        if data is not None and fetch.sha256(data) != source["sha256"]:
+        if data is None or fetch.sha256(data) == source["sha256"]:
+            continue
+        if is_table(data, source["kind"]):
             changed.append((source, data))
-    return changed
+        else:
+            problems.append("%s: %s no longer serves this file (the pinned copy on disk was kept)" % (source["id"], source["url"]))
+    return changed, problems
+
+
+def keep_previous(path):
+    """Set the current download aside as <name>.prev so a refresh can be undone by hand."""
+    if path.exists():
+        path.replace(path.with_name(path.name + ".prev"))
 
 
 def run(script):
@@ -305,7 +340,8 @@ def main(argv=None):
         rule_files, notes = discover_rules(manifest, get, grab)
         found += rule_files
         problems += notes
-    replaced = replaced_in_place(manifest["sources"], grab)
+    replaced, stale = replaced_in_place(manifest["sources"], grab, skip={source["id"] for source, _ in found})
+    problems += stale
 
     print("New files: %d" % len(found))
     for source, _ in found:
@@ -319,17 +355,27 @@ def main(argv=None):
         return 1 if problems else 0
 
     for source, data in found:
+        in_force = [s for s in manifest["sources"] if s["kind"] == "addendum_b" and s.get("effective") == source.get("effective")]
+        before = fetch.raw_path(in_force[-1]).read_bytes() if in_force and fetch.raw_path(in_force[-1]).exists() else None
         print("  " + adopt(manifest, source, data))
+        if before:
+            print(list_change(source, before, data))
     for source, data in replaced:
-        fetch.raw_path(source).write_bytes(data)
-        print("  %-18s re-pinned: %s -> %s" % (source["id"], source["sha256"][:12], fetch.sha256(data)[:12]))
+        path = fetch.raw_path(source)
+        before = path.read_bytes() if path.exists() else None
+        keep_previous(path)
+        path.write_bytes(data)
+        print("  %-18s REPLACED IN PLACE by CMS; re-pinned %s -> %s (old copy kept as .prev)" % (
+            source["id"], source["sha256"][:12], fetch.sha256(data)[:12]))
+        if before:
+            print(list_change(source, before, data))
         source["sha256"] = fetch.sha256(data)
     fetch.save_manifest(manifest)
 
     status = run("fetch.py") or run("build.py") or run("run_tests.py")
     if status or problems:
         print("\nREFRESH FAILED. The site's tables were not updated. Fix what is reported above and run it again.")
-        print("To undo the changes to the file list: git checkout pipeline/sources.json")
+        print("To undo: git checkout pipeline/sources.json, and in data/raw/ rename any <file>.prev back to <file>.")
         return 1
     notes = follow_ups(fetch.load_sources())
     print("\nStill to do by hand:" if notes else "\nNothing left to do by hand.")

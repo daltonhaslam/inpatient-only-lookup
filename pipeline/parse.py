@@ -40,6 +40,9 @@ def _read(archive, name):
 def _xml(archive, name):
     """Parse a workbook part. Spreadsheet XML has no DTD; one that declares entities is refused."""
     data = _read(archive, name)
+    # Workbook parts are UTF-8. Anything else (UTF-16 would hide a DTD from the byte search) is refused.
+    if b"\x00" in data or not data.lstrip(b"\xef\xbb\xbf \t\r\n").startswith(b"<"):
+        raise ParseError("%s is not UTF-8 XML" % name)
     if b"<!DOCTYPE" in data or b"<!ENTITY" in data:
         raise ParseError("%s declares a DTD or entities" % name)
     return ET.fromstring(data)

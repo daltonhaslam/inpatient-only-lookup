@@ -78,17 +78,27 @@ def _allowed(url):
     return parts.scheme == "https" and parts.hostname in ALLOWED_HOSTS
 
 
+class _AllowedRedirects(urllib.request.HTTPRedirectHandler):
+    """Follow a redirect only to another allowed https host; refuse it before any request is sent."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        if not _allowed(newurl):
+            raise ValueError("refusing redirect to %s: not an allowed https host" % newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+_OPENER = urllib.request.build_opener(_AllowedRedirects)
+
+
 def download(url):
-    """The bytes at an allowed https URL. Redirects are followed only if they stay on allowed hosts."""
+    """The bytes at an allowed https URL. Redirects are followed only while they stay on allowed hosts."""
     if not _allowed(url):
         raise ValueError("refusing to fetch %s: not an allowed https host" % url)
     parts = urllib.parse.urlsplit(url)
     # CMS file names contain spaces and slashes; keep any escapes the link already has.
     quoted = urllib.parse.urlunsplit(parts._replace(path=urllib.parse.quote(parts.path, safe="/%")))
     request = urllib.request.Request(quoted, headers={"User-Agent": UA})
-    with urllib.request.urlopen(request, timeout=120) as response:
-        if not _allowed(response.geturl()):
-            raise ValueError("%s redirected to %s, which is not an allowed https host" % (url, response.geturl()))
+    with _OPENER.open(request, timeout=120) as response:
         data = response.read(MAX_BYTES + 1)
     if len(data) > MAX_BYTES:
         raise ValueError("%s is larger than %d bytes" % (url, MAX_BYTES))
