@@ -1010,7 +1010,7 @@
 "mechanical ventilation",
 "neurostimulator"
 ],
-"label": "Nerve-stimulation catheter, ventilated patient, insert or replace, percutaneous"
+"label": "New-technology catheter device, insertion or replacement (see CMS's file)"
 },
 "1028T": {
 "family": "Emerging technology catheter procedures",
@@ -1019,7 +1019,7 @@
 "mechanical ventilation",
 "neurostimulator"
 ],
-"label": "Nerve-stimulation catheter, ventilated patient, program with repositioning"
+"label": "New-technology catheter device, programming with repositioning (see CMS's file)"
 },
 "1029T": {
 "family": "Emerging technology catheter procedures",
@@ -1028,7 +1028,7 @@
 "mechanical ventilation",
 "neurostimulator"
 ],
-"label": "Nerve-stimulation catheter, ventilated patient, program without repositioning"
+"label": "New-technology catheter device, programming, no repositioning (see CMS's file)"
 },
 "1072T": {
 "family": "Liver graft machine perfusion",
@@ -6973,7 +6973,7 @@
 "impella removal",
 "temporary heart pump"
 ],
-"label": "Left heart pump removal, surgical, with resection and staple closure"
+"label": "Left heart pump removal, surgical (see CMS's file for the exact variant)"
 },
 "34001": {
 "family": "Artery and vein clot removal",
