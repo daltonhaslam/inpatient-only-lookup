@@ -78,6 +78,8 @@ npm run serve                          # http://127.0.0.1:4173
 npm test                               # unit tests, output checks, browser tests
 ```
 
+`BASE_URL=https://… node e2e/smoke.mjs` runs the browser checks against a deployed copy.
+
 To rebuild the tables from CMS's files (about 100 MB, downloaded on first run):
 
 ```bash

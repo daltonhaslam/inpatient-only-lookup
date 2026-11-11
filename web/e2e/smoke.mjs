@@ -1,26 +1,33 @@
 // End-to-end smoke test: node e2e/smoke.mjs   (exits non-zero if any check fails)
 // Serves docs/ locally and drives the cached Chromium. No test framework.
+// BASE_URL=https://example.com node e2e/smoke.mjs   runs the same checks against a deployed site instead.
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { launch } from './browser.mjs';
 import { serve } from './serve.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const AXE = join(here, '..', 'node_modules', 'axe-core', 'axe.min.js');
-if (!existsSync(join(here, '..', '..', 'docs', 'index.html'))) {
+const AXE_SOURCE = readFileSync(AXE, 'utf8');
+const LIVE = process.env.BASE_URL ? new URL(process.env.BASE_URL).origin : null;
+if (!LIVE && !existsSync(join(here, '..', '..', 'docs', 'index.html'))) {
   console.error('docs/ is not built. Run: cd web && BUILD_DATE=2026-11-11 node build.mjs');
   process.exit(2);
 }
 
-const server = await serve();
-const base = `http://127.0.0.1:${server.address().port}`;
+const server = LIVE ? null : await serve();
+const base = LIVE || `http://127.0.0.1:${server.address().port}`;
 const browser = await launch();
 
 let passed = 0;
 const failures = [];
 const problems = []; // console errors and page errors, in order
 let ignore404 = false;
+// Live only: Vercel Web Analytics is not enabled yet, so its script 404s (as the 404 page, so Chrome
+// logs both "Failed to load resource" and a MIME-type refusal) on every page.
+const EXPECTED_LIVE_404 = '/_vercel/insights/script.js';
+let sawAnalytics404 = false;
 
 async function newContext(options = {}) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, ...options });
@@ -29,6 +36,7 @@ async function newContext(options = {}) {
     page.on('console', (message) => {
       if (message.type() !== 'error') return;
       if (ignore404 && /status of 404/.test(message.text())) return;
+      if (LIVE && (message.location().url.endsWith(EXPECTED_LIVE_404) || message.text().includes(EXPECTED_LIVE_404))) { sawAnalytics404 = true; return; }
       problems.push(`console error on ${page.url()}: ${message.text()}`);
     });
     page.on('pageerror', (error) => problems.push(`page error on ${page.url()}: ${error.message}`));
@@ -332,7 +340,7 @@ for (const scheme of ['light', 'dark']) {
     for (const path of axePaths) {
       await open(page, path);
       if (path.includes('q=')) await page.waitForSelector('[data-results] .verdict');
-      await page.addScriptTag({ path: AXE });
+      await page.evaluate(AXE_SOURCE);   // evaluate, not addScriptTag: the live CSP forbids inline scripts
       const results = await page.evaluate(() => window.axe.run(document));
       for (const v of results.violations.filter((x) => x.impact === 'serious' || x.impact === 'critical')) {
         report.push(`${path} [${v.impact}] ${v.id}: ${v.help}\n      ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join('\n      ')}`);
@@ -368,6 +376,7 @@ await check('404: missing path returns the 404 page with a link home', async (pa
 });
 
 await browser.close();
-server.close();
+server?.close();
+if (sawAnalytics404) console.log(`\nnote: expected console error seen live: ${EXPECTED_LIVE_404} returned 404 (Web Analytics not enabled)`);
 console.log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) { console.log(`failed: ${failures.join('; ')}`); process.exit(1); }
