@@ -47,6 +47,8 @@ export function periodIndex(data, iso) {
   return found;
 }
 
+/** True while a date is answered from a final rule's Addendum B, before CMS posts that January's file. */
+export const isScheduled = (period) => Boolean(period) && period.basis === 'f';
 export const stateOf = (si) => (si === 'C' ? 'ipo' : si === '' || si === 'D' ? 'gone' : 'off');
 export const num = (n) => n.toLocaleString('en-US');
 

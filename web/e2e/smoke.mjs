@@ -132,7 +132,12 @@ await check('date field: typing a year digit by digit does not jump; an out-of-r
   await input.fill('2031-05-05');
   await input.dispatchEvent('change');
   await input.blur();
-  eq(await input.inputValue(), '2027-12-31', 'out-of-range date snaps to the last date answered');
+  const dosMax = await input.getAttribute('max');
+  eq(await input.inputValue(), dosMax, 'out-of-range date snaps to the last date answered');
+  await input.fill('0202-03-03');
+  await input.dispatchEvent('change');
+  await input.blur();
+  eq(await input.inputValue(), dosMax, 'a half-typed year is dropped, not acted on');
 });
 
 await check('a date carried from another page is written into the address bar', async (page) => {
@@ -162,14 +167,34 @@ await check('touch: a vertical swipe over the timeline scrolls and leaves the da
   await waitText(page.locator('.verdict__answer').first(), (t) => t.includes('2022'), 'answer after a tap in 2022');
 });
 
-await check('scheduled dates are marked on every view', async (page) => {
-  await open(page, '/?q=99213&dos=2027-02-01');
-  await waitText(page.locator('[data-results] .verdict__note').first(), (t) => t.startsWith('Scheduled'), 'scheduled note on a never-listed code');
-  await page.fill('[data-q]', 'hip replacement');
-  await page.locator('[data-results] [data-row="27130"]').waitFor();
-  assert(await page.locator('[data-scheduled]').first().isVisible(), 'scheduled banner is not visible in 2027');
+await check('scheduled dates are marked once, beside the date', async (page) => {
+  await open(page, '/');
+  // The date answered from a final rule, if the data has one (it goes away when CMS posts the January file).
+  const scheduled = await page.evaluate(async () => {
+    const data = await (await fetch(document.body.dataset.ipo)).json();
+    const period = data.periods.find((p) => p.basis === 'f');
+    return period ? period.d : null;
+  });
+  if (!scheduled) return;
+  await open(page, `/?q=99213&dos=${scheduled}`);
+  const banner = page.locator('[data-scheduled]').first();
+  await waitText(banner, (t) => t.startsWith('Scheduled'), 'scheduled banner');
+  assert(await banner.isVisible(), 'scheduled banner is not visible');
+  eq(await page.locator('body').evaluate((body) => (body.innerText.match(/Scheduled\. This comes from/g) || []).length), 1, 'scheduled caution appears once');
   await setDate(page, '2026-06-01');
   await page.waitForFunction(() => document.querySelector('[data-scheduled]').hidden);
+});
+
+await check('several codes in the search box point to the bulk check; a late click keeps the date', async (page) => {
+  await open(page, '/');
+  await page.fill('[data-q]', '27447 vs 27130');
+  await waitText(page.locator('[data-results]'), (t) => t.includes('2 codes'), 'hint for two codes');
+  await page.fill('[data-q]', 'hip replacement');
+  await page.locator('[data-results] [data-row="27130"]').waitFor();
+  await setDate(page, '2021-03-03');
+  await page.locator('[data-results] [data-row="27130"]').click();   // inside the URL debounce
+  await page.waitForURL('**/code/27130/**');
+  await waitText(page.locator('.verdict__answer').first(), (t) => t.includes('March 3, 2021'), 'date carried by an immediate click');
 });
 
 await check('home: Today button resets the date, then hides', async (page) => {

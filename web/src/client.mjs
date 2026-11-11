@@ -2,7 +2,7 @@
 // Every page is complete without this script; it only makes the date and the search live.
 import {
   isDate, formatDate, todayISO, clampDate, dayNumber, fromDayNumber, normalizeCode, isCode, periodIndex,
-  stateAt, lookup, expandOther, countsAt, exemptCodes, buildIndex, search, extractCodes, num, csv,
+  stateAt, lookup, expandOther, countsAt, exemptCodes, buildIndex, search, extractCodes, num, csv, isScheduled,
 } from './engine.mjs';
 import { esc, chip, CHIP, verdict, verdictParts, eventList, codeRow, answer, axis, pct, scheduledNote } from './views.mjs';
 
@@ -42,6 +42,9 @@ function rememberedDate() {
 
 /** A date in the link wins; otherwise the date this tab last chose; otherwise today. */
 function startingDate() {
+  // Coming back to a page, the tab's latest choice beats the date frozen in that page's address.
+  const [navigation] = window.performance.getEntriesByType('navigation');
+  if (navigation && navigation.type === 'back_forward') return rememberedDate();
   const fromUrl = params().get('dos');
   return usable(fromUrl) ? fromUrl : rememberedDate();
 }
@@ -62,17 +65,19 @@ function writeUrl() {
 // of a drag: browsers throttle history writes.
 let persistTimer = 0;
 function persist(now = false) {
+  remember(state.date);   // at once: a link clicked in the next instant must carry the date
   clearTimeout(persistTimer);
-  const write = () => { remember(state.date); writeUrl(); };
-  if (now) write(); else persistTimer = setTimeout(write, 250);
+  if (now) writeUrl(); else persistTimer = setTimeout(writeUrl, 250);
 }
 
 function loadOther() {
   if (!state.otherLoading) {
+    state.otherFailed = false;
     state.otherLoading = fetch(document.body.dataset.other)
       .then((response) => { if (!response.ok) throw new Error(String(response.status)); return response.json(); })
-      .then((packed) => { state.other = expandOther(packed); state.otherFailed = false; })
-      .catch(() => { state.otherLoading = null; state.otherFailed = true; });
+      .then((packed) => { state.other = expandOther(packed); })
+      .catch(() => { state.otherLoading = null; state.otherFailed = true; })
+      .then(() => { drawVerdicts(); drawBulk(); });
   }
   return state.otherLoading;
 }
@@ -103,7 +108,7 @@ function drawControls() {
   }
   for (const link of $$('[data-more]')) link.href = link.pathname + (date === state.today ? '' : `?dos=${date}`);
   const period = state.data.periods[periodIndex(state.data, date)];
-  const scheduled = period && period.basis === 'f';
+  const scheduled = isScheduled(period);
   for (const note of $$('[data-scheduled]')) {
     note.hidden = !scheduled;
     if (scheduled) setHtml(note, scheduledNote(period));
@@ -181,10 +186,14 @@ function drawResults() {
   const named = extractCodes(query);
   const code = named.length === 1 ? named[0] : normalizeCode(query);
   if (isCode(code)) {
-    if (!data.codes[code] && !state.other) loadOther().then(drawVerdicts);
+    if (!data.codes[code] && !state.other) loadOther();
     host.innerHTML = `<div data-verdict-host="${esc(code)}" data-link="1"></div>`;
     drawVerdicts();
     drawControls();
+    return;
+  }
+  if (named.length > 1) {
+    host.innerHTML = `<p class="results__none">That looks like ${named.length} codes. The search box takes one at a time; <a href="#several-h">check several codes at once</a> just below.</p>`;
     return;
   }
   state.index ||= buildIndex(data);
@@ -212,7 +221,7 @@ function bulkRows() {
       status: result.kind === 'unknown' ? 'No record of this code' : CHIP[reply.state],
       removed: result.removed ? formatDate(result.removed, 'short') : '',
       exemption: exemption ? { active: 'Exempt', ended: 'Ended', none: 'None' }[exemption.status] : '',
-      basis: result.period && result.period.basis === 'f' ? 'scheduled (final rule)' : 'CMS Addendum B',
+      basis: result.kind === 'unknown' ? '' : isScheduled(result.period) ? 'scheduled (final rule)' : 'CMS Addendum B',
     };
   });
 }
@@ -230,11 +239,8 @@ function drawBulk() {
   const body = rows.map((row) => `<tr><th scope="row">${row.listed ? `<a href="/code/${esc(row.code)}/">${esc(row.code)}</a>` : esc(row.code)}</th><td>${esc(row.label)}</td><td>${row.unknown ? esc(row.status) : chip(row.state)}</td><td>${esc(row.removed)}</td><td>${esc(row.exemption)}</td></tr>`).join('');
   const tally = (state) => rows.filter((row) => row.state === state).length;
   const missing = tally('gone');
-  const period = state.data.periods[state.period];
-  const notes = [
-    state.bulkDropped ? `Only the first ${rows.length} codes were checked; ${state.bulkDropped} more were left out.` : '',
-    period && period.basis === 'f' ? scheduledNote(period) : '',
-  ].filter(Boolean).map((text) => `<p class="note note--sched">${text}</p>`).join('');
+  const notes = state.bulkDropped
+    ? `<p class="note note--sched">Only the first ${rows.length} codes were checked; ${state.bulkDropped} more were left out.</p>` : '';
   setHtml(host, `<p class="results__count">${rows.length} ${rows.length === 1 ? 'code' : 'codes'} on ${formatDate(state.date)}: ${tally('ipo')} inpatient only, ${tally('off')} not${missing ? `, ${missing} not in CMS’s files on that date or not found` : ''}.</p>${notes}
 <div class="scroll"><table class="check"><thead><tr><th scope="col">Code</th><th scope="col">Procedure</th><th scope="col">Status</th><th scope="col">Left the list</th><th scope="col">Review exemption</th></tr></thead><tbody>${body}</tbody></table></div>
 <p><button type="button" class="quiet" data-bulk-csv>Download as CSV</button></p>`);
@@ -262,6 +268,13 @@ function drawDate() {
   }
   drawExempt();
   drawBulk();
+}
+
+/** On leaving the date field: a real date outside the range goes to the nearest date answered;
+ *  a half-typed one (year 0202) is dropped. Either way the field ends up showing the date in force. */
+function settleDateField(input) {
+  if (isDate(input.value) && input.value >= '2000-01-01') setDate(input.value);
+  input.value = state.date;
 }
 
 function setDate(date) {
@@ -331,8 +344,7 @@ function wire() {
   document.addEventListener('focusout', (event) => {
     const target = event.target;
     if (!target.matches?.('[data-dos]') || target.value === state.date) return;
-    if (isDate(target.value)) setDate(target.value);   // out of range: go to the nearest date answered
-    target.value = state.date;
+    settleDateField(target);
   });
   // A page restored from the back/forward cache may be showing an older date than the tab's.
   window.addEventListener('pageshow', (event) => {
@@ -343,8 +355,7 @@ function wire() {
     if (form.matches('[data-ask], [data-dos-form]')) {
       event.preventDefault();
       const input = $('[data-dos]', form);
-      if (input && isDate(input.value)) setDate(input.value);
-      if (input) input.value = state.date;
+      if (input) settleDateField(input);
       $('[data-results] a')?.focus();
     } else if (form.matches('[data-bulk]')) {
       event.preventDefault();
@@ -356,7 +367,7 @@ function wire() {
         return;
       }
       drawBulk();
-      loadOther().then(drawBulk);
+      loadOther();
     }
   });
   document.addEventListener('click', (event) => {

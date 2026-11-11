@@ -1,6 +1,6 @@
 // Page templates. Build-time only: everything here becomes static HTML in docs/.
 import { SITE, feedbackHref, CFR } from './site.mjs';
-import { formatDate, monthYear, lookup, countsAt, periodIndex, stateAt, dayNumber, num, scale } from './engine.mjs';
+import { formatDate, monthYear, lookup, countsAt, periodIndex, stateAt, dayNumber, num, scale, isScheduled } from './engine.mjs';
 import { esc, out, fr, cfr, verdict, eventList, codeRow, axis, axisYears, pct, scheduledNote } from './views.mjs';
 
 const NAV = [
@@ -66,7 +66,7 @@ ${body}
 /** Shown while the chosen date is answered from a final rule and not yet from a quarterly file. */
 function scheduledBanner(data, date) {
   const period = data.periods[periodIndex(data, date)];
-  const on = period && period.basis === 'f';
+  const on = isScheduled(period);
   return `<p class="note note--sched" data-scheduled${on ? '' : ' hidden'}>${on ? scheduledNote(period) : ''}</p>`;
 }
 
@@ -277,7 +277,8 @@ export function history(ctx) {
     const returned = change.added.filter((code) => ctx.returnedOn[`${y.year}-01-01`].has(code));
     const added = change.added.filter((code) => !ctx.returnedOn[`${y.year}-01-01`].has(code));
     const during = (kinds) => y.midyear.flatMap((m) => kinds.flatMap((kind) => m[kind]));
-    const mid = during(['new', 'added']);
+    const midReturned = y.midyear.flatMap((m) => m.added.filter((code) => ctx.returnedOn[m.date] && ctx.returnedOn[m.date].has(code)));
+    const mid = during(['new', 'added']).filter((code) => !midReturned.includes(code));
     const midOff = during(['removed', 'retired']);
     const facts = [
       ['On the list January 1', num(y.start)],
@@ -294,7 +295,7 @@ export function history(ctx) {
 <h2 id="yh${y.year}">${y.year}</h2>
 <p>${YEAR_NOTES[y.year]()}${file}</p>
 <dl class="ledger">${facts}</dl>
-${codeList(data, 'Removed', change.removed)}${codeList(data, 'Returned to the list', returned)}${codeList(data, 'New or added', [...change.new, ...added])}${codeList(data, 'Retired while on the list', change.retired)}${codeList(data, 'Added during the year', mid)}${codeList(data, 'Removed or retired during the year', midOff)}
+${codeList(data, 'Removed', change.removed)}${codeList(data, 'Returned to the list', returned)}${codeList(data, 'New or added', [...change.new, ...added])}${codeList(data, 'Retired while on the list', change.retired)}${codeList(data, 'Added during the year', mid)}${codeList(data, 'Returned during the year', midReturned)}${codeList(data, 'Removed or retired during the year', midOff)}
 <p class="year__src">${esc(rule.name)} (${esc(ctx.ruleIds[y.year])}), ${fr(rule.fr)}${y.year < 2020 ? '. Before 2020 this site has one file a year, so mid-year changes are not shown.' : '.'}</p>
 </section>`;
   }).join('\n');

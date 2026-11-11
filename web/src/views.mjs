@@ -167,7 +167,7 @@ function identity(title, code, label, where) {
   return `<header class="verdict__id"><${title} class="verdict__title">${text}</${title}>${where}</header>`;
 }
 
-/** The caution shown for dates answered from a final rule before CMS posts that January's file. */
+/** The caution shown, once per page beside the date, for dates answered from a final rule before CMS posts that January's file. */
 export const scheduledNote = (period) => `Scheduled. This comes from the ${esc(period.label)}; CMS’s January file will confirm it.`;
 
 /**
@@ -182,8 +182,6 @@ export function verdictParts(data, code, date, today, other = null, { title = 'h
   const result = lookup(data, code, date, other);
   if (result.kind === 'pending') return { state: 'gone', body: `<p class="verdict__wait">Checking ${esc(code)}…</p>`, timeline: '' };
   const reply = answer(data, result, today);
-  const scheduled = result.period && result.period.basis === 'f' && result.kind !== 'unknown'
-    ? `<p class="verdict__note">${scheduledNote(result.period)}</p>` : '';
   if (result.kind !== 'listed') {
     const file = result.kind === 'other' && result.state === 'off' ? ` It is in the ${fileLink(result.period)}; see that file for its status indicator.` : '';
     return {
@@ -192,7 +190,7 @@ export function verdictParts(data, code, date, today, other = null, { title = 'h
       body: `${identity(title, code, '<span class="verdict__none">No description: this site describes only codes that have been on the list.</span>', '')}
 <${heading} class="verdict__answer">${reply.head}</${heading}>
 <p class="verdict__lead">${reply.lead}${file}</p>
-${scheduled}<p class="verdict__note">Off the inpatient-only list is not the same as payable. Other status indicators also mean Medicare does not pay a code on an outpatient claim.</p>`,
+<p class="verdict__note">Off the inpatient-only list is not the same as payable. Other status indicators also mean Medicare does not pay a code on an outpatient claim.</p>`,
     };
   }
   const record = result.record;
@@ -209,7 +207,7 @@ ${scheduled}<p class="verdict__note">Off the inpatient-only list is not the same
     body: `${identity(title, code, esc(record.label), `<p class="verdict__where"><a href="/group/${esc(groupId)}/">${esc(groupName)}</a>: ${esc(family)}</p>`)}
 <${heading} class="verdict__answer">${reply.head}</${heading}>
 <p class="verdict__lead">${reply.lead}${reply.last ? ` <span class="verdict__src">${eventSource(data, reply.last, code)}</span>` : ''}</p>
-${scheduled}${cautions}
+${cautions}
 <dl class="facts">
 <div><dt>In CMS’s file</dt><dd>${status}</dd></div>
 <div><dt>Medical review</dt><dd>${exemptionText(data, result)}</dd></div>
