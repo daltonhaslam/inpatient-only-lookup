@@ -248,7 +248,14 @@ function wire() {
   document.addEventListener('pointermove', (event) => {
     if (drag) later(() => { if (drag) setDate(dateAt(event.clientX)); });
   });
-  for (const type of ['pointerup', 'pointercancel']) document.addEventListener(type, () => { drag = null; });
+  // A quick flick can end before the queued frame runs: land on the release point, then stop.
+  document.addEventListener('pointerup', (event) => {
+    if (!drag) return;
+    cancelAnimationFrame(frame);
+    setDate(dateAt(event.clientX));
+    drag = null;
+  });
+  document.addEventListener('pointercancel', () => { drag = null; });
 
   document.addEventListener('input', (event) => {
     const target = event.target;
