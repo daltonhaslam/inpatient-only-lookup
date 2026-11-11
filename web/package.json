@@ -1,0 +1,23 @@
+{
+  "name": "inpatient-only-lookup-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test test/ && node e2e/smoke.mjs",
+    "unit": "node --test test/",
+    "serve": "node e2e/serve.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@fontsource-variable/archivo": "5.2.8",
+    "@fontsource-variable/besley": "5.2.8",
+    "esbuild": "0.28.2"
+  },
+  "devDependencies": {
+    "playwright": "1.64.0",
+    "axe-core": "4.10.2"
+  }
+}

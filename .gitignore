@@ -1,9 +1,10 @@
 # Raw CMS and Federal Register downloads carry AMA CPT descriptors; never commit them.
 data/raw/
+# The built site: Vercel builds it from web/ on every push.
+docs/
 __pycache__/
 *.pyc
 .DS_Store
 node_modules/
 .project-status
 web/e2e/screenshots/
-dist/
