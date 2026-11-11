@@ -116,6 +116,7 @@ button.quiet:hover { background: var(--panel); color: var(--ink); border-color: 
 .results:empty { margin: 0; }
 .results__count, .results__none { color: var(--ink-2); margin-bottom: 0.6rem; max-width: var(--measure); }
 .note { color: var(--ink-2); font-size: 0.95rem; max-width: var(--measure); margin-top: 0.9rem; }
+.note--sched { color: var(--ink); padding: 0.55rem 0.8rem; border-left: 4px solid var(--ex); background: var(--panel); }
 
 .dos { display: flex; gap: 0.75rem; align-items: stretch; margin: 1.25rem 0 1.5rem; }
 .dos .field { width: 15rem; max-width: 100%; }

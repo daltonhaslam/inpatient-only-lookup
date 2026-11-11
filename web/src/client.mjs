@@ -4,7 +4,7 @@ import {
   isDate, formatDate, todayISO, clampDate, dayNumber, fromDayNumber, normalizeCode, isCode, periodIndex,
   stateAt, lookup, expandOther, countsAt, exemptCodes, buildIndex, search, extractCodes, num, csv,
 } from './engine.mjs';
-import { esc, chip, CHIP, verdict, verdictParts, eventList, codeRow, answer, axis, pct } from './views.mjs';
+import { esc, chip, CHIP, verdict, verdictParts, eventList, codeRow, answer, axis, pct, scheduledNote } from './views.mjs';
 
 // Vercel Web Analytics: never send what someone searched for or which date they chose.
 window.va = window.va || function va() { (window.vaq = window.vaq || []).push(arguments); };
@@ -14,10 +14,12 @@ const $ = (selector, rootNode = document) => rootNode.querySelector(selector);
 const $$ = (selector, rootNode = document) => [...rootNode.querySelectorAll(selector)];
 const params = () => new URLSearchParams(window.location.search);
 
+const BULK_LIMIT = 500;
+
 const state = {
-  data: null, other: null, otherLoading: null, index: null,
+  data: null, other: null, otherLoading: null, otherFailed: false, index: null,
   date: null, today: null, period: null,   // period: index of the Addendum B in force on `date`
-  query: '', bulk: [],
+  query: '', bulk: [], bulkDropped: 0,
   cells: [],         // the whole-list squares, resolved once: {node, record, state}
   counts: new Map(), // period index -> countsAt()
 };
@@ -29,13 +31,19 @@ function remember(date) {
   } catch { /* private mode: the URL still carries it */ }
 }
 
-function startingDate(data) {
-  const usable = (date) => isDate(date) && clampDate(data, date) === date;
-  const fromUrl = params().get('dos');
-  if (usable(fromUrl)) return fromUrl;
+const usable = (date) => isDate(date) && clampDate(state.data, date) === date;
+
+/** The date this tab last chose, or today. */
+function rememberedDate() {
   let kept = null;
   try { kept = window.sessionStorage.getItem('dos'); } catch { /* none */ }
   return usable(kept) ? kept : state.today;
+}
+
+/** A date in the link wins; otherwise the date this tab last chose; otherwise today. */
+function startingDate() {
+  const fromUrl = params().get('dos');
+  return usable(fromUrl) ? fromUrl : rememberedDate();
 }
 
 function writeUrl() {
@@ -45,15 +53,26 @@ function writeUrl() {
     if (state.query) next.set('q', state.query); else next.delete('q');
   }
   const text = next.toString();
-  window.history.replaceState(null, '', `${window.location.pathname}${text ? `?${text}` : ''}${window.location.hash}`);
+  try {
+    window.history.replaceState(null, '', `${window.location.pathname}${text ? `?${text}` : ''}${window.location.hash}`);
+  } catch { /* Safari refuses more than 100 of these in 30 seconds; the next one will catch up */ }
+}
+
+// Keep the address bar and the remembered date in step with the page, but not on every frame
+// of a drag: browsers throttle history writes.
+let persistTimer = 0;
+function persist(now = false) {
+  clearTimeout(persistTimer);
+  const write = () => { remember(state.date); writeUrl(); };
+  if (now) write(); else persistTimer = setTimeout(write, 250);
 }
 
 function loadOther() {
   if (!state.otherLoading) {
     state.otherLoading = fetch(document.body.dataset.other)
       .then((response) => { if (!response.ok) throw new Error(String(response.status)); return response.json(); })
-      .then((packed) => { state.other = expandOther(packed); })
-      .catch(() => { state.otherLoading = null; });
+      .then((packed) => { state.other = expandOther(packed); state.otherFailed = false; })
+      .catch(() => { state.otherLoading = null; state.otherFailed = true; });
   }
   return state.otherLoading;
 }
@@ -83,6 +102,12 @@ function drawControls() {
     $('[data-mark-date]', mark).textContent = formatDate(date, 'short');
   }
   for (const link of $$('[data-more]')) link.href = link.pathname + (date === state.today ? '' : `?dos=${date}`);
+  const period = state.data.periods[periodIndex(state.data, date)];
+  const scheduled = period && period.basis === 'f';
+  for (const note of $$('[data-scheduled]')) {
+    note.hidden = !scheduled;
+    if (scheduled) setHtml(note, scheduledNote(period));
+  }
 }
 
 function drawVerdicts() {
@@ -91,11 +116,16 @@ function drawVerdicts() {
     const code = host.dataset.verdictHost;
     const options = { title: host.dataset.title || 'h2', heading: host.dataset.heading || 'h3', link: host.dataset.link === '1' };
     const body = $('[data-verdict-body]', host);
+    if (!data.codes[code] && !other && state.otherFailed) {
+      setHtml(host, `<p class="results__none">Couldn’t load the list of codes that were never inpatient only, so ${esc(code)} can’t be checked right now. Check your connection and try again.</p>`);
+      continue;
+    }
     const parts = verdictParts(data, code, date, today, other, options);
     // Rebuild the whole panel when there is none yet, or when its timeline appears or disappears
     // (a code that turns out to have no history); otherwise swap only the answer.
     if (!body || Boolean(parts.timeline) !== Boolean($('.tl', host))) {
       host.innerHTML = verdict(data, code, date, today, other, options);
+      delete host.dataset.html;
     } else {
       setHtml(body, parts.body);
       body.parentNode.className = `verdict verdict--${parts.state}`;
@@ -147,7 +177,9 @@ function drawResults() {
   const query = state.query.trim();
   document.documentElement.classList.toggle('asked', Boolean(query));
   if (!query) { host.innerHTML = ''; return; }
-  const code = normalizeCode(query);
+  // "27447", "CPT 27447", "27447-RT" and "hip replacement 27130" all mean one code.
+  const named = extractCodes(query);
+  const code = named.length === 1 ? named[0] : normalizeCode(query);
   if (isCode(code)) {
     if (!data.codes[code] && !state.other) loadOther().then(drawVerdicts);
     host.innerHTML = `<div data-verdict-host="${esc(code)}" data-link="1"></div>`;
@@ -180,6 +212,7 @@ function bulkRows() {
       status: result.kind === 'unknown' ? 'No record of this code' : CHIP[reply.state],
       removed: result.removed ? formatDate(result.removed, 'short') : '',
       exemption: exemption ? { active: 'Exempt', ended: 'Ended', none: 'None' }[exemption.status] : '',
+      basis: result.period && result.period.basis === 'f' ? 'scheduled (final rule)' : 'CMS Addendum B',
     };
   });
 }
@@ -187,18 +220,29 @@ function bulkRows() {
 function drawBulk() {
   const host = $('[data-bulk-out]');
   if (!host || !state.bulk.length) return;
-  if (!state.other) { host.innerHTML = '<p>Checking…</p>'; return; }
+  if (!state.other) {
+    setHtml(host, state.otherFailed
+      ? '<p class="results__none">Couldn’t load the list of codes that were never inpatient only. Check your connection and try again.</p>'
+      : '<p>Checking…</p>');
+    return;
+  }
   const rows = bulkRows();
   const body = rows.map((row) => `<tr><th scope="row">${row.listed ? `<a href="/code/${esc(row.code)}/">${esc(row.code)}</a>` : esc(row.code)}</th><td>${esc(row.label)}</td><td>${row.unknown ? esc(row.status) : chip(row.state)}</td><td>${esc(row.removed)}</td><td>${esc(row.exemption)}</td></tr>`).join('');
-  const on = rows.filter((row) => row.state === 'ipo').length;
-  setHtml(host, `<p class="results__count">${rows.length} ${rows.length === 1 ? 'code' : 'codes'} on ${formatDate(state.date)}: ${on} inpatient only, ${rows.length - on} not.</p>
+  const tally = (state) => rows.filter((row) => row.state === state).length;
+  const missing = tally('gone');
+  const period = state.data.periods[state.period];
+  const notes = [
+    state.bulkDropped ? `Only the first ${rows.length} codes were checked; ${state.bulkDropped} more were left out.` : '',
+    period && period.basis === 'f' ? scheduledNote(period) : '',
+  ].filter(Boolean).map((text) => `<p class="note note--sched">${text}</p>`).join('');
+  setHtml(host, `<p class="results__count">${rows.length} ${rows.length === 1 ? 'code' : 'codes'} on ${formatDate(state.date)}: ${tally('ipo')} inpatient only, ${tally('off')} not${missing ? `, ${missing} not in CMS’s files on that date or not found` : ''}.</p>${notes}
 <div class="scroll"><table class="check"><thead><tr><th scope="col">Code</th><th scope="col">Procedure</th><th scope="col">Status</th><th scope="col">Left the list</th><th scope="col">Review exemption</th></tr></thead><tbody>${body}</tbody></table></div>
 <p><button type="button" class="quiet" data-bulk-csv>Download as CSV</button></p>`);
 }
 
 function downloadBulk() {
-  const rows = [['code', 'procedure', 'date_of_service', 'status', 'left_the_list', 'review_exemption']]
-    .concat(bulkRows().map((row) => [row.code, row.label, state.date, row.status, row.removed, row.exemption]));
+  const rows = [['code', 'procedure', 'date_of_service', 'status', 'left_the_list', 'review_exemption', 'source']]
+    .concat(bulkRows().map((row) => [row.code, row.label, state.date, row.status, row.removed, row.exemption, row.basis]));
   const link = document.createElement('a');
   link.href = URL.createObjectURL(new Blob([csv(rows)], { type: 'text/csv' }));
   link.download = `inpatient-only-${state.date}.csv`;
@@ -224,8 +268,7 @@ function setDate(date) {
   const next = clampDate(state.data, date);
   if (next === state.date) return;
   state.date = next;
-  remember(next);
-  writeUrl();
+  persist();
   drawDate();
 }
 
@@ -240,21 +283,34 @@ function wire() {
   document.addEventListener('pointerdown', (event) => {
     const track = event.target.closest?.('[data-track]');
     if (!track || event.button > 0) return;
-    event.preventDefault();
     const box = track.getBoundingClientRect();
-    drag = { left: box.left, width: box.width };
-    setDate(dateAt(event.clientX));
+    // A finger may be starting a scroll, so a touch only takes hold once it moves sideways
+    // (or lifts without moving: a tap). A mouse or pen takes hold at once.
+    drag = { left: box.left, width: box.width, x: event.clientX, y: event.clientY, held: event.pointerType !== 'touch' };
+    if (drag.held) {
+      event.preventDefault();
+      setDate(dateAt(event.clientX));
+    }
   });
   document.addEventListener('pointermove', (event) => {
-    if (drag) later(() => { if (drag) setDate(dateAt(event.clientX)); });
+    if (!drag) return;
+    if (!drag.held) {
+      const dx = Math.abs(event.clientX - drag.x);
+      if (dx < 6 || dx < Math.abs(event.clientY - drag.y)) return;
+      drag.held = true;
+    }
+    later(() => { if (drag) setDate(dateAt(event.clientX)); });
   });
   // A quick flick can end before the queued frame runs: land on the release point, then stop.
   document.addEventListener('pointerup', (event) => {
     if (!drag) return;
     cancelAnimationFrame(frame);
-    setDate(dateAt(event.clientX));
+    const tap = Math.abs(event.clientX - drag.x) < 6 && Math.abs(event.clientY - drag.y) < 6;
+    if (drag.held || tap) setDate(dateAt(event.clientX));
     drag = null;
+    persist(true);
   });
+  // The browser took the gesture for scrolling: leave the date alone.
   document.addEventListener('pointercancel', () => { drag = null; });
 
   document.addEventListener('input', (event) => {
@@ -266,9 +322,21 @@ function wire() {
       later(() => { drawResults(); drawLists(); });
     }
   });
+  // A date field reports each keystroke of the year as a complete date (0002, 0020, 0202...).
+  // Act only on a date the site answers for; on leaving the field, show the date in force.
   document.addEventListener('change', (event) => {
     const target = event.target;
-    if (target.matches('[data-dos]') && isDate(target.value)) setDate(target.value);
+    if (target.matches('[data-dos]') && usable(target.value)) setDate(target.value);
+  });
+  document.addEventListener('focusout', (event) => {
+    const target = event.target;
+    if (!target.matches?.('[data-dos]') || target.value === state.date) return;
+    if (isDate(target.value)) setDate(target.value);   // out of range: go to the nearest date answered
+    target.value = state.date;
+  });
+  // A page restored from the back/forward cache may be showing an older date than the tab's.
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) setDate(rememberedDate());
   });
   document.addEventListener('submit', (event) => {
     const form = event.target;
@@ -276,10 +344,13 @@ function wire() {
       event.preventDefault();
       const input = $('[data-dos]', form);
       if (input && isDate(input.value)) setDate(input.value);
+      if (input) input.value = state.date;
       $('[data-results] a')?.focus();
     } else if (form.matches('[data-bulk]')) {
       event.preventDefault();
-      state.bulk = extractCodes($('[data-bulk-input]', form).value).slice(0, 500);
+      const pasted = extractCodes($('[data-bulk-input]', form).value);
+      state.bulk = pasted.slice(0, BULK_LIMIT);
+      state.bulkDropped = pasted.length - state.bulk.length;
       if (!state.bulk.length) {
         setHtml($('[data-bulk-out]'), '<p class="results__none">No five-character codes found in that text.</p>');
         return;
@@ -320,17 +391,17 @@ async function start() {
   const data = await response.json();
   state.data = data;
   state.today = clampDate(data, todayISO());
-  state.date = startingDate(data);
+  state.date = startingDate();
   state.cells = $$('[data-cell]').map((node) => ({ node, record: data.codes[node.dataset.cell], state: null }));
   const box = $('[data-q]');
   if (box) {
     state.query = params().get('q') || box.value || '';
     box.value = state.query;
   }
-  remember(state.date);
   wire();
   drawResults();
   drawDate();
+  persist(true);
   document.documentElement.classList.add('live');
 }
 

@@ -187,7 +187,7 @@ function context(buildDate) {
   const returnedOn = Object.fromEntries(ledger.map((entry) => [`${entry.year}-01-01`, new Set()]));
   for (const code of codes) {
     for (const event of eventsOf(data, data.codes[code])) {
-      if (event.type === 'returned') returnedOn[event.date].add(code);
+      if (event.type === 'returned') (returnedOn[event.date] ||= new Set()).add(code);
     }
   }
   const phases = ledger.filter((entry) => entry.year >= PHASE_OUT_FROM).map((entry) => {

@@ -1,7 +1,7 @@
 // Page templates. Build-time only: everything here becomes static HTML in docs/.
 import { SITE, feedbackHref, CFR } from './site.mjs';
 import { formatDate, monthYear, lookup, countsAt, periodIndex, stateAt, dayNumber, num, scale } from './engine.mjs';
-import { esc, out, fr, cfr, verdict, eventList, codeRow, axis, axisYears, pct } from './views.mjs';
+import { esc, out, fr, cfr, verdict, eventList, codeRow, axis, axisYears, pct, scheduledNote } from './views.mjs';
 
 const NAV = [
   ['/', 'Lookup'],
@@ -63,11 +63,19 @@ ${body}
 `;
 }
 
+/** Shown while the chosen date is answered from a final rule and not yet from a quarterly file. */
+function scheduledBanner(data, date) {
+  const period = data.periods[periodIndex(data, date)];
+  const on = period && period.basis === 'f';
+  return `<p class="note note--sched" data-scheduled${on ? '' : ' hidden'}>${on ? scheduledNote(period) : ''}</p>`;
+}
+
 /** The date-of-service control. The browser keeps it in step with the URL and other pages. */
 export const dateControl = (data, date) => `<form class="dos" data-dos-form>
 <label class="field field--dos"><span>Date of service</span><input type="date" name="dos" data-dos min="${data.dosMin}" max="${data.dosMax}" value="${date}" required></label>
 <button type="button" class="quiet" data-today hidden>Today</button>
-</form>`;
+</form>
+${scheduledBanner(data, date)}`;
 
 // ---- home ---------------------------------------------------------------------------------
 
@@ -123,6 +131,7 @@ export function home(ctx) {
 <label class="field field--dos"><span>Date of service</span><input type="date" name="dos" data-dos min="${data.dosMin}" max="${data.dosMax}" value="${date}" required></label>
 <button type="button" class="quiet" data-today hidden>Today</button>
 </form>
+${scheduledBanner(data, date)}
 <p class="ask__try">Try <a href="/?q=27447">27447</a>, <a href="/?q=hip+replacement">hip replacement</a>, <a href="/?q=lumbar+fusion">lumbar fusion</a>, <a href="/?q=hysterectomy">hysterectomy</a> or <a href="/?q=CABG">CABG</a>. Have a list? <a href="#several-h">Check several codes at once</a>.</p>
 <noscript><p class="note">Search needs JavaScript. Without it, every code still has its own page: start from a body system below.</p></noscript>
 <div class="results" data-results aria-live="polite"></div>
@@ -267,7 +276,9 @@ export function history(ctx) {
     const change = y.january;
     const returned = change.added.filter((code) => ctx.returnedOn[`${y.year}-01-01`].has(code));
     const added = change.added.filter((code) => !ctx.returnedOn[`${y.year}-01-01`].has(code));
-    const mid = y.midyear.flatMap((m) => [...m.new, ...m.added]);
+    const during = (kinds) => y.midyear.flatMap((m) => kinds.flatMap((kind) => m[kind]));
+    const mid = during(['new', 'added']);
+    const midOff = during(['removed', 'retired']);
     const facts = [
       ['On the list January 1', num(y.start)],
       ['Removed', num(change.removed.length)],
@@ -275,6 +286,7 @@ export function history(ctx) {
       ['New or added codes', num(change.new.length + added.length)],
       ['Codes retired', num(change.retired.length)],
       ['Added during the year', num(mid.length)],
+      ...(midOff.length ? [['Removed or retired during the year', num(midOff.length)]] : []),
     ].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
     const rule = data.rules[y.year];
     const file = String(y.year) === ctx.scheduled ? ' Scheduled: from the final rule, until CMS posts the January file.' : '';
@@ -282,7 +294,7 @@ export function history(ctx) {
 <h2 id="yh${y.year}">${y.year}</h2>
 <p>${YEAR_NOTES[y.year]()}${file}</p>
 <dl class="ledger">${facts}</dl>
-${codeList(data, 'Removed', change.removed)}${codeList(data, 'Returned to the list', returned)}${codeList(data, 'New or added', [...change.new, ...added])}${codeList(data, 'Retired while on the list', change.retired)}${codeList(data, 'Added during the year', mid)}
+${codeList(data, 'Removed', change.removed)}${codeList(data, 'Returned to the list', returned)}${codeList(data, 'New or added', [...change.new, ...added])}${codeList(data, 'Retired while on the list', change.retired)}${codeList(data, 'Added during the year', mid)}${codeList(data, 'Removed or retired during the year', midOff)}
 <p class="year__src">${esc(rule.name)} (${esc(ctx.ruleIds[y.year])}), ${fr(rule.fr)}${y.year < 2020 ? '. Before 2020 this site has one file a year, so mid-year changes are not shown.' : '.'}</p>
 </section>`;
   }).join('\n');

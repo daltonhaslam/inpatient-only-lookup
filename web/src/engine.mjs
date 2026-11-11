@@ -206,7 +206,5 @@ export function search(index, query, limit = 60) {
 
 /** Pull every distinct five-character code out of free text (a pasted list, a spreadsheet column). */
 export function extractCodes(text) {
-  const seen = new Set();
-  for (const match of String(text || '').toUpperCase().matchAll(/(?<![0-9A-Z])[0-9A-Z]\d{3}[0-9A-Z](?![0-9A-Z])/g)) seen.add(match[0]);
-  return [...seen];
+  return [...new Set(String(text || '').toUpperCase().split(/[^0-9A-Z]+/).filter(isCode))];
 }

@@ -91,7 +91,8 @@ await check('home: typing a code, changing the date, searching by name, opening 
 
   await setDate(page, '2021-03-03');
   eq(await waitText(answer(page), (t) => t.includes('March 3, 2021'), 'answer after date change'), 'Not inpatient only on March 3, 2021.', 'answer');
-  has(page.url(), 'dos=2021-03-03', 'URL');
+  // The address bar follows a moment later (history writes are debounced).
+  await page.waitForURL(/dos=2021-03-03/, { timeout: 3000 });
 
   await page.fill('[data-q]', 'hip replacement');
   const row = page.locator('[data-results] [data-row="27130"]');
@@ -103,6 +104,72 @@ await check('home: typing a code, changing the date, searching by name, opening 
   await page.waitForSelector('html.live');
   await page.waitForFunction(() => document.querySelector('[data-dos]').value === '2021-03-03');
   eq(await page.inputValue('[data-dos]'), '2021-03-03', 'date input on the code page');
+});
+
+await check('home: a code inside a longer query is still a code lookup', async (page) => {
+  await open(page, '/');
+  for (const query of ['CPT 27447', '27447-RT', 'knee 27447', ' 27447 ']) {
+    await page.fill('[data-q]', query);
+    await waitText(page.locator('[data-results] .verdict__code'), (t) => t === '27447', `code shown for ${JSON.stringify(query)}`);
+  }
+});
+
+await check('date field: typing a year digit by digit does not jump; an out-of-range date snaps on leaving', async (page) => {
+  await open(page, '/code/27447/');
+  const input = page.locator('[data-dos]').first();
+  const shown = () => page.locator('.verdict__answer').first().textContent();
+  const before = await shown();
+  // What Chrome reports while "2021" is typed into the year: 0002, 0020, 0202, then 2021.
+  for (const partial of ['0002-03-03', '0020-03-03', '0202-03-03']) {
+    await input.fill(partial);
+    await input.dispatchEvent('change');
+    eq(await input.inputValue(), partial, 'field left alone while typing');
+    eq(await shown(), before, 'answer unchanged while typing');
+  }
+  await input.fill('2021-03-03');
+  await input.dispatchEvent('change');
+  await waitText(page.locator('.verdict__answer').first(), (t) => t.includes('March 3, 2021'), 'answer after a full date');
+  await input.fill('2031-05-05');
+  await input.dispatchEvent('change');
+  await input.blur();
+  eq(await input.inputValue(), '2027-12-31', 'out-of-range date snaps to the last date answered');
+});
+
+await check('a date carried from another page is written into the address bar', async (page) => {
+  await open(page, '/?dos=2021-03-03');
+  await page.waitForURL(/dos=2021-03-03/);
+  await open(page, '/code/27130/');
+  await page.waitForURL(/\/code\/27130\/\?dos=2021-03-03/, { timeout: 3000 });
+  await waitText(page.locator('.verdict__answer').first(), (t) => t.includes('March 3, 2021'), 'answer on the carried date');
+});
+
+await check('touch: a vertical swipe over the timeline scrolls and leaves the date alone; a tap sets it', async (page) => {
+  await open(page, '/code/27132/?dos=2026-02-01');
+  const track = page.locator('[data-track]').first();
+  await track.scrollIntoViewIfNeeded();
+  const box = await track.boundingBox();
+  const x = box.x + box.width * 0.45;
+  const y = box.y + box.height / 2;
+  const fire = (type, cx, cy) => page.evaluate(([t, px, py]) => {
+    document.querySelector('[data-track]').dispatchEvent(new PointerEvent(t, { bubbles: true, cancelable: true, pointerType: 'touch', clientX: px, clientY: py, button: 0 }));
+  }, [type, cx, cy]);
+  await fire('pointerdown', x, y);
+  await fire('pointermove', x + 2, y + 30);
+  await fire('pointercancel', x + 2, y + 60);
+  eq(await page.locator('[data-dos]').first().inputValue(), '2026-02-01', 'date after a vertical swipe');
+  await fire('pointerdown', x, y);
+  await fire('pointerup', x, y);
+  await waitText(page.locator('.verdict__answer').first(), (t) => t.includes('2022'), 'answer after a tap in 2022');
+});
+
+await check('scheduled dates are marked on every view', async (page) => {
+  await open(page, '/?q=99213&dos=2027-02-01');
+  await waitText(page.locator('[data-results] .verdict__note').first(), (t) => t.startsWith('Scheduled'), 'scheduled note on a never-listed code');
+  await page.fill('[data-q]', 'hip replacement');
+  await page.locator('[data-results] [data-row="27130"]').waitFor();
+  assert(await page.locator('[data-scheduled]').first().isVisible(), 'scheduled banner is not visible in 2027');
+  await setDate(page, '2026-06-01');
+  await page.waitForFunction(() => document.querySelector('[data-scheduled]').hidden);
 });
 
 await check('home: Today button resets the date, then hides', async (page) => {

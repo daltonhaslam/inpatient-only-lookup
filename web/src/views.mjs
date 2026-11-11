@@ -167,6 +167,9 @@ function identity(title, code, label, where) {
   return `<header class="verdict__id"><${title} class="verdict__title">${text}</${title}>${where}</header>`;
 }
 
+/** The caution shown for dates answered from a final rule before CMS posts that January's file. */
+export const scheduledNote = (period) => `Scheduled. This comes from the ${esc(period.label)}; CMS’s January file will confirm it.`;
+
 /**
  * Everything about one code on one date, in two parts so the browser can redraw the answer
  * without rebuilding the timeline under the reader's finger:
@@ -179,8 +182,8 @@ export function verdictParts(data, code, date, today, other = null, { title = 'h
   const result = lookup(data, code, date, other);
   if (result.kind === 'pending') return { state: 'gone', body: `<p class="verdict__wait">Checking ${esc(code)}…</p>`, timeline: '' };
   const reply = answer(data, result, today);
-  const scheduled = result.period && result.period.basis === 'f'
-    ? `<p class="verdict__note">Scheduled. This comes from the ${esc(result.period.label)}; CMS’s January file will confirm it.</p>` : '';
+  const scheduled = result.period && result.period.basis === 'f' && result.kind !== 'unknown'
+    ? `<p class="verdict__note">${scheduledNote(result.period)}</p>` : '';
   if (result.kind !== 'listed') {
     const file = result.kind === 'other' && result.state === 'off' ? ` It is in the ${fileLink(result.period)}; see that file for its status indicator.` : '';
     return {
@@ -189,7 +192,7 @@ export function verdictParts(data, code, date, today, other = null, { title = 'h
       body: `${identity(title, code, '<span class="verdict__none">No description: this site describes only codes that have been on the list.</span>', '')}
 <${heading} class="verdict__answer">${reply.head}</${heading}>
 <p class="verdict__lead">${reply.lead}${file}</p>
-<p class="verdict__note">Off the inpatient-only list is not the same as payable. Other status indicators also mean Medicare does not pay a code on an outpatient claim.</p>`,
+${scheduled}<p class="verdict__note">Off the inpatient-only list is not the same as payable. Other status indicators also mean Medicare does not pay a code on an outpatient claim.</p>`,
     };
   }
   const record = result.record;
