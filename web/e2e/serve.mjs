@@ -10,7 +10,13 @@ const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 
 
 export function serve(port = 0) {
   const server = createServer(async (request, response) => {
-    const path = normalize(decodeURIComponent(new URL(request.url, 'http://x').pathname));
+    let path = '';
+    try {
+      path = normalize(decodeURIComponent(new URL(request.url, 'http://x').pathname));
+    } catch {
+      response.writeHead(400).end();
+      return;
+    }
     let file = join(root, path);
     if (!file.startsWith(root)) { response.writeHead(400).end(); return; }
     try {

@@ -50,8 +50,14 @@ export function periodIndex(data, iso) {
 export const stateOf = (si) => (si === 'C' ? 'ipo' : si === '' || si === 'D' ? 'gone' : 'off');
 export const num = (n) => n.toLocaleString('en-US');
 
-/** Rows of strings as CSV text. */
-export const csv = (rows) => `${rows.map((row) => row.map((value) => (/[",\r\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value)).join(',')).join('\n')}\n`;
+/** Rows of strings as CSV text. A cell a spreadsheet would run as a formula gets a leading apostrophe. */
+export function csv(rows) {
+  const cell = (value) => {
+    const text = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+    return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  };
+  return `${rows.map((row) => row.map(cell).join(',')).join('\n')}\n`;
+}
 
 /** A linear scale between two dates: share(iso) is 0..1 (clamped); at(share) is the date at a share. */
 export function scale(from, to) {

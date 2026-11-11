@@ -121,6 +121,11 @@ class Labels(unittest.TestCase):
             self.assertLessEqual(len(item["keywords"]), 6, code)
             self.assertFalse(re.search(r"[<>]", label + " ".join(item["keywords"]) + item["family"]), code)
 
+    def test_group_ids_are_plain_slugs(self):
+        # They become URLs and folder names in the site build.
+        for group in load(ROOT / "data" / "groups.json"):
+            self.assertRegex(group["id"], r"^[a-z]+(-[a-z]+)*$")
+
     def test_every_group_is_used(self):
         self.assertEqual({item["group"] for item in self.labels.values()}, self.groups)
 
@@ -153,6 +158,11 @@ class Rules(unittest.TestCase):
     def test_exemption_end_dates_are_iso_dates(self):
         for code, date in fetch.load_rules()["exemption_ends"].items():
             self.assertRegex(date, r"^\d{4}-\d\d-\d\d$", code)
+
+    def test_every_source_is_an_https_government_address(self):
+        for source in fetch.load_sources():
+            for key in ("url", "landing"):
+                self.assertRegex(source[key], r"^https://www\.(cms|govinfo)\.gov/", source["id"])
 
     def test_regimes_are_in_date_order(self):
         starts = [regime["removed_from"] for regime in fetch.load_rules()["exemption_regimes"]]
