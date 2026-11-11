@@ -1,0 +1,510 @@
+{
+ "note": "Every CMS file the site is built from. sha256 is pinned on first fetch; a later mismatch means CMS replaced the file.",
+ "sources": [
+  {
+   "id": "b-2020-01",
+   "kind": "addendum_b",
+   "effective": "2020-01-01",
+   "url": "https://www.cms.gov/files/zip/addendum-b-jan-2020.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "4298bbc8fba8e8ea157dc6a78f1a1ba73508618eded9a9d7302955c0ba813f04"
+  },
+  {
+   "id": "b-2020-01-corr",
+   "kind": "addendum_b",
+   "effective": "2020-01-01",
+   "corrects": "b-2020-01",
+   "url": "https://www.cms.gov/files/zip/addendum-b-jan-2020-correction.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "9ecd1665e0db975edc0a8732987ea5d176417afc88d5a884f57ee246c8a6d1ba"
+  },
+  {
+   "id": "b-2020-04",
+   "kind": "addendum_b",
+   "effective": "2020-04-01",
+   "url": "https://www.cms.gov/files/zip/addendum-b-april-2020.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "8350fde3d112aa99f1f2abe81dcdede7a7c81208ea1bb83498d620dac3f74ba2"
+  },
+  {
+   "id": "b-2020-04-corr",
+   "kind": "addendum_b",
+   "effective": "2020-04-01",
+   "corrects": "b-2020-04",
+   "url": "https://www.cms.gov/files/zip/april-2020-correction.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "c337bc086e144958384649af6fdddc57cc8aa2372bb7477a6ddbff858dae99b4"
+  },
+  {
+   "id": "b-2020-07",
+   "kind": "addendum_b",
+   "effective": "2020-07-01",
+   "url": "https://www.cms.gov/files/zip/opps-july-2020-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "39b2fe39a4e3732c2a69a0ca82f73198132786635a3ad00ea7b0de1ba8b2c8f0"
+  },
+  {
+   "id": "b-2020-07-corr",
+   "kind": "addendum_b",
+   "effective": "2020-07-01",
+   "corrects": "b-2020-07",
+   "url": "https://www.cms.gov/files/zip/fy-july-2020-addendum-b-correction.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "75fec616a8fd9bc631ca45b85ce3e8f5d60547874981eb5e89ae9b5de3ff505c"
+  },
+  {
+   "id": "b-2020-10",
+   "kind": "addendum_b",
+   "effective": "2020-10-01",
+   "url": "https://www.cms.gov/files/zip/addendum-b-oct-2020.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "6fb4e78ce7d9713366e005809c88e903b484058ab57df3d948afcf03779758d6"
+  },
+  {
+   "id": "b-2020-10-corr",
+   "kind": "addendum_b",
+   "effective": "2020-10-01",
+   "corrects": "b-2020-10",
+   "url": "https://www.cms.gov/files/zip/october-2020-correction-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "841c7f59267de031112bf52f581b3d667fa2e2f33a1dcee5e8e3e8c855e23686"
+  },
+  {
+   "id": "b-2021-01",
+   "kind": "addendum_b",
+   "effective": "2021-01-01",
+   "url": "https://www.cms.gov/files/zip/addendum-b-january-2021.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "8fdbb0a63776beed5b8a07e28f2d56a3b483b103bd5c71a7d0142e0fb232c2a3"
+  },
+  {
+   "id": "b-2021-01-corr",
+   "kind": "addendum_b",
+   "effective": "2021-01-01",
+   "corrects": "b-2021-01",
+   "url": "https://www.cms.gov/files/zip/addendum-b-correction.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "608dc3b3997b045971f2ad5666cf92f2e3195e45e75bfab7c416002ff43b34ea"
+  },
+  {
+   "id": "b-2021-04",
+   "kind": "addendum_b",
+   "effective": "2021-04-01",
+   "url": "https://www.cms.gov/files/zip/addendum-b-april-2021.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "092e1076ab6ca96f3aa20ee6631fa7ad385dd3a28c4afd2c62b5aa58675d0884"
+  },
+  {
+   "id": "b-2021-07",
+   "kind": "addendum_b",
+   "effective": "2021-07-01",
+   "url": "https://www.cms.gov/files/zip/addendum-b-july-2021.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "ec76ef6073bb37379ad7ce53fd635a8ce342bfaa40274e5f226291456e9d4bc8"
+  },
+  {
+   "id": "b-2021-10",
+   "kind": "addendum_b",
+   "effective": "2021-10-01",
+   "url": "https://www.cms.gov/files/zip/october-2021-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "fca971cbf5b4368ce293bb5104fe4dd85872cc3b0375b1bec58642addf8fa636"
+  },
+  {
+   "id": "b-2021-10-corr",
+   "kind": "addendum_b",
+   "effective": "2021-10-01",
+   "corrects": "b-2021-10",
+   "url": "https://www.cms.gov/files/zip/october-2021-addendum-b-correction.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "4f44113a20fec10b79f7dd84425b15dc45642aa55ece3e6160ac6161a1e1ddbf"
+  },
+  {
+   "id": "b-2022-01",
+   "kind": "addendum_b",
+   "effective": "2022-01-01",
+   "url": "https://www.cms.gov/files/zip/january-2022-opps-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "9f6f3a2c89907d95aaaf13015a298b080f09a40c73f8025a647c4c45e471a79b"
+  },
+  {
+   "id": "b-2022-04",
+   "kind": "addendum_b",
+   "effective": "2022-04-01",
+   "url": "https://www.cms.gov/files/zip/2022-april-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "9fcfaf7e5562da45c6125766c0cdbf2d07a18616bb24428d0363c1f34f0fbde8"
+  },
+  {
+   "id": "b-2022-07",
+   "kind": "addendum_b",
+   "effective": "2022-07-01",
+   "url": "https://www.cms.gov/files/zip/addendum-b-july-2022.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "8c52cfacad4cd572f86b7b63fe67746ee652279d5163498b98cb39ca3d05033a"
+  },
+  {
+   "id": "b-2022-10",
+   "kind": "addendum_b",
+   "effective": "2022-10-01",
+   "url": "https://www.cms.gov/files/zip/addendum-b-october-2022-updated-11142022.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "20e59cc64fc473d8267bf5e819adc12873d0c41f0d71376c106fa0d432c48d00"
+  },
+  {
+   "id": "b-2023-01",
+   "kind": "addendum_b",
+   "effective": "2023-01-01",
+   "url": "https://www.cms.gov/files/zip/january-2023-opps-addendum-b-updated-01/20/2023.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "80a743084cdea03e7af59f793a86a9e18e0173c9c9b3f02a1756d833cdd1d8c6"
+  },
+  {
+   "id": "b-2023-04",
+   "kind": "addendum_b",
+   "effective": "2023-04-01",
+   "url": "https://www.cms.gov/files/zip/april-2023-opps-addendum-b-updated.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "aa038c2209182db0befd4b115acc5453c909bb6c537ed58dc45cda7a939b975c"
+  },
+  {
+   "id": "b-2023-07",
+   "kind": "addendum_b",
+   "effective": "2023-07-01",
+   "url": "https://www.cms.gov/files/zip/july-2023-opps-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "38adde21fb514ed2e3955b0d4ccd44152b38461f86dcfafeb339ada75d3a1a10"
+  },
+  {
+   "id": "b-2023-10",
+   "kind": "addendum_b",
+   "effective": "2023-10-01",
+   "url": "https://www.cms.gov/files/zip/october-2023-opps-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "f28337d8a1748b8358cbdf362544485ca0397d55bc89c8cecd560be9cb877d34"
+  },
+  {
+   "id": "b-2024-01",
+   "kind": "addendum_b",
+   "effective": "2024-01-01",
+   "url": "https://www.cms.gov/files/zip/january-2024-opps-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "696b652db25c06924e261d389920b86fb8253ec2b8b2dca7e5d53890a97a98fc"
+  },
+  {
+   "id": "b-2024-04",
+   "kind": "addendum_b",
+   "effective": "2024-04-01",
+   "url": "https://www.cms.gov/files/zip/april-2024-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "2020cabd843bddf0be88e10e3bed3657ba63b0b1d8d566f5fc2ab5fa2c4772f8"
+  },
+  {
+   "id": "b-2024-07",
+   "kind": "addendum_b",
+   "effective": "2024-07-01",
+   "url": "https://www.cms.gov/files/zip/july-2024-addendum-b-080524.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "6ae30b5c88b9538c993fd8f28a04fe72cd2ac82c7c2c1f5c35dc0e40142a756d"
+  },
+  {
+   "id": "b-2024-10",
+   "kind": "addendum_b",
+   "effective": "2024-10-01",
+   "url": "https://www.cms.gov/files/zip/october-2024-web-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "f7fd47eb848d92e3577e94c4ea2e4de36fbfac96ffdf779c2ab7b2a9a4b2a36e"
+  },
+  {
+   "id": "b-2025-01",
+   "kind": "addendum_b",
+   "effective": "2025-01-01",
+   "url": "https://www.cms.gov/files/zip/january-2025-opps-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "3aafe9ca13e816744c233e4cbc9053d8dd6953f52896ec0f2ddfd930dfa782fb"
+  },
+  {
+   "id": "b-2025-04",
+   "kind": "addendum_b",
+   "effective": "2025-04-01",
+   "url": "https://www.cms.gov/files/zip/april-2025-opps-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "d4b7549305ca020132c780fa25b41297270d6b462dae3ddfd57c28664fa7b373"
+  },
+  {
+   "id": "b-2025-07",
+   "kind": "addendum_b",
+   "effective": "2025-07-01",
+   "url": "https://www.cms.gov/files/zip/July-2025-opps-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "e1d819ef7ef14b9ab308bd6da7728ffb522ce856ca4bbcd852170592f3af1cc0"
+  },
+  {
+   "id": "b-2025-10",
+   "kind": "addendum_b",
+   "effective": "2025-10-01",
+   "url": "https://www.cms.gov/files/zip/october-2025-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "8ed16339bca1cde58caa1ab73630c2c5eddab7516fb9b633c138c8da0193c233"
+  },
+  {
+   "id": "b-2026-01",
+   "kind": "addendum_b",
+   "effective": "2026-01-01",
+   "url": "https://www.cms.gov/files/zip/january-2026-opps-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "cf05c09304085fa1863e2f2e5429e172830c6fa17101d23f512c53ced74044e0"
+  },
+  {
+   "id": "b-2026-04",
+   "kind": "addendum_b",
+   "effective": "2026-04-01",
+   "url": "https://www.cms.gov/files/zip/cy-2026-april-opps-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "127644907d9cc4026d7b8349400c7c3787290bffc28e40fecc96c32935b0b181"
+  },
+  {
+   "id": "b-2026-07",
+   "kind": "addendum_b",
+   "effective": "2026-07-01",
+   "url": "https://www.cms.gov/files/zip/july-2026-opps-addendum-b.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "85baa6b3be8c92a2009241f358f767bcc722bf81b219f4740bbb3306648ea9c9"
+  },
+  {
+   "id": "b-2026-10",
+   "kind": "addendum_b",
+   "effective": "2026-10-01",
+   "url": "https://www.cms.gov/files/zip/October-2026-OPPS-Addendum-B.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates",
+   "sha256": "2fc507a1fa6715eb2c702049a18912a33017003606550f61345ae1b48b00bf5b"
+  },
+  {
+   "id": "addenda-2017",
+   "kind": "rule_addenda",
+   "cy": 2017,
+   "rule": "CMS-1656-FC",
+   "url": "https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/HospitalOutpatientPPS/Downloads/CMS-1656-FC-2017-OPPS-FR-Addenda.zip",
+   "landing": "https://www.cms.gov/medicare/medicare-fee-for-service-payment/hospitaloutpatientpps/hospital-outpatient-regulations-and-notices-items/cms-1656-fc",
+   "sha256": "b9cf2db266fe6c67bfb1047e2dfe12b38403af77fcc0e9d98a9461222dfd6af1"
+  },
+  {
+   "id": "addenda-2018",
+   "kind": "rule_addenda",
+   "cy": 2018,
+   "rule": "CMS-1678-FC",
+   "url": "https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/HospitalOutpatientPPS/Downloads/CMS-1678-FC-2018-OPPS-FR-Addenda.zip",
+   "landing": "https://www.cms.gov/medicare/medicare-fee-for-service-payment/hospitaloutpatientpps/hospital-outpatient-regulations-and-notices-items/cms-1678-fc",
+   "sha256": "f81ae9cc21b44f43f2a9d8c639fec2428d6bdc83478d23f70dfb675e79d8e93a"
+  },
+  {
+   "id": "addenda-2019",
+   "kind": "rule_addenda",
+   "cy": 2019,
+   "rule": "CMS-1695-FC",
+   "url": "https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/HospitalOutpatientPPS/Downloads/CMS-1695-FC-2019-OPPS-FR-Addenda.zip",
+   "landing": "https://www.cms.gov/medicare/medicare-fee-for-service-payment/hospitaloutpatientpps/hospital-outpatient-regulations-and-notices-items/cms-1695-fc",
+   "sha256": "2ad03af521638f4c9961fc5089ef0f8c9841141cb4ff6aace3ed867ec3c7f717"
+  },
+  {
+   "id": "addenda-2020",
+   "kind": "rule_addenda",
+   "cy": 2020,
+   "rule": "CMS-1717-FC",
+   "url": "https://www.cms.gov/Medicare/Medicare-Fee-for-Service-Payment/HospitalOutpatientPPS/Downloads/CMS-1717-FC-2020-OPPS-Addenda.zip",
+   "landing": "https://www.cms.gov/medicare/medicare-fee-for-service-payment/hospitaloutpatientpps/hospital-outpatient-regulations-and-notices-items/cms-1717-fc",
+   "sha256": "114dafd6ded32100d168eef6482d277808d12745867ec08a7fb9da6f5bb36c63"
+  },
+  {
+   "id": "addenda-2021",
+   "kind": "rule_addenda",
+   "cy": 2021,
+   "rule": "CMS-1736-FC",
+   "url": "https://www.cms.gov/files/zip/2021-nfrm-opps-addenda.zip",
+   "landing": "https://www.cms.gov/medicaremedicare-fee-service-paymenthospitaloutpatientppshospital-outpatient-regulations-and-notices/cms-1736-fc",
+   "sha256": "9c1a7e5d23abb0910b43e3272cf15ee089368d06b24c29078121c22136a6c3ef"
+  },
+  {
+   "id": "addenda-2022",
+   "kind": "rule_addenda",
+   "cy": 2022,
+   "rule": "CMS-1753-FC",
+   "url": "https://www.cms.gov/files/zip/2022-nfrm-opps-addenda.zip",
+   "landing": "https://www.cms.gov/medicaremedicare-fee-service-paymenthospitaloutpatientpps/cms-1753-fc",
+   "sha256": "4b950e7ea0f87175fc2ba5408d37f493631398194301d8c37b5f4d455b0f192d"
+  },
+  {
+   "id": "addenda-2023",
+   "kind": "rule_addenda",
+   "cy": 2023,
+   "rule": "CMS-1772-FC",
+   "url": "https://www.cms.gov/files/zip/2023-nfrm-opps-addenda.zip",
+   "landing": "https://www.cms.gov/medicaremedicare-fee-service-paymenthospitaloutpatientppshospital-outpatient-regulations-and-notices/cms-1772-fc",
+   "sha256": "bb433c3f17a1ffd6deb7ee2d1b61be5991d8638857b675a9739e8a130f1fb1b8"
+  },
+  {
+   "id": "addenda-2024",
+   "kind": "rule_addenda",
+   "cy": 2024,
+   "rule": "CMS-1786-FC",
+   "url": "https://www.cms.gov/files/zip/2024-nfrm-opps-addenda.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/regulations-notices/cms-1786-fc",
+   "sha256": "82b6671f4b6734e5b32d294a236b5a201f2a9e04d8381f9140befa475564f6b0"
+  },
+  {
+   "id": "addenda-2025",
+   "kind": "rule_addenda",
+   "cy": 2025,
+   "rule": "CMS-1809-FC",
+   "url": "https://www.cms.gov/files/zip/2025-nfrm-opps-addenda.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/regulations-notices/cms-1809-fc",
+   "sha256": "640c396047cdbc82cad9244446958f671c52784c9274965663183102b9c89aef"
+  },
+  {
+   "id": "addenda-2026",
+   "kind": "rule_addenda",
+   "cy": 2026,
+   "rule": "CMS-1834-FC",
+   "url": "https://www.cms.gov/files/zip/2026-nfrm-opps-addenda.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/regulations-notices/cms-1834-fc",
+   "sha256": "602a0d556468ce036f1d2f0bce8872ec8610c526504893ba0fa0fb414212cff0"
+  },
+  {
+   "id": "addenda-2027",
+   "kind": "rule_addenda",
+   "cy": 2027,
+   "rule": "CMS-1850-FC",
+   "url": "https://www.cms.gov/files/zip/2027-fr-opps-addenda-updated-11-10-2026.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/regulations-notices/cms-1850-fc",
+   "sha256": "1cec7b3867cc48e464b0303b153915f625509597ce1aa029d89f329e2740ebee"
+  },
+  {
+   "id": "removed-2021",
+   "kind": "removal_file",
+   "cy": 2021,
+   "rule": "CMS-1736-FC",
+   "url": "https://www.cms.gov/files/zip/services-removed-inpatient-only-ipo-list-cy-2021.zip",
+   "landing": "https://www.cms.gov/medicaremedicare-fee-service-paymenthospitaloutpatientppshospital-outpatient-regulations-and-notices/cms-1736-fc",
+   "sha256": "1106bb7688e4cd7ccee23d766bea8f924813d42e168a5f404aa240066ed20cfa"
+  },
+  {
+   "id": "removed-2027",
+   "kind": "removal_file",
+   "cy": 2027,
+   "rule": "CMS-1850-FC",
+   "url": "https://www.cms.gov/files/zip/2027-fr-procedures-removal-ipo-list.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/regulations-notices/cms-1850-fc",
+   "sha256": "91e91a58b261268dfd0381734d0acd470232e8018fc81f2a91c12ff2e0fbe74f"
+  },
+  {
+   "id": "fr-2017-23932",
+   "kind": "fr_text",
+   "published": "2017-11-13",
+   "doc": "2017-23932",
+   "fr": "82 FR 52356",
+   "rule": "CMS-1678-FC",
+   "url": "https://www.govinfo.gov/content/pkg/FR-2017-11-13/html/2017-23932.htm",
+   "landing": "https://www.govinfo.gov/app/details/FR-2017-11-13/2017-23932",
+   "sha256": "66dcdfa23a185ddba09989c949d4550cd92ab8e815df0c50fbd3f6eb96344100"
+  },
+  {
+   "id": "fr-2019-24138",
+   "kind": "fr_text",
+   "published": "2019-11-12",
+   "doc": "2019-24138",
+   "fr": "84 FR 61142",
+   "rule": "CMS-1717-FC",
+   "url": "https://www.govinfo.gov/content/pkg/FR-2019-11-12/html/2019-24138.htm",
+   "landing": "https://www.govinfo.gov/app/details/FR-2019-11-12/2019-24138",
+   "sha256": "dbb4c1c81d06ed0313484f44f94637b5679c9c7294375f3f27498adc2bd4967d"
+  },
+  {
+   "id": "fr-2020-26819",
+   "kind": "fr_text",
+   "published": "2020-12-29",
+   "doc": "2020-26819",
+   "fr": "85 FR 85866",
+   "rule": "CMS-1736-FC",
+   "url": "https://www.govinfo.gov/content/pkg/FR-2020-12-29/html/2020-26819.htm",
+   "landing": "https://www.govinfo.gov/app/details/FR-2020-12-29/2020-26819",
+   "sha256": "a93fa9d60b9ce29d1dd6528a79bcc05ba3ad3d9fc3214b572da5e74ac6e8f4d9"
+  },
+  {
+   "id": "fr-2021-24011",
+   "kind": "fr_text",
+   "published": "2021-11-16",
+   "doc": "2021-24011",
+   "fr": "86 FR 63458",
+   "rule": "CMS-1753-FC",
+   "url": "https://www.govinfo.gov/content/pkg/FR-2021-11-16/html/2021-24011.htm",
+   "landing": "https://www.govinfo.gov/app/details/FR-2021-11-16/2021-24011",
+   "sha256": "495694d5a60eee178e855f42754557b5f5add96bd37dd9897aed5516cff4c0c9"
+  },
+  {
+   "id": "fr-2022-23918",
+   "kind": "fr_text",
+   "published": "2022-11-23",
+   "doc": "2022-23918",
+   "fr": "87 FR 71748",
+   "rule": "CMS-1772-FC",
+   "url": "https://www.govinfo.gov/content/pkg/FR-2022-11-23/html/2022-23918.htm",
+   "landing": "https://www.govinfo.gov/app/details/FR-2022-11-23/2022-23918",
+   "sha256": "f9d66799572448fa5c66016434eaf4beb5d827b599be8b16454203d578261bbb"
+  },
+  {
+   "id": "fr-2023-24293",
+   "kind": "fr_text",
+   "published": "2023-11-22",
+   "doc": "2023-24293",
+   "fr": "88 FR 81540",
+   "rule": "CMS-1786-FC",
+   "url": "https://www.govinfo.gov/content/pkg/FR-2023-11-22/html/2023-24293.htm",
+   "landing": "https://www.govinfo.gov/app/details/FR-2023-11-22/2023-24293",
+   "sha256": "6940c9cb52d134e677f1db192127501b539c94f9576f6a7b314c0cbf5301ad46"
+  },
+  {
+   "id": "fr-2024-25521",
+   "kind": "fr_text",
+   "published": "2024-11-27",
+   "doc": "2024-25521",
+   "fr": "89 FR 93912",
+   "rule": "CMS-1809-FC",
+   "url": "https://www.govinfo.gov/content/pkg/FR-2024-11-27/html/2024-25521.htm",
+   "landing": "https://www.govinfo.gov/app/details/FR-2024-11-27/2024-25521",
+   "sha256": "9a71632f9c8908a7ce586b58d2b01af5cf8484056d2b2b02be5a2e1e5ccc6db0"
+  },
+  {
+   "id": "fr-2025-20907",
+   "kind": "fr_text",
+   "published": "2025-11-25",
+   "doc": "2025-20907",
+   "fr": "90 FR 53448",
+   "rule": "CMS-1834-FC",
+   "url": "https://www.govinfo.gov/content/pkg/FR-2025-11-25/html/2025-20907.htm",
+   "landing": "https://www.govinfo.gov/app/details/FR-2025-11-25/2025-20907",
+   "sha256": "4ef4c3a83c9ed41b107dc2ade7bfd7cf2d79749ac732167121afbc9f5acdfef5"
+  },
+  {
+   "id": "fr-2026-03578",
+   "kind": "fr_text",
+   "published": "2026-02-23",
+   "doc": "2026-03578",
+   "fr": "91 FR 8383",
+   "rule": "CMS-1834-CN",
+   "url": "https://www.govinfo.gov/content/pkg/FR-2026-02-23/html/2026-03578.htm",
+   "landing": "https://www.govinfo.gov/app/details/FR-2026-02-23/2026-03578",
+   "sha256": "e1e0bf7d647b7ed6eb77b2e0047179b97b199151fa832191c81866dc3a9997e1"
+  },
+  {
+   "id": "fr-2026-22739",
+   "kind": "fr_text",
+   "published": "2026-11-06",
+   "doc": "2026-22739",
+   "fr": "91 FR 70284",
+   "rule": "CMS-1850-FC",
+   "url": "https://www.govinfo.gov/content/pkg/FR-2026-11-06/html/2026-22739.htm",
+   "landing": "https://www.govinfo.gov/app/details/FR-2026-11-06/2026-22739",
+   "sha256": "e6a29421233d0f2155434f1b273ad89de6063672c200d5abf20ca75c74acdca2"
+  }
+ ]
+}

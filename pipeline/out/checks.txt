@@ -1,0 +1,145 @@
+Inpatient-only list: reconciliation against CMS's files
+32 snapshots, 2017-01 to 2027-01; 1861 codes ever on the list; 19329 other codes
+
+1. Each file's workbook and its text copy list the same inpatient-only codes
+----------------------------------------------------------------------------
+ok    b-2020-01
+ok    b-2020-01-corr
+ok    b-2020-04
+ok    b-2020-04-corr
+ok    b-2020-07
+ok    b-2020-07-corr
+ok    b-2020-10
+ok    b-2020-10-corr
+ok    b-2021-01
+ok    b-2021-01-corr
+ok    b-2021-04
+ok    b-2021-07
+ok    b-2021-10
+ok    b-2021-10-corr
+ok    b-2022-01
+ok    b-2022-04
+ok    b-2022-07
+ok    b-2022-10
+ok    b-2023-01
+ok    b-2023-04
+ok    b-2023-07
+ok    b-2023-10
+ok    b-2024-01
+ok    b-2024-04
+ok    b-2024-07
+ok    b-2024-10
+ok    b-2025-01
+      codes in only one copy (none inpatient-only): A4341
+ok    b-2025-04
+      codes in only one copy (none inpatient-only): A4341
+ok    b-2025-07
+      codes in only one copy (none inpatient-only): A4341
+ok    b-2025-10
+      codes in only one copy (none inpatient-only): A4341
+ok    b-2026-01
+      codes in only one copy (none inpatient-only): A4341, G0465
+ok    b-2026-04
+      codes in only one copy (none inpatient-only): A4341, G0465
+ok    b-2026-07
+      codes in only one copy (none inpatient-only): A4341, G0465
+ok    b-2026-10
+ok    addenda-2017
+ok    addenda-2018
+ok    addenda-2019
+ok    addenda-2020
+ok    addenda-2021
+ok    addenda-2022
+ok    addenda-2023
+ok    addenda-2024
+ok    addenda-2025
+ok    addenda-2026
+ok    addenda-2027
+ok    removed-2021
+ok    removed-2027
+
+2. Addendum E equals status indicator C in the same rule's Addendum B and in January's quarterly file
+-----------------------------------------------------------------------------------------------------
+ok    CY 2017  Addendum E 1746 codes = final-rule Addendum B status C 1746
+ok    CY 2018  Addendum E 1747 codes = final-rule Addendum B status C 1747
+ok    CY 2019  Addendum E 1739 codes = final-rule Addendum B status C 1739
+ok    CY 2020  Addendum E 1740 codes = final-rule Addendum B status C 1740
+ok    CY 2020  Addendum E 1740 codes = January 2020 Addendum B status C 1740
+ok    CY 2021  Addendum E 1438 codes = final-rule Addendum B status C 1438
+ok    CY 2021  Addendum E 1438 codes = January 2021 Addendum B status C 1438
+ok    CY 2022  Addendum E 1728 codes = final-rule Addendum B status C 1728
+ok    CY 2022  Addendum E 1728 codes = January 2022 Addendum B status C 1728
+ok    CY 2023  Addendum E 1723 codes = final-rule Addendum B status C 1723
+ok    CY 2023  Addendum E 1723 codes = January 2023 Addendum B status C 1723
+ok    CY 2024  Addendum E 1735 codes = final-rule Addendum B status C 1735
+ok    CY 2024  Addendum E 1735 codes = January 2024 Addendum B status C 1735
+ok    CY 2025  Addendum E 1731 codes = final-rule Addendum B status C 1731
+ok    CY 2025  Addendum E 1731 codes = January 2025 Addendum B status C 1731
+ok    CY 2026  Addendum E 1438 codes = final-rule Addendum B status C 1438
+ok    CY 2026  Addendum E 1438 codes = January 2026 Addendum B status C 1438
+ok    CY 2027  Addendum E 813 codes = final-rule Addendum B status C 813
+
+3. CMS's removal files equal the codes that leave status C and stay payable
+---------------------------------------------------------------------------
+ok    CY 2021  removal file 298 codes = 298 computed removals
+ok    CY 2027  removal file 637 codes = 637 computed removals
+
+4. Counts CMS states in each final rule equal the counts computed from Addendum B
+---------------------------------------------------------------------------------
+ok    CY 2021  removed: CMS says 298 (85 FR 86093); computed 298
+ok    CY 2021  on the list before the removals: CMS says 1740 (85 FR 86092); computed 1740
+ok    CY 2023  new codes added: CMS says 8 (87 FR 72006); computed 9 (+1: 99418, a new prolonged-services code, also enters Addendum B with status C but is not in Table 65)
+ok    CY 2024  services added: CMS says 10 (88 FR 81860); computed 10
+ok    CY 2026  removed: CMS says 285 (90 FR 53788); computed 285
+ok    CY 2026  on the list before the removals (CMS: "approximately"): CMS says 1731 (90 FR 53781); computed 1731
+ok    CY 2027  removed: CMS says 637 (91 FR 70574); computed 637
+ok    CY 2027  on the list when CMS proposed the removals: CMS says 1438 (91 FR 70570); computed 1438
+
+5. Code lists printed in the Federal Register equal the changes computed from Addendum B
+----------------------------------------------------------------------------------------
+ok    CY 2020  Table 49 (84 FR 61359): removed 12 printed, 11 computed, 1 difference(s) explained
+ok    CY 2020  Table 49 (84 FR 61359): added 0 printed, 22 computed, 22 difference(s) explained
+ok    CY 2021  Table 48 (85 FR 86094-86110): removed 298 printed, 298 computed, 0 difference(s) explained
+ok    CY 2021  Table 48 (85 FR 86094-86110): added 0 printed, 5 computed, 5 difference(s) explained
+ok    CY 2022  Table 48 (86 FR 63712-63736): removed 0 printed, 0 computed, 0 difference(s) explained
+ok    CY 2022  Table 48 (86 FR 63712-63736): added 294 printed, 303 computed, 9 difference(s) explained
+ok    CY 2022  Table 48: the 5 codes it keeps off the list are not status C
+ok    CY 2023  Table 65 (87 FR 72010-72012): removed 11 printed, 11 computed, 0 difference(s) explained
+ok    CY 2023  Table 65 (87 FR 72010-72012): added 8 printed, 9 computed, 1 difference(s) explained
+ok    CY 2024  Table 103 (88 FR 81862): removed 0 printed, 0 computed, 0 difference(s) explained
+ok    CY 2024  Table 103 (88 FR 81862): added 10 printed, 10 computed, 0 difference(s) explained
+ok    CY 2025  Table 138 (89 FR 94275): removed 1 printed, 1 computed, 0 difference(s) explained
+ok    CY 2025  Table 138 (89 FR 94275): added 3 printed, 5 computed, 8 difference(s) explained
+ok    CY 2026  Table 119 (90 FR 53790-53802): removed 285 printed, 285 computed, 0 difference(s) explained
+ok    CY 2026  Table 119 (90 FR 53790-53802): added 0 printed, 2 computed, 2 difference(s) explained
+
+6. Year by year (computed from Addendum B status C)
+---------------------------------------------------
+      year  Jan 1  removed  retired  new  added  mid-year new  Dec 31
+      2017   1746        0        0    0      0             0    1746
+      2018   1747        6       19   25      1             0    1747
+ok    CY 2018 balances: 1746 - 6 - 19 + 25 + 1 = 1747
+      2019   1739        4        6    1      1             0    1739
+ok    CY 2019 balances: 1747 - 4 - 6 + 1 + 1 = 1739
+      2020   1740       11       10   22      0             0    1740
+ok    CY 2020 balances: 1739 - 11 - 10 + 22 + 0 = 1740
+      2021   1438      298        9    5      0             3    1441
+ok    CY 2021 balances: 1740 - 298 - 9 + 5 + 0 = 1438
+      2022   1728        0       16    9    294             0    1728
+ok    CY 2022 balances: 1441 - 0 - 16 + 9 + 294 = 1728
+      2023   1723       11        3    9      0             2    1725
+ok    CY 2023 balances: 1728 - 11 - 3 + 9 + 0 = 1723
+      2024   1735        0        0    9      1             3    1738
+ok    CY 2024 balances: 1725 - 0 - 0 + 9 + 1 = 1735
+      2025   1731        1       11    5      0             0    1731
+ok    CY 2025 balances: 1738 - 1 - 11 + 5 + 0 = 1731
+      2026   1438      285       10    2      0            10    1448
+ok    CY 2026 balances: 1731 - 285 - 10 + 2 + 0 = 1438
+      2027    813      637        4    6      0             0     813
+ok    CY 2027 balances: 1448 - 637 - 4 + 6 + 0 = 813
+
+7. Every quoted Federal Register passage is on the page it cites
+----------------------------------------------------------------
+ok    157 quotes checked against the govinfo text of each rule
+
+All checks passed.

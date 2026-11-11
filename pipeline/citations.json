@@ -1,0 +1,947 @@
+{
+ "note": "Verbatim passages from the Federal Register. tests check that each quote appears on the page it cites. `` and '' are the Federal Register's own quotation marks.",
+ "citations": {
+  "H18-TKA-final": {
+   "claim": "CY2018 final rule finalizes removal of TKA (27447) from IPO list and precludes RAC patient-status review for 2 years",
+   "quote": "For CY 2018, we are finalizing our proposal to remove total knee arthroplasty (TKA) from the inpatient only list. In addition, we are precluding the Recovery Audit Contractors from reviewing TKA procedures for ``patient status'' (that is, site of service) for a period of 2 years.",
+   "cite": "82 FR 52362",
+   "source": "fr-2017-23932"
+  },
+  "H18-TKA-code": {
+   "claim": "CY2018: removal list codes for CY2018 and one addition (TKA = 27447)",
+   "quote": "we are removing the following procedures from the IPO list for CY 2018: CPT codes 27447, 43282, 43772, 43773, 43774, and 55866. We also are adding CPT code 92941 to the IPO list for CY 2018.",
+   "cite": "82 FR 52526",
+   "source": "fr-2017-23932"
+  },
+  "H18-TKA-27447": {
+   "claim": "CY2018: finalizes removal of 27447 and APC/SI",
+   "quote": "we are finalizing our proposal to remove the TKA procedure described by CPT code 27447 from the IPO list beginning in CY 2018 and to assign the TKA procedure to C-APC 5115 with status indicator ``J1''.",
+   "cite": "82 FR 52525",
+   "source": "fr-2017-23932"
+  },
+  "H20-THA": {
+   "claim": "CY2020 final rule finalizes removal of THA (27130) and conforming anesthesia code 01214",
+   "quote": "we are finalizing the removal of CPT code 27130, and assigning the procedure to C-APC 5115 (Level 5 Musculoskeletal Procedures) with status indicator ``J1''.",
+   "cite": "84 FR 61355",
+   "source": "fr-2019-24138"
+  },
+  "H20-THA-anes": {
+   "claim": "CY2020: anesthesia code 01214 removed as conforming change",
+   "quote": "In addition, we are removing anesthesia code 01214, (anesthesia for open procedures involving hip joint; total hip arthroplasty) as a conforming change.",
+   "cite": "84 FR 61355",
+   "source": "fr-2019-24138"
+  },
+  "H20-spine": {
+   "claim": "CY2020 final removes 22633, 22634, 63265-63268",
+   "quote": "Therefore, we are finalizing the removal of CPT codes 22633, 22634, 63265, 63266, 63267, and 63268, and assigning the procedures as follows.",
+   "cite": "84 FR 61357",
+   "source": "fr-2019-24138"
+  },
+  "H20-anes": {
+   "claim": "CY2020 final removes additional anesthesia codes recommended by commenters",
+   "quote": "we agree that the recommended anesthesia CPT codes should be removed from the IPO list, as they meet criterion 3",
+   "cite": "84 FR 61358",
+   "source": "fr-2019-24138"
+  },
+  "H20-T49": {
+   "claim": "CY2020: Table 49 contains final changes to IPO list",
+   "quote": "Table 49 contains the final changes that we are making to the IPO list for CY 2020.",
+   "cite": "84 FR 61358",
+   "source": "fr-2019-24138"
+  },
+  "H20-first": {
+   "claim": "CY2020: IPO section: Addendum E lists IPO codes (identification of IPO services)",
+   "quote": "The complete list of codes that describe procedures that will be paid by Medicare in CY 2020 as inpatient only procedures is included as Addendum E",
+   "cite": "84 FR 61352",
+   "source": "fr-2019-24138"
+  },
+  "H20-2mn": {
+   "claim": "CY2020: 2-midnight benchmark applicable once procedures removed from IPO list",
+   "quote": "However, the 2- midnight benchmark is applicable once procedures have been removed from the IPO list.",
+   "cite": "84 FR 61363",
+   "source": "fr-2019-24138"
+  },
+  "E20-prop": {
+   "claim": "CY2020 proposed a 1-year exemption",
+   "quote": "we proposed to establish a 1- year exemption from certain medical review activities for procedures removed from the IPO list under the OPPS in CY 2020 and subsequent years.",
+   "cite": "84 FR 61364",
+   "source": "fr-2019-24138"
+  },
+  "E20-2yr": {
+   "claim": "CY2020 final rule creates 2-year exemption (what is exempted)",
+   "quote": "we have decided to modify our proposal and exempt procedures that are removed from the IPO list from site-of-service claim denials under Medicare Part A, eligibility for BFCC-QIO referrals to RACs for noncompliance with the 2-midnight rule, and RAC reviews for ``patient status'' (that is, site-of-service) for a period of 2 years beginning in CY 2020.",
+   "cite": "84 FR 61364",
+   "source": "fr-2019-24138"
+  },
+  "E20-final": {
+   "claim": "CY2020 final policy statement: 2 calendar years following removal",
+   "quote": "for CY 2020 and subsequent years, we are finalizing a policy to exempt procedures that have been removed from the IPO list from eligibility for referral to RACs for noncompliance with the 2-midnight rule within the 2-calendar years following their removal from the IPO list.",
+   "cite": "84 FR 61365",
+   "source": "fr-2019-24138"
+  },
+  "E20-initial": {
+   "claim": "CY2020: initial BFCC-QIO short-stay review not exempted",
+   "quote": "this proposal does not exempt procedures that are removed from the IPO list from the initial medical reviews of claims for short-stay inpatient admissions conducted by BFCC-QIOs.",
+   "cite": "84 FR 61365",
+   "source": "fr-2019-24138"
+  },
+  "E20-resume": {
+   "claim": "CY2020: RAC referrals resume after the 2-year period",
+   "quote": "it is necessary to allow BFCC-QIOs to resume referring providers to the RACs for further medical review due to exhibiting persistent noncompliance with Medicare payment policies after the two-year exemption period.",
+   "cite": "84 FR 61365",
+   "source": "fr-2019-24138"
+  },
+  "Y21-total": {
+   "claim": "CY2021 final: elimination over 3 years; 266 MSK + 16 HOP Panel services and anesthesia codes = 298; Table 48",
+   "quote": "we are finalizing our proposal with modification to eliminate the IPO list over the course of the next 3 years, starting with the proposed removal of 266 musculoskeletal-related services and 16 HOP Panel recommended services and related anesthesia codes, for a total of 298 services, as provided in Table 48 in CY 2021.",
+   "cite": "85 FR 86093",
+   "source": "fr-2020-26819"
+  },
+  "Y21-T48": {
+   "claim": "CY2021: Table 48 lists final procedures removed",
+   "quote": "Table 48 lists the final procedures, including long descriptors and CPT/HCPCS codes and status indicators (if applicable) that are removed from the IPO list for CY 2021.",
+   "cite": "85 FR 86093",
+   "source": "fr-2020-26819"
+  },
+  "Y21-SI": {
+   "claim": "CY2021: all 298 assigned J1 except 34 N and two Q1",
+   "quote": "All 298 services that are being removed from the IPO list beginning in CY 2021 are assigned status indicator ``J1'' and will receive payment through C-APCs, except for 34 services that are assigned status indicator ``N''",
+   "cite": "85 FR 86088",
+   "source": "fr-2020-26819"
+  },
+  "Y21-1740": {
+   "claim": "CY2021: IPO list of 1,740 services",
+   "quote": "we proposed to eliminate the current IPO list of 1,740 services, starting with the 266 musculoskeletal-related services",
+   "cite": "85 FR 86092",
+   "source": "fr-2020-26819"
+  },
+  "Y21-by2024": {
+   "claim": "CY2021 proposal: list completely eliminated by 2024",
+   "quote": "Therefore, we proposed to transition services off the IPO list over a 3-year period, with the list completely eliminated by 2024.",
+   "cite": "85 FR 86086",
+   "source": "fr-2020-26819"
+  },
+  "Y21-T47": {
+   "claim": "CY2021: HOP Panel recommended 16 additional procedures (Table 47)",
+   "quote": "the Advisory Panel on Hospital Outpatient Payment (HOP Panel) recommended that we remove the 16 additional procedures in Table 47 from the IPO list",
+   "cite": "85 FR 86089",
+   "source": "fr-2020-26819"
+  },
+  "Y21-regn": {
+   "claim": "CY2021 regulation text 419.22(n): 3-year transition, eliminated by January 1, 2024",
+   "quote": "(n) Services and procedures that the Secretary designates as requiring inpatient care. Effective beginning on January 1, 2021, the Secretary shall eliminate the list of services and procedures designated as requiring inpatient care through a 3-year transition, with the full list eliminated in its entirety by January 1, 2024.",
+   "cite": "85 FR 86302",
+   "source": "fr-2020-26819"
+  },
+  "Y21-addE": {
+   "claim": "CY2021: Addendum E complete list / SI C identification",
+   "quote": "The complete list of codes that describe services that will be paid by Medicare in CY 2021 as inpatient only services is included as Addendum E",
+   "cite": "85 FR 86083",
+   "source": "fr-2020-26819"
+  },
+  "E21-prop": {
+   "claim": "CY2021 proposed continuing 2-year exemption",
+   "quote": "we proposed to continue this 2-year exemption from site-of- service claim denials, BFCC-QIO referrals to Recovery Audit Contractors (RACs), and RAC reviews for ``patient status''",
+   "cite": "85 FR 86084",
+   "source": "fr-2020-26819"
+  },
+  "E21-indef": {
+   "claim": "CY2021 final: indefinite exemption for procedures removed on or after 1/1/2021 (what is exempted)",
+   "quote": "procedures removed from the IPO list on or after January 1, 2021 will be indefinitely exempted from site-of-service claim denials under Medicare Part A, eligibility for BFCC-QIO referrals to RACs for noncompliance with the 2-Midnight rule, and RAC reviews for ``patient status'' (that is, site-of-service) indefinitely,",
+   "cite": "85 FR 86119",
+   "source": "fr-2020-26819"
+  },
+  "E21-indef2": {
+   "claim": "CY2021 final: exact condition for exemption ending",
+   "quote": "until the procedure is more commonly performed in the outpatient setting then the inpatient setting.",
+   "cite": "85 FR 86119",
+   "source": "fr-2020-26819"
+  },
+  "E21-50pct": {
+   "claim": "CY2021: exemption ends only if claims data show >50 percent outpatient in a single calendar year",
+   "quote": "in a single calendar year we would need to have Medicare claims data indicating that procedure was performed more than 50 percent of the time in the outpatient setting.",
+   "cite": "85 FR 86119",
+   "source": "fr-2020-26819"
+  },
+  "E21-rulemaking": {
+   "claim": "CY2021: end of exemption to be revisited in rulemaking; applies only to CY2021+ removals",
+   "quote": "We will revisit in rulemaking whether and when an exemption for a procedure should be ended.",
+   "cite": "85 FR 86119",
+   "source": "fr-2020-26819"
+  },
+  "E21-pre2021": {
+   "claim": "CY2021: only removals from CY2021 onward; may revisit procedures removed before 1/1/2021",
+   "quote": "This will only apply to procedures removed from the IPO list beginning in CY 2021. We may revisit procedures that were removed from the IPO list prior to January 1, 2021 and extend their exemption if we deem it necessary.",
+   "cite": "85 FR 86119",
+   "source": "fr-2020-26819"
+  },
+  "E21-not-exception": {
+   "claim": "CY2021: exemption is not an exception to the 2-Midnight rule",
+   "quote": "While these procedures will be exempt from certain medical review activities related to the 2-Midnight rule, providers are not excepted from compliance with the 2-Midnight rule.",
+   "cite": "85 FR 86120",
+   "source": "fr-2020-26819"
+  },
+  "E21-fraud": {
+   "claim": "CY2021: CMS may still review for systemic fraud or abuse",
+   "quote": "Additionally, CMS may still conduct medical review in cases in which there is evidence of systemic fraud or abuse occurring.",
+   "cite": "85 FR 86120",
+   "source": "fr-2020-26819"
+  },
+  "E21-cfr": {
+   "claim": "CY2021: 412.3 amended; 2020 removals 2 years, 2021+ removals until Secretary determines",
+   "quote": "For those services and procedures removed between January 1 and December 31, 2020, this exemption will last for 2 years from the date of such removal. For those services and procedures removed on or after January 1, 2021, this exemption will last until the Secretary determines that the service or procedure is more commonly performed in the outpatient setting.",
+   "cite": "85 FR 86120",
+   "source": "fr-2020-26819"
+  },
+  "E21-cfrtext": {
+   "claim": "CY2021 412.3(d)(2) regulation text: (i) 2020 removals 2 years; (ii) 2021+ until Secretary determines",
+   "quote": "(i) For those services and procedures removed between January 1 and December 31, 2020, the exemption in this paragraph (d)(2) will last for 2 years from the date of such removal.",
+   "cite": "85 FR 86300",
+   "source": "fr-2020-26819"
+  },
+  "Y22-prop": {
+   "claim": "CY2022 proposal: halt elimination and add 298 services back",
+   "quote": "we proposed to halt the elimination of the IPO list and, after clinical review of the services removed from the IPO list in CY 2021 as part of the first phase of eliminating the IPO list, we proposed to add the 298 services removed from the IPO list in CY 2021 back to the IPO list beginning in CY 2022.",
+   "cite": "86 FR 63672",
+   "source": "fr-2021-24011"
+  },
+  "Y22-final": {
+   "claim": "CY2022 final: halt elimination; add back services removed in CY2021 except 22630, 23472, 27702 and anesthesia codes",
+   "quote": "to pause the elimination of the IPO list and add back to the IPO list the services removed in CY 2021, except CPT code 22630",
+   "cite": "86 FR 63711",
+   "source": "fr-2021-24011"
+  },
+  "Y22-anes": {
+   "claim": "CY2022: corresponding anesthesia codes remain off",
+   "quote": "and their corresponding anesthesia codes: CPT code 01638",
+   "cite": "86 FR 63711",
+   "source": "fr-2021-24011"
+  },
+  "Y22-T48": {
+   "claim": "CY2022: Table 48 not stated in same sentence; Addendum E complete list",
+   "quote": "The complete list of codes describing services that are designated as inpatient only services beginning in CY 2022 is also included as Addendum E",
+   "cite": "86 FR 63711",
+   "source": "fr-2021-24011"
+  },
+  "Y22-0643T": {
+   "claim": "CY2022: 0643T newly classified inpatient only",
+   "quote": "CPT code 0643T should be classified as an inpatient only procedure.",
+   "cite": "86 FR 63710",
+   "source": "fr-2021-24011"
+  },
+  "Y22-115": {
+   "claim": "CY2022: approximately 115 other requested services not kept off list",
+   "quote": "we also received comments requesting that approximately 115 other services remain off the IPO list in CY 2022.",
+   "cite": "86 FR 63708",
+   "source": "fr-2021-24011"
+  },
+  "Y22-reclass": {
+   "claim": "CY2022: reclassifying the other requested codes as inpatient only",
+   "quote": "we are reclassifying these codes as inpatient only procedures for CY 2022.",
+   "cite": "86 FR 63708",
+   "source": "fr-2021-24011"
+  },
+  "Y22-regn": {
+   "claim": "CY2022 reg text: 419.22(n) reference to 3-year elimination removed (final rule amends (n))",
+   "quote": "we are also finalizing our proposal to amend the regulation at Sec. 419.22(n) to remove the reference to the elimination of the list of services and procedures designated as requiring inpatient care through a 3-year transition",
+   "cite": "86 FR 63711",
+   "source": "fr-2021-24011"
+  },
+  "Y22-419-23": {
+   "claim": "CY2022 reg text: 419.23 added with the removal criteria",
+   "quote": "Sec. 419.23 Removal of services and procedures from the Inpatient Only List.",
+   "cite": "86 FR 63993",
+   "source": "fr-2021-24011"
+  },
+  "Y22-crit1": {
+   "claim": "CY2022 reg text: criteria (b)(1)-(2)",
+   "quote": "(1) Most outpatient departments are equipped to provide the service or procedure to the Medicare population. (2) The simplest service or procedure described by the code may be performed in most outpatient departments.",
+   "cite": "86 FR 63993",
+   "source": "fr-2021-24011"
+  },
+  "Y22-crit2": {
+   "claim": "CY2022 reg text: criteria (b)(3)-(4)",
+   "quote": "(3) The service or procedure is related to codes that CMS has already removed from the Inpatient Only List described in paragraph (a) of this section. (4) CMS determines that the service or procedure is being performed in numerous hospitals on an outpatient basis.",
+   "cite": "86 FR 63993",
+   "source": "fr-2021-24011"
+  },
+  "Y22-crit5": {
+   "claim": "CY2022 reg text: criterion (b)(5)",
+   "quote": "(5) CMS determines that the service or procedure can be appropriately and safely performed in an ambulatory surgical center, and is specified as a covered ambulatory surgical procedure under Sec. 416.166 of this chapter, or CMS has proposed to specify it as a covered ambulatory surgical procedure under Sec. 416.166 of this chapter.",
+   "cite": "86 FR 63993",
+   "source": "fr-2021-24011"
+  },
+  "Y22-98": {
+   "claim": "CY2022: 131 of 298 codes on zero or one OPPS claim",
+   "quote": "revealing that 131 of the 298 codes removed from the IPO list in the CY 2021 OPPS/ASC final rule with comment period appeared on either zero or one OPPS claim and 269 of the 298",
+   "cite": "86 FR 63673",
+   "source": "fr-2021-24011"
+  },
+  "E22-prop": {
+   "claim": "CY2022 proposed to rescind indefinite exemption; apply 2-year exemption to removals on/after 1/1/2021",
+   "quote": "Accordingly, we proposed to rescind the indefinite exemption and instead apply a 2-year exemption from two midnight medical review activities for services removed from the IPO list on or after January 1, 2021.",
+   "cite": "86 FR 63738",
+   "source": "fr-2021-24011"
+  },
+  "E22-all2020": {
+   "claim": "CY2022: same 2-year exemption applies to all services removed on or after 1/1/2020",
+   "quote": "Accordingly, we stated that under our proposal, the same 2-year exemption would apply to all service removed from the IPO list on or after January 1, 2020.",
+   "cite": "86 FR 63738",
+   "source": "fr-2021-24011"
+  },
+  "E22-412": {
+   "claim": "CY2022 proposal to amend 412.3: all removals after 1/1/2020 last 2 years",
+   "quote": "We proposed that for all services and procedures removed after January 1, 2020, this exemption would last for 2 years from the date of such removal.",
+   "cite": "86 FR 63739",
+   "source": "fr-2021-24011"
+  },
+  "E22-final": {
+   "claim": "CY2022 final: 2-year exemption adequate; finalizing proposed policy without modifications",
+   "quote": "we believe that a 2- year exemption time period is adequate to let providers gain experience with the application of the 2-Midnight rule to those procedures that have been newly removed from the IPO list.",
+   "cite": "86 FR 63740",
+   "source": "fr-2021-24011"
+  },
+  "E22-final2": {
+   "claim": "CY2022 final: finalizing proposed policy without modifications; amending 412.3",
+   "quote": "Therefore, we are finalizing our proposed policy without modifications. We are also finalizing our proposal to amend Sec. 412.3 of our regulations to clarify when a procedure removed from the IPO list is exempt from certain medical review activities.",
+   "cite": "86 FR 63740",
+   "source": "fr-2021-24011"
+  },
+  "E22-cfr": {
+   "claim": "CY2022 reg text: 412.3(d)(2)(i) revised to 2 years for removals on/after 1/1/2020",
+   "quote": "(i) For those services and procedures removed on or after January 1, 2020, the exemption in this paragraph (d)(2) will last for 2 years from the date of such removal.",
+   "cite": "86 FR 63992",
+   "source": "fr-2021-24011"
+  },
+  "E22-gaming": {
+   "claim": "CY2022: 2-midnight presumption: not a focus of review absent systematic gaming, abuse, or delays",
+   "quote": "absent evidence of systematic gaming, abuse, or delays in the provision of care in an attempt to qualify for the 2-Midnight presumption.",
+   "cite": "86 FR 63736",
+   "source": "fr-2021-24011"
+  },
+  "E22-notexc": {
+   "claim": "CY2022: exemption is not from the 2-Midnight rule but from certain review procedures",
+   "quote": "The exemption is not from the 2-Midnight rule but from certain medical review procedures and site-of-service claim denials.",
+   "cite": "86 FR 63739",
+   "source": "fr-2021-24011"
+  },
+  "Y23-prop10": {
+   "claim": "CY2023 proposal: 10 services proposed for removal (Table 46 of proposed rule)",
+   "quote": "we identified 10 services described by the following codes that we proposed to remove from the IPO list for CY 2023:",
+   "cite": "87 FR 72005",
+   "source": "fr-2022-23918"
+  },
+  "Y23-final8": {
+   "claim": "CY2023 final: removes eight maxillofacial codes",
+   "quote": "we are finalizing our proposal to remove CPT codes 21141, 21142, 21143, 21194, 21196, 21347, 21366, and 21422 from the IPO list and reassign them to status indicator ``J1'' and APC 5165 beginning in CY 2023.",
+   "cite": "87 FR 72009",
+   "source": "fr-2022-23918"
+  },
+  "Y23-22632": {
+   "claim": "CY2023 final: removes 22632",
+   "quote": "We are also finalizing our proposal to remove CPT code 22632 from the IPO list and reassign the service to status indicator ``N''.",
+   "cite": "87 FR 72009",
+   "source": "fr-2022-23918"
+  },
+  "Y23-16036": {
+   "claim": "CY2023 final: not removing 16036",
+   "quote": "We are not finalizing our proposal to remove CPT code 16036 from the IPO list and will continue to assign CPT code 16036 to status indicator ``C''.",
+   "cite": "87 FR 72009",
+   "source": "fr-2022-23918"
+  },
+  "Y23-47550": {
+   "claim": "CY2023 final: removes 47550 and 21255",
+   "quote": "Finally, we are removing CPT code 47550 and reassigning it to status indicator ``N'' and removing CPT code 21255 and reassigning it to status indicator ``J1''",
+   "cite": "87 FR 72009",
+   "source": "fr-2022-23918"
+  },
+  "Y23-T65": {
+   "claim": "CY2023: Table 65 contains changes to the IPO list",
+   "quote": "Table 65 below contains the changes to the IPO list for CY 2023.",
+   "cite": "87 FR 72009",
+   "source": "fr-2022-23918"
+  },
+  "Y23-add8": {
+   "claim": "CY2023: eight added codes (new CPT codes)",
+   "quote": "The codes for these services, which will be effective on January 1, 2023, are CPT codes 15778, 22860, 49596, 49616, 49617, 49618, 49621, and 49622.",
+   "cite": "87 FR 72006",
+   "source": "fr-2022-23918"
+  },
+  "Y23-addSI": {
+   "claim": "CY2023: added services assigned SI C",
+   "quote": "we found that they require a hospital inpatient admission or stay and we proposed to assign these services to status indicator ``C'' for CY 2023.",
+   "cite": "87 FR 72006",
+   "source": "fr-2022-23918"
+  },
+  "Y23-not-elim": {
+   "claim": "CY2023: not considering eliminating the IPO list",
+   "quote": "We are not considering eliminating the IPO list at this time.",
+   "cite": "87 FR 72008",
+   "source": "fr-2022-23918"
+  },
+  "E23-desc": {
+   "claim": "CY2023 describes CY2022 as reinstating a two-year exemption from BFCC-QIO review",
+   "quote": "we reinstated a two-year period of exemption from certain BFCC- QIO medical review activities for procedures newly removed from the IPO list",
+   "cite": "87 FR 72009",
+   "source": "fr-2022-23918"
+  },
+  "E23-desc2": {
+   "claim": "CY2023: during exemption BFCC-QIOs will not deny claims or refer to RACs",
+   "quote": "BFCC-QIOs may conduct medical reviews for education purposes but will not deny claims or make referrals to recovery audit contractors (RACs) for noncompliance with the 2-midnight rule",
+   "cite": "87 FR 72009",
+   "source": "fr-2022-23918"
+  },
+  "Y24-none": {
+   "claim": "CY2024: no services proposed for removal",
+   "quote": "Therefore, we did not propose to remove any services from the IPO list for CY 2024.",
+   "cite": "88 FR 81859",
+   "source": "fr-2023-24293"
+  },
+  "Y24-add9": {
+   "claim": "CY2024: nine new codes proposed for IPO addition",
+   "quote": "We proposed to add nine services for which codes were newly created by the AMA CPT Editorial Panel for CY 2024 to the IPO list.",
+   "cite": "88 FR 81859",
+   "source": "fr-2023-24293"
+  },
+  "Y24-codes": {
+   "claim": "CY2024: nine codes",
+   "quote": "These new services are described by the CPT codes 0790T, 22836, 22837, 22838, 61889, 76984, 76987, 76988, and 76989",
+   "cite": "88 FR 81859",
+   "source": "fr-2023-24293"
+  },
+  "Y24-0646T": {
+   "claim": "CY2024: 0646T reassigned from E1 to C",
+   "quote": "we proposed to reassign CPT code 0646T from status indicator ``E1'' (not payable by Medicare) to ``C,'' effective CY 2024.",
+   "cite": "88 FR 81859",
+   "source": "fr-2023-24293"
+  },
+  "Y24-T102": {
+   "claim": "CY2024: Table 102 proposed changes (page of table text) ",
+   "quote": "Table 102 below contains the proposed changes to the IPO list for CY 2024.",
+   "cite": "88 FR 81860",
+   "source": "fr-2023-24293"
+  },
+  "Y24-T103": {
+   "claim": "CY2024: Table 103 final changes",
+   "quote": "Table 103 below contains the changes to the IPO list for CY 2024.",
+   "cite": "88 FR 81862",
+   "source": "fr-2023-24293"
+  },
+  "Y24-ten": {
+   "claim": "CY2024: commenters supported adding the ten services in Table 102",
+   "quote": "We received several comments in support of our proposal to add the ten services listed in Table 102 above to the IPO list for CY 2024.",
+   "cite": "88 FR 81860",
+   "source": "fr-2023-24293"
+  },
+  "Y24-window": {
+   "claim": "CY2024: IPO services performed outpatient can receive IPPS payment if admitted same day or within following 3 calendar days",
+   "quote": "The commenter is correct services on the IPO list performed in the outpatient setting can receive IPPS payment if the patient is admitted on the day of the procedure or within the following 3-calendar days. However, services on the IPO list will not receive payment under the OPPS.",
+   "cite": "88 FR 81861",
+   "source": "fr-2023-24293"
+  },
+  "Y24-keep4": {
+   "claim": "CY2024: maintaining 43775, 43644, 43645, 44204 on IPO list",
+   "quote": "we are maintaining CPT codes 43775, 43644, 43645, and 44204 on the IPO list for CY 2024.",
+   "cite": "88 FR 81863",
+   "source": "fr-2023-24293"
+  },
+  "Y25-none": {
+   "claim": "CY2025: no services proposed for removal",
+   "quote": "Therefore, we did not propose to remove any services from the IPO list for CY 2025.",
+   "cite": "89 FR 94272",
+   "source": "fr-2024-25521"
+  },
+  "Y25-add3": {
+   "claim": "CY2025: three new codes added to IPO list (0894T-0896T)",
+   "quote": "These new services are described by CPT codes 0894T, 0895T, and 0896T, which will be effective on January 1, 2025.",
+   "cite": "89 FR 94272",
+   "source": "fr-2024-25521"
+  },
+  "Y25-final": {
+   "claim": "CY2025 final: add 0894T-0896T; remove 22848",
+   "quote": "we are finalizing our proposal with modification to add CPT codes 0894T, 0895T, and 0896T to the IPO list and assign them to status indicator ``C'' (Inpatient Procedures).",
+   "cite": "89 FR 94274",
+   "source": "fr-2024-25521"
+  },
+  "Y25-22848": {
+   "claim": "CY2025 final: removing 22848 and assigning SI N",
+   "quote": "We are also removing CPT code 22848 from the IPO list and reassigning it to status indicator ``N''",
+   "cite": "89 FR 94274",
+   "source": "fr-2024-25521"
+  },
+  "Y25-T138": {
+   "claim": "CY2025: Table 138 final changes",
+   "quote": "Table 138 below contains the changes to the IPO list for CY 2025.",
+   "cite": "89 FR 94274",
+   "source": "fr-2024-25521"
+  },
+  "Y25-T137": {
+   "claim": "CY2025: Table 137 proposed changes",
+   "quote": "Table 137 contains the proposed changes to the IPO list for CY 2025.",
+   "cite": "89 FR 94272",
+   "source": "fr-2024-25521"
+  },
+  "Y25-addE": {
+   "claim": "CY2025: Addendum E complete list",
+   "quote": "The complete list of codes that are designated as inpatient only services beginning in CY 2025 is also included as Addendum E",
+   "cite": "89 FR 94274",
+   "source": "fr-2024-25521"
+  },
+  "Y26-hist": {
+   "claim": "CY2026 recounts CY2021: 298 codes incl 266 MSK removed",
+   "quote": "As part of the first phase of this elimination of the IPO list, we removed 298 codes, including 266 musculoskeletal-related services, from the list beginning in CY 2021.",
+   "cite": "90 FR 53781",
+   "source": "fr-2025-20907"
+  },
+  "Y26-halt": {
+   "claim": "CY2026 recounts CY2022: halted elimination; returned most services",
+   "quote": "we returned most services removed from the IPO list in 2021 back to the IPO list beginning in CY 2022",
+   "cite": "90 FR 53781",
+   "source": "fr-2025-20907"
+  },
+  "Y26-1731": {
+   "claim": "CY2026: approximately 1,731 services on IPO list",
+   "quote": "Currently, there are approximately 1,731 services on the IPO list.",
+   "cite": "90 FR 53781",
+   "source": "fr-2025-20907"
+  },
+  "Y26-285": {
+   "claim": "CY2026 proposal: 285 mostly MSK services including 16 non-MSK services removed in 2021 and added back in 2022",
+   "quote": "For CY 2026, we identified 285 mostly musculoskeletal services that we proposed to remove from the IPO list, including 16 non- musculoskeletal services",
+   "cite": "90 FR 53784",
+   "source": "fr-2025-20907"
+  },
+  "Y26-7msk": {
+   "claim": "CY2026 recounts CY2022: seven MSK procedures and related anesthesia maintained off the list",
+   "quote": "we maintained the removal of seven musculoskeletal procedures, and their related anesthesia services, from the IPO list.",
+   "cite": "90 FR 53783",
+   "source": "fr-2025-20907"
+  },
+  "Y26-11": {
+   "claim": "CY2026 recounts CY2023: 11 more MSK services removed",
+   "quote": "In the CY 2023 OPPS/ASC final rule with comment period, we removed 11 more musculoskeletal services from the IPO list.",
+   "cite": "90 FR 53783",
+   "source": "fr-2025-20907"
+  },
+  "Y26-T119": {
+   "claim": "CY2026: final APC/SI assignments for removed procedures in Table 119",
+   "quote": "Final APC assignments, status indicator assignments, and long descriptors for all procedures removed from the IPO list for CY 2026 can be found in Table 119.",
+   "cite": "90 FR 53786",
+   "source": "fr-2025-20907"
+  },
+  "Y26-proposal-MSK": {
+   "claim": "CY2026: MSK first group removed",
+   "quote": "For CY 2026, we proposed that musculoskeletal services would be the first group of services that would be removed from the IPO list",
+   "cite": "90 FR 53783",
+   "source": "fr-2025-20907"
+  },
+  "Y26-final285": {
+   "claim": "CY2026 final: eliminate over 3 years, starting with 285 mostly MSK services (Table 119)",
+   "quote": "we finalize eliminating the IPO list over the course of the next 3 years, starting with the removal of 285 mostly musculoskeletal-related services, as",
+   "cite": "90 FR 53788",
+   "source": "fr-2025-20907"
+  },
+  "Y26-final285b": {
+   "claim": "CY2026 final: Table 119 (continuation across page break)",
+   "quote": "provided in Table 119, for CY 2026.",
+   "cite": "90 FR 53789",
+   "source": "fr-2025-20907"
+  },
+  "Y26-crit": {
+   "claim": "CY2026 final: eliminate the 419.23 criteria as conforming change",
+   "quote": "We finalize our proposal eliminating the criteria for removing procedures from the IPO list currently codified at Sec. 419.23, as a conforming change.",
+   "cite": "90 FR 53789",
+   "source": "fr-2025-20907"
+  },
+  "Y26-pre-2028": {
+   "claim": "CY2026 preamble text states January 1, 2028 (corrected later)",
+   "quote": "with the list eliminated in its entirety by January 1, 2028.",
+   "cite": "90 FR 53789",
+   "source": "fr-2025-20907"
+  },
+  "Y26-prop-2029": {
+   "claim": "CY2026: proposal to complete elimination by January 1, 2029",
+   "quote": "For CY 2026 and subsequent years, we proposed to eliminate the IPO list through a 3-year transition, completing the elimination by January 1, 2029.",
+   "cite": "90 FR 53782",
+   "source": "fr-2025-20907"
+  },
+  "Y26-prop-n": {
+   "claim": "CY2026 proposal text of 419.22(n): January 1, 2029",
+   "quote": "we proposed to amend Sec. 419.22(n) to state that effective beginning on January 1, 2026, the Secretary shall eliminate the list of services and procedures designated as requiring inpatient care through a 3-year transition, with the full list eliminated in its entirety by January 1, 2029.",
+   "cite": "90 FR 53783",
+   "source": "fr-2025-20907"
+  },
+  "Y26-prop-2029b": {
+   "claim": "CY2026 proposal: transition over 3 years with list eliminated by CY 2029",
+   "quote": "Therefore, we proposed to transition services off the IPO list over a 3-year period, with the list completely eliminated by CY 2029.",
+   "cite": "90 FR 53783",
+   "source": "fr-2025-20907"
+  },
+  "Y26-regn": {
+   "claim": "CY2026 reg text 419.22(n) (final): list eliminated in its entirety by January 1, 2029",
+   "quote": "(n) Services and procedures that the Secretary designates as requiring inpatient care. Effective beginning on January 1, 2026, the Secretary shall eliminate the list of services and procedures designated as requiring inpatient care through a 3-year transition, with the list eliminated in its entirety by January 1, 2029.",
+   "cite": "90 FR 54086",
+   "source": "fr-2025-20907"
+  },
+  "Y26-419-23-removed": {
+   "claim": "CY2026 reg text: 419.23 removed",
+   "quote": "Sec. 419.23 [Removed] 0 22. Section 419.23 is removed.",
+   "cite": "90 FR 54086",
+   "source": "fr-2025-20907"
+  },
+  "Y26-412": {
+   "claim": "CY2026 reg text 412.3(d)(2): exemption for removals on/after 1/1/2021",
+   "quote": "Claims for services and procedures removed from the inpatient only list under Sec. 419.22 of this chapter on or after January 1, 2021 are exempt from certain medical review activities until the Secretary determines that the service or procedure is more commonly performed in the outpatient setting than the inpatient setting.",
+   "cite": "90 FR 54082",
+   "source": "fr-2025-20907"
+  },
+  "Y26-obstacle": {
+   "claim": "CY2026: maxillofacial codes removed 2021, added back 2022, removed again 2023 - regulatory uncertainty",
+   "quote": "we removed several maxillofacial procedures in CY 2023, after originally removing them from the IPO list in CY 2021 and adding them back in CY 2022 (87 FR 72009).",
+   "cite": "90 FR 53782",
+   "source": "fr-2025-20907"
+  },
+  "Y26-SNF": {
+   "claim": "CY2026: 3-day inpatient stay for SNF remains statutory requirement",
+   "quote": "A prior 3-day inpatient hospital stay remains a statutory requirement for SNF coverage.",
+   "cite": "90 FR 53786",
+   "source": "fr-2025-20907"
+  },
+  "Y26-either": {
+   "claim": "CY2026: removal allows payment in either inpatient or outpatient setting",
+   "quote": "Removal of procedures from the IPO list allows for payment of the procedure in either the inpatient setting or the outpatient setting.",
+   "cite": "90 FR 53786",
+   "source": "fr-2025-20907"
+  },
+  "Y26-notonly": {
+   "claim": "CY2026: removal does not require outpatient-only performance",
+   "quote": "the removal of a service from the IPO list does not require the service to be performed only on an outpatient basis.",
+   "cite": "90 FR 53784",
+   "source": "fr-2025-20907"
+  },
+  "Y26-addE": {
+   "claim": "CY2026: Addendum B SI and Addendum E",
+   "quote": "The complete list of codes that describe services that are finalized to be paid by Medicare in CY 2026 as inpatient only services is included as Addendum E",
+   "cite": "90 FR 53789",
+   "source": "fr-2025-20907"
+  },
+  "Y26-addB": {
+   "claim": "CY2026: removed services and SI/APC in Addendum B",
+   "quote": "The services removed from the IPO list for CY 2026 and their final status indicators and APC assignments (if applicable) are included in Addendum B",
+   "cite": "90 FR 53789",
+   "source": "fr-2025-20907"
+  },
+  "Y26-ASC": {
+   "claim": "CY2026: 276 procedures added to ASC CPL from criteria changes plus 271 IPO-removal codes",
+   "quote": "We also are adding 276 procedures to the ASC CPL based on these criteria changes and adding an additional 271 codes to the ASC CPL that we are finalizing for removal from the IPO list for CY 2026.",
+   "cite": "90 FR 53450",
+   "source": "fr-2025-20907"
+  },
+  "Y26-ASC547": {
+   "claim": "CY2026: finalizing 547 procedures added to ASC CPL (+13)",
+   "quote": "to add the proposed 547 procedures to the ASC CPL for CY 2026. We are also finalizing adding an additional 13 codes recommended by commenters to the ASC CPL for CY 2026.",
+   "cite": "90 FR 53859",
+   "source": "fr-2025-20907"
+  },
+  "Y26-ASC271": {
+   "claim": "CY2026 proposal: 271 IPO-list codes proposed for ASC CPL",
+   "quote": "we proposed to add 271 surgery or surgery-like codes to the CPL that are currently on the IPO list",
+   "cite": "90 FR 53858",
+   "source": "fr-2025-20907"
+  },
+  "Y26-ASCrationale": {
+   "claim": "CY2026: adding IPO-removed procedures to ASC CPL for consistency",
+   "quote": "We believe that adding these procedures to the ASC CPL as the IPO list is phased-out allows for greater consistency and less confusion between the two lists.",
+   "cite": "90 FR 53857",
+   "source": "fr-2025-20907"
+  },
+  "Y26-solicit": {
+   "claim": "CY2026: solicited comment on order of removal for CY2027 and CY2028",
+   "quote": "the order of removal of additional clinical families of services, and/or specific services, for each of the CY 2027 and CY 2028 rulemakings, until the IPO list is completely eliminated.",
+   "cite": "90 FR 53788",
+   "source": "fr-2025-20907"
+  },
+  "E26-hist": {
+   "claim": "CY2026 recounts CY2020 and CY2021 exemptions",
+   "quote": "we finalized a policy to exempt procedures that have been removed from the IPO list from certain medical review activities for 2 calendar years following their removal from the IPO list.",
+   "cite": "90 FR 53782",
+   "source": "fr-2025-20907"
+  },
+  "E26-hist2": {
+   "claim": "CY2026 recounts CY2021: indefinite exemption while list eliminated over 3 years",
+   "quote": "we finalized a policy to indefinitely exempt such procedures from those medical review activities while the IPO list was eliminated over 3 years.",
+   "cite": "90 FR 53782",
+   "source": "fr-2025-20907"
+  },
+  "E26-oversight": {
+   "claim": "CY2026: due to a drafting oversight 412.3(d)(2)(ii) was not removed",
+   "quote": "However, due to a drafting oversight, we failed to correspondingly remove Sec. 412.3(d)(2)(ii):",
+   "cite": "90 FR 53829",
+   "source": "fr-2025-20907"
+  },
+  "E26-oversight-ii": {
+   "claim": "CY2026: text of 412.3(d)(2)(ii) left in CFR (indefinite)",
+   "quote": "``For those services and procedures removed on or after January 1, 2021, the exemption in this paragraph (d)(2) will last until the Secretary determines that the service or procedure is more commonly performed in the outpatient setting.''",
+   "cite": "90 FR 53829",
+   "source": "fr-2025-20907"
+  },
+  "E26-oversight2": {
+   "claim": "CY2026: exemption remained the indefinite period from CY2021",
+   "quote": "As a result of this error, the exemption period was not changed to two years as we intended and instead remained the indefinite exemption period that was finalized in the CY 2021 OPPS/ASC final rule with comment period.",
+   "cite": "90 FR 53829",
+   "source": "fr-2025-20907"
+  },
+  "E26-2022": {
+   "claim": "CY2026 recounts CY2022: intended 2 years for all removed on/after 1/1/2020 incl. 2021",
+   "quote": "we stated that we were amending Sec. 412.3(d)(2) to clarify ``that for all services and procedures removed after January 1, 2020, this exemption would last for 2 years from the date of such removal.",
+   "cite": "90 FR 53829",
+   "source": "fr-2025-20907"
+  },
+  "E26-MAC": {
+   "claim": "CY2026: short-stay review responsibility moves from BFCC-QIOs to MACs as of September 1, 2025",
+   "quote": "On May 22, 2025, CMS announced that responsibility for short-stay reviews will be transitioned from the BFCC-QIOs to the MACs, as of September 1, 2025.",
+   "cite": "90 FR 53829",
+   "source": "fr-2025-20907"
+  },
+  "E26-mnrule": {
+   "claim": "CY2026: 2-midnight rule applicable once services removed from IPO list",
+   "quote": "However, the 2-midnight rule is applicable once services have been removed from the IPO list.",
+   "cite": "90 FR 53829",
+   "source": "fr-2025-20907"
+  },
+  "E26-indef": {
+   "claim": "CY2026: procedures removed on/after 1/1/2021 indefinitely exempted (recital)",
+   "quote": "procedures that have been removed from the IPO list on January 1, 2021 or later were indefinitely exempted from site-of- service claim denials under Medicare Part A, eligibility for referrals to RACs for noncompliance with the 2-midnight rule, and RAC reviews for ``patient status'' (that is, site-of-service).",
+   "cite": "90 FR 53829",
+   "source": "fr-2025-20907"
+  },
+  "E26-notexc": {
+   "claim": "CY2026: exemption from certain medical review, not an exception; fraud/abuse review still possible",
+   "quote": "Providers are still required to comply with the 2-midnight rule during the exemption period, and CMS or its contractors may still conduct patient status medical review in cases in which there is evidence of systemic fraud or abuse occurring.",
+   "cite": "90 FR 53830",
+   "source": "fr-2025-20907"
+  },
+  "E26-50": {
+   "claim": "CY2026: Secretary determination is >50 percent outpatient in a single calendar year",
+   "quote": "the determination of the Secretary that a service or procedure is more commonly performed in the outpatient setting is based on claims data that demonstrates that the service or procedure is being performed more than 50 percent of the time in the outpatient setting in a single calendar year",
+   "cite": "90 FR 53830",
+   "source": "fr-2025-20907"
+  },
+  "E26-notyet": {
+   "claim": "CY2026: no exemption has yet been ended; process via notice and comment rulemaking",
+   "quote": "through the process of ending the exemption period for an indefinitely exempted procedure, we will establish that process, including the effective date of the end of the exemption period, through notice and comment rulemaking",
+   "cite": "90 FR 53832",
+   "source": "fr-2025-20907"
+  },
+  "E26-firsttime": {
+   "claim": "CY2026: first time Secretary determines, announce via notice and comment rulemaking",
+   "quote": "the first time that the Secretary determines that a service or procedure is more commonly performed in the outpatient setting than the inpatient setting, we will make the announcement that the exemption is ending for the service or procedure through notice and comment rulemaking.",
+   "cite": "90 FR 53832",
+   "source": "fr-2025-20907"
+  },
+  "E26-final": {
+   "claim": "CY2026 final: continue indefinite exemption; revise 412.3(d)(2)",
+   "quote": "We are finalizing our proposal to (1) continue the indefinite exemption from site-of-service claim denials, initial medical review contractor referrals to RACs, and RAC reviews for ``patient status'' (that is, site-of-service) finalized in the CY 2021 OPPS/ASC final rule with comment period for procedures that are removed from the IPO list in CY 2021 or later under the OPPS;",
+   "cite": "90 FR 53832",
+   "source": "fr-2025-20907"
+  },
+  "E26-MA": {
+   "claim": "CY2026: MA plans required to comply with 2-midnight benchmark",
+   "quote": "Medicare Advantage plans are required to comply with the 2-midnight benchmark.",
+   "cite": "90 FR 53831",
+   "source": "fr-2025-20907"
+  },
+  "Y27-1438": {
+   "claim": "CY2027: 1,438 services remaining; proposed to remove approximately half (637)",
+   "quote": "Currently, there are 1,438 services remaining on the IPO list. For CY 2027, we proposed to remove approximately half of the remaining IPO services as the second phase of the elimination of the IPO list.",
+   "cite": "91 FR 70570",
+   "source": "fr-2026-22739"
+  },
+  "Y27-families": {
+   "claim": "CY2027: clinical families removed (637 services)",
+   "quote": "we proposed to remove 637 services from the following clinical families: auditory, digestive, endocrine, female genital, hemic and lymphatic systems, integumentary, male genital, maternity care and delivery, mediastinum and diaphragm, respiratory, and urinary.",
+   "cite": "91 FR 70570",
+   "source": "fr-2026-22739"
+  },
+  "Y27-final637": {
+   "claim": "CY2027 final: finalizing removal of 637 services (second phase)",
+   "quote": "we are finalizing our proposal to remove 637 services from the IPO list for CY 2027 as the second phase of the elimination of the IPO list.",
+   "cite": "91 FR 70574",
+   "source": "fr-2026-22739"
+  },
+  "Y27-2028a": {
+   "claim": "CY2027: remaining clinical families to be removed for CY2028 (third and final phase)",
+   "quote": "We expect that these remaining clinical families and services would be removed from the IPO list for CY 2028, during the third and final phase of the elimination.",
+   "cite": "91 FR 70571",
+   "source": "fr-2026-22739"
+  },
+  "Y27-2028b": {
+   "claim": "CY2027: CY2028 families: neurological, cardiovascular, solid organ, intestinal, islet cell transplants",
+   "quote": "procedures for removal in CY 2028 would be from the neurological family, cardiovascular family, solid organ, intestinal, and islet cell transplants and related services.",
+   "cite": "91 FR 70571",
+   "source": "fr-2026-22739"
+  },
+  "Y27-all2028": {
+   "claim": "CY2027: expects to address all remaining clinical families during CY 2028 rulemaking",
+   "quote": "we expect to address all of the remaining clinical families and their removal during CY 2028 rulemaking.",
+   "cite": "91 FR 70571",
+   "source": "fr-2026-22739"
+  },
+  "Y27-regn": {
+   "claim": "CY2027 recounts: 419.22(n) effective 1/1/2026, list eliminated by January 1, 2029 (90 FR 53788-53789, 54086; 91 FR 8384)",
+   "quote": "effective on January 1, 2026, the Secretary shall eliminate the list of services and procedures designated as requiring inpatient care through a 3-year transition period, with the list eliminated in its entirety by January 1, 2029 (90 FR 53788 to 53789 and 54086; 91 FR 8384).",
+   "cite": "91 FR 70570",
+   "source": "fr-2026-22739"
+  },
+  "Y27-285": {
+   "claim": "CY2027 recounts CY2026: removed 285 mostly MSK procedures",
+   "quote": "we again finalized a policy to eliminate the IPO list over the course of three years, beginning by removing 285 mostly musculoskeletal procedures for CY 2026 (90 FR 53780 through 53802).",
+   "cite": "91 FR 70570",
+   "source": "fr-2026-22739"
+  },
+  "Y27-pre": {
+   "claim": "CY2027 recounts CY2021 and CY2022 histories (298; halted)",
+   "quote": "we removed 298 codes, including 266 musculoskeletal-related services, from the list beginning in CY 2021.",
+   "cite": "91 FR 70570",
+   "source": "fr-2026-22739"
+  },
+  "Y27-ASC618": {
+   "claim": "CY2027: 618 codes added to ASC CPL (recommended or removed from IPO)",
+   "quote": "we are continuing to expand the ASC covered procedures list (CPL) by adding 618 codes to the ASC CPL that were recommended by interested parties or were finalized for removal from the IPO list for CY 2027.",
+   "cite": "91 FR 70286",
+   "source": "fr-2026-22739"
+  },
+  "Y27-ASC618b": {
+   "claim": "CY2027 proposal: 618 procedures proposed for removal from IPO list to be added to ASC CPL",
+   "quote": "Several commenters supported our proposal to add 618 procedures proposed for removal from the IPO list to the ASC CPL for CY 2027.",
+   "cite": "91 FR 70663",
+   "source": "fr-2026-22739"
+  },
+  "Y27-file": {
+   "claim": "CY2027: removed services listed in public use file, not in a table; Addendum E is complete list",
+   "quote": "These services and their final status indicators and APC assignments (if applicable) are listed in the public use file titled ``Final Procedures Removed from the IPO List for CY 2027'', which is available on the CMS website.",
+   "cite": "91 FR 70574",
+   "source": "fr-2026-22739"
+  },
+  "Y27-addE": {
+   "claim": "CY2027: Addendum E complete list of IPO services",
+   "quote": "The complete list of codes that describe services that are finalized to be paid by Medicare in CY 2027 as inpatient only services is included as Addendum E",
+   "cite": "91 FR 70574",
+   "source": "fr-2026-22739"
+  },
+  "Y27-addB": {
+   "claim": "CY2027 proposed: Addendum B included proposed removals; Addendum E list",
+   "quote": "The services proposed for removal from the IPO list for CY 2027 and their proposed status indicators and APC assignments (if applicable) were also included in Addendum B",
+   "cite": "91 FR 70571",
+   "source": "fr-2026-22739"
+  },
+  "Y27-T79": {
+   "claim": "CY2027: Table 79 is APC reassignment requests, not the removal list",
+   "quote": "The proposed and final APC and status indicator assignments for procedures for which commenters requested APC reassignments are listed in Table 79 below.",
+   "cite": "91 FR 70574",
+   "source": "fr-2026-22739"
+  },
+  "Y27-deleted": {
+   "claim": "CY2027: codes not proposed for removal because deleted by AMA",
+   "quote": "were not proposed for removal as these codes are being deleted by the AMA. They will no longer be effective starting in CY 2027.",
+   "cite": "91 FR 70574",
+   "source": "fr-2026-22739"
+  },
+  "Y27-cpl-keep": {
+   "claim": "CY2027: 0235T etc. not accepted for removal; will be with their clinical families",
+   "quote": "We plan to remove these procedures in future rulemaking with procedures in their clinical families",
+   "cite": "91 FR 70574",
+   "source": "fr-2026-22739"
+  },
+  "Y27-no-need": {
+   "claim": "CY2027: not necessary to maintain an IPO list",
+   "quote": "Therefore, we continue to believe it is not necessary for us to maintain an IPO list",
+   "cite": "91 FR 70572",
+   "source": "fr-2026-22739"
+  },
+  "E27-indef": {
+   "claim": "CY2027: indefinite exemption restated; what is exempted and condition for ending",
+   "quote": "procedures removed from the IPO list on or after January 1, 2021, are indefinitely exempted from site-of-service claim denials, initial medical review contractor referrals to RACs, and RAC reviews for ``patient status'' (that is, site-of-service) until the Secretary determines that the service or procedure is more commonly performed in the outpatient setting than the inpatient setting.",
+   "cite": "91 FR 70573",
+   "source": "fr-2026-22739"
+  },
+  "E27-50": {
+   "claim": "CY2027: exemption ends for a procedure only when >50 percent outpatient in a single calendar year",
+   "quote": "For the exemption to end for a specific procedure, in a single calendar year we would need to have Medicare claims data indicating that the procedure was performed more than 50 percent of the time in the outpatient setting.",
+   "cite": "91 FR 70573",
+   "source": "fr-2026-22739"
+  },
+  "E27-announce": {
+   "claim": "CY2027: end of exemption announced via rulemaking",
+   "quote": "We noted that the end of the exemption period for each procedure removed from the IPO list on or after January 1, 2021 would be announced via rulemaking.",
+   "cite": "91 FR 70573",
+   "source": "fr-2026-22739"
+  },
+  "E27-educ": {
+   "claim": "CY2027: contractors may review for education but claims not denied during exemption",
+   "quote": "During the exemption period, Medicare review contractors have the opportunity to review such claims in order to provide education for practitioners and providers regarding compliance with the 2-midnight rule, but claims identified as noncompliant are not denied with respect to the site-of-service under Medicare Part A.",
+   "cite": "91 FR 70573",
+   "source": "fr-2026-22739"
+  },
+  "E27-26ref": {
+   "claim": "CY2027 refers readers to CY2026 discussion at 90 FR 53827-53832",
+   "quote": "We also refer commenters to the full discussion on these exemptions in section X.D. of the CY 2026 OPPS/ASC final rule with comment period (90 FR 53827 through 53832).",
+   "cite": "91 FR 70573",
+   "source": "fr-2026-22739"
+  },
+  "E27-MA": {
+   "claim": "CY2027: MA plans must comply with the 2-midnight rule",
+   "quote": "These requirements mean that MA plans must comply with the 2-midnight rule and may not treat removal from the IPO list as requiring those procedures to be performed in the outpatient setting.",
+   "cite": "91 FR 70572",
+   "source": "fr-2026-22739"
+  },
+  "E27-notrequire": {
+   "claim": "CY2027: removal does not require outpatient-only performance",
+   "quote": "the removal of a service from the IPO list does not require the service to be performed only on an outpatient basis.",
+   "cite": "91 FR 70572",
+   "source": "fr-2026-22739"
+  },
+  "E27-eliminated": {
+   "claim": "CY2027: policy not to deny; exemption prevents burden of audits and denials",
+   "quote": "will prevent hospitals from the burden of audits and denials due to furnishing former IPO procedures in the inpatient setting.",
+   "cite": "91 FR 70572",
+   "source": "fr-2026-22739"
+  },
+  "E27-noshift": {
+   "claim": "CY2027: do not anticipate limits on Part A access (SNF concern response)",
+   "quote": "we do not anticipate to see large shifts in site-of-care due to the elimination of the IPO list",
+   "cite": "91 FR 70572",
+   "source": "fr-2026-22739"
+  },
+  "C-2029": {
+   "claim": "Correction notice 2026-03578 (91 FR 8383-8385): corrects January 1, 2028 to January 1, 2029 on 90 FR 53789",
+   "quote": "6. On page 53789, second column, first line, the date ``January 1, 2028'' is corrected to read ``January 1, 2029''.",
+   "cite": "91 FR 8384",
+   "source": "fr-2026-03578"
+  },
+  "C-2029-sum": {
+   "claim": "Correction notice summary: correcting an error in the final date of elimination of the IPO list",
+   "quote": "On page 53789, we are correcting an error in the final date of the elimination of the Inpatient Only list.",
+   "cite": "91 FR 8383",
+   "source": "fr-2026-03578"
+  },
+  "C-T119": {
+   "claim": "Correction notice: Table 119 descriptor corrections for 20802 and 20805 (descriptor only)",
+   "quote": "On page 53791, in the table titled ``TABLE 119: FINAL PROCEDURES FOR REMOVAL FROM THE IPO LIST FOR CY 2026'', we are correcting an error in the long descriptors for CPT codes 20802 and 20805.",
+   "cite": "91 FR 8383",
+   "source": "fr-2026-03578"
+  },
+  "C-419": {
+   "claim": "CY2027 final rule adds a new 419.23 (off-campus outpatient department rule) - unrelated to IPO",
+   "quote": "6. Adding Sec. 419.23 to subpart B to read as follows: Sec. 419.23 Special rule for off-campus outpatient department of a provider.",
+   "cite": "91 FR 70761",
+   "source": "fr-2026-22739"
+  },
+  "E21-cfrtext-ii": {
+   "claim": "CY2021 412.3(d)(2)(ii) regulation text",
+   "quote": "(ii) For those services and procedures removed on or after January 1, 2021, the exemption in this paragraph (d)(2) will last until the Secretary determines that the service or procedure is more commonly performed in the outpatient setting.",
+   "cite": "85 FR 86300",
+   "source": "fr-2020-26819"
+  }
+ }
+}

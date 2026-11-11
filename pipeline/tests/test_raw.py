@@ -1,0 +1,64 @@
+"""Checks that need the raw CMS downloads. Skipped when data/raw/ is absent (a fresh clone)."""
+import hashlib
+import re
+import unittest
+
+import citations
+import fetch
+import history
+import parse
+from test_data import ROOT, load
+
+RAW_PRESENT = (ROOT / "data" / "raw").is_dir() and any((ROOT / "data" / "raw").iterdir())
+
+
+def words(text):
+    return re.findall(r"[a-z0-9]+", text.lower())
+
+
+def shares_run(a, b, length):
+    grams = {tuple(a[i:i + length]) for i in range(len(a) - length + 1)}
+    return any(tuple(b[i:i + length]) in grams for i in range(len(b) - length + 1))
+
+
+@unittest.skipUnless(RAW_PRESENT, "raw CMS files not downloaded; run pipeline/fetch.py")
+class Raw(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.sources = history.load_sources()
+
+    def test_every_file_matches_its_pin(self):
+        for source in self.sources:
+            digest = hashlib.sha256(fetch.raw_path(source).read_bytes()).hexdigest()
+            self.assertEqual(digest, source["sha256"], source["id"])
+
+    def test_quotes_are_on_their_cited_pages(self):
+        self.assertEqual(citations.verify(self.sources), [])
+
+    def test_no_label_copies_a_cms_descriptor(self):
+        """A label may not equal a CMS/AMA descriptor or share five consecutive words with one."""
+        labels = load(ROOT / "data" / "labels.json")
+        patterns = {"addendum_b": history.ADDENDUM_B, "rule_addenda": history.ADDENDUM_B, "removal_file": history.REMOVAL}
+        descriptors = {}
+        for source in self.sources:
+            pattern = patterns.get(source["kind"])
+            if pattern is None:
+                continue
+            path = fetch.raw_path(source)
+            for code, texts in parse.descriptor_table(path, parse.pick_member(path, pattern)).items():
+                if code in labels:
+                    descriptors.setdefault(code, set()).update(texts)
+        self.assertEqual(set(descriptors), set(labels))
+        copied = []
+        for code, item in labels.items():
+            label = words(item["label"])
+            for text in descriptors[code]:
+                theirs = words(text)
+                if label == theirs or shares_run(label, theirs, 5):
+                    copied.append(code)
+                    break
+        self.assertEqual(copied, [])
+
+
+if __name__ == "__main__":
+    unittest.main()
