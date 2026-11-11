@@ -9,7 +9,6 @@ import { serve } from './serve.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const AXE = join(here, '..', 'node_modules', 'axe-core', 'axe.min.js');
-const AXE_SOURCE = readFileSync(AXE, 'utf8');
 const LIVE = process.env.BASE_URL ? new URL(process.env.BASE_URL).origin : null;
 if (!LIVE && !existsSync(join(here, '..', '..', 'docs', 'index.html'))) {
   console.error('docs/ is not built. Run: cd web && BUILD_DATE=2026-11-11 node build.mjs');
@@ -21,22 +20,20 @@ const base = LIVE || `http://127.0.0.1:${server.address().port}`;
 const browser = await launch();
 
 let passed = 0;
+let skipped = 0;
 const failures = [];
 const problems = []; // console errors and page errors, in order
 let ignore404 = false;
-// Live only: Vercel Web Analytics is not enabled yet, so its script 404s (as the 404 page, so Chrome
-// logs both "Failed to load resource" and a MIME-type refusal) on every page.
-const EXPECTED_LIVE_404 = '/_vercel/insights/script.js';
-let sawAnalytics404 = false;
 
 async function newContext(options = {}) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, ...options });
+  // Test runs must not send page views to the live site's analytics (the local stub serves the same empty script).
+  await context.route('**/_vercel/insights/**', (route) => route.fulfill({ status: 200, contentType: 'application/javascript', body: '' }));
   if (options.javaScriptEnabled !== false) await context.clock.setFixedTime(new Date('2026-11-11T12:00:00'));
   context.on('page', (page) => {
     page.on('console', (message) => {
       if (message.type() !== 'error') return;
       if (ignore404 && /status of 404/.test(message.text())) return;
-      if (LIVE && (message.location().url.endsWith(EXPECTED_LIVE_404) || message.text().includes(EXPECTED_LIVE_404))) { sawAnalytics404 = true; return; }
       problems.push(`console error on ${page.url()}: ${message.text()}`);
     });
     page.on('pageerror', (error) => problems.push(`page error on ${page.url()}: ${error.message}`));
@@ -51,11 +48,10 @@ async function check(name, fn, options = {}) {
   const page = await context.newPage();
   page.setDefaultTimeout(6000);
   try {
-    await fn(page, context);
+    const outcome = await fn(page, context);
     const fresh = problems.slice(before);
     if (fresh.length) throw new Error(`console/page errors:\n    ${fresh.join('\n    ')}`);
-    passed += 1;
-    console.log(`✓ ${name}`);
+    if (outcome && outcome.skip) { skipped += 1; console.log(`– skipped: ${outcome.skip}`); } else { passed += 1; console.log(`✓ ${name}`); }
   } catch (error) {
     failures.push(name);
     console.log(`✗ ${name}\n    ${String(error.message || error).split('\n').join('\n    ')}`);
@@ -183,7 +179,7 @@ await check('scheduled dates are marked once, beside the date', async (page) => 
     const period = data.periods.find((p) => p.basis === 'f');
     return period ? period.d : null;
   });
-  if (!scheduled) return;
+  if (!scheduled) return { skip: 'no scheduled period in the data' };
   await open(page, `/?q=99213&dos=${scheduled}`);
   const banner = page.locator('[data-scheduled]').first();
   await waitText(banner, (t) => t.startsWith('Scheduled'), 'scheduled banner');
@@ -197,12 +193,25 @@ await check('several codes in the search box point to the bulk check; a late cli
   await open(page, '/');
   await page.fill('[data-q]', '27447 vs 27130');
   await waitText(page.locator('[data-results]'), (t) => t.includes('2 codes'), 'hint for two codes');
+  await waitText(page.locator('[data-results] .verdict__code'), (t) => t === '27447', 'verdict for the first code');
   await page.fill('[data-q]', 'hip replacement');
   await page.locator('[data-results] [data-row="27130"]').waitFor();
   await setDate(page, '2021-03-03');
   await page.locator('[data-results] [data-row="27130"]').click();   // inside the URL debounce
   await page.waitForURL('**/code/27130/**');
   await waitText(page.locator('.verdict__answer').first(), (t) => t.includes('March 3, 2021'), 'date carried by an immediate click');
+});
+
+await check('back with nothing stored: the date in the address wins', async (page) => {
+  await open(page, '/');
+  await page.evaluate(() => sessionStorage.clear());
+  await open(page, '/code/27130/?dos=2021-03-03');
+  await waitText(page.locator('.verdict__answer').first(), (t) => t.includes('March 3, 2021'), 'answer on the linked date');
+  await open(page, '/methods/');
+  await page.evaluate(() => sessionStorage.clear());
+  await page.goBack();
+  await page.waitForSelector('html.live');
+  await waitText(page.locator('.verdict__answer').first(), (t) => t.includes('March 3, 2021'), 'answer after going back');
 });
 
 await check('home: Today button resets the date, then hides', async (page) => {
@@ -216,6 +225,19 @@ await check('home: Today button resets the date, then hides', async (page) => {
   eq(await page.inputValue('[data-dos]'), '2026-11-11', 'date after Today');
   assert(await today.isHidden(), 'Today did not hide after reset');
   assert(!page.url().includes('dos='), `URL still carries dos: ${page.url()}`);
+});
+
+await check('bulk check on a scheduled date carries the Scheduled note', async (page) => {
+  await open(page, '/');
+  const scheduled = await page.evaluate(async () => {
+    const period = (await (await fetch(document.body.dataset.ipo)).json()).periods.find((p) => p.basis === 'f');
+    return period ? period.d : null;
+  });
+  if (!scheduled) return { skip: 'no scheduled period in the data' };
+  await open(page, `/?dos=${scheduled}`);
+  await page.fill('[data-bulk-input]', '27130 27447');
+  await page.click('[data-bulk] button[type="submit"]');
+  await waitText(page.locator('[data-bulk-out]'), (t) => t.includes('Scheduled'), 'scheduled note in the bulk output');
 });
 
 await check('home: a never-listed code and a nonsense code', async (page) => {
@@ -333,6 +355,11 @@ await check('phone 390x844: no horizontal overflow', async (page) => {
 
 // ---- accessibility ------------------------------------------------------------------------
 
+// Read lazily so a missing node_modules gives this message, not a raw ENOENT at import time.
+function axeSource() {
+  if (!existsSync(AXE)) throw new Error('axe-core is not installed. Run: cd web && npm install');
+  return readFileSync(AXE, 'utf8');
+}
 const axePaths = ['/?q=27447', '/code/27132/', '/history/', '/phase-out/', '/exemption/', '/methods/', '/group/spine/'];
 for (const scheme of ['light', 'dark']) {
   await check(`axe (${scheme}): no serious or critical violations`, async (page) => {
@@ -340,7 +367,7 @@ for (const scheme of ['light', 'dark']) {
     for (const path of axePaths) {
       await open(page, path);
       if (path.includes('q=')) await page.waitForSelector('[data-results] .verdict');
-      await page.evaluate(AXE_SOURCE);   // evaluate, not addScriptTag: the live CSP forbids inline scripts
+      await page.evaluate(axeSource());   // evaluate, not addScriptTag: the live CSP forbids inline scripts
       const results = await page.evaluate(() => window.axe.run(document));
       for (const v of results.violations.filter((x) => x.impact === 'serious' || x.impact === 'critical')) {
         report.push(`${path} [${v.impact}] ${v.id}: ${v.help}\n      ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join('\n      ')}`);
@@ -377,6 +404,5 @@ await check('404: missing path returns the 404 page with a link home', async (pa
 
 await browser.close();
 server?.close();
-if (sawAnalytics404) console.log(`\nnote: expected console error seen live: ${EXPECTED_LIVE_404} returned 404 (Web Analytics not enabled)`);
-console.log(`\n${passed} passed, ${failures.length} failed`);
+console.log(`\n${passed} passed, ${failures.length} failed, ${skipped} skipped`);
 if (failures.length) { console.log(`failed: ${failures.join('; ')}`); process.exit(1); }

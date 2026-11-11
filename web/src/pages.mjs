@@ -287,6 +287,7 @@ export function history(ctx) {
       ['New or added codes', num(change.new.length + added.length)],
       ['Codes retired', num(change.retired.length)],
       ['Added during the year', num(mid.length)],
+      ...(midReturned.length ? [['Returned during the year', num(midReturned.length)]] : []),
       ...(midOff.length ? [['Removed or retired during the year', num(midOff.length)]] : []),
     ].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
     const rule = data.rules[y.year];

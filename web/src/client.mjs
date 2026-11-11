@@ -25,27 +25,34 @@ const state = {
 };
 
 function remember(date) {
-  // Today is the default, not a choice: storing it would bring "yesterday" back tomorrow.
+  // "Today" is stored as the word, not the date: a tab that chose today stays on today tomorrow,
+  // and a tab that stored nothing can be told apart from one that chose today.
   try {
-    if (date === state.today) window.sessionStorage.removeItem('dos'); else window.sessionStorage.setItem('dos', date);
-  } catch { /* private mode: the URL still carries it */ }
+    window.sessionStorage.setItem('dos', date === state.today ? 'today' : date);
+  } catch { /* private mode: nothing is stored, and the URL date is used on every kind of navigation */ }
 }
 
 const usable = (date) => isDate(date) && clampDate(state.data, date) === date;
 
-/** The date this tab last chose, or today. */
-function rememberedDate() {
-  let kept = null;
-  try { kept = window.sessionStorage.getItem('dos'); } catch { /* none */ }
-  return usable(kept) ? kept : state.today;
+/** What this tab last chose, or null when nothing usable is stored (or storage is unavailable). */
+function storedDate() {
+  try {
+    const kept = window.sessionStorage.getItem('dos');
+    if (kept === 'today') return state.today;
+    return usable(kept) ? kept : null;
+  } catch { return null; }
 }
+
+/** The date this tab last chose, or today. */
+const rememberedDate = () => storedDate() ?? state.today;
 
 /** A date in the link wins; otherwise the date this tab last chose; otherwise today. */
 function startingDate() {
-  // Coming back to a page, the tab's latest choice beats the date frozen in that page's address.
-  const [navigation] = window.performance.getEntriesByType('navigation');
-  if (navigation && navigation.type === 'back_forward') return rememberedDate();
   const fromUrl = params().get('dos');
+  // Coming back to a page, the tab's latest choice beats the date frozen in that page's address;
+  // with nothing stored, the address is all there is.
+  const [navigation] = window.performance.getEntriesByType('navigation');
+  if (navigation && navigation.type === 'back_forward') return storedDate() ?? (usable(fromUrl) ? fromUrl : state.today);
   return usable(fromUrl) ? fromUrl : rememberedDate();
 }
 
@@ -62,12 +69,13 @@ function writeUrl() {
 }
 
 // Keep the address bar and the remembered date in step with the page, but not on every frame
-// of a drag: browsers throttle history writes.
+// of a drag: browsers throttle history writes. The pagehide and link-click listeners in wire()
+// save the date at once, so a change is never lost on leaving inside the delay.
 let persistTimer = 0;
 function persist(now = false) {
-  remember(state.date);   // at once: a link clicked in the next instant must carry the date
+  const save = () => { remember(state.date); writeUrl(); };
   clearTimeout(persistTimer);
-  if (now) writeUrl(); else persistTimer = setTimeout(writeUrl, 250);
+  if (now) save(); else persistTimer = setTimeout(save, 250);
 }
 
 function loadOther() {
@@ -77,9 +85,9 @@ function loadOther() {
       .then((response) => { if (!response.ok) throw new Error(String(response.status)); return response.json(); })
       .then((packed) => { state.other = expandOther(packed); })
       .catch(() => { state.otherLoading = null; state.otherFailed = true; })
-      .then(() => { drawVerdicts(); drawBulk(); });
+      // A throw while redrawing must not become an unhandled rejection.
+      .then(() => { drawVerdicts(); drawBulk(); }).catch(() => {});
   }
-  return state.otherLoading;
 }
 
 // ---- drawing ------------------------------------------------------------------------------
@@ -175,6 +183,13 @@ function drawExempt() {
   }
 }
 
+function showVerdict(host, code, before) {
+  if (!state.data.codes[code] && !state.other) loadOther();
+  host.innerHTML = `${before}<div data-verdict-host="${esc(code)}" data-link="1"></div>`;
+  drawVerdicts();
+  drawControls();
+}
+
 function drawResults() {
   const host = $('[data-results]');
   if (!host) return;
@@ -186,14 +201,12 @@ function drawResults() {
   const named = extractCodes(query);
   const code = named.length === 1 ? named[0] : normalizeCode(query);
   if (isCode(code)) {
-    if (!data.codes[code] && !state.other) loadOther();
-    host.innerHTML = `<div data-verdict-host="${esc(code)}" data-link="1"></div>`;
-    drawVerdicts();
-    drawControls();
+    showVerdict(host, code, '');
     return;
   }
   if (named.length > 1) {
-    host.innerHTML = `<p class="results__none">That looks like ${named.length} codes. The search box takes one at a time; <a href="#several-h">check several codes at once</a> just below.</p>`;
+    // Not a dead end: say why, and still answer for the first code.
+    showVerdict(host, named[0], `<p class="results__none">That looks like ${named.length} codes. The search box takes one at a time; <a href="#several-h">check several codes at once</a> just below. Showing the first, ${esc(named[0])}.</p>`);
     return;
   }
   state.index ||= buildIndex(data);
@@ -239,8 +252,11 @@ function drawBulk() {
   const body = rows.map((row) => `<tr><th scope="row">${row.listed ? `<a href="/code/${esc(row.code)}/">${esc(row.code)}</a>` : esc(row.code)}</th><td>${esc(row.label)}</td><td>${row.unknown ? esc(row.status) : chip(row.state)}</td><td>${esc(row.removed)}</td><td>${esc(row.exemption)}</td></tr>`).join('');
   const tally = (state) => rows.filter((row) => row.state === state).length;
   const missing = tally('gone');
-  const notes = state.bulkDropped
-    ? `<p class="note note--sched">Only the first ${rows.length} codes were checked; ${state.bulkDropped} more were left out.</p>` : '';
+  const period = state.data.periods[state.period];
+  // The page-level banner sits beside the date field; the table needs its own caution.
+  const notes = (isScheduled(period) ? `<p class="note note--sched">${scheduledNote(period)}</p>` : '')
+    + (state.bulkDropped
+      ? `<p class="note note--sched">Only the first ${rows.length} codes were checked; ${state.bulkDropped} more were left out.</p>` : '');
   setHtml(host, `<p class="results__count">${rows.length} ${rows.length === 1 ? 'code' : 'codes'} on ${formatDate(state.date)}: ${tally('ipo')} inpatient only, ${tally('off')} not${missing ? `, ${missing} not in CMS’s files on that date or not found` : ''}.</p>${notes}
 <div class="scroll"><table class="check"><thead><tr><th scope="col">Code</th><th scope="col">Procedure</th><th scope="col">Status</th><th scope="col">Left the list</th><th scope="col">Review exemption</th></tr></thead><tbody>${body}</tbody></table></div>
 <p><button type="button" class="quiet" data-bulk-csv>Download as CSV</button></p>`);
@@ -270,10 +286,11 @@ function drawDate() {
   drawBulk();
 }
 
+// '1000-01-01': a four-digit year means a real date was typed; a half-typed year (0202) does not.
 /** On leaving the date field: a real date outside the range goes to the nearest date answered;
  *  a half-typed one (year 0202) is dropped. Either way the field ends up showing the date in force. */
 function settleDateField(input) {
-  if (isDate(input.value) && input.value >= '2000-01-01') setDate(input.value);
+  if (isDate(input.value) && input.value >= '1000-01-01') setDate(input.value);
   input.value = state.date;
 }
 
@@ -366,10 +383,16 @@ function wire() {
         setHtml($('[data-bulk-out]'), '<p class="results__none">No five-character codes found in that text.</p>');
         return;
       }
+      loadOther();   // first, so a retry shows "Checking…" rather than the last failure
       drawBulk();
-      loadOther();
     }
   });
+  // Leaving the page inside the persist delay must not lose the date: save it synchronously on
+  // pagehide, and on a click on any link (capture phase, before the navigation starts).
+  window.addEventListener('pagehide', () => remember(state.date));
+  document.addEventListener('click', (event) => {
+    if (event.target.closest?.('a[href]')) remember(state.date);
+  }, true);
   document.addEventListener('click', (event) => {
     const target = event.target;
     if (target.closest('[data-today]')) setDate(state.today);
