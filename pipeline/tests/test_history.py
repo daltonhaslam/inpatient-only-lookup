@@ -4,8 +4,19 @@ import unittest
 import history
 
 
+REGIMES = [
+    {"removed_from": "2020-01-01", "kind": "two-year", "years": 2},
+    {"removed_from": "2021-01-01", "kind": "indefinite", "two_year_text_until": "2026-01-01"},
+    {"removed_from": "2026-01-01", "kind": "indefinite"},
+]
+
+
 def snap(**codes):
-    return {code: {"si": si, "ci": "", "apc": ""} for code, si in codes.items()}
+    return dict(codes)
+
+
+def exemption(year, ended=None):
+    return history.exemption_for(datetime.date(year, 1, 1), REGIMES, ended)
 
 
 def periods(*dates):
@@ -29,7 +40,7 @@ class CodeHistory(unittest.TestCase):
 
     def events(self, *statuses):
         snapshots = [snap(X=s) if s is not None else {} for s in statuses]
-        return history.code_history("X", snapshots, self.P)
+        return history.code_history("X", snapshots, self.P, REGIMES)
 
     def test_removed_returned_removed(self):
         h = self.events("C", "J1", "C", "C", "T")
@@ -64,30 +75,49 @@ class CodeHistory(unittest.TestCase):
 
 class Exemption(unittest.TestCase):
     def test_removed_in_2020_is_two_years(self):
-        e = history.exemption_for(datetime.date(2020, 1, 1))
+        e = exemption(2020)
         self.assertEqual((e["kind"], e["through"]), ("two-year", "2021-12-31"))
 
     def test_removed_in_2021_is_indefinite_with_the_two_year_text_window(self):
-        e = history.exemption_for(datetime.date(2021, 1, 1))
+        e = exemption(2021)
         self.assertEqual((e["kind"], e["through"]), ("indefinite", None))
         self.assertEqual(e["two_year_text"], {"from": "2023-01-01", "through": "2025-12-31"})
 
     def test_removed_in_2026_has_no_two_year_text_window(self):
-        e = history.exemption_for(datetime.date(2026, 1, 1))
+        e = exemption(2026)
         self.assertEqual((e["kind"], e["two_year_text"]), ("indefinite", None))
 
     def test_removed_in_2024_window_would_start_in_2026_so_there_is_none(self):
-        self.assertIsNone(history.exemption_for(datetime.date(2024, 1, 1))["two_year_text"])
+        self.assertIsNone(exemption(2024)["two_year_text"])
 
     def test_removed_before_2020(self):
-        self.assertEqual(history.exemption_for(datetime.date(2018, 1, 1))["kind"], "before-2020")
+        self.assertEqual(exemption(2018)["kind"], "before-2020")
 
     def test_ended_exemption_runs_through_the_day_before(self):
-        e = history.exemption_for(datetime.date(2026, 1, 1), datetime.date(2030, 1, 1))
+        e = exemption(2026, datetime.date(2030, 1, 1))
         self.assertEqual(e["through"], "2029-12-31")
 
 
+class EndedExemption(unittest.TestCase):
+    P = periods("2020-01-01", "2021-01-01", "2022-01-01", "2026-01-01")
+
+    def test_an_end_date_applies_only_to_removals_before_it(self):
+        snapshots = [snap(X="C"), snap(X="J1"), snap(X="C"), snap(X="J1")]
+        h = history.code_history("X", snapshots, self.P, REGIMES, {"X": "2025-01-01"})
+        self.assertEqual(h["spans"][1]["exemption"]["through"], "2024-12-31")
+        self.assertIsNone(h["spans"][3]["exemption"]["through"])
+
+
 class Periods(unittest.TestCase):
+    def test_rule_inside_the_quarterly_range_without_a_january_file_is_an_error(self):
+        sources = [
+            {"id": "b-2020-01", "kind": "addendum_b", "effective": "2020-01-01"},
+            {"id": "b-2021-04", "kind": "addendum_b", "effective": "2021-04-01"},
+            {"id": "addenda-2021", "kind": "rule_addenda", "cy": 2021},
+        ]
+        with self.assertRaises(ValueError):
+            history.build_periods(sources)
+
     def test_correction_replaces_original_and_rules_fill_the_ends(self):
         sources = [
             {"id": "b-2020-01", "kind": "addendum_b", "effective": "2020-01-01"},

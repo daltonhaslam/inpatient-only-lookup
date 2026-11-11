@@ -18,19 +18,13 @@ To add a file CMS posted somewhere discovery does not look:
     python3 pipeline/refresh.py --add-rule 2028 https://www.cms.gov/files/zip/....zip [--removal-file URL]
 """
 import argparse
-import hashlib
-import html
-import json
 import re
 import subprocess
 import sys
 import urllib.parse
-from pathlib import Path
 
 import fetch
-import history
 
-ROOT = Path(__file__).resolve().parent.parent
 QUARTERLY_PAGE = "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/addendum-a-b-updates"
 RULES_PAGE = "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/regulations-notices"
 MONTHS = {"january": "01", "april": "04", "july": "07", "october": "10"}
@@ -41,8 +35,8 @@ def links(page_html):
     """[(absolute https://www.cms.gov url, visible text)] for every link on a CMS page."""
     found = []
     for href, inner in _LINK.findall(page_html):
-        url = urllib.parse.urljoin("https://www.cms.gov/", html.unescape(href))
-        text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", inner))).strip()
+        url = urllib.parse.urljoin("https://www.cms.gov/", fetch.text_of(href))
+        text = fetch.squash(fetch.text_of(inner))
         found.append((url, text))
     return found
 
@@ -70,14 +64,22 @@ def quarter_of(text):
     return "%s-%s" % (match.group(1) or match.group(3), MONTHS[match.group(2).lower()])
 
 
+RECHECK_QUARTERS = 8   # how far back discovery looks for a replaced or corrected Addendum B
+
+
 def discover_quarters(sources, get):
-    """New Addendum B sources for quarters after the newest one already in sources.json."""
-    newest = max(source["effective"] for source in sources if source["kind"] == "addendum_b")[:7]
+    """Addendum B files CMS has posted that sources.json does not have.
+
+    Covers quarters after the newest one on file, and the last RECHECK_QUARTERS on file, where a
+    link we have not seen is a correction or a replacement. Either way the later file wins.
+    """
+    on_file = sorted({source["effective"][:7] for source in sources if source["kind"] == "addendum_b"})
+    oldest = on_file[-RECHECK_QUARTERS:][0]
     known = {source["url"].lower() for source in sources}
     pages = {}
     for url, text in links(get(QUARTERLY_PAGE)):
         quarter = quarter_of(text)
-        if quarter and quarter > newest and urllib.parse.urlsplit(url).hostname == "www.cms.gov":
+        if quarter and quarter >= oldest and urllib.parse.urlsplit(url).hostname == "www.cms.gov":
             pages.setdefault(quarter, []).append(url)
     found = []
     for quarter in sorted(pages):
@@ -115,20 +117,25 @@ def discover_rule(sources, get):
     return found
 
 
-def unique_ids(sources, additions):
-    """A second file for a quarter that already has one is a correction of it."""
+def assign_ids(sources, additions):
+    """Give each addition an id no source has. Mutates additions.
+
+    A further Addendum B for a quarter already on file corrects it (ids b-2026-10, b-2026-10-corr,
+    b-2026-10-corr2, ...); history.build_periods uses the last one listed. A second addenda zip or
+    removal file for a year is refused: one of the two is wrong and a person has to choose.
+    """
     taken = {source["id"] for source in sources}
     for source in additions:
-        if source["id"] in taken and source["kind"] == "addendum_b":
-            source["corrects"] = source["id"]
-            source["id"] += "-corr"
-        suffix = 2
         base = source["id"]
-        while source["id"] in taken:
-            source["id"] = "%s%d" % (base, suffix)
-            suffix += 1
+        if base in taken:
+            if source["kind"] != "addendum_b":
+                raise SystemExit("sources.json already has %s; remove it first if %s replaces it" % (base, source["url"]))
+            source["corrects"] = base
+            suffix = 1
+            while source["id"] in taken:
+                source["id"] = "%s-corr%s" % (base, "" if suffix == 1 else suffix)
+                suffix += 1
         taken.add(source["id"])
-    return additions
 
 
 def recheck(sources, count=3):
@@ -138,29 +145,28 @@ def recheck(sources, count=3):
     rule_files = [s for s in sources if s.get("cy") == newest_cy]
     changed = []
     for source in quarterly + rule_files:
-        digest = hashlib.sha256(fetch.download(source["url"])).hexdigest()
-        if digest != source["sha256"]:
+        if fetch.sha256(fetch.download(source["url"])) != source["sha256"]:
             changed.append(source["id"])
     return changed
 
 
 def run(script):
-    return subprocess.run([sys.executable, str(ROOT / "pipeline" / script)], cwd=str(ROOT)).returncode
+    return subprocess.run([sys.executable, str(fetch.PIPELINE / script)], cwd=str(fetch.ROOT)).returncode
 
 
-def follow_ups(manifest):
+def follow_ups(sources):
     """What a person still has to do by hand after an automatic refresh."""
     notes = []
-    rulebook = json.loads((ROOT / "pipeline" / "rules.json").read_text())
-    have_rules = {rule["cy"] for rule in rulebook["rules"]}
-    for source in manifest["sources"]:
-        if source["kind"] == "rule_addenda" and source["cy"] >= 2020 and source["cy"] not in have_rules:
-            notes.append("rules.json has no entry for CY %d (%s): add its Federal Register citation, the counts "
-                         "CMS states, and the printed code table if there is one." % (source["cy"], source["rule"]))
-    derived = ROOT / "pipeline" / "derived" / "ipo-history.json"
+    have_rules = {rule["cy"] for rule in fetch.load_rules()["rules"]}
+    first_quarterly = min(int(source["effective"][:4]) for source in sources if source["kind"] == "addendum_b")
+    for source in sources:
+        if source["kind"] == "rule_addenda" and source["cy"] >= first_quarterly and source["cy"] not in have_rules:
+            notes.append("rules.json has no entry for CY %d%s: add its Federal Register citation, the counts CMS "
+                         "states, and the printed code table if there is one." % (source["cy"], " (%s)" % source["rule"] if source["rule"] else ""))
+    derived = fetch.PIPELINE / "derived" / "ipo-history.json"
     if derived.exists():
-        listed = set(json.loads(derived.read_text()))
-        labels = set(json.loads((ROOT / "data" / "labels.json").read_text()))
+        listed = set(fetch.read_json(derived))
+        labels = set(fetch.read_json(fetch.ROOT / "data" / "labels.json"))
         if listed - labels:
             notes.append("%d code(s) need a plain-language label in data/labels.json: %s" % (
                 len(listed - labels), ", ".join(sorted(listed - labels))))
@@ -200,7 +206,7 @@ def main(argv=None):
         def get(url):
             return fetch.download(url).decode("utf-8", errors="replace")
         additions = discover_quarters(sources, get) + discover_rule(sources, get)
-    additions = unique_ids(sources, additions)
+    assign_ids(sources, additions)
 
     print("New files found: %d" % len(additions))
     for source in additions:
@@ -217,7 +223,7 @@ def main(argv=None):
         sources.extend(additions)
         fetch.save_manifest(manifest)
     status = run("fetch.py") or run("build.py") or run("run_tests.py")
-    notes = follow_ups(fetch.load_manifest())
+    notes = follow_ups(fetch.load_sources())
     print("\nStill to do by hand:" if notes else "\nNothing left to do by hand.")
     for note in notes:
         print("  - " + note)

@@ -1,10 +1,10 @@
-"""Read CMS's OPPS addenda (xlsx, csv or tab-delimited txt inside a zip) into {code: row} tables.
+"""Read CMS's OPPS addenda (xlsx, csv or tab-delimited txt inside a zip) into {code: status indicator}.
 
-Only the code, status indicator, comment indicator and APC are kept. Descriptor columns are
-AMA-copyrighted and are dropped here, so nothing downstream of this module can publish them.
-Standard library only.
+Only the code and its status indicator are kept. Descriptor columns are AMA-copyrighted and are
+dropped here, so nothing downstream of this module can publish them. Standard library only.
 """
 import csv
+import functools
 import io
 import re
 import zipfile
@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 
 CODE_RE = re.compile(r"^[0-9A-Z][0-9]{3}[0-9A-Z]$")
 MAX_MEMBER_BYTES = 80 * 1024 * 1024
+MIN_CODES = 50   # the smallest real table (a removal file) has several hundred
 _NS = {"m": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
 _REL_NS = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 
@@ -101,15 +102,11 @@ def read_member(zip_path, member):
         return [("", list(csv.reader(io.StringIO(text, newline=""), delimiter=delimiter)))]
 
 
-def members(zip_path):
-    with zipfile.ZipFile(zip_path) as archive:
-        return [name for name in archive.namelist() if not name.endswith("/")]
-
-
 def pick_member(zip_path, pattern, prefer_spreadsheet=True):
     """The one member whose basename matches pattern: the workbook if present, else the text copy."""
     regex = re.compile(pattern, re.I)
-    names = [name for name in members(zip_path) if regex.search(name.rsplit("/", 1)[-1])]
+    with zipfile.ZipFile(zip_path) as archive:
+        names = [name for name in archive.namelist() if regex.search(name.rsplit("/", 1)[-1])]
     books = [name for name in names if name.lower().endswith((".xlsx", ".xlsm"))]
     texts = [name for name in names if name.lower().endswith((".txt", ".csv"))]
     ordered = (books + texts) if prefer_spreadsheet else (texts + books)
@@ -129,12 +126,11 @@ def normalize_code(text):
 _HEADERS = {
     "code": re.compile(r"^(cy\s*\d{4}\s*)?(hcpcs|cpt)(\s*/\s*cpt)?\s*code$", re.I),
     "si": re.compile(r"^(cy\s*\d{4}\s*)?(opps\s*)?(si|status\s*indicator)$", re.I),
-    "ci": re.compile(r"^(cy\s*\d{4}\s*)?(opps\s*)?(ci|comment\s*indicator)$", re.I),
-    "apc": re.compile(r"^(cy\s*\d{4}\s*)?(opps\s*)?apc(\s*assignment)?$", re.I),
 }
 
 
 def _find_header(rows):
+    """(row number, {"code": column, "si": column}) of the header row, or (None, None)."""
     for number, row in enumerate(rows[:40]):
         found = {}
         for index, cell in enumerate(row):
@@ -142,13 +138,18 @@ def _find_header(rows):
             for key, regex in _HEADERS.items():
                 if key not in found and regex.match(label):
                     found[key] = index
-        if "code" in found and "si" in found:
+        if len(found) == len(_HEADERS):
             return number, found
     return None, None
 
 
+def _cell(row, index):
+    return (row[index] or "").strip() if index < len(row) else ""
+
+
+@functools.lru_cache(maxsize=None)
 def code_table(zip_path, member):
-    """Parse one addendum into {code: {"si", "ci", "apc"}}.
+    """Parse one addendum into {code: status indicator}. Treat the result as read-only: it is cached.
 
     Raises ParseError when no sheet has a code and status-indicator header, when a code repeats
     with a different status indicator, or when the table is implausibly small.
@@ -161,21 +162,15 @@ def code_table(zip_path, member):
             continue
         parsed_any = True
         for row in rows[header_row + 1:]:
-            def cell(key):
-                index = columns.get(key)
-                return (row[index] or "").strip() if index is not None and index < len(row) else ""
-            code = normalize_code(cell("code"))
+            code = normalize_code(_cell(row, columns["code"]))
             if not CODE_RE.match(code):
                 continue
-            entry = {"si": cell("si").upper(), "ci": cell("ci").upper(), "apc": cell("apc").split(".")[0]}
-            if entry["apc"].upper() in ("N/A", "NA"):
-                entry["apc"] = ""
-            if code in table and table[code]["si"] != entry["si"]:
-                raise ParseError("%s: %s listed with status %s and %s" % (member, code, table[code]["si"], entry["si"]))
-            table[code] = entry
+            si = _cell(row, columns["si"]).upper()
+            if table.setdefault(code, si) != si:
+                raise ParseError("%s: %s listed with status %s and %s" % (member, code, table[code], si))
     if not parsed_any:
         raise ParseError("no code/status-indicator header found in %s" % member)
-    if len(table) < 50:
+    if len(table) < MIN_CODES:
         raise ParseError("only %d codes parsed from %s" % (len(table), member))
     return table
 
@@ -196,7 +191,7 @@ def descriptor_table(zip_path, member):
             continue
         wanted = [i for i, cell in enumerate(rows[header_row]) if _DESCRIPTOR_HEADER.search(cell or "")]
         for row in rows[header_row + 1:]:
-            code = normalize_code(row[columns["code"]] if columns["code"] < len(row) else "")
+            code = normalize_code(_cell(row, columns["code"]))
             if CODE_RE.match(code):
                 table[code] = [row[i].strip() for i in wanted if i < len(row) and row[i].strip()]
     return table

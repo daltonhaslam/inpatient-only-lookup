@@ -1237,5 +1237,28 @@
   }
  ],
  "exemption_ends": {},
- "exemption_ends_note": "When CMS ends a code's medical-review exemption through rulemaking, add \"CODE\": \"YYYY-MM-DD\" (the first day the exemption no longer applies). None has ended as of the CY 2027 final rule (90 FR 53832; 91 FR 70573)."
+ "exemption_ends_note": "When CMS ends a code's medical-review exemption through rulemaking, add \"CODE\": \"YYYY-MM-DD\" (the first day the exemption no longer applies). It ends the exemption of that code's removals before that day. None has ended as of the CY 2027 final rule (90 FR 53832; 91 FR 70573).",
+ "exemption_regimes": [
+  {
+   "removed_from": "2020-01-01",
+   "kind": "two-year",
+   "years": 2,
+   "cite": "84 FR 61365",
+   "cfr": "42 CFR 412.3(d)(2)(i), as added at 85 FR 86300"
+  },
+  {
+   "removed_from": "2021-01-01",
+   "kind": "indefinite",
+   "two_year_text_until": "2026-01-01",
+   "cite": "85 FR 86119",
+   "cfr": "42 CFR 412.3(d)(2)(ii), as added at 85 FR 86300"
+  },
+  {
+   "removed_from": "2026-01-01",
+   "kind": "indefinite",
+   "cite": "90 FR 53832",
+   "cfr": "42 CFR 412.3(d)(2), as revised at 90 FR 54082"
+  }
+ ],
+ "exemption_regimes_note": "Which medical-review exemption attaches to a removal, by the date of the removal; the last regime on or before that date applies. years: a fixed length. two_year_text_until: until this date the regulation also carried a two-year paragraph for removals on or after January 1, 2020 (86 FR 63992); CMS later said the indefinite exemption had remained in effect (90 FR 53829)."
 }

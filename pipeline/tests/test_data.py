@@ -1,15 +1,13 @@
 """Checks on the committed tables: they run without the raw CMS files."""
-import json
+import collections
 import re
 import unittest
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent.parent
-DERIVED = ROOT / "pipeline" / "derived"
+import fetch
 
-
-def load(path):
-    return json.loads(path.read_text())
+ROOT = fetch.ROOT
+DERIVED = fetch.PIPELINE / "derived"
+load = fetch.read_json
 
 
 class Ledger(unittest.TestCase):
@@ -83,6 +81,19 @@ class Codes(unittest.TestCase):
                 if span["state"] != "off":
                     self.assertIsNone(span["removed"], code)
 
+    def test_per_code_events_add_up_to_the_year_ledger(self):
+        """The ledger and the per-code events are derived separately; they must agree."""
+        events = collections.Counter()
+        for record in self.history.values():
+            for event in record["events"]:
+                kind = "added" if event["type"] == "returned" else event["type"]
+                events[(event["date"], kind)] += 1
+        for entry in load(DERIVED / "years.json"):
+            changes = [dict(entry["january"] or {}, date="%d-01-01" % entry["year"])] + entry["midyear"]
+            for change in changes:
+                for kind in ("removed", "retired", "new", "added"):
+                    self.assertEqual(events[(change["date"], kind)], len(change.get(kind, [])), (change["date"], kind))
+
     def test_ever_listed_and_never_listed_do_not_overlap(self):
         self.assertFalse(set(self.history) & set(self.other))
         self.assertIn("99213", self.other)
@@ -120,9 +131,13 @@ class Rules(unittest.TestCase):
             self.assertRegex(item["cite"], r"^\d+ FR \d+$", key)
             self.assertLessEqual(len(item["quote"]), 400, key)
 
-    def test_no_code_has_an_exemption_end_yet(self):
-        # Change this when CMS ends an exemption through rulemaking and rules.json records it.
-        self.assertEqual(load(ROOT / "pipeline" / "rules.json")["exemption_ends"], {})
+    def test_exemption_end_dates_are_iso_dates(self):
+        for code, date in fetch.load_rules()["exemption_ends"].items():
+            self.assertRegex(date, r"^\d{4}-\d\d-\d\d$", code)
+
+    def test_regimes_are_in_date_order(self):
+        starts = [regime["removed_from"] for regime in fetch.load_rules()["exemption_regimes"]]
+        self.assertEqual(starts, sorted(starts))
 
 
 if __name__ == "__main__":

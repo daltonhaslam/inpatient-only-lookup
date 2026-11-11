@@ -51,8 +51,8 @@ class Parse(unittest.TestCase):
             member = parse.pick_member(path, r"addendum[ _-]*b(?![a-z])")
             self.assertTrue(member.endswith(".xlsx"))
             table = parse.code_table(path, member)
-        self.assertEqual(table["00100"], {"si": "J1", "ci": "", "apc": "5041"})
-        self.assertEqual(table["0075T"]["si"], "C")
+        self.assertEqual(table["00100"], "J1")
+        self.assertEqual(table["0075T"], "C")
         self.assertNotIn("Some text", str(table))
 
     def test_text_copy_is_picked_when_asked(self):
@@ -88,7 +88,7 @@ class Parse(unittest.TestCase):
                 z.writestr("2099 Addendum E.txt", "\n".join(rows).encode("cp1252"))
             table = parse.code_table(path, parse.pick_member(path, r"addendum[ _-]*e(?![a-z])"))
         self.assertEqual(len(table), 60)
-        self.assertEqual(table["00100"]["si"], "C")
+        self.assertEqual(table["00100"], "C")
 
 
 if __name__ == "__main__":

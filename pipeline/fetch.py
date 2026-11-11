@@ -6,14 +6,18 @@ Usage: python3 pipeline/fetch.py [--only ID ...] [--repin ID ...]
 """
 import argparse
 import hashlib
+import html
 import json
+import re
 import sys
 import urllib.parse
 import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-MANIFEST = ROOT / "pipeline" / "sources.json"
+PIPELINE = ROOT / "pipeline"
+MANIFEST = PIPELINE / "sources.json"
+RULES = PIPELINE / "rules.json"
 RAW = ROOT / "data" / "raw"
 # www.cms.gov answers 403 to urllib's default agent.
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
@@ -21,12 +25,44 @@ ALLOWED_HOSTS = {"www.cms.gov", "www.govinfo.gov", "www.ecfr.gov"}
 MAX_BYTES = 60 * 1024 * 1024
 
 
+def read_json(path):
+    return json.loads(Path(path).read_text())
+
+
+def write_json(path, value, **dumps_options):
+    """Write JSON with a trailing newline; compact and key-sorted unless told otherwise."""
+    options = dumps_options or {"separators": (",", ":"), "sort_keys": True}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, **options) + "\n")
+
+
 def load_manifest():
-    return json.loads(MANIFEST.read_text())
+    return read_json(MANIFEST)
+
+
+def load_sources():
+    return load_manifest()["sources"]
 
 
 def save_manifest(manifest):
-    MANIFEST.write_text(json.dumps(manifest, indent=1) + "\n")
+    write_json(MANIFEST, manifest, indent=1)
+
+
+def load_rules():
+    return read_json(RULES)
+
+
+def sha256(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def squash(text):
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def text_of(markup):
+    """The text of an HTML fragment: tags dropped, entities decoded."""
+    return html.unescape(re.sub(r"<[^>]+>", "", markup))
 
 
 def raw_path(source):
@@ -53,7 +89,7 @@ def fetch(source, repin=False):
     if not path.exists():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(download(source["url"]))
-    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    digest = sha256(path.read_bytes())
     if source.get("sha256") in (None, "") or repin:
         changed = source.get("sha256") != digest
         source["sha256"] = digest

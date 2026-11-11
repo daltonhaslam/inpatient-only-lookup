@@ -1,62 +1,75 @@
 Inpatient-only list: reconciliation against CMS's files
 32 snapshots, 2017-01 to 2027-01; 1861 codes ever on the list; 19329 other codes
 
-1. Each file's workbook and its text copy list the same inpatient-only codes
-----------------------------------------------------------------------------
-ok    b-2020-01
-ok    b-2020-01-corr
-ok    b-2020-04
-ok    b-2020-04-corr
-ok    b-2020-07
-ok    b-2020-07-corr
-ok    b-2020-10
-ok    b-2020-10-corr
-ok    b-2021-01
-ok    b-2021-01-corr
-ok    b-2021-04
-ok    b-2021-07
-ok    b-2021-10
-ok    b-2021-10-corr
-ok    b-2022-01
-ok    b-2022-04
-ok    b-2022-07
-ok    b-2022-10
-ok    b-2023-01
-ok    b-2023-04
-ok    b-2023-07
-ok    b-2023-10
-ok    b-2024-01
-ok    b-2024-04
-ok    b-2024-07
-ok    b-2024-10
-ok    b-2025-01
+1. Each table's workbook and its text copy agree
+------------------------------------------------
+ok    b-2020-01 (b)
+ok    b-2020-01-corr (b)
+ok    b-2020-04 (b)
+ok    b-2020-04-corr (b)
+ok    b-2020-07 (b)
+ok    b-2020-07-corr (b)
+ok    b-2020-10 (b)
+ok    b-2020-10-corr (b)
+ok    b-2021-01 (b)
+ok    b-2021-01-corr (b)
+ok    b-2021-04 (b)
+ok    b-2021-07 (b)
+ok    b-2021-10 (b)
+ok    b-2021-10-corr (b)
+ok    b-2022-01 (b)
+ok    b-2022-04 (b)
+ok    b-2022-07 (b)
+ok    b-2022-10 (b)
+ok    b-2023-01 (b)
+ok    b-2023-04 (b)
+ok    b-2023-07 (b)
+ok    b-2023-10 (b)
+ok    b-2024-01 (b)
+ok    b-2024-04 (b)
+ok    b-2024-07 (b)
+ok    b-2024-10 (b)
+ok    b-2025-01 (b)
       codes in only one copy (none inpatient-only): A4341
-ok    b-2025-04
+ok    b-2025-04 (b)
       codes in only one copy (none inpatient-only): A4341
-ok    b-2025-07
+ok    b-2025-07 (b)
       codes in only one copy (none inpatient-only): A4341
-ok    b-2025-10
+ok    b-2025-10 (b)
       codes in only one copy (none inpatient-only): A4341
-ok    b-2026-01
+ok    b-2026-01 (b)
       codes in only one copy (none inpatient-only): A4341, G0465
-ok    b-2026-04
+ok    b-2026-04 (b)
       codes in only one copy (none inpatient-only): A4341, G0465
-ok    b-2026-07
+ok    b-2026-07 (b)
       codes in only one copy (none inpatient-only): A4341, G0465
-ok    b-2026-10
-ok    addenda-2017
-ok    addenda-2018
-ok    addenda-2019
-ok    addenda-2020
-ok    addenda-2021
-ok    addenda-2022
-ok    addenda-2023
-ok    addenda-2024
-ok    addenda-2025
-ok    addenda-2026
-ok    addenda-2027
-ok    removed-2021
-ok    removed-2027
+ok    b-2026-10 (b)
+ok    addenda-2017 (e)
+ok    addenda-2017 (b)
+ok    addenda-2018 (e)
+ok    addenda-2018 (b)
+ok    addenda-2019 (e)
+ok    addenda-2019 (b)
+ok    addenda-2020 (e)
+ok    addenda-2020 (b)
+ok    addenda-2021 (e)
+ok    addenda-2021 (b)
+ok    addenda-2022 (e)
+ok    addenda-2022 (b)
+ok    addenda-2023 (e)
+ok    addenda-2023 (b)
+ok    addenda-2024 (e)
+ok    addenda-2024 (b)
+ok    addenda-2025 (e)
+ok    addenda-2025 (b)
+      codes in only one copy (none inpatient-only): A4341
+ok    addenda-2026 (e)
+ok    addenda-2026 (b)
+      codes in only one copy (none inpatient-only): A4341, G0465
+ok    addenda-2027 (e)
+ok    addenda-2027 (b)
+ok    removed-2021 (removal)
+ok    removed-2027 (removal)
 
 2. Addendum E equals status indicator C in the same rule's Addendum B and in January's quarterly file
 -----------------------------------------------------------------------------------------------------

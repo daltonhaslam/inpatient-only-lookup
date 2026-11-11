@@ -1,5 +1,4 @@
 """Checks that need the raw CMS downloads. Skipped when data/raw/ is absent (a fresh clone)."""
-import hashlib
 import re
 import unittest
 
@@ -7,9 +6,7 @@ import citations
 import fetch
 import history
 import parse
-from test_data import ROOT, load
-
-RAW_PRESENT = (ROOT / "data" / "raw").is_dir() and any((ROOT / "data" / "raw").iterdir())
+RAW_PRESENT = fetch.RAW.is_dir() and any(fetch.RAW.iterdir())
 
 
 def words(text):
@@ -25,29 +22,27 @@ def shares_run(a, b, length):
 class Raw(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.sources = history.load_sources()
+        cls.sources = fetch.load_sources()
 
     def test_every_file_matches_its_pin(self):
         for source in self.sources:
-            digest = hashlib.sha256(fetch.raw_path(source).read_bytes()).hexdigest()
-            self.assertEqual(digest, source["sha256"], source["id"])
+            self.assertEqual(fetch.sha256(fetch.raw_path(source).read_bytes()), source["sha256"], source["id"])
 
     def test_quotes_are_on_their_cited_pages(self):
         self.assertEqual(citations.verify(self.sources), [])
 
     def test_no_label_copies_a_cms_descriptor(self):
         """A label may not equal a CMS/AMA descriptor or share five consecutive words with one."""
-        labels = load(ROOT / "data" / "labels.json")
-        patterns = {"addendum_b": history.ADDENDUM_B, "rule_addenda": history.ADDENDUM_B, "removal_file": history.REMOVAL}
+        labels = fetch.read_json(fetch.ROOT / "data" / "labels.json")
         descriptors = {}
         for source in self.sources:
-            pattern = patterns.get(source["kind"])
-            if pattern is None:
-                continue
-            path = fetch.raw_path(source)
-            for code, texts in parse.descriptor_table(path, parse.pick_member(path, pattern)).items():
-                if code in labels:
-                    descriptors.setdefault(code, set()).update(texts)
+            for which, pattern in history.MEMBERS.get(source["kind"], {}).items():
+                if which == "e":
+                    continue    # Addendum E repeats the descriptors of the same rule's Addendum B
+                path = fetch.raw_path(source)
+                for code, texts in parse.descriptor_table(path, parse.pick_member(path, pattern)).items():
+                    if code in labels:
+                        descriptors.setdefault(code, set()).update(texts)
         self.assertEqual(set(descriptors), set(labels))
         copied = []
         for code, item in labels.items():
