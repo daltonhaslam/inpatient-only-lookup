@@ -67,6 +67,10 @@ class CodeHistory(unittest.TestCase):
         h = self.events("C", "J1", "T", "T", "N")
         self.assertEqual([s["removed"] for s in h["spans"][1:]], ["2021-01-01"] * 3)
 
+    def test_removal_date_survives_a_file_the_code_is_missing_from(self):
+        h = self.events("C", "J1", None, "J1", "J1")
+        self.assertEqual([s["removed"] for s in h["spans"]], [None, "2021-01-01", None, "2021-01-01"])
+
     def test_never_listed_span_has_no_removal(self):
         h = self.events("J1", "J1", "C", "C", "C")
         self.assertIsNone(h["spans"][0]["removed"])

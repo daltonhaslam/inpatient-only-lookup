@@ -26,14 +26,14 @@ MAX_BYTES = 60 * 1024 * 1024
 
 
 def read_json(path):
-    return json.loads(Path(path).read_text())
+    return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
 def write_json(path, value, **dumps_options):
     """Write JSON with a trailing newline; compact and key-sorted unless told otherwise."""
     options = dumps_options or {"separators": (",", ":"), "sort_keys": True}
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, ensure_ascii=False, **options) + "\n")
+    path.write_text(json.dumps(value, ensure_ascii=False, **options) + "\n", encoding="utf-8")
 
 
 def load_manifest():
@@ -66,17 +66,29 @@ def text_of(markup):
 
 
 def raw_path(source):
-    name = urllib.parse.unquote(source["url"].rsplit("/", 1)[-1]) or "download"
-    return RAW / source["id"] / name
+    """Where a source's download lives: data/raw/<id>/<file name>. The name is the URL's last
+    path segment with anything that could leave the folder stripped."""
+    segment = urllib.parse.unquote(urllib.parse.urlsplit(source["url"]).path.rsplit("/", 1)[-1])
+    name = re.sub(r"[^A-Za-z0-9._ -]", "_", segment.replace("..", "_")).strip(" .") or "download"
+    return RAW / re.sub(r"[^A-Za-z0-9._-]", "_", source["id"]) / name
+
+
+def _allowed(url):
+    parts = urllib.parse.urlsplit(url)
+    return parts.scheme == "https" and parts.hostname in ALLOWED_HOSTS
 
 
 def download(url):
-    parts = urllib.parse.urlsplit(url)
-    if parts.scheme != "https" or parts.hostname not in ALLOWED_HOSTS:
+    """The bytes at an allowed https URL. Redirects are followed only if they stay on allowed hosts."""
+    if not _allowed(url):
         raise ValueError("refusing to fetch %s: not an allowed https host" % url)
-    quoted = urllib.parse.urlunsplit(parts._replace(path=urllib.parse.quote(parts.path)))
+    parts = urllib.parse.urlsplit(url)
+    # CMS file names contain spaces and slashes; keep any escapes the link already has.
+    quoted = urllib.parse.urlunsplit(parts._replace(path=urllib.parse.quote(parts.path, safe="/%")))
     request = urllib.request.Request(quoted, headers={"User-Agent": UA})
     with urllib.request.urlopen(request, timeout=120) as response:
+        if not _allowed(response.geturl()):
+            raise ValueError("%s redirected to %s, which is not an allowed https host" % (url, response.geturl()))
         data = response.read(MAX_BYTES + 1)
     if len(data) > MAX_BYTES:
         raise ValueError("%s is larger than %d bytes" % (url, MAX_BYTES))

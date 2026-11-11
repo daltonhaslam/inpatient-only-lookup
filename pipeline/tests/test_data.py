@@ -131,6 +131,14 @@ class Rules(unittest.TestCase):
             self.assertRegex(item["cite"], r"^\d+ FR \d+$", key)
             self.assertLessEqual(len(item["quote"]), 400, key)
 
+    def test_event_cites_point_at_pages_with_a_verified_quote(self):
+        quoted = {item["cite"] for item in load(ROOT / "pipeline" / "citations.json")["citations"].values()}
+        for rule in fetch.load_rules()["rules"]:
+            self.assertRegex(rule["fr"], r"^\d+ FR \d+$", rule["cy"])
+            for kind, cite in rule["event_cites"].items():
+                self.assertIn(kind, ("removed", "returned", "added", "new", "retired"), rule["cy"])
+                self.assertIn(cite, quoted, (rule["cy"], kind))
+
     def test_exemption_end_dates_are_iso_dates(self):
         for code, date in fetch.load_rules()["exemption_ends"].items():
             self.assertRegex(date, r"^\d{4}-\d\d-\d\d$", code)

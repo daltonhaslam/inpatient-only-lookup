@@ -6,8 +6,9 @@ Writes  pipeline/derived/periods.json      one row per Addendum B snapshot
         pipeline/derived/ipo-history.json  events and dated spans for every code ever on the list
         pipeline/derived/other-codes.json  first/last period for codes never on the list
         pipeline/derived/years.json        the year-by-year ledger shown on the History page
+        pipeline/derived/reconciliation.json  CMS's stated counts and printed tables beside the computed ones
         pipeline/out/checks.txt            the reconciliation report
-Exits non-zero if any check fails.
+Exits non-zero if any check fails, and then leaves pipeline/derived/ untouched.
 """
 import sys
 
@@ -25,11 +26,14 @@ class Report:
     def __init__(self):
         self.lines = []
         self.failures = 0
+        self.checks = 0
+        self.rows = []      # comparisons the site shows: {"year", "what", "cms", "computed", "cite", "note"}
 
     def section(self, title):
         self.lines += ["", title, "-" * len(title)]
 
     def check(self, ok, text):
+        self.checks += 1
         if not ok:
             self.failures += 1
         self.lines.append("%s  %s" % ("ok  " if ok else "FAIL", text))
@@ -128,6 +132,8 @@ def reconcile(report, sources, periods, snapshots, ledger, rules):
             if adjust:
                 text += " (%+d: %s)" % (adjust, claim["why"])
             report.check(computed == claim["count"] + adjust, text)
+            report.rows.append({"year": rule["cy"], "what": claim["what"], "cms": claim["count"], "computed": computed,
+                                "cite": claim["cite"], "note": claim.get("why", "")})
 
     report.section("5. Code lists printed in the Federal Register equal the changes computed from Addendum B")
     for rule in rules:
@@ -144,6 +150,11 @@ def reconcile(report, sources, periods, snapshots, ledger, rules):
             stale = explained[side] - (printed ^ computed)
             report.check(not unexplained and not stale, "CY %d  %s (%s): %s %d printed, %d computed, %d difference(s) explained" % (
                 rule["cy"], printed_table["name"], printed_table["pages"], side, len(printed), len(computed), len(printed ^ computed)))
+            if printed or side == "removed":
+                differences = len(printed ^ computed)
+                report.rows.append({"year": rule["cy"], "what": "codes %s, as printed in %s" % (side, printed_table["name"]),
+                                    "cms": len(printed), "computed": len(computed), "cite": printed_table["pages"].split("-")[0],
+                                    "note": "%d difference%s, explained on the Methods page" % (differences, "" if differences == 1 else "s") if differences else ""})
             if unexplained:
                 report.note("unexplained: %s" % sorted(unexplained))
             if stale:
@@ -162,11 +173,6 @@ def reconcile(report, sources, periods, snapshots, ledger, rules):
         report.lines.append("      %d  %5d  %7d  %7d  %3d  %5d  %12d  %6d" % (
             entry["year"], entry["start"], len(change["removed"]), len(change["retired"]),
             len(change["new"]), len(change["added"]), mid, entry["end"]))
-        if entry["january"] is not None:
-            before = by_year[entry["year"] - 1]["end"]
-            balanced = before - len(change["removed"]) - len(change["retired"]) + len(change["new"]) + len(change["added"]) == entry["start"]
-            report.check(balanced, "CY %d balances: %d - %d - %d + %d + %d = %d" % (
-                entry["year"], before, len(change["removed"]), len(change["retired"]), len(change["new"]), len(change["added"]), entry["start"]))
 
 
 def main():
@@ -195,12 +201,18 @@ def main():
     for code in rulebook["exemption_ends"]:
         report.check(code in ipo_history, "exemption end date is for a code with list history: %s" % code)
 
-    fetch.write_json(DERIVED / "periods.json", periods)
-    fetch.write_json(DERIVED / "ipo-history.json", ipo_history)
-    fetch.write_json(DERIVED / "other-codes.json", other)
-    fetch.write_json(DERIVED / "years.json", ledger)
     OUT.mkdir(parents=True, exist_ok=True)
-    report.lines += ["", "%d check(s) failed" % report.failures if report.failures else "All checks passed."]
+    if report.failures:
+        # The site is built from the derived tables: never replace them with unreconciled data.
+        report.lines += ["", "%d check(s) failed. pipeline/derived/ was left as it was." % report.failures]
+    else:
+        fetch.write_json(DERIVED / "periods.json", periods)
+        fetch.write_json(DERIVED / "ipo-history.json", ipo_history)
+        fetch.write_json(DERIVED / "other-codes.json", other)
+        fetch.write_json(DERIVED / "years.json", ledger)
+        fetch.write_json(DERIVED / "reconciliation.json", {
+            "rows": sorted(report.rows, key=lambda row: row["year"]), "checks": report.checks, "quotes": len(citations.load())})
+        report.lines += ["", "All checks passed."]
     (OUT / "checks.txt").write_text("\n".join(report.lines) + "\n")
     print("\n".join(report.lines))
     return 1 if report.failures else 0

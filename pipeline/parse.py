@@ -82,12 +82,13 @@ def _xlsx_sheets(archive):
 
 
 def _decode(data):
-    for encoding in ("utf-8-sig", "cp1252", "latin-1"):
+    """CMS's text copies are UTF-8 or Windows-1252; Latin-1 decodes anything left."""
+    for encoding in ("utf-8-sig", "cp1252"):
         try:
             return data.decode(encoding)
         except UnicodeDecodeError:
             continue
-    raise ParseError("undecodable text")
+    return data.decode("latin-1")
 
 
 def read_member(zip_path, member):
@@ -103,12 +104,15 @@ def read_member(zip_path, member):
 
 
 def pick_member(zip_path, pattern, prefer_spreadsheet=True):
-    """The one member whose basename matches pattern: the workbook if present, else the text copy."""
+    """The member whose basename matches pattern: the workbook, or its text copy if asked or if there
+    is no workbook. More than one workbook or text copy matching is an error."""
     regex = re.compile(pattern, re.I)
     with zipfile.ZipFile(zip_path) as archive:
         names = [name for name in archive.namelist() if regex.search(name.rsplit("/", 1)[-1])]
     books = [name for name in names if name.lower().endswith((".xlsx", ".xlsm"))]
     texts = [name for name in names if name.lower().endswith((".txt", ".csv"))]
+    if len(books) > 1 or len(texts) > 1:
+        raise ParseError("more than one member matching %r in %s: %s" % (pattern, zip_path, books + texts))
     ordered = (books + texts) if prefer_spreadsheet else (texts + books)
     if not ordered:
         raise ParseError("no member matching %r in %s" % (pattern, zip_path))

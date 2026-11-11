@@ -17,11 +17,12 @@ def load():
     return fetch.read_json(fetch.PIPELINE / "citations.json")["citations"]
 
 
-def page_number(cite):
+def split_cite(cite):
+    """(volume, page) of a "VOL FR PAGE" citation."""
     match = re.fullmatch(r"(\d+) FR (\d+)", cite)
     if not match:
         raise ValueError("citation is not 'VOL FR PAGE': %r" % cite)
-    return int(match.group(2))
+    return int(match.group(1)), int(match.group(2))
 
 
 def verify(sources):
@@ -36,6 +37,10 @@ def verify(sources):
             continue
         if source["id"] not in cache:
             cache[source["id"]] = pages_of(fetch.raw_path(source))
-        if fetch.squash(item["quote"]) not in cache[source["id"]].get(page_number(item["cite"]), ""):
+        volume, page = split_cite(item["cite"])
+        quote = fetch.squash(item["quote"])
+        if volume != split_cite(source["fr"])[0]:
+            problems.append("%s: %s is not in volume %s of %s" % (key, item["cite"], source["fr"].split()[0], source["id"]))
+        elif not quote or quote not in cache[source["id"]].get(page, ""):
             problems.append("%s: quote not found on %s" % (key, item["cite"]))
     return problems

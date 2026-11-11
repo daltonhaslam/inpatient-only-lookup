@@ -8,7 +8,11 @@
    "published": "2017-11-13",
    "doc": "2017-23932",
    "stated": [],
-   "table": null
+   "table": null,
+   "event_cites": {
+    "removed": "82 FR 52526",
+    "added": "82 FR 52526"
+   }
   },
   {
    "cy": 2019,
@@ -17,7 +21,8 @@
    "published": "2018-11-21",
    "doc": "2018-24243",
    "stated": [],
-   "table": null
+   "table": null,
+   "event_cites": {}
   },
   {
    "cy": 2020,
@@ -82,6 +87,9 @@
       "why": "New codes for CY 2020 that enter Addendum B already assigned status C. The rule's table lists changes to existing codes only."
      }
     ]
+   },
+   "event_cites": {
+    "removed": "84 FR 61358"
    }
   },
   {
@@ -422,6 +430,9 @@
       "why": "New codes for CY 2021 that enter Addendum B already assigned status C."
      }
     ]
+   },
+   "event_cites": {
+    "removed": "85 FR 86093"
    }
   },
   {
@@ -756,6 +767,10 @@
       "why": "New codes for CY 2022 that enter Addendum B already assigned status C. Table 48 covers the services removed in CY 2021 and one reclassified code."
      }
     ]
+   },
+   "event_cites": {
+    "returned": "86 FR 63711",
+    "added": "86 FR 63710"
    }
   },
   {
@@ -810,6 +825,10 @@
       "why": "A new prolonged inpatient services code for CY 2023 that enters Addendum B with status C. It is not a surgical procedure and is not in Table 65."
      }
     ]
+   },
+   "event_cites": {
+    "removed": "87 FR 72009",
+    "new": "87 FR 72006"
    }
   },
   {
@@ -843,6 +862,10 @@
      "76988",
      "76989"
     ]
+   },
+   "event_cites": {
+    "new": "88 FR 81859",
+    "added": "88 FR 81859"
    }
   },
   {
@@ -886,6 +909,9 @@
       "why": "New codes for CY 2025 that enter Addendum B already assigned status C. They replace three codes retired the same day."
      }
     ]
+   },
+   "event_cites": {
+    "removed": "89 FR 94274"
    }
   },
   {
@@ -1210,6 +1236,9 @@
       "why": "New codes for CY 2026 that enter Addendum B already assigned status C."
      }
     ]
+   },
+   "event_cites": {
+    "removed": "90 FR 53788"
    }
   },
   {
@@ -1233,7 +1262,11 @@
      "compare": "start_of_prior_year"
     }
    ],
-   "table": null
+   "table": null,
+   "event_cites": {
+    "removed": "91 FR 70574",
+    "retired": "91 FR 70574"
+   }
   }
  ],
  "exemption_ends": {},
@@ -1260,5 +1293,6 @@
    "cfr": "42 CFR 412.3(d)(2), as revised at 90 FR 54082"
   }
  ],
- "exemption_regimes_note": "Which medical-review exemption attaches to a removal, by the date of the removal; the last regime on or before that date applies. years: a fixed length. two_year_text_until: until this date the regulation also carried a two-year paragraph for removals on or after January 1, 2020 (86 FR 63992); CMS later said the indefinite exemption had remained in effect (90 FR 53829)."
+ "exemption_regimes_note": "Which medical-review exemption attaches to a removal, by the date of the removal; the last regime on or before that date applies. years: a fixed length. two_year_text_until: until this date the regulation also carried a two-year paragraph for removals on or after January 1, 2020 (86 FR 63992); CMS later said the indefinite exemption had remained in effect (90 FR 53829).",
+ "event_cites_note": "Where each final rule finalizes its January 1 changes, by kind of change. A change with no page here is cited to the rule as a whole and to the Addendum B file that shows it."
 }

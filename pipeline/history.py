@@ -34,15 +34,22 @@ def table(source, which):
 def build_periods(sources):
     """Ordered periods, each {"id", "date", "source", "basis"}.
 
-    basis is "quarterly" (an Addendum B update; a later-listed correction replaces the file it
-    corrects), "annual" (a final rule's Addendum B for a year before the quarterly files start)
+    basis is "quarterly" (an Addendum B update; a file is replaced by the one whose "corrects"
+    names it), "annual" (a final rule's Addendum B for a year before the quarterly files start)
     or "final-rule" (the newest rule's Addendum B, standing in until its January file is posted).
     """
-    quarters = {}
+    by_quarter = {}
     for source in sources:
         if source["kind"] == "addendum_b":
-            # sources.json lists a quarter's files in the order CMS posted them: the last one wins.
-            quarters[source["effective"]] = source
+            by_quarter.setdefault(source["effective"], []).append(source)
+    quarters = {}
+    for effective, files in by_quarter.items():
+        # The file in force is the one no other file corrects, whatever order they are listed in.
+        corrected = {source.get("corrects") for source in files}
+        current = [source for source in files if source["id"] not in corrected]
+        if len(current) != 1:
+            raise ValueError("%s: expected one current Addendum B, found %s" % (effective, [s["id"] for s in current]))
+        quarters[effective] = current[0]
     periods = [{"id": effective[:7], "date": effective, "source": source["id"], "basis": "quarterly"}
                for effective, source in quarters.items()]
     first_quarter, last_quarter = min(quarters), max(quarters)
@@ -182,11 +189,11 @@ def code_history(code, snapshots, periods, regimes, exemption_ends=None):
             events.append({"date": date.isoformat(), "type": kind, "si": si})
         if kind == "removed":
             removed_on = date
-        elif state != "off":
+        elif state == "ipo" or kind == "retired":
             removed_on = None
         was_listed = was_listed or state == "ipo"
         span = {"from": date.isoformat(), "state": state, "si": si, "removed": None, "exemption": None}
-        if removed_on is not None:
+        if state == "off" and removed_on is not None:
             span["removed"] = removed_on.isoformat()
             span["exemption"] = exemption_for(removed_on, regimes, ended if ended and removed_on < ended else None)
         spans.append(span)
