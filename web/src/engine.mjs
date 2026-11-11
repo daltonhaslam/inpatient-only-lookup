@@ -146,31 +146,33 @@ export function buildIndex(data) {
 /**
  * Codes matching a query, best first. A query that looks like a code (starts with a digit, or a
  * letter then digits) matches by code prefix; anything else matches when every word in it starts
- * a word of the label, keywords, family or group. Label matches rank above the rest.
+ * a word of the label, keywords, family or group. Label matches rank above the rest, then shorter labels.
  */
 export function search(index, query, limit = 60) {
   const text = fold(String(query || '').trim());
   if (!text) return { codes: [], total: 0 };
-  const scored = [];
+  const scored = [];   // [score, label length in words, code]: lower is better
   if (/^(\d[0-9a-z]{0,4}|[a-z]\d{1,4})$/.test(text)) {
     const prefix = text.toUpperCase();
-    for (const entry of index) if (entry.code.startsWith(prefix)) scored.push([entry.code === prefix ? 0 : 1, entry.code]);
+    for (const entry of index) if (entry.code.startsWith(prefix)) scored.push([entry.code === prefix ? 0 : 1, 0, entry.code]);
   }
   const terms = wordsOf(text);
   if (!scored.length && terms.length) {
     for (const entry of index) {
       let score = 0;
       for (const term of terms) {
-        const inLabel = entry.label.findIndex((word) => word.startsWith(term));
-        if (inLabel >= 0) score += inLabel === 0 ? 0 : 1;
+        if (entry.label.some((word) => word.startsWith(term))) score += 0;
         else if (entry.extra.some((word) => word.startsWith(term))) score += 3;
         else { score = -1; break; }
       }
-      if (score >= 0) scored.push([score + 2, entry.code]);
+      // Anesthesia codes echo the procedure they go with; list the procedure first unless asked.
+      if (score >= 0 && entry.label[0] === 'anesthesia' && !terms.some((term) => 'anesthesia'.startsWith(term))) score += 1;
+      // Among equal matches the shorter label is the plainer procedure ("Total hip replacement").
+      if (score >= 0) scored.push([score + 2, entry.label.length, entry.code]);
     }
   }
-  scored.sort((a, b) => a[0] - b[0] || (a[1] < b[1] ? -1 : 1));
-  return { codes: scored.slice(0, limit).map((item) => item[1]), total: scored.length };
+  scored.sort((a, b) => a[0] - b[0] || a[1] - b[1] || (a[2] < b[2] ? -1 : 1));
+  return { codes: scored.slice(0, limit).map((item) => item[2]), total: scored.length };
 }
 
 /** Pull every distinct five-character code out of free text (a pasted list, a spreadsheet column). */

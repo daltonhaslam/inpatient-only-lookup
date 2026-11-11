@@ -1,0 +1,281 @@
+// End-to-end smoke test: node e2e/smoke.mjs   (exits non-zero if any check fails)
+// Serves docs/ locally and drives the cached Chromium. No test framework.
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+import { existsSync } from 'node:fs';
+import { launch } from './browser.mjs';
+import { serve } from './serve.mjs';
+
+const here = dirname(fileURLToPath(import.meta.url));
+const AXE = join(here, '..', 'node_modules', 'axe-core', 'axe.min.js');
+if (!existsSync(join(here, '..', '..', 'docs', 'index.html'))) {
+  console.error('docs/ is not built. Run: cd web && BUILD_DATE=2026-11-11 node build.mjs');
+  process.exit(2);
+}
+
+const server = await serve();
+const base = `http://127.0.0.1:${server.address().port}`;
+const browser = await launch();
+
+let passed = 0;
+const failures = [];
+const problems = []; // console errors and page errors, in order
+let ignore404 = false;
+
+async function newContext(options = {}) {
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, ...options });
+  if (options.javaScriptEnabled !== false) await context.clock.setFixedTime(new Date('2026-11-11T12:00:00'));
+  context.on('page', (page) => {
+    page.on('console', (message) => {
+      if (message.type() !== 'error') return;
+      if (ignore404 && /status of 404/.test(message.text())) return;
+      problems.push(`console error on ${page.url()}: ${message.text()}`);
+    });
+    page.on('pageerror', (error) => problems.push(`page error on ${page.url()}: ${error.message}`));
+  });
+  return context;
+}
+
+/** Run one check in a fresh context; any console/page error during it fails the check. */
+async function check(name, fn, options = {}) {
+  const before = problems.length;
+  const context = await newContext(options);
+  const page = await context.newPage();
+  page.setDefaultTimeout(6000);
+  try {
+    await fn(page, context);
+    const fresh = problems.slice(before);
+    if (fresh.length) throw new Error(`console/page errors:\n    ${fresh.join('\n    ')}`);
+    passed += 1;
+    console.log(`✓ ${name}`);
+  } catch (error) {
+    failures.push(name);
+    console.log(`✗ ${name}\n    ${String(error.message || error).split('\n').join('\n    ')}`);
+  } finally {
+    await context.close();
+  }
+}
+
+const assert = (condition, message) => { if (!condition) throw new Error(message); };
+const eq = (actual, expected, what) => assert(actual === expected, `${what}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+const has = (actual, part, what) => assert(String(actual).includes(part), `${what}: expected to include ${JSON.stringify(part)}, got ${JSON.stringify(String(actual).slice(0, 300))}`);
+
+async function open(page, path) {
+  await page.goto(base + path);
+  await page.waitForSelector('html.live', { timeout: 20000 }).catch(() => { throw new Error(`${path}: page never went live (html.live)`); });
+}
+const answer = (page, scope = '') => page.locator(`${scope} .verdict__answer`.trim()).first();
+/** Wait until a locator's text satisfies a test, then return it (or throw with the last text). */
+async function waitText(locator, test, what) {
+  let last = '';
+  for (let i = 0; i < 60; i += 1) {
+    last = ((await locator.textContent().catch(() => '')) || '').trim();
+    if (test(last)) return last;
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  throw new Error(`${what}: last text was ${JSON.stringify(last)}`);
+}
+async function setDate(page, iso) {
+  const input = page.locator('[data-dos]').first();
+  await input.fill(iso);
+  await input.dispatchEvent('change');
+}
+
+// ---- home ---------------------------------------------------------------------------------
+
+await check('home: typing a code, changing the date, searching by name, opening a row', async (page) => {
+  await open(page, '/');
+  await page.fill('[data-q]', '27447');
+  const first = await waitText(answer(page), (t) => /inpatient only on/i.test(t), 'verdict for 27447');
+  has(first, 'inpatient only on', 'answer');
+
+  await setDate(page, '2021-03-03');
+  eq(await waitText(answer(page), (t) => t.includes('March 3, 2021'), 'answer after date change'), 'Not inpatient only on March 3, 2021.', 'answer');
+  has(page.url(), 'dos=2021-03-03', 'URL');
+
+  await page.fill('[data-q]', 'hip replacement');
+  const row = page.locator('[data-results] [data-row="27130"]');
+  await row.waitFor();
+  assert(await row.locator('.chip').count() === 1, 'row 27130 has no status chip');
+  assert((await row.locator('.chip').textContent()).trim().length > 0, 'status chip is empty');
+  await row.click();
+  await page.waitForURL('**/code/27130/**');
+  await page.waitForSelector('html.live');
+  await page.waitForFunction(() => document.querySelector('[data-dos]').value === '2021-03-03');
+  eq(await page.inputValue('[data-dos]'), '2021-03-03', 'date input on the code page');
+});
+
+await check('home: Today button resets the date, then hides', async (page) => {
+  await open(page, '/');
+  const today = page.locator('[data-today]').first();
+  assert(await today.isHidden(), 'Today is visible while the date is today');
+  await setDate(page, '2021-03-03');
+  await today.waitFor({ state: 'visible' });
+  await today.click();
+  await page.waitForFunction(() => document.querySelector('[data-dos]').value === '2026-11-11');
+  eq(await page.inputValue('[data-dos]'), '2026-11-11', 'date after Today');
+  assert(await today.isHidden(), 'Today did not hide after reset');
+  assert(!page.url().includes('dos='), `URL still carries dos: ${page.url()}`);
+});
+
+await check('home: a never-listed code and a nonsense code', async (page) => {
+  await open(page, '/');
+  await page.fill('[data-q]', '99213');
+  await waitText(page.locator('[data-results]'), (t) => t.includes('has not been on the inpatient-only list'), '99213 result');
+  await page.fill('[data-q]', '0000Z');
+  await waitText(page.locator('[data-results]'), (t) => t.includes('No record of'), '0000Z result');
+});
+
+await check('home: bulk check table and CSV download', async (page) => {
+  await open(page, '/');
+  await page.fill('[data-bulk-input]', '27130, 27447 22630\n99213 0000Z');
+  await page.click('[data-bulk] button[type="submit"]');
+  await page.waitForFunction(() => document.querySelectorAll('[data-bulk-out] table tbody tr').length === 5);
+  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download as CSV' }).click()]);
+  const stream = await download.createReadStream();
+  let text = '';
+  for await (const chunk of stream) text += chunk;
+  const lines = text.split('\n').filter((line) => line.trim());
+  eq(lines.length, 6, `CSV line count (header + 5); text was:\n${text}`);
+  has(download.suggestedFilename(), '.csv', 'download name');
+});
+
+await check('home: whole-list count follows the date', async (page) => {
+  await open(page, '/');
+  await setDate(page, '2026-11-11');
+  eq(await waitText(page.locator('[data-count="total"]'), (t) => t === '1,448', 'total on 2026-11-11'), '1,448', 'total on 2026-11-11');
+  await setDate(page, '2021-03-03');
+  eq(await waitText(page.locator('[data-count="total"]'), (t) => t === '1,438', 'total on 2021-03-03'), '1,438', 'total on 2021-03-03');
+});
+
+// ---- a code page --------------------------------------------------------------------------
+
+await check('code page: range input by keyboard keeps focus', async (page) => {
+  await open(page, '/code/27132/?dos=2026-02-01');
+  eq(await waitText(answer(page), (t) => t.includes('2026'), 'answer'), 'Not inpatient only on February 1, 2026.', 'answer');
+  await page.locator('[data-range]').focus();
+  await page.keyboard.press('ArrowRight');
+  eq(await waitText(answer(page), (t) => t.includes('February 2'), 'answer after ArrowRight'), 'Not inpatient only on February 2, 2026.', 'answer');
+  const focused = await page.evaluate(() => document.activeElement && document.activeElement.matches('[data-range]'));
+  assert(focused, 'focus left the range input after redraw');
+});
+
+await check('code page: timeline track press and drag', async (page) => {
+  await open(page, '/code/27132/?dos=2026-02-01');
+  await waitText(answer(page), (t) => t.includes('2026'), 'answer');
+  await page.locator('[data-track]').scrollIntoViewIfNeeded();
+  const box = await page.locator('[data-track]').boundingBox();
+  const at = (share) => ({ x: box.x + box.width * share, y: box.y + box.height / 2 });
+  const markDate = () => page.locator('[data-mark-date]').textContent();
+  const start = at(0.45);
+  await page.mouse.move(start.x, start.y);
+  await page.mouse.down();
+  const afterPress = await waitText(answer(page), (t) => /2022/.test(t) || /2021/.test(t) || /2023/.test(t), 'answer after pressing the track at 45%');
+  assert(/in 2022|, 2022\./.test(afterPress), `date after press at 45% is not in 2022: ${afterPress}`);
+  has(afterPress, 'Inpatient only on', 'answer after press');
+  const seen = new Set([await markDate()]);
+  for (const share of [0.55, 0.62, 0.7, 0.8]) {
+    const p = at(share);
+    await page.mouse.move(p.x, p.y, { steps: 4 });
+    await page.waitForFunction((was) => document.querySelector('[data-mark-date]').textContent !== was, [...seen].pop());
+    seen.add(await markDate());
+  }
+  await page.mouse.up();
+  assert(seen.size === 5, `dragging produced ${seen.size} distinct dates, expected 5: ${[...seen].join(' | ')}`);
+  eq(await waitText(answer(page), (t) => /2026/.test(t), 'answer at 80%'), await answer(page).textContent(), 'answer stable');
+  has(await answer(page).textContent(), 'Not inpatient only on', 'answer at 80% (August 2026 is after the 2026 removal)');
+});
+
+// ---- group page ---------------------------------------------------------------------------
+
+await check('group page: chips follow the date', async (page) => {
+  await open(page, '/group/spine/');
+  const chips = () => page.locator('[data-row] .chip').allTextContents();
+  await setDate(page, '2026-11-11');
+  const now = await waitText(page.locator('[data-row] .chip').first(), (t) => t.length > 0, 'first chip');
+  const a = await chips();
+  assert(a.length > 5, `only ${a.length} chips`);
+  await setDate(page, '2022-06-01');
+  await page.waitForFunction((was) => [...document.querySelectorAll('[data-row] .chip')].map((c) => c.textContent).join('|') !== was, a.join('|'));
+  const b = await chips();
+  assert(a.join('|') !== b.join('|'), `chips identical on both dates (${now})`);
+  eq(await page.locator('[data-row] .chip.chip--ipo').count() > 0 || b.some((t) => t === 'Inpatient only'), true, 'some spine code is inpatient only in mid-2022');
+});
+
+// ---- no JavaScript ------------------------------------------------------------------------
+
+await check('no-JS: code page still answers, home shows the noscript note and system links', async (page) => {
+  await page.goto(`${base}/code/27447/`);
+  const head = await answer(page).textContent();
+  assert(/(Not i|I)npatient only on .+\d{4}\./.test(head), `no answer sentence: ${head}`);
+  assert(await page.locator('.events li').count() > 0, 'history list is empty');
+  await page.goto(`${base}/`);
+  has(await page.locator('noscript').first().textContent(), 'Search needs JavaScript', 'noscript note');
+  assert(await page.locator('a[href^="/group/"]').count() >= 20, 'body-system links missing');
+}, { javaScriptEnabled: false });
+
+// ---- phone --------------------------------------------------------------------------------
+
+await check('phone 390x844: no horizontal overflow', async (page) => {
+  const paths = ['/', '/?q=27447', '/code/27132/', '/history/', '/phase-out/', '/exemption/', '/methods/', '/group/heart/'];
+  const wide = [];
+  for (const path of paths) {
+    await open(page, path);
+    if (path.includes('q=')) await page.waitForSelector('[data-results] .verdict');
+    const m = await page.evaluate(() => ({ s: document.documentElement.scrollWidth, c: document.documentElement.clientWidth }));
+    if (m.s > m.c + 1) {
+      const culprit = await page.evaluate((c) => [...document.querySelectorAll('body *')].filter((e) => e.getBoundingClientRect().right > c + 1).slice(0, 3).map((e) => `${e.tagName.toLowerCase()}.${String(e.className).split(' ')[0]}`).join(', '), m.c);
+      wide.push(`${path}: scrollWidth ${m.s} > clientWidth ${m.c} (${culprit})`);
+    }
+  }
+  assert(wide.length === 0, wide.join('\n'));
+}, { viewport: { width: 390, height: 844 } });
+
+// ---- accessibility ------------------------------------------------------------------------
+
+const axePaths = ['/?q=27447', '/code/27132/', '/history/', '/phase-out/', '/exemption/', '/methods/', '/group/spine/'];
+for (const scheme of ['light', 'dark']) {
+  await check(`axe (${scheme}): no serious or critical violations`, async (page) => {
+    const report = [];
+    for (const path of axePaths) {
+      await open(page, path);
+      if (path.includes('q=')) await page.waitForSelector('[data-results] .verdict');
+      await page.addScriptTag({ path: AXE });
+      const results = await page.evaluate(() => window.axe.run(document));
+      for (const v of results.violations.filter((x) => x.impact === 'serious' || x.impact === 'critical')) {
+        report.push(`${path} [${v.impact}] ${v.id}: ${v.help}\n      ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join('\n      ')}`);
+      }
+    }
+    assert(report.length === 0, `${report.length} violations\n  ${report.join('\n  ')}`);
+  }, { colorScheme: scheme });
+}
+
+// ---- keyboard and 404 ---------------------------------------------------------------------
+
+await check('keyboard: Tab reaches the skip link first and it moves focus into main', async (page) => {
+  await open(page, '/');
+  await page.keyboard.press('Tab');
+  const first = await page.evaluate(() => document.activeElement.className + ' ' + document.activeElement.getAttribute('href'));
+  has(first, 'skip', 'first focusable element');
+  await page.keyboard.press('Enter');
+  const where = await page.evaluate(() => {
+    const el = document.activeElement;
+    return { inMain: Boolean(el && el.closest('main')), tag: el ? `${el.tagName.toLowerCase()}#${el.id}` : 'none' };
+  });
+  assert(where.inMain, `focus after activating the skip link is ${where.tag}, not inside main`);
+});
+
+await check('404: missing path returns the 404 page with a link home', async (page) => {
+  ignore404 = true;
+  try {
+    const response = await page.goto(`${base}/no/such/page/`);
+    eq(response.status(), 404, 'status');
+    has(await page.locator('h1').textContent(), 'That page does not exist', 'h1');
+    assert(await page.locator('main a[href="/"]').count() > 0, 'no link back to the lookup');
+  } finally { ignore404 = false; }
+});
+
+await browser.close();
+server.close();
+console.log(`\n${passed} passed, ${failures.length} failed`);
+if (failures.length) { console.log(`failed: ${failures.join('; ')}`); process.exit(1); }

@@ -1,6 +1,6 @@
 // Page templates. Build-time only: everything here becomes static HTML in docs/.
 import { SITE, feedbackHref, CFR } from './site.mjs';
-import { formatDate, monthYear, lookup, countsAt, periodIndex, spanAt, eventsOf, stateOf } from './engine.mjs';
+import { formatDate, monthYear, lookup, countsAt, periodIndex, spanAt, eventsOf, stateOf, dayNumber } from './engine.mjs';
 import { esc, out, fr, cfr, chip, verdict, eventList, codeRow, AXIS } from './views.mjs';
 
 const NAV = [
@@ -48,7 +48,7 @@ ${ctx.assets.preload}
 <a class="top__name" href="/">${SITE.name}</a>
 <nav class="top__nav" aria-label="Site">${nav}</nav>
 </header>
-<main id="main">
+<main id="main" tabindex="-1">
 ${body}
 </main>
 <footer class="foot">
@@ -70,6 +70,20 @@ export const dateControl = (data, date) => `<form class="dos" data-dos-form>
 
 // ---- home ---------------------------------------------------------------------------------
 
+/** A visible slider over the whole lookup range, with a tick for each January 1. */
+function scrubber(data, date) {
+  const min = dayNumber(data.dosMin);
+  const max = dayNumber(data.dosMax);
+  const years = [];
+  for (let year = Number(data.dosMin.slice(0, 4)); year <= Number(data.dosMax.slice(0, 4)); year += 1) {
+    years.push(`<span style="left:${(((dayNumber(`${year}-01-01`) - min) / (max - min)) * 100).toFixed(3)}%">${year}</span>`);
+  }
+  return `<div class="scrub">
+<input class="scrub__range" data-range type="range" min="${min}" max="${max}" value="${dayNumber(date)}" aria-label="Date of service, ${formatDate(data.dosMin)} to ${formatDate(data.dosMax)}" aria-valuetext="${formatDate(date)}">
+<div class="scrub__years" aria-hidden="true">${years.join('')}</div>
+</div>`;
+}
+
 function wholeList(ctx, date) {
   const { data } = ctx;
   const index = periodIndex(data, date);
@@ -88,7 +102,8 @@ function wholeList(ctx, date) {
   }).join('\n');
   return `<section class="whole" aria-labelledby="whole-h">
 <h2 id="whole-h">The whole list on <span data-dos-text>${formatDate(date)}</span></h2>
-<p class="whole__sum"><strong data-count="total">${num(counts.total)}</strong> codes are inpatient only on this date, out of ${num(ctx.codes.length)} that have been on the list at some point since 2017. Each square is one code: filled is on the list, hollow is off it, a dot is a code not in use. Change the date and watch the list empty.</p>
+<p class="whole__sum"><strong data-count="total">${num(counts.total)}</strong> codes are inpatient only on this date, out of ${num(ctx.codes.length)} that have been on the list at some point since 2017. Each square is one code: filled is on the list, hollow is off it, a dot is a code not in use. Drag the date to watch the list empty, refill and empty again.</p>
+${scrubber(data, date)}
 <p class="cellkey" aria-hidden="true"><span><i class="cell cell--ipo"></i>On the list</span><span><i class="cell cell--off"></i>Off the list</span><span><i class="cell cell--gone"></i>Not in the files</span></p>
 <div class="systems" data-cells>
 ${groups}
@@ -205,10 +220,10 @@ ${families}
 const YEAR_NOTES = {
   2018: () => `Total knee replacement (27447) and five other procedures came off the list, and one was added (${fr('82 FR 52526')}). CMS barred recovery auditors from patient-status review of knee replacement for two years (${fr('82 FR 52362')}).`,
   2019: () => `Four codes left the list in CMS’s files (CY 2019 final rule, ${fr('83 FR 58818')}).`,
-  2020: () => `Total hip replacement (27130), six spine procedures and their anesthesia codes came off (${fr('84 FR 61355')}; ${fr('84 FR 61357')}; ${fr('84 FR 61358')}). CMS created a two-year exemption from certain medical review for procedures removed from 2020 on (${fr('84 FR 61365')}).`,
+  2020: () => `Total hip replacement (27130), six spine procedures and five anesthesia codes came off (${fr('84 FR 61355')}; ${fr('84 FR 61357')}; ${fr('84 FR 61358')}). CMS created a two-year exemption from certain medical review for procedures removed from 2020 on (${fr('84 FR 61365')}).`,
   2021: () => `CMS decided to eliminate the list over three years and removed the first 298 codes: 266 musculoskeletal services, 16 recommended by its advisory panel, and related anesthesia codes (${fr('85 FR 86093')}). It made the medical-review exemption indefinite for anything removed in 2021 or later (${fr('85 FR 86119')}).`,
   2022: () => `CMS halted the elimination and put back the codes it had removed, except lumbar fusion 22630, shoulder replacement 23472, ankle replacement 27702 and two anesthesia codes (${fr('86 FR 63711')}). It classified one more code, 0643T, as inpatient only (${fr('86 FR 63710')}) and wrote removal criteria into the regulation (${fr('86 FR 63993')}). It also meant to cut the exemption back to two years, but left the indefinite paragraph in the regulation (${fr('90 FR 53829')}).`,
-  2023: () => `Eleven codes came off: eight facial-bone procedures (${fr('87 FR 72009')}), plus 22632, 47550 and 21255. All eleven had been removed in 2021 and put back in 2022. Eight new codes were added (${fr('87 FR 72006')}). CMS said it was not considering eliminating the list (${fr('87 FR 72008')}).`,
+  2023: () => `Eleven codes came off: eight facial-bone procedures (${fr('87 FR 72009')}), plus 22632, 47550 and 21255. Ten of the eleven had been removed in 2021 and put back in 2022 (${fr('90 FR 53782')}). Eight new codes were added (${fr('87 FR 72006')}). CMS said it was not considering eliminating the list (${fr('87 FR 72008')}).`,
   2024: () => `Nothing came off. Nine new codes were added and 0646T was moved onto the list (${fr('88 FR 81859')}).`,
   2025: () => `One code came off, 22848, and three new codes were confirmed on the list (${fr('89 FR 94274')}).`,
   2026: () => `CMS restarted the elimination, this time with a three-year schedule in the regulation (${fr('90 FR 54086')}). The first 285 codes came off, mostly musculoskeletal (${fr('90 FR 53788')}). The removal criteria were deleted (${fr('90 FR 53789')}), and the indefinite exemption was restated in 42 CFR 412.3(d)(2) (${fr('90 FR 54082')}).`,
@@ -231,7 +246,7 @@ function sizeChart(ctx) {
   for (let year = 2017; year <= 2029; year += 1) years.push(`<span class="tl__year" style="left:${x(`${year}-01-01`).toFixed(3)}%">${year}</span>`);
   const rows = ctx.ledger.map((y) => `<tr><th scope="row">${y.year}</th><td>${num(y.start)}</td><td>${num(y.end)}</td></tr>`).join('');
   return `<figure class="chart">
-<figcaption>Codes on the inpatient-only list, January 2017 to the regulation’s end date</figcaption>
+<figcaption>Codes on the inpatient-only list, January 2017 to the regulation’s end date <span class="chart__key">Hatched: scheduled for 2027. Dashed: 2028, not yet decided.</span></figcaption>
 <div class="chart__plot" role="img" aria-label="Bar chart of the number of codes on the list over time: about 1,740 through 2020, 1,438 in 2021, 1,728 in 2022, 1,438 in 2026, 813 in 2027, and none by January 2029.">${bars}${labels}<span class="chart__open" style="left:${x(`${Number(data.dosMax.slice(0, 4)) + 1}-01-01`).toFixed(3)}%;width:${(100 - x(`${Number(data.dosMax.slice(0, 4)) + 1}-01-01`)).toFixed(3)}%"><span>2028: CMS expects to remove the rest</span></span></div>
 <div class="tl__axis" aria-hidden="true">${years.join('')}</div>
 <details class="chart__table"><summary>The same numbers as a table</summary>
@@ -301,7 +316,7 @@ function byGroupTable(ctx, codes, caption) {
   const rows = data.groups.map(([id, name], g) => {
     const mine = ctx.byGroup[g].filter((code) => set.has(code));
     if (!mine.length) return '';
-    return `<details class="codes"><summary><a href="/group/${id}/">${esc(name)}</a> (${num(mine.length)})</summary><p class="codes__list">${mine.map((code) => codeLink(data, code)).join(' ')}</p></details>`;
+    return `<details class="codes"><summary>${esc(name)} (${num(mine.length)})</summary><p class="codes__list">${mine.map((code) => codeLink(data, code)).join(' ')}</p><p class="codes__more"><a href="/group/${id}/">All ${esc(name.toLowerCase())} codes</a></p></details>`;
   }).join('');
   return `<div class="bygroup"><p class="bygroup__cap">${caption}</p>${rows}</div>`;
 }

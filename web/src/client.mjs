@@ -94,6 +94,11 @@ function drawLists() {
 
 function drawControls() {
   for (const input of $$('[data-dos]')) if (input.value !== state.date) input.value = state.date;
+  const day = String(dayNumber(state.date));
+  for (const range of $$('[data-range]')) {
+    if (range.value !== day) range.value = day;
+    range.setAttribute('aria-valuetext', formatDate(state.date));
+  }
   for (const button of $$('[data-today]')) button.hidden = state.date === state.today;
 }
 

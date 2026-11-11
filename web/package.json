@@ -4,8 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node --test test/ && node e2e/smoke.mjs",
-    "unit": "node --test test/",
+    "test": "node --test test/*.test.mjs && node e2e/smoke.mjs",
+    "unit": "node --test test/*.test.mjs",
     "serve": "node e2e/serve.mjs"
   },
   "engines": {
