@@ -152,6 +152,8 @@ button.quiet:hover { background: var(--panel); color: var(--ink); border-color: 
 .facts { margin-top: 1.4rem; border-top: 1px solid var(--rule); max-width: 60rem; }
 .facts > div { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); gap: 0.3rem 1.5rem; padding: 0.8rem 0; border-bottom: 1px solid var(--rule); }
 .facts dt { font-weight: 600; color: var(--ink-2); }
+.facts--wide { margin: 0.4rem 0 1.2rem; }
+.facts--wide > div { grid-template-columns: 13rem minmax(0, 1fr); }
 .facts dd { margin: 0; max-width: var(--measure); }
 
 /* ---- timeline ---- */
@@ -287,7 +289,7 @@ td a[target] { white-space: nowrap; }
   .ask__form button { justify-self: start; }
   .row { grid-template-columns: 4.2rem minmax(0, 1fr); }
   .row .chip { grid-column: 2; justify-self: start; }
-  .facts > div { grid-template-columns: minmax(0, 1fr); }
+  .facts > div, .facts--wide > div { grid-template-columns: minmax(0, 1fr); }
   .events li { grid-template-columns: minmax(0, 1fr); }
   .tl__year:nth-child(even) { color: transparent; }
   .field input { font-size: 1.2rem; }

@@ -384,13 +384,11 @@ export function exemption(ctx) {
 
 <section class="block" aria-labelledby="long-h">
 <h2 id="long-h">How long it lasts</h2>
-<div class="scroll"><table class="check">
-<thead><tr><th scope="col">Removed from the list</th><th scope="col">Exemption</th><th scope="col">Source</th></tr></thead>
-<tbody>
-<tr><th scope="row">Before 2020</th><td>None under this rule. For total knee replacement, removed in 2018, CMS separately barred recovery-auditor patient-status review for two years.</td><td>${fr('82 FR 52362')}</td></tr>
-<tr><th scope="row">During 2020</th><td>Two years from removal: January 1, 2020 through December 31, 2021.</td><td>${fr('84 FR 61365')}; ${fr('85 FR 86300')}</td></tr>
-<tr><th scope="row">2021 or later</th><td>Indefinite: until CMS determines the procedure is more commonly performed outpatient.</td><td>${fr('85 FR 86119')}; ${fr('90 FR 54082')}</td></tr>
-</tbody></table></div>
+<dl class="facts facts--wide">
+<div><dt>Removed before 2020</dt><dd>None under this rule. For total knee replacement, removed in 2018, CMS separately barred recovery-auditor patient-status review for two years (${fr('82 FR 52362')}).</dd></div>
+<div><dt>Removed during 2020</dt><dd>Two years from removal: January 1, 2020 through December 31, 2021 (${fr('84 FR 61365')}; ${fr('85 FR 86300')}).</dd></div>
+<div><dt>Removed in 2021 or later</dt><dd>Indefinite: until CMS determines the procedure is more commonly performed outpatient (${fr('85 FR 86119')}; ${fr('90 FR 54082')}).</dd></div>
+</dl>
 <p>To end a procedure’s exemption, CMS needs Medicare claims showing it “being performed more than 50 percent of the time in the outpatient setting in a single calendar year” (${fr('90 FR 53830')}), and it will announce the end through notice-and-comment rulemaking (${fr('90 FR 53832')}; ${fr('91 FR 70573')}). <strong>CMS has not ended any procedure’s exemption.</strong> When it does, this site will show the end date on that code.</p>
 </section>
 
