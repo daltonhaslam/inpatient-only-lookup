@@ -2,9 +2,9 @@
 // Every page is complete without this script; it only makes the date and the search live.
 import {
   isDate, formatDate, todayISO, clampDate, dayNumber, fromDayNumber, normalizeCode, isCode, periodIndex,
-  spanAt, stateOf, lookup, expandOther, countsAt, buildIndex, search, extractCodes,
+  stateAt, lookup, expandOther, countsAt, exemptCodes, buildIndex, search, extractCodes, num, csv,
 } from './engine.mjs';
-import { esc, chip, CHIP, verdict, eventList, codeRow, answer, AXIS } from './views.mjs';
+import { esc, chip, CHIP, verdict, verdictParts, eventList, codeRow, answer, axis, pct } from './views.mjs';
 
 // Vercel Web Analytics: never send what someone searched for or which date they chose.
 window.va = window.va || function va() { (window.vaq = window.vaq || []).push(arguments); };
@@ -14,22 +14,28 @@ const $ = (selector, rootNode = document) => rootNode.querySelector(selector);
 const $$ = (selector, rootNode = document) => [...rootNode.querySelectorAll(selector)];
 const params = () => new URLSearchParams(window.location.search);
 
-const state = { data: null, other: null, otherLoading: null, index: null, date: null, today: null, query: '', bulk: [] };
+const state = {
+  data: null, other: null, otherLoading: null, index: null,
+  date: null, today: null, period: null,   // period: index of the Addendum B in force on `date`
+  query: '', bulk: [],
+  cells: [],         // the whole-list squares, resolved once: {node, record, state}
+  counts: new Map(), // period index -> countsAt()
+};
 
 function remember(date) {
-  try { window.sessionStorage.setItem('dos', date); } catch { /* private mode: the URL still carries it */ }
-}
-
-function recall() {
-  try { return window.sessionStorage.getItem('dos'); } catch { return null; }
+  // Today is the default, not a choice: storing it would bring "yesterday" back tomorrow.
+  try {
+    if (date === state.today) window.sessionStorage.removeItem('dos'); else window.sessionStorage.setItem('dos', date);
+  } catch { /* private mode: the URL still carries it */ }
 }
 
 function startingDate(data) {
+  const usable = (date) => isDate(date) && clampDate(data, date) === date;
   const fromUrl = params().get('dos');
-  if (isDate(fromUrl) && fromUrl >= data.dosMin && fromUrl <= data.dosMax) return fromUrl;
-  const kept = recall();
-  if (isDate(kept) && kept >= data.dosMin && kept <= data.dosMax) return kept;
-  return clampDate(data, todayISO());
+  if (usable(fromUrl)) return fromUrl;
+  let kept = null;
+  try { kept = window.sessionStorage.getItem('dos'); } catch { /* none */ }
+  return usable(kept) ? kept : state.today;
 }
 
 function writeUrl() {
@@ -53,53 +59,85 @@ function loadOther() {
 }
 
 // ---- drawing ------------------------------------------------------------------------------
+// A date change redraws in three tiers: the controls and each verdict's answer (every change),
+// the lists, squares and counts (only when the date crosses into another Addendum B), and the
+// search results (only when the query changes).
 
-function drawVerdictHosts() {
+function setHtml(node, html) {
+  if (node && node.dataset.html !== html) { node.innerHTML = html; node.dataset.html = html; }
+}
+
+function drawControls() {
+  const { date } = state;
+  for (const input of $$('[data-dos]')) if (input.value !== date) input.value = date;
+  for (const button of $$('[data-today]')) button.hidden = date === state.today;
+  const day = String(dayNumber(date));
+  const spoken = formatDate(date);
+  for (const range of $$('[data-range]')) {
+    if (range.value !== day) range.value = day;
+    range.setAttribute('aria-valuetext', spoken);
+  }
+  for (const node of $$('[data-dos-text]')) node.textContent = spoken;
+  for (const mark of $$('[data-mark]')) {
+    mark.style.left = pct(axis.share(date));
+    $('[data-mark-date]', mark).textContent = formatDate(date, 'short');
+  }
+  for (const link of $$('[data-more]')) link.href = link.pathname + (date === state.today ? '' : `?dos=${date}`);
+}
+
+function drawVerdicts() {
+  const { data, date, today, other } = state;
   for (const host of $$('[data-verdict-host]')) {
-    const focused = host.contains(document.activeElement) && document.activeElement.matches('[data-range]');
     const code = host.dataset.verdictHost;
-    host.innerHTML = verdict(state.data, code, state.date, state.today, state.other, {
-      title: host.dataset.title || 'h2', heading: host.dataset.heading || 'h3', link: host.dataset.link === '1',
-    });
-    if (focused) $('[data-range]', host)?.focus();
+    const options = { title: host.dataset.title || 'h2', heading: host.dataset.heading || 'h3', link: host.dataset.link === '1' };
+    const body = $('[data-verdict-body]', host);
+    const parts = verdictParts(data, code, date, today, other, options);
+    // Rebuild the whole panel when there is none yet, or when its timeline appears or disappears
+    // (a code that turns out to have no history); otherwise swap only the answer.
+    if (!body || Boolean(parts.timeline) !== Boolean($('.tl', host))) {
+      host.innerHTML = verdict(data, code, date, today, other, options);
+    } else {
+      setHtml(body, parts.body);
+      body.parentNode.className = `verdict verdict--${parts.state}`;
+    }
   }
   for (const host of $$('[data-events-host]')) {
-    host.innerHTML = eventList(state.data, state.data.codes[host.dataset.eventsHost], state.date, state.today);
+    setHtml(host, eventList(data, host.dataset.eventsHost, date, today));
   }
 }
 
 function drawLists() {
-  const { data, date } = state;
-  const index = periodIndex(data, date);
+  const { data, period } = state;
   for (const row of $$('[data-row]')) {
-    const span = spanAt(data.codes[row.dataset.row], index);
-    const now = stateOf(span ? span[1] : '');
+    const now = stateAt(data.codes[row.dataset.row], period);
     const badge = $('.chip', row);
-    if (badge) { badge.className = `chip chip--${now}`; badge.textContent = CHIP[now]; }
+    if (badge && badge.dataset.state !== now) {
+      badge.className = `chip chip--${now}`;
+      badge.textContent = CHIP[now];
+      badge.dataset.state = now;
+    }
   }
-  for (const cell of $$('[data-cell]')) {
-    const span = spanAt(data.codes[cell.dataset.cell], index);
-    cell.className = `cell cell--${stateOf(span ? span[1] : '')}`;
+  for (const cell of state.cells) {
+    const now = stateAt(cell.record, period);
+    if (cell.state !== now) { cell.node.className = `cell cell--${now}`; cell.state = now; }
   }
   const counted = $$('[data-count]');
   if (counted.length) {
-    const counts = countsAt(data, index);
+    if (!state.counts.has(period)) state.counts.set(period, countsAt(data, period));
+    const counts = state.counts.get(period);
     for (const node of counted) {
       const key = node.dataset.count;
-      node.textContent = (key === 'total' ? counts.total : counts.groups[Number(key)]).toLocaleString('en-US');
+      if (key !== 'exempt') node.textContent = num(key === 'total' ? counts.total : counts.groups[Number(key)]);
     }
   }
-  for (const node of $$('[data-dos-text]')) node.textContent = formatDate(date);
 }
 
-function drawControls() {
-  for (const input of $$('[data-dos]')) if (input.value !== state.date) input.value = state.date;
-  const day = String(dayNumber(state.date));
-  for (const range of $$('[data-range]')) {
-    if (range.value !== day) range.value = day;
-    range.setAttribute('aria-valuetext', formatDate(state.date));
+function drawExempt() {
+  const nodes = $$('[data-count="exempt"]');
+  if (nodes.length) {
+    const count = num(exemptCodes(state.data, state.date).length);
+    for (const node of nodes) node.textContent = count;
   }
-  for (const button of $$('[data-today]')) button.hidden = state.date === state.today;
 }
 
 function drawResults() {
@@ -111,8 +149,10 @@ function drawResults() {
   if (!query) { host.innerHTML = ''; return; }
   const code = normalizeCode(query);
   if (isCode(code)) {
-    if (!data.codes[code] && !state.other) loadOther().then(drawResults);
-    host.innerHTML = `<div data-verdict-host="${esc(code)}" data-link="1">${verdict(data, code, date, state.today, state.other, { link: true })}</div>`;
+    if (!data.codes[code] && !state.other) loadOther().then(drawVerdicts);
+    host.innerHTML = `<div data-verdict-host="${esc(code)}" data-link="1"></div>`;
+    drawVerdicts();
+    drawControls();
     return;
   }
   state.index ||= buildIndex(data);
@@ -122,28 +162,24 @@ function drawResults() {
     return;
   }
   const more = found.total > found.codes.length ? ` Showing the first ${found.codes.length}; keep typing to narrow it.` : '';
-  host.innerHTML = `<p class="results__count">${found.total.toLocaleString('en-US')} ${found.total === 1 ? 'code matches' : 'codes match'}, with status on ${formatDate(date)}.${more}</p>
+  host.innerHTML = `<p class="results__count">${num(found.total)} ${found.total === 1 ? 'code matches' : 'codes match'}, with status on <span data-dos-text>${formatDate(date)}</span>.${more}</p>
 <ul class="rows" data-rows>${found.codes.map((match) => codeRow(data, match, date)).join('')}</ul>`;
-}
-
-function exemptionWord(result) {
-  if (result.kind !== 'listed' || result.state !== 'off' || !result.exemption) return '';
-  if (result.exemption.status === 'active') return 'Exempt';
-  return result.exemption.status === 'ended' ? 'Ended' : 'None';
 }
 
 function bulkRows() {
   return state.bulk.map((code) => {
     const result = lookup(state.data, code, state.date, state.other);
     const reply = answer(state.data, result, state.today);
+    const exemption = result.state === 'off' && result.exemption;
     return {
       code,
-      label: result.kind === 'listed' ? result.record.label : '',
-      status: result.kind === 'unknown' ? 'No record of this code' : CHIP[reply.state],
-      state: reply.state,
-      removed: result.removed ? formatDate(result.removed, 'short') : '',
-      exemption: exemptionWord(result),
       listed: result.kind === 'listed',
+      unknown: result.kind === 'unknown',
+      label: result.kind === 'listed' ? result.record.label : '',
+      state: reply.state,
+      status: result.kind === 'unknown' ? 'No record of this code' : CHIP[reply.state],
+      removed: result.removed ? formatDate(result.removed, 'short') : '',
+      exemption: exemption ? { active: 'Exempt', ended: 'Ended', none: 'None' }[exemption.status] : '',
     };
   });
 }
@@ -153,20 +189,18 @@ function drawBulk() {
   if (!host || !state.bulk.length) return;
   if (!state.other) { host.innerHTML = '<p>Checking…</p>'; return; }
   const rows = bulkRows();
-  const body = rows.map((row) => `<tr><th scope="row">${row.listed ? `<a href="/code/${esc(row.code)}/">${esc(row.code)}</a>` : esc(row.code)}</th><td>${esc(row.label)}</td><td>${row.status === CHIP[row.state] ? chip(row.state) : esc(row.status)}</td><td>${esc(row.removed)}</td><td>${esc(row.exemption)}</td></tr>`).join('');
+  const body = rows.map((row) => `<tr><th scope="row">${row.listed ? `<a href="/code/${esc(row.code)}/">${esc(row.code)}</a>` : esc(row.code)}</th><td>${esc(row.label)}</td><td>${row.unknown ? esc(row.status) : chip(row.state)}</td><td>${esc(row.removed)}</td><td>${esc(row.exemption)}</td></tr>`).join('');
   const on = rows.filter((row) => row.state === 'ipo').length;
-  host.innerHTML = `<p class="results__count">${rows.length} ${rows.length === 1 ? 'code' : 'codes'} on ${formatDate(state.date)}: ${on} inpatient only, ${rows.length - on} not.</p>
+  setHtml(host, `<p class="results__count">${rows.length} ${rows.length === 1 ? 'code' : 'codes'} on ${formatDate(state.date)}: ${on} inpatient only, ${rows.length - on} not.</p>
 <div class="scroll"><table class="check"><thead><tr><th scope="col">Code</th><th scope="col">Procedure</th><th scope="col">Status</th><th scope="col">Left the list</th><th scope="col">Review exemption</th></tr></thead><tbody>${body}</tbody></table></div>
-<p><button type="button" class="quiet" data-bulk-csv>Download as CSV</button></p>`;
+<p><button type="button" class="quiet" data-bulk-csv>Download as CSV</button></p>`);
 }
 
 function downloadBulk() {
-  const cell = (value) => (/[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value);
-  const lines = [['code', 'procedure', 'date_of_service', 'status', 'left_the_list', 'review_exemption']]
-    .concat(bulkRows().map((row) => [row.code, row.label, state.date, row.status, row.removed, row.exemption]))
-    .map((row) => row.map(cell).join(','));
+  const rows = [['code', 'procedure', 'date_of_service', 'status', 'left_the_list', 'review_exemption']]
+    .concat(bulkRows().map((row) => [row.code, row.label, state.date, row.status, row.removed, row.exemption]));
   const link = document.createElement('a');
-  link.href = URL.createObjectURL(new Blob([`${lines.join('\n')}\n`], { type: 'text/csv' }));
+  link.href = URL.createObjectURL(new Blob([csv(rows)], { type: 'text/csv' }));
   link.download = `inpatient-only-${state.date}.csv`;
   document.body.append(link);
   link.click();
@@ -174,11 +208,15 @@ function downloadBulk() {
   setTimeout(() => URL.revokeObjectURL(link.href), 1000);
 }
 
-function draw() {
+function drawDate() {
+  const period = periodIndex(state.data, state.date);
+  drawVerdicts();
   drawControls();
-  drawResults();
-  drawVerdictHosts();
-  drawLists();
+  if (period !== state.period) {
+    state.period = period;
+    drawLists();
+  }
+  drawExempt();
   drawBulk();
 }
 
@@ -188,41 +226,38 @@ function setDate(date) {
   state.date = next;
   remember(next);
   writeUrl();
-  draw();
+  drawDate();
 }
 
 // ---- events -------------------------------------------------------------------------------
 
-function dateAt(track, clientX) {
-  const box = track.getBoundingClientRect();
-  const share = Math.max(0, Math.min(1, (clientX - box.left) / box.width));
-  const from = dayNumber(AXIS.from);
-  return fromDayNumber(Math.round(from + share * (dayNumber(AXIS.to) - from)));
-}
-
 function wire() {
   let frame = 0;
-  let dragging = false;
+  let drag = null;   // the box of the track being dragged, read once when the drag starts
   const later = (job) => { cancelAnimationFrame(frame); frame = requestAnimationFrame(job); };
+  const dateAt = (clientX) => axis.at((clientX - drag.left) / drag.width);
 
   document.addEventListener('pointerdown', (event) => {
     const track = event.target.closest?.('[data-track]');
     if (!track || event.button > 0) return;
-    dragging = true;
     event.preventDefault();
-    setDate(dateAt(track, event.clientX));
+    const box = track.getBoundingClientRect();
+    drag = { left: box.left, width: box.width };
+    setDate(dateAt(event.clientX));
   });
   document.addEventListener('pointermove', (event) => {
-    if (!dragging) return;
-    const track = $('[data-track]');
-    if (track) later(() => setDate(dateAt(track, event.clientX)));
+    if (drag) later(() => { if (drag) setDate(dateAt(event.clientX)); });
   });
-  for (const type of ['pointerup', 'pointercancel']) document.addEventListener(type, () => { dragging = false; });
+  for (const type of ['pointerup', 'pointercancel']) document.addEventListener(type, () => { drag = null; });
 
   document.addEventListener('input', (event) => {
     const target = event.target;
     if (target.matches('[data-range]')) setDate(fromDayNumber(Number(target.value)));
-    else if (target.matches('[data-q]')) { state.query = target.value; writeUrl(); later(drawResults); }
+    else if (target.matches('[data-q]')) {
+      state.query = target.value;
+      writeUrl();
+      later(() => { drawResults(); drawLists(); });
+    }
   });
   document.addEventListener('change', (event) => {
     const target = event.target;
@@ -234,12 +269,14 @@ function wire() {
       event.preventDefault();
       const input = $('[data-dos]', form);
       if (input && isDate(input.value)) setDate(input.value);
-      $('[data-results] a, [data-results] [data-range]')?.focus();
+      $('[data-results] a')?.focus();
     } else if (form.matches('[data-bulk]')) {
       event.preventDefault();
       state.bulk = extractCodes($('[data-bulk-input]', form).value).slice(0, 500);
-      const host = $('[data-bulk-out]');
-      if (!state.bulk.length) { host.innerHTML = '<p class="results__none">No five-character codes found in that text.</p>'; return; }
+      if (!state.bulk.length) {
+        setHtml($('[data-bulk-out]'), '<p class="results__none">No five-character codes found in that text.</p>');
+        return;
+      }
       drawBulk();
       loadOther().then(drawBulk);
     }
@@ -258,20 +295,26 @@ function wire() {
     cells.addEventListener('pointerover', (event) => {
       if (!event.target.matches('[data-cell]')) return;
       const code = event.target.dataset.cell;
-      const result = lookup(state.data, code, state.date);
-      hint.textContent = `${code} ${result.record.label}: ${CHIP[result.state].toLowerCase()}`;
+      const record = state.data.codes[code];
+      hint.textContent = `${code} ${record.label}: ${CHIP[stateAt(record, state.period)].toLowerCase()}`;
     });
     cells.addEventListener('pointerleave', () => { hint.textContent = idle; });
   }
 }
 
 async function start() {
-  const response = await fetch(document.body.dataset.ipo);
+  const source = document.body.dataset.ipo;
+  if (!source) {         // a page that does not depend on the date
+    document.documentElement.classList.add('live');
+    return;
+  }
+  const response = await fetch(source);
   if (!response.ok) return;
   const data = await response.json();
   state.data = data;
   state.today = clampDate(data, todayISO());
   state.date = startingDate(data);
+  state.cells = $$('[data-cell]').map((node) => ({ node, record: data.codes[node.dataset.cell], state: null }));
   const box = $('[data-q]');
   if (box) {
     state.query = params().get('q') || box.value || '';
@@ -279,7 +322,8 @@ async function start() {
   }
   remember(state.date);
   wire();
-  draw();
+  drawResults();
+  drawDate();
   document.documentElement.classList.add('live');
 }
 

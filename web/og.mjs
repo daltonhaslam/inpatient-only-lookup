@@ -4,7 +4,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { launch } from './e2e/browser.mjs';
-import { periodIndex, spanAt } from './src/engine.mjs';
+import { periodIndex, stateAt } from './src/engine.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const docs = join(here, '..', 'docs');
@@ -20,11 +20,7 @@ const codes = Object.keys(data.codes).sort();
 const rows = [];
 for (let year = 2020; year <= Number(data.dosMax.slice(0, 4)); year += 1) {
   const index = periodIndex(data, `${year}-01-01`);
-  const cells = codes.filter((_, i) => i % 14 === 0).map((code) => {
-    const span = spanAt(data.codes[code], index);
-    const si = span ? span[1] : '';
-    return `<i class="${si === 'C' ? 'on' : si === '' || si === 'D' ? 'gone' : 'off'}"></i>`;
-  }).join('');
+  const cells = codes.filter((_, i) => i % 14 === 0).map((code) => `<i class="${stateAt(data.codes[code], index)}"></i>`).join('');
   rows.push(`<div class="row"><b>${year}</b><div class="cells">${cells}</div></div>`);
 }
 
@@ -39,7 +35,7 @@ p{font:500 26px/1.35 Archivo;color:#4a615c;margin-top:16px;max-width:940px}
 .row b{font:600 17px/1 Archivo;color:#4a615c;width:44px;font-variant-numeric:tabular-nums}
 .cells{display:flex;gap:2.5px;flex:1}
 i{flex:1;height:17px;border-radius:2px}
-.on{background:#108a78}.off{border:1.5px solid #8ea19c}.gone{background:transparent}
+.ipo{background:#108a78}.off{border:1.5px solid #8ea19c}
 footer{display:flex;justify-content:space-between;font:600 22px/1 Archivo;margin-top:18px}
 footer span:last-child{color:#4a615c;font-weight:500}
 </style><div><h1>Was it inpatient only on that date?</h1><p>Medicare’s inpatient-only list, code by code and day by day: what left, what came back, what is still exempt from review.</p></div>

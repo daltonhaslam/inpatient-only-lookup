@@ -1,7 +1,7 @@
 // Lookup logic shared by the build (prerendered pages) and the browser.
 // Pure functions over the site data; no DOM. Dates are ISO strings (YYYY-MM-DD) and compare as text.
 
-export const EVENT = { l: 'listed', n: 'new', a: 'added', t: 'returned', r: 'removed', x: 'retired' };
+const EVENT = { l: 'listed', n: 'new', a: 'added', t: 'returned', r: 'removed', x: 'retired' };
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 export const isDate = (text) => /^\d{4}-\d\d-\d\d$/.test(text || '') && !Number.isNaN(Date.parse(`${text}T00:00:00Z`))
@@ -48,6 +48,20 @@ export function periodIndex(data, iso) {
 }
 
 export const stateOf = (si) => (si === 'C' ? 'ipo' : si === '' || si === 'D' ? 'gone' : 'off');
+export const num = (n) => n.toLocaleString('en-US');
+
+/** Rows of strings as CSV text. */
+export const csv = (rows) => `${rows.map((row) => row.map((value) => (/[",\r\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value)).join(',')).join('\n')}\n`;
+
+/** A linear scale between two dates: share(iso) is 0..1 (clamped); at(share) is the date at a share. */
+export function scale(from, to) {
+  const start = dayNumber(from);
+  const length = dayNumber(to) - start;
+  return {
+    share: (iso) => Math.max(0, Math.min(1, (dayNumber(iso) - start) / length)),
+    at: (share) => fromDayNumber(Math.round(start + Math.max(0, Math.min(1, share)) * length)),
+  };
+}
 
 /** The span of a code's history in force at a period index. Spans are [period index, SI, exemption index]. */
 export function spanAt(record, index) {
@@ -57,6 +71,10 @@ export function spanAt(record, index) {
   }
   return current;
 }
+
+/** A code's status indicator, and its state, at a period index ('' and 'gone' before it exists). */
+export const siAt = (record, index) => (spanAt(record, index) || [0, ''])[1];
+export const stateAt = (record, index) => stateOf(siAt(record, index));
 
 /**
  * Where a removal's medical-review exemption stands on a date.
@@ -86,11 +104,7 @@ export function lookup(data, code, iso, other = null) {
     const si = span ? span[1] : '';
     const state = stateOf(si);
     const exemption = span && span[2] >= 0 ? exemptionOn(data.exemptions[span[2]], iso) : null;
-    return {
-      ...base, kind: 'listed', record, state, si, exemption,
-      removed: exemption ? exemption.from : null,
-      everListedBefore: record.events.some((event) => data.periods[event[0]].d <= iso && 'lnat'.includes(event[1])),
-    };
+    return { ...base, kind: 'listed', record, state, si, exemption, removed: exemption ? exemption.from : null };
   }
   if (other && other[code]) {
     const [first, last] = other[code];
@@ -119,10 +133,19 @@ export function countsAt(data, index) {
   const groups = new Array(data.groups.length).fill(0);
   let total = 0;
   for (const record of Object.values(data.codes)) {
-    const span = spanAt(record, index);
-    if (span && span[1] === 'C') { total += 1; groups[data.families[record.family][1]] += 1; }
+    if (siAt(record, index) === 'C') { total += 1; groups[data.families[record.family][1]] += 1; }
   }
   return { total, groups };
+}
+
+/** The codes whose medical-review exemption is in the given status ('active' or 'ended') on a date. */
+export function exemptCodes(data, iso, status = 'active') {
+  const index = periodIndex(data, iso);
+  return Object.keys(data.codes).filter((code) => {
+    const span = spanAt(data.codes[code], index);
+    const exemption = span && span[2] >= 0 ? exemptionOn(data.exemptions[span[2]], iso) : null;
+    return exemption && exemption.status === status;
+  });
 }
 
 // ---- search -------------------------------------------------------------------------------

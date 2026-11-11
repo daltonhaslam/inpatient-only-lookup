@@ -17,11 +17,11 @@ export const feedbackHref = (path) =>
 export const STATUS = {
   C: 'inpatient procedure, not paid under the outpatient system',
   J1: 'paid as an outpatient service through a comprehensive APC',
-  N: 'payable as an outpatient service, packaged into the payment for other services',
+  N: 'no separate outpatient payment; packaged into the payment for other services',
   T: 'paid as an outpatient service; the multiple-procedure reduction applies',
   S: 'paid as an outpatient service; not reduced when multiple',
-  Q1: 'payable as an outpatient service; packaged when billed with certain other services',
-  Q2: 'payable as an outpatient service; packaged when billed with certain procedures',
+  Q1: 'outpatient service, packaged when billed with certain other services and otherwise paid separately',
+  Q2: 'outpatient service, packaged when billed with certain procedures and otherwise paid separately',
   E1: 'not paid by Medicare on outpatient claims',
   D: 'discontinued code',
 };

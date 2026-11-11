@@ -7,7 +7,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build as bundle } from 'esbuild';
 import { SITE } from './src/site.mjs';
-import { todayISO, isDate, monthYear, periodIndex, spanAt, exemptionOn, eventsOf } from './src/engine.mjs';
+import { todayISO, isDate, monthYear, formatDate, clampDate, periodIndex, siAt, countsAt, exemptCodes, lookup, eventsOf, csv } from './src/engine.mjs';
 import * as pages from './src/pages.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -44,7 +44,7 @@ function siteData(today) {
 
   const newestRule = Math.max(...rulebook.rules.map((rule) => rule.cy));
   if (newestRule !== COPY_YEAR) {
-    throw new Error(`rules.json now reaches CY ${newestRule}, but the page copy in web/src/pages.mjs describes CY ${COPY_YEAR}. Update the copy (YEAR_NOTES, phase-out, home) and COPY_YEAR.`);
+    throw new Error(`rules.json now reaches CY ${newestRule}, but the page copy describes CY ${COPY_YEAR}. In web/src/pages.mjs add YEAR_NOTES[${newestRule}] and PHASE_NOTES[${newestRule}], and reread the home status section, the History "end of the list" section, the phase-out page (its unfinished phase and descriptions) and the Methods page (removal files, scheduled year). Then set COPY_YEAR in web/build.mjs.`);
   }
   const missing = Object.keys(history).filter((code) => !labels[code]);
   if (missing.length) console.warn(`No label yet for: ${missing.join(', ')} (shown as "No plain-language label yet")`);
@@ -91,12 +91,19 @@ function siteData(today) {
 
   const rules = {};
   for (const rule of rulebook.rules) {
-    rules[rule.cy] = { name: `CY ${rule.cy} final rule`, id: rule.rule, fr: rule.fr, cites: rule.event_cites };
+    rules[rule.cy] = { name: `CY ${rule.cy} final rule`, fr: rule.fr, cites: rule.event_cites, codes: rule.code_cites || {} };
   }
   const dosMin = periods.find((p) => p.basis === 'quarterly').date;
   const dosMax = `${periods[periods.length - 1].date.slice(0, 4)}-12-31`;
+  const ruleIds = Object.fromEntries(rulebook.rules.map((rule) => [rule.cy, rule.rule]));
+  // Cautions for single codes, from a date on: {code: [{from, text, cite}]}.
+  const notes = {};
+  for (const note of rulebook.notes) {
+    for (const code of note.codes) (notes[code] ||= []).push({ from: note.from, text: note.text, cite: note.cite });
+  }
   return {
-    data: { built: today, dosMin, dosMax, periods: sitePeriods, exemptions, groups: groups.map((g) => [g.id, g.name]), families, codes, rules },
+    ruleIds,
+    data: { built: today, dosMin, dosMax, periods: sitePeriods, exemptions, groups: groups.map((g) => [g.id, g.name]), families, codes, rules, notes },
     rulebook, sources, periods,
   };
 }
@@ -131,8 +138,12 @@ function sourceRows(sources, periods) {
   return Object.values(sources).map((s) => ({ label: label(s), use: use(s), landing: s.landing, sha256: s.sha256 }));
 }
 
-function context(today) {
-  const { data, rulebook, sources, periods } = siteData(today);
+// The first year of the phase-out in 42 CFR 419.22(n); each January from here on is a phase.
+const PHASE_OUT_FROM = 2026;
+
+function context(buildDate) {
+  const { data, rulebook, sources, periods, ruleIds } = siteData(buildDate);
+  const today = clampDate(data, buildDate);
   const codes = Object.keys(data.codes).sort();
   const byGroup = data.groups.map(() => []);
   const byFamily = data.families.map(() => []);
@@ -144,43 +155,48 @@ function context(today) {
     byGroup[data.families[family][1]].push(code);
   }
 
-  const ledger = read('pipeline/derived/years.json');
-  const year = (n) => ledger.find((entry) => entry.year === n);
-  const todayIndex = periodIndex(data, today);
-  const lastIndex = data.periods.length - 1;
-  const exemptOn = (code, date, index) => {
-    const span = spanAt(data.codes[code], index);
-    const state = span && span[2] >= 0 ? exemptionOn(data.exemptions[span[2]], date) : null;
-    return state && state.status === 'active' ? state : null;
-  };
+  // The copy says no exemption has been ended and describes one 2022-2025 conflict. If the data
+  // stops agreeing, fail here instead of publishing a sentence that is no longer true.
+  const ended = data.exemptions.filter((e) => e.kind === 'indefinite' && e.through);
+  if (ended.length) {
+    throw new Error('rules.json now ends an exemption. Update the copy that says none has ended (views.mjs exemptionText; pages.mjs home, phase-out "After the list ends", exemption page) and cite the rule that ended it, then remove this check.');
+  }
+  const disputedCodes = codes.filter((code) => {
+    const last = data.codes[code].spans[data.codes[code].spans.length - 1];
+    return last[2] >= 0 && data.exemptions[last[2]].tyt;
+  }).length;
+  if (disputedCodes !== 16) {
+    throw new Error(`The exemption page says the 2022-2025 conflict affects 16 codes (5 + 11); the data now says ${disputedCodes}. Update pages.mjs.`);
+  }
+
+  // Removals since 2020, grouped by removal date and by whether the exemption still runs today.
   const cohorts = new Map();
-  for (const code of codes) {
-    const state = exemptOn(code, today, todayIndex);
-    if (state) cohorts.set(state.from, [...(cohorts.get(state.from) || []), code]);
-    else {
-      // Removals whose exemption has run out are listed too, so the page accounts for every removal since 2020.
-      const span = spanAt(data.codes[code], todayIndex);
-      const past = span && span[2] >= 0 ? exemptionOn(data.exemptions[span[2]], today) : null;
-      if (past && past.status === 'ended') cohorts.set(`${past.from}|ended`, [...(cohorts.get(`${past.from}|ended`) || []), code]);
+  for (const status of ['active', 'ended']) {
+    for (const code of exemptCodes(data, today, status)) {
+      const exemption = lookup(data, code, today).exemption;
+      const key = `${exemption.from}|${exemption.through || ''}|${status}`;
+      cohorts.set(key, [...(cohorts.get(key) || []), code]);
     }
   }
   const exemptCohorts = [...cohorts.entries()].sort().map(([key, list]) => {
-    const [from, ended] = key.split('|');
-    return { from, codes: list, status: ended ? 'exemption ended December 31, 2021' : 'exempt now' };
+    const [from, through, status] = key.split('|');
+    return { from, codes: list, status: status === 'active' ? 'exempt now' : `exemption ended ${formatDate(through)}` };
   });
 
-  const returnedOn = {};
+  const ledger = read('pipeline/derived/years.json');
+  const returnedOn = Object.fromEntries(ledger.map((entry) => [`${entry.year}-01-01`, new Set()]));
   for (const code of codes) {
     for (const event of eventsOf(data, data.codes[code])) {
-      if (event.type === 'returned') (returnedOn[event.date] ||= new Set()).add(code);
+      if (event.type === 'returned') returnedOn[event.date].add(code);
     }
   }
-  for (const entry of ledger) returnedOn[`${entry.year}-01-01`] ||= new Set();
-
-  const sizes = periods.map((p, i) => {
-    let count = 0;
-    for (const code of codes) { const span = spanAt(data.codes[code], i); if (span && span[1] === 'C') count += 1; }
-    return { date: p.date, basis: BASIS[p.basis], count };
+  const phases = ledger.filter((entry) => entry.year >= PHASE_OUT_FROM).map((entry) => {
+    const date = `${entry.year}-01-01`;
+    const index = periodIndex(data, date);
+    return {
+      year: entry.year, date, past: date <= today, removed: entry.january.removed.length, codes: entry.january.removed,
+      start: entry.start, staying: codes.filter((code) => siAt(data.codes[code], index) === 'C'), file: data.periods[index].label,
+    };
   });
 
   const reconciliation = read('pipeline/derived/reconciliation.json');
@@ -193,17 +209,12 @@ function context(today) {
   const lastQuarterly = quarterly[quarterly.length - 1];
 
   return {
-    data, codes, byGroup, byFamily, familiesByGroup, today, ledger, sizes, returnedOn, exemptCohorts, gaps,
+    data, codes, byGroup, byFamily, familiesByGroup, today, ledger, returnedOn, ruleIds, notes: rulebook.notes, exemptCohorts, gaps, phases, disputedCodes,
+    sizes: periods.map((p, i) => ({ date: p.date, basis: BASIS[p.basis], count: countsAt(data, i).total })),
     reconciliation: reconciliation.rows.filter((row) => row.cms || row.computed),
-    leaving2027: year(2027).january.removed,
-    after2027: codes.filter((code) => { const span = spanAt(data.codes[code], lastIndex); return span && span[1] === 'C'; }),
-    stats: {
-      left2026: year(2026).january.removed.length,
-      leaving2027: year(2027).january.removed.length,
-      after2027: year(2027).start,
-      exemptNow: exemptCohorts.filter((c) => c.status === 'exempt now').reduce((n, c) => n + c.codes.length, 0),
-      disputedCodes: codes.filter((code) => data.codes[code].spans.some((s, i, all) => i === all.length - 1 && s[2] >= 0 && data.exemptions[s[2]].tyt)).length,
-    },
+    exemptNow: exemptCodes(data, today).length,
+    firstYear: data.periods[0].d.slice(0, 4),
+    nextYear: Number(data.dosMax.slice(0, 4)) + 1,
     sources: sourceRows(sources, periods),
     counts: { quarterly: quarterly.length, checks: reconciliation.checks, quotes: reconciliation.quotes },
     lastQuarter: lastQuarterly.date,
@@ -216,7 +227,6 @@ function context(today) {
 
 function historyCsv(ctx) {
   const { data } = ctx;
-  const cell = (value) => (/[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value);
   const rows = [['code', 'label', 'body_system', 'procedure_family', 'date', 'event', 'status_indicator_after', 'source_file']];
   for (const code of ctx.codes) {
     const record = data.codes[code];
@@ -225,7 +235,7 @@ function historyCsv(ctx) {
       rows.push([code, record.label, data.groups[g][1], family, event.date, event.type, event.si || 'not in file', event.period.label]);
     }
   }
-  return `${rows.map((row) => row.map(cell).join(',')).join('\n')}\n`;
+  return csv(rows);
 }
 
 const FONTS = [
@@ -237,7 +247,6 @@ async function main() {
   const today = process.env.BUILD_DATE || todayISO();
   if (!isDate(today)) throw new Error(`BUILD_DATE must be YYYY-MM-DD, got ${today}`);
   const ctx = context(today);
-  ctx.today = today < ctx.data.dosMin ? ctx.data.dosMin : today > ctx.data.dosMax ? ctx.data.dosMax : today;
 
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });

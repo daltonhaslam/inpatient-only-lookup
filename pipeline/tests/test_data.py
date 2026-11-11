@@ -138,6 +138,17 @@ class Rules(unittest.TestCase):
             for kind, cite in rule["event_cites"].items():
                 self.assertIn(kind, ("removed", "returned", "added", "new", "retired"), rule["cy"])
                 self.assertIn(cite, quoted, (rule["cy"], kind))
+            for code, cite in rule.get("code_cites", {}).items():
+                self.assertIn(cite, quoted, (rule["cy"], code))
+
+    def test_notes_name_real_codes_and_cited_pages(self):
+        quoted = {item["cite"] for item in load(ROOT / "pipeline" / "citations.json")["citations"].values()}
+        history = load(DERIVED / "ipo-history.json")
+        for note in fetch.load_rules()["notes"]:
+            self.assertIn(note["cite"], quoted)
+            self.assertRegex(note["from"], r"^\d{4}-\d\d-\d\d$")
+            for code in note["codes"]:
+                self.assertIn(code, history)
 
     def test_exemption_end_dates_are_iso_dates(self):
         for code, date in fetch.load_rules()["exemption_ends"].items():

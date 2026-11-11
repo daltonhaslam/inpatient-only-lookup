@@ -312,9 +312,6 @@ td a[target] { white-space: nowrap; }
   .dos { flex-wrap: wrap; }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .cell, .tl__mark { transition: background-color 0.12s linear, opacity 0.12s linear; }
-}
 
 @media print {
   .top__nav, .ask__form, .ask__try, .several, .dos, .tl__range, .skip { display: none; }

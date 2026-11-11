@@ -143,6 +143,6 @@ ok    CY 2026  Table 119 (90 FR 53790-53802): added 0 printed, 2 computed, 2 dif
 
 7. Every quoted Federal Register passage is on the page it cites
 ----------------------------------------------------------------
-ok    157 quotes checked against the govinfo text of each rule
+ok    167 quotes checked against the govinfo text of each rule
 
 All checks passed.

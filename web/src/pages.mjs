@@ -1,7 +1,7 @@
 // Page templates. Build-time only: everything here becomes static HTML in docs/.
 import { SITE, feedbackHref, CFR } from './site.mjs';
-import { formatDate, monthYear, lookup, countsAt, periodIndex, spanAt, eventsOf, stateOf, dayNumber } from './engine.mjs';
-import { esc, out, fr, cfr, chip, verdict, eventList, codeRow, AXIS } from './views.mjs';
+import { formatDate, monthYear, lookup, countsAt, periodIndex, stateAt, dayNumber, num, scale } from './engine.mjs';
+import { esc, out, fr, cfr, verdict, eventList, codeRow, axis, axisYears, pct } from './views.mjs';
 
 const NAV = [
   ['/', 'Lookup'],
@@ -11,7 +11,8 @@ const NAV = [
   ['/methods/', 'Methods'],
 ];
 
-const num = (n) => n.toLocaleString('en-US');
+// Pages whose content follows the date of service; only these load the data file.
+const LIVE = new Set(['home', 'code', 'group']);
 const plural = (n, one, many = `${one}s`) => `${num(n)} ${n === 1 ? one : many}`;
 const codeLink = (data, code) => `<a href="/code/${esc(code)}/" title="${esc(data.codes[code] ? data.codes[code].label : '')}">${esc(code)}</a>`;
 
@@ -37,12 +38,12 @@ export function layout(ctx, { path, title, description, page, body }) {
 <meta name="twitter:card" content="summary_large_image">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-${ctx.assets.preload}
+${ctx.assets.preload}${LIVE.has(page) ? `\n<link rel="preload" href="${ctx.assets.data}" as="fetch" crossorigin>` : ''}
 <link rel="stylesheet" href="${ctx.assets.css}">
 <script defer src="${ctx.assets.js}"></script>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
-<body data-page="${page}" data-ipo="${ctx.assets.data}" data-other="${ctx.assets.other}">
+<body data-page="${page}"${LIVE.has(page) ? ` data-ipo="${ctx.assets.data}" data-other="${ctx.assets.other}"` : ''}>
 <a class="skip" href="#main">Skip to content</a>
 <header class="top">
 <a class="top__name" href="/">${SITE.name}</a>
@@ -52,7 +53,7 @@ ${ctx.assets.preload}
 ${body}
 </main>
 <footer class="foot">
-<p class="foot__warn"><strong>Not billing or legal advice.</strong> This site reports what CMS’s files and rules say about a code on a date. It does not decide whether a particular admission is payable: once a procedure is off the list, the two-midnight rule still applies. Not affiliated with or endorsed by CMS or the AMA. Check CMS’s own files before you rely on an answer.</p>
+<p class="foot__warn"><strong>Not billing or legal advice.</strong> This site reports what CMS’s files and rules say about a code on a date. It does not decide whether a particular admission is payable: once a procedure is off the list, the two-midnight rule applies to it. Not affiliated with or endorsed by CMS or the AMA. Check CMS’s own files before you rely on an answer.</p>
 <p>Plain-language procedure labels are this site’s own wording, not CPT descriptors. CPT codes are copyright American Medical Association. CPT is a registered trademark of the American Medical Association.</p>
 <p>Data as of ${formatDate(ctx.data.built)}: ${esc(ctx.latestFile)}. <a href="/methods/">Methods and sources</a>.</p>
 <p>Built by ${out(SITE.linkedin, esc(SITE.author))}, using Claude Code. See something wrong? ${out(feedbackHref(path), 'Send a correction')}. ${out(SITE.repo, 'Code and data on GitHub')}. Part of ${out(SITE.family, 'Paid &amp; Penalized')}.</p>
@@ -74,9 +75,10 @@ export const dateControl = (data, date) => `<form class="dos" data-dos-form>
 function scrubber(data, date) {
   const min = dayNumber(data.dosMin);
   const max = dayNumber(data.dosMax);
+  const range = scale(data.dosMin, data.dosMax);
   const years = [];
   for (let year = Number(data.dosMin.slice(0, 4)); year <= Number(data.dosMax.slice(0, 4)); year += 1) {
-    years.push(`<span style="left:${(((dayNumber(`${year}-01-01`) - min) / (max - min)) * 100).toFixed(3)}%">${year}</span>`);
+    years.push(`<span style="left:${pct(range.share(`${year}-01-01`))}">${year}</span>`);
   }
   return `<div class="scrub">
 <input class="scrub__range" data-range type="range" min="${min}" max="${max}" value="${dayNumber(date)}" aria-label="Date of service, ${formatDate(data.dosMin)} to ${formatDate(data.dosMax)}" aria-valuetext="${formatDate(date)}">
@@ -90,10 +92,7 @@ function wholeList(ctx, date) {
   const counts = countsAt(data, index);
   const groups = data.groups.map(([id, name], g) => {
     const codes = ctx.byGroup[g];
-    const cells = codes.map((code) => {
-      const span = spanAt(data.codes[code], index);
-      return `<i data-cell="${code}" class="cell cell--${stateOf(span ? span[1] : '')}"></i>`;
-    }).join('');
+    const cells = codes.map((code) => `<i data-cell="${code}" class="cell cell--${stateAt(data.codes[code], index)}"></i>`).join('');
     return `<div class="sys">
 <p class="sys__name"><a href="/group/${id}/">${esc(name)}</a></p>
 <p class="sys__count"><span data-count="${g}">${counts.groups[g]}</span> of ${codes.length}</p>
@@ -102,7 +101,7 @@ function wholeList(ctx, date) {
   }).join('\n');
   return `<section class="whole" aria-labelledby="whole-h">
 <h2 id="whole-h">The whole list on <span data-dos-text>${formatDate(date)}</span></h2>
-<p class="whole__sum"><strong data-count="total">${num(counts.total)}</strong> codes are inpatient only on this date, out of ${num(ctx.codes.length)} that have been on the list at some point since 2017. Each square is one code: filled is on the list, hollow is off it, a dot is a code not in use. Drag the date to watch the list empty, refill and empty again.</p>
+<p class="whole__sum"><strong data-count="total">${num(counts.total)}</strong> codes are inpatient only on this date, out of ${num(ctx.codes.length)} that have been on the list at some point since ${ctx.firstYear}. Each square is one code: filled is on the list, hollow is off it, a dot is a code not in use. Move the date to see the list shrink in 2021, refill in 2022 and shrink again from 2026.</p>
 ${scrubber(data, date)}
 <p class="cellkey" aria-hidden="true"><span><i class="cell cell--ipo"></i>On the list</span><span><i class="cell cell--off"></i>Off the list</span><span><i class="cell cell--gone"></i>Not in the files</span></p>
 <div class="systems" data-cells>
@@ -115,6 +114,7 @@ ${groups}
 export function home(ctx) {
   const { data } = ctx;
   const date = ctx.today;
+  const newest = ctx.phases[ctx.phases.length - 1];
   const body = `<section class="ask" aria-labelledby="ask-h">
 <h1 id="ask-h">Was it inpatient only on that date?</h1>
 <p class="ask__sub">Medicare’s inpatient-only list, code by code and day by day: every date of service from ${formatDate(data.dosMin)} through ${formatDate(data.dosMax)}, with what left the list, what came back, and what is still exempt from medical review.</p>
@@ -143,11 +143,11 @@ ${wholeList(ctx, date)}
 <section class="status" aria-labelledby="status-h">
 <h2 id="status-h">The list is being phased out</h2>
 <div class="status__grid">
-<p><strong>${num(ctx.stats.leaving2027)} codes leave on January 1, 2027.</strong> They follow the ${num(ctx.stats.left2026)} that left in 2026. CMS expects to remove the rest for 2028, and the regulation says the list is gone by January 1, 2029. <a href="/phase-out/">The schedule</a></p>
-<p><strong>${num(ctx.stats.exemptNow)} codes are exempt from certain medical review today.</strong> A procedure removed in 2021 or later keeps its exemption until CMS ends it, code by code. None has ended. <a href="/exemption/">What the exemption covers</a></p>
+<p><strong>${num(newest.removed)} codes ${newest.past ? 'left' : 'leave'} on ${formatDate(newest.date)}.</strong> They follow the ${num(ctx.phases[0].removed)} that left in ${ctx.phases[0].year}. CMS expects to remove the rest for ${ctx.nextYear}, and the regulation says the list is gone by January 1, 2029. <a href="/phase-out/">The schedule</a></p>
+<p><strong><span data-count="exempt">${num(ctx.exemptNow)}</span> codes are exempt from certain medical review on <span data-dos-text>${formatDate(date)}</span>.</strong> A procedure removed in 2021 or later keeps its exemption until CMS ends it, code by code. None has ended. <a href="/exemption/">What the exemption covers</a></p>
 <p><strong>This has happened before.</strong> CMS removed 298 codes in 2021 and put 293 of them back in 2022. A code’s status depends on the date. <a href="/history/">Year by year</a></p>
 </div>
-<p class="status__after">The lookup stays useful after the list ends. Audits and appeals turn on what was true on the date of service, and on whether a code’s exemption was still running.</p>
+<p class="status__after">The date of service will still matter after the list ends. Audits and appeals turn on what was true that day, and on whether a code’s exemption was still running.</p>
 </section>`;
   return layout(ctx, {
     path: '/', page: 'home', title: SITE.name, body,
@@ -172,7 +172,7 @@ ${verdict(data, code, date, ctx.today, null, { title: 'h1', heading: 'h2' })}
 </div>
 <section class="block" aria-labelledby="hist-h">
 <h2 id="hist-h">History of ${code}</h2>
-<div data-events-host="${code}">${eventList(data, record, date, ctx.today)}</div>
+<div data-events-host="${code}">${eventList(data, code, date, ctx.today)}</div>
 <p class="note">Dates before 2020 come from each year’s final rule, so a change is dated January 1 of its year. From 2020 on, changes are dated to the quarter CMS’s Addendum B first shows them.</p>
 </section>
 ${siblings.length ? `<section class="block" aria-labelledby="sib-h">
@@ -211,7 +211,7 @@ ${families}
 <nav class="others" aria-label="Other body systems"><h2>Other body systems</h2><p>${others}</p></nav>`;
   return layout(ctx, {
     path: `/group/${id}/`, page: 'group', title: `${name}: inpatient-only codes`, body,
-    description: `${name}: the ${ctx.byGroup[g].length} codes that have been on Medicare’s inpatient-only list since 2017, with each code’s status by date of service.`,
+    description: `${name}: the ${ctx.byGroup[g].length} codes that have been on Medicare’s inpatient-only list since ${ctx.firstYear}, with each code’s status by date of service.`,
   });
 }
 
@@ -219,36 +219,38 @@ ${families}
 
 const YEAR_NOTES = {
   2018: () => `Total knee replacement (27447) and five other procedures came off the list, and one was added (${fr('82 FR 52526')}). CMS barred recovery auditors from patient-status review of knee replacement for two years (${fr('82 FR 52362')}).`,
-  2019: () => `Four codes left the list in CMS’s files (CY 2019 final rule, ${fr('83 FR 58818')}).`,
-  2020: () => `Total hip replacement (27130), six spine procedures and five anesthesia codes came off (${fr('84 FR 61355')}; ${fr('84 FR 61357')}; ${fr('84 FR 61358')}). CMS created a two-year exemption from certain medical review for procedures removed from 2020 on (${fr('84 FR 61365')}).`,
+  2019: () => `Four codes came off: 31241, 0266T and two anesthesia codes, 01402 and 00670 (${fr('83 FR 58999')}; ${fr('83 FR 59000')}; ${fr('83 FR 59001')}; ${fr('83 FR 59002')}).`,
+  2020: () => `Total hip replacement (27130), six spine procedures and anesthesia codes came off (${fr('84 FR 61355')}; ${fr('84 FR 61357')}; ${fr('84 FR 61358')}). The rule’s table lists twelve codes; one of them, 00670, had already come off for 2019. CMS created a two-year exemption from certain medical review for procedures removed from 2020 on (${fr('84 FR 61365')}).`,
   2021: () => `CMS decided to eliminate the list over three years and removed the first 298 codes: 266 musculoskeletal services, 16 recommended by its advisory panel, and related anesthesia codes (${fr('85 FR 86093')}). It made the medical-review exemption indefinite for anything removed in 2021 or later (${fr('85 FR 86119')}).`,
   2022: () => `CMS halted the elimination and put back the codes it had removed, except lumbar fusion 22630, shoulder replacement 23472, ankle replacement 27702 and two anesthesia codes (${fr('86 FR 63711')}). It classified one more code, 0643T, as inpatient only (${fr('86 FR 63710')}) and wrote removal criteria into the regulation (${fr('86 FR 63993')}). It also meant to cut the exemption back to two years, but left the indefinite paragraph in the regulation (${fr('90 FR 53829')}).`,
-  2023: () => `Eleven codes came off: eight facial-bone procedures (${fr('87 FR 72009')}), plus 22632, 47550 and 21255. Ten of the eleven had been removed in 2021 and put back in 2022 (${fr('90 FR 53782')}). Eight new codes were added (${fr('87 FR 72006')}). CMS said it was not considering eliminating the list (${fr('87 FR 72008')}).`,
-  2024: () => `Nothing came off. Nine new codes were added and 0646T was moved onto the list (${fr('88 FR 81859')}).`,
+  2023: () => `Eleven codes came off: the eight facial-bone procedures CMS had proposed, plus 21255, 22632 and 47550 (${fr('87 FR 72009')}). In CMS’s files, ten of the eleven had come off in 2021 and gone back on in 2022; CMS says as much for the facial-bone codes (${fr('90 FR 53782')}) and for 22632 (${fr('87 FR 72006')}). Eight new codes were added (${fr('87 FR 72006')}). CMS said it was not considering eliminating the list at that time (${fr('87 FR 72008')}).`,
+  2024: () => `Nothing came off. Nine new codes were added and 0646T was moved onto the list (${fr('88 FR 81861')}).`,
   2025: () => `One code came off, 22848, and three new codes were confirmed on the list (${fr('89 FR 94274')}).`,
-  2026: () => `CMS restarted the elimination, this time with a three-year schedule in the regulation (${fr('90 FR 54086')}). The first 285 codes came off, mostly musculoskeletal (${fr('90 FR 53788')}). The removal criteria were deleted (${fr('90 FR 53789')}), and the indefinite exemption was restated in 42 CFR 412.3(d)(2) (${fr('90 FR 54082')}).`,
-  2027: () => `The second phase: 637 codes come off on January 1, 2027, from the auditory, digestive, endocrine, female genital, hemic and lymphatic, integumentary, male genital, maternity, mediastinum and diaphragm, respiratory and urinary families (${fr('91 FR 70570')}; ${fr('91 FR 70574')}). The Federal Register does not print the list; CMS posted it as a file.`,
+  2026: () => `CMS restarted the elimination, this time with an end date in the regulation: the list is to be “eliminated in its entirety by January 1, 2029” (${fr('90 FR 54086')}). The first 285 codes came off, mostly musculoskeletal (${fr('90 FR 53788')}). The removal criteria were deleted (${fr('90 FR 53789')}), and the indefinite exemption was restated in 42 CFR 412.3(d)(2) (${fr('90 FR 54082')}).`,
+  2027: () => `The second phase: 637 codes come off on January 1, 2027. They are selected, less complex services from the auditory, digestive, endocrine, female genital, hemic and lymphatic, integumentary, male genital, maternity, mediastinum and diaphragm, respiratory and urinary families (${fr('91 FR 70571')}; ${fr('91 FR 70574')}). The Federal Register does not print the list; CMS posted it as a file.`,
 };
 
 function sizeChart(ctx) {
   const { data } = ctx;
   const max = Math.max(...ctx.sizes.map((s) => s.count));
-  const span = Date.parse(AXIS.to) - Date.parse(AXIS.from);
-  const x = (iso) => ((Date.parse(iso) - Date.parse(AXIS.from)) / span) * 100;
+  const x = (iso) => axis.share(iso);
+  const open = `${ctx.nextYear}-01-01`;
+  const height = (count) => `${((count / max) * 100).toFixed(2)}%`;
   const bars = ctx.sizes.map((s, i) => {
-    const end = i + 1 < ctx.sizes.length ? ctx.sizes[i + 1].date : `${Number(data.dosMax.slice(0, 4)) + 1}-01-01`;
+    const end = i + 1 < ctx.sizes.length ? ctx.sizes[i + 1].date : open;
     const title = `${s.basis === 'q' ? monthYear(s.date) : s.date.slice(0, 4)}: ${num(s.count)} codes`;
-    return `<span class="bar${s.basis === 'f' ? ' bar--sched' : ''}" style="left:${x(s.date).toFixed(3)}%;width:${(x(end) - x(s.date)).toFixed(3)}%;height:${((s.count / max) * 100).toFixed(2)}%" title="${title}"></span>`;
+    return `<span class="bar${s.basis === 'f' ? ' bar--sched' : ''}" style="left:${pct(x(s.date))};width:${pct(x(end) - x(s.date))};height:${height(s.count)}" title="${title}"></span>`;
   }).join('');
-  const labels = ctx.sizes.filter((s, i) => i === 0 || s.date.endsWith('-01-01') && Math.abs(s.count - ctx.sizes[i - 1].count) > 100)
-    .map((s) => `<span class="chart__val" style="left:${x(s.date).toFixed(3)}%;bottom:${((s.count / max) * 100).toFixed(2)}%">${num(s.count)}</span>`).join('');
-  const years = [];
-  for (let year = 2017; year <= 2029; year += 1) years.push(`<span class="tl__year" style="left:${x(`${year}-01-01`).toFixed(3)}%">${year}</span>`);
+  // Label the first bar and every January that moved the list by more than 100 codes.
+  const turns = ctx.sizes.filter((s, i) => i === 0 || (s.date.endsWith('-01-01') && Math.abs(s.count - ctx.sizes[i - 1].count) > 100));
+  const labels = turns.map((s) => `<span class="chart__val" style="left:${pct(x(s.date))};bottom:${height(s.count)}">${num(s.count)}</span>`).join('');
+  const spoken = turns.map((s) => `${num(s.count)} in ${s.date.slice(0, 4)}`).join(', ');
+  const scheduled = ctx.scheduled ? ` Hatched: scheduled for ${ctx.scheduled}.` : '';
   const rows = ctx.ledger.map((y) => `<tr><th scope="row">${y.year}</th><td>${num(y.start)}</td><td>${num(y.end)}</td></tr>`).join('');
   return `<figure class="chart">
-<figcaption>Codes on the inpatient-only list, January 2017 to the regulation’s end date <span class="chart__key">Hatched: scheduled for 2027. Dashed: 2028, not yet decided.</span></figcaption>
-<div class="chart__plot" role="img" aria-label="Bar chart of the number of codes on the list over time: about 1,740 through 2020, 1,438 in 2021, 1,728 in 2022, 1,438 in 2026, 813 in 2027, and none by January 2029.">${bars}${labels}<span class="chart__open" style="left:${x(`${Number(data.dosMax.slice(0, 4)) + 1}-01-01`).toFixed(3)}%;width:${(100 - x(`${Number(data.dosMax.slice(0, 4)) + 1}-01-01`)).toFixed(3)}%"><span>2028: CMS expects to remove the rest</span></span></div>
-<div class="tl__axis" aria-hidden="true">${years.join('')}</div>
+<figcaption>Codes on the inpatient-only list, ${monthYear(data.periods[0].d)} to the regulation’s end date <span class="chart__key">${scheduled} Dashed: ${ctx.nextYear}, not yet decided.</span></figcaption>
+<div class="chart__plot" role="img" aria-label="Bar chart of the number of codes on the list over time: ${spoken}, and none by January 2029.">${bars}${labels}<span class="chart__open" style="left:${pct(x(open))};width:${pct(1 - x(open))}"><span>${ctx.nextYear}: CMS expects to remove the rest</span></span></div>
+<div class="tl__axis" aria-hidden="true">${axisYears('tl__year')}</div>
 <details class="chart__table"><summary>The same numbers as a table</summary>
 <table><thead><tr><th scope="col">Year</th><th scope="col">On January 1</th><th scope="col">On December 31</th></tr></thead><tbody>${rows}</tbody></table></details>
 </figure>`;
@@ -275,13 +277,13 @@ export function history(ctx) {
       ['Added during the year', num(mid.length)],
     ].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
     const rule = data.rules[y.year];
-    const file = y.year === Number(data.dosMax.slice(0, 4)) && ctx.scheduled ? ' Scheduled: from the final rule, until CMS posts the January file.' : '';
+    const file = String(y.year) === ctx.scheduled ? ' Scheduled: from the final rule, until CMS posts the January file.' : '';
     return `<section class="year" id="y${y.year}" aria-labelledby="yh${y.year}">
 <h2 id="yh${y.year}">${y.year}</h2>
 <p>${YEAR_NOTES[y.year]()}${file}</p>
 <dl class="ledger">${facts}</dl>
 ${codeList(data, 'Removed', change.removed)}${codeList(data, 'Returned to the list', returned)}${codeList(data, 'New or added', [...change.new, ...added])}${codeList(data, 'Retired while on the list', change.retired)}${codeList(data, 'Added during the year', mid)}
-<p class="year__src">${esc(rule.name)} (${esc(rule.id)}), ${fr(rule.fr)}${y.year < 2020 ? '. Before 2020 this site has one file a year, so mid-year changes are not shown.' : '.'}</p>
+<p class="year__src">${esc(rule.name)} (${esc(ctx.ruleIds[y.year])}), ${fr(rule.fr)}${y.year < 2020 ? '. Before 2020 this site has one file a year, so mid-year changes are not shown.' : '.'}</p>
 </section>`;
   }).join('\n');
 
@@ -291,8 +293,8 @@ ${codeList(data, 'Removed', change.removed)}${codeList(data, 'Returned to the li
 <p class="lede">CMS has tried to end the inpatient-only list twice. The first attempt lasted one year. A code removed in 2021 may have been inpatient only again in 2022 and gone again in 2026, which is why the date of service matters.</p>
 ${sizeChart(ctx)}
 <section class="block" aria-labelledby="next-h">
-<h2 id="next-h">2028 and the end of the list</h2>
-<p>CMS expects to remove everything left for 2028, in next year’s rule: the neurological and cardiovascular families and solid organ, intestinal and islet cell transplants (${fr('91 FR 70571')}). The regulation says the list is “eliminated in its entirety by January 1, 2029” (${cfr('419.22', '42 CFR 419.22(n)')}; ${fr('90 FR 54086')}). <a href="/phase-out/">The schedule, and what remains</a>.</p>
+<h2 id="next-h">${ctx.nextYear} and the end of the list</h2>
+<p>CMS expects to remove everything left for ${ctx.nextYear}, in next year’s rule: the neurological and cardiovascular families and solid organ, intestinal and islet cell transplants (${fr('91 FR 70571')}). The regulation says the list is “eliminated in its entirety by January 1, 2029” (${cfr('419.22', '42 CFR 419.22(n)')}; ${fr('90 FR 54086')}). <a href="/phase-out/">The schedule, and what remains</a>.</p>
 </section>
 ${years}
 <section class="block" aria-labelledby="rec-h">
@@ -318,55 +320,60 @@ function byGroupTable(ctx, codes, caption) {
     if (!mine.length) return '';
     return `<details class="codes"><summary>${esc(name)} (${num(mine.length)})</summary><p class="codes__list">${mine.map((code) => codeLink(data, code)).join(' ')}</p><p class="codes__more"><a href="/group/${id}/">All ${esc(name.toLowerCase())} codes</a></p></details>`;
   }).join('');
-  return `<div class="bygroup"><p class="bygroup__cap">${caption}</p>${rows}</div>`;
+  return `<p class="note">${caption}</p>${rows}`;
 }
 
+// What each finished or scheduled phase removed, by the year it takes effect.
+const PHASE_NOTES = {
+  2026: () => `Mostly musculoskeletal: joint replacement, spine, fracture repair and amputation, with their anesthesia codes (${fr('90 FR 53788')}). <a href="/history/#y2026">The codes</a>`,
+  2027: () => `Selected, less complex services from the auditory, digestive, endocrine, female genital, hemic and lymphatic, integumentary, male genital, maternity, mediastinum and diaphragm, respiratory and urinary families (${fr('91 FR 70571')}; ${fr('91 FR 70574')}).`,
+};
+
 export function phaseOut(ctx) {
-  const { stats } = ctx;
+  const newest = ctx.phases[ctx.phases.length - 1];
   const body = `<h1>The phase-out schedule</h1>
 <p class="lede">Since January 1, 2026 the regulation has required CMS to eliminate the inpatient-only list “through a 3-year transition, with the list eliminated in its entirety by January 1, 2029” (${cfr('419.22', '42 CFR 419.22(n)')}; ${fr('90 FR 54086')}).</p>
 <ol class="phases">
-<li class="phase phase--done"><p class="phase__when">January 1, 2026</p><h2>${num(stats.left2026)} codes removed</h2><p>Mostly musculoskeletal: joint replacement, spine, fracture repair and amputation, with their anesthesia codes (${fr('90 FR 53788')}). <a href="/history/#y2026">The codes</a></p></li>
-<li class="phase phase--next"><p class="phase__when">January 1, 2027</p><h2>${num(stats.leaving2027)} codes removed</h2><p>The auditory, digestive, endocrine, female genital, hemic and lymphatic, integumentary, male genital, maternity, mediastinum and diaphragm, respiratory and urinary families (${fr('91 FR 70570')}; ${fr('91 FR 70574')}). ${num(stats.after2027)} codes stay on the list for 2027.</p></li>
-<li class="phase phase--open"><p class="phase__when">January 1, 2028, not yet final</p><h2>CMS expects to remove the rest</h2><p>“These remaining clinical families and services would be removed from the IPO list for CY 2028, during the third and final phase”: neurological, cardiovascular, and solid organ, intestinal and islet cell transplants (${fr('91 FR 70571')}). That needs next year’s rule. Until CMS finalizes it, this site does not answer for dates in 2028.</p></li>
+${ctx.phases.map((phase) => `<li class="phase${phase.past ? ' phase--done' : ''}"><p class="phase__when">${formatDate(phase.date)}</p><h2>${num(phase.removed)} codes removed</h2><p>${PHASE_NOTES[phase.year]()}${phase === ctx.phases[ctx.phases.length - 1] ? ` ${num(phase.start)} codes stay on the list for ${phase.year}.` : ''}</p></li>`).join('\n')}
+<li class="phase phase--open"><p class="phase__when">January 1, ${ctx.nextYear}, not yet final</p><h2>CMS expects to remove the rest</h2><p>“We expect that these remaining clinical families and services would be removed from the IPO list for CY 2028, during the third and final phase”: neurological, cardiovascular, and solid organ, intestinal and islet cell transplants (${fr('91 FR 70571')}). That needs next year’s rule. Until CMS finalizes it, this site does not answer for dates in ${ctx.nextYear}.</p></li>
 <li class="phase phase--end"><p class="phase__when">By January 1, 2029</p><h2>The list is gone</h2><p>The regulation’s outside date. The CY 2026 rule’s preamble printed January 1, 2028 in one place; CMS corrected it to 2029 (${fr('91 FR 8384')}).</p></li>
 </ol>
 
 <section class="block" aria-labelledby="leave-h">
-<h2 id="leave-h">Leaving on January 1, 2027</h2>
-${byGroupTable(ctx, ctx.leaving2027, `The ${num(stats.leaving2027)} codes, in this site’s body-system groups. CMS’s own list is the file “Final Procedures Removed from the IPO List for CY 2027” (${fr('91 FR 70574')}).`)}
+<h2 id="leave-h">${newest.past ? 'Left' : 'Leaving'} on ${formatDate(newest.date)}</h2>
+${byGroupTable(ctx, newest.codes, `The ${num(newest.removed)} codes, in this site’s body-system groups. CMS’s own list is the file “Final Procedures Removed from the IPO List for CY 2027” (${fr('91 FR 70574')}).`)}
 </section>
 <section class="block" aria-labelledby="stay-h">
-<h2 id="stay-h">Still on the list for 2027</h2>
-${byGroupTable(ctx, ctx.after2027, `The ${num(stats.after2027)} codes with status indicator C in the CY 2027 final rule’s Addendum B.`)}
+<h2 id="stay-h">Still on the list on ${formatDate(newest.date)}</h2>
+${byGroupTable(ctx, newest.staying, `The ${num(newest.start)} codes with status indicator C in the ${esc(newest.file)}.`)}
 </section>
 
 <section class="block" aria-labelledby="means-h">
 <h2 id="means-h">What changes when a code leaves</h2>
 <ul class="plain">
 <li><strong>Either setting can be paid.</strong> “Removal of procedures from the IPO list allows for payment of the procedure in either the inpatient setting or the outpatient setting” (${fr('90 FR 53786')}). Removal does not require the service to be done outpatient (${fr('90 FR 53784')}).</li>
-<li><strong>The two-midnight rule decides inpatient status.</strong> While a procedure is on the list, an inpatient admission is generally appropriate whatever the expected stay. Once it is off, the two-midnight benchmark applies (${cfr('412.3', '42 CFR 412.3(d)')}; ${fr('84 FR 61363')}).</li>
-<li><strong>Certain medical review is suspended.</strong> Procedures removed in 2021 or later are exempt from site-of-service denials and recovery-auditor patient-status review until CMS ends the exemption for that procedure. <a href="/exemption/">The exemption</a></li>
+<li><strong>The two-midnight rule decides whether Part A pays for the admission.</strong> While a procedure is on the list, an inpatient admission is generally appropriate whatever the expected stay. Once it is off, the two-midnight benchmark applies (${cfr('412.3', '42 CFR 412.3(d)')}; ${fr('84 FR 61363')}).</li>
+<li><strong>Some medical review is limited.</strong> Procedures removed in 2021 or later are exempt from site-of-service denials and recovery-auditor patient-status review until CMS ends the exemption for that procedure. <a href="/exemption/">The exemption</a></li>
 <li><strong>The three-day stay for nursing-facility coverage is unchanged.</strong> “A prior 3-day inpatient hospital stay remains a statutory requirement for SNF coverage” (${fr('90 FR 53786')}).</li>
-<li><strong>Many removed codes also became payable in surgery centers.</strong> CMS added 271 of the 2026 removals to the ambulatory surgical center list (${fr('90 FR 53450')}), and 618 codes for 2027 that were removed from the list or recommended by commenters (${fr('91 FR 70286')}). This site does not track the surgery-center list.</li>
-<li><strong>Medicare Advantage.</strong> CMS notes that Medicare Advantage plans must follow the two-midnight benchmark (${fr('90 FR 53831')}). Plans’ own review practices are outside this site.</li>
+<li><strong>Many removed codes also became payable in surgery centers.</strong> CMS added 271 of the 2026 removals to the ambulatory surgical center list (${fr('90 FR 53450')}), and 618 codes for 2027 that were removed from the list or recommended by interested parties (${fr('91 FR 70286')}). This site does not track the surgery-center list.</li>
+<li><strong>Medicare Advantage.</strong> CMS says Medicare Advantage plans must follow the two-midnight rule and “may not treat removal from the IPO list as requiring those procedures to be performed in the outpatient setting” (${fr('91 FR 70572')}). Plans’ own review practices are outside this site.</li>
 </ul>
 </section>
 
 <section class="block" aria-labelledby="after-h">
-<h2 id="after-h">After the list ends</h2>
-<p>This site stays useful. A claim is judged by the rules in force on its date of service, so an audit or appeal years from now still needs to know whether a procedure was inpatient only that day. And the medical-review exemption outlives the list: each removed procedure keeps it until CMS ends it for that procedure, which CMS has not yet done for any (${fr('90 FR 53832')}).</p>
+<h2 id="after-h">Why the date of service still matters after the list ends</h2>
+<p>A claim is judged by the rules in force on its date of service, so an audit or appeal years from now still needs to know whether a procedure was inpatient only that day. And the medical-review exemption outlives the list: each removed procedure keeps it until CMS ends it for that procedure, which CMS has not done for any (${fr('90 FR 53832')}; ${fr('91 FR 70573')}).</p>
 </section>`;
   return layout(ctx, {
     path: '/phase-out/', page: 'phase-out', title: 'The inpatient-only list phase-out schedule', body,
-    description: 'Medicare’s inpatient-only list ends by January 1, 2029. What left in 2026, the 637 codes leaving January 1, 2027, what remains for 2028, and what changes when a code leaves.',
+    description: 'Medicare’s inpatient-only list ends by January 1, 2029. What left in 2026, the 637 codes removed January 1, 2027, what remains, and what changes when a code leaves.',
   });
 }
 
 // ---- exemption ----------------------------------------------------------------------------
 
 export function exemption(ctx) {
-  const { data, stats } = ctx;
+  const { data } = ctx;
   const cohorts = ctx.exemptCohorts.map((c) => `<details class="codes"><summary>Removed ${formatDate(c.from)}: ${plural(c.codes.length, 'code')}, ${c.status}</summary><p class="codes__list">${c.codes.map((code) => codeLink(data, code)).join(' ')}</p></details>`).join('');
   const body = `<h1>The medical-review exemption</h1>
 <p class="lede">When a procedure comes off the inpatient-only list, the two-midnight rule starts to apply to it. To give hospitals time to adjust, CMS exempts claims for the procedure from some kinds of review. For anything removed in 2021 or later, that exemption has no end date yet.</p>
@@ -381,7 +388,7 @@ export function exemption(ctx) {
 <p>CMS names three things (${fr('85 FR 86119')}; restated at ${fr('90 FR 53832')} and ${fr('91 FR 70573')}):</p>
 <ul class="plain">
 <li>site-of-service claim denials under Medicare Part A;</li>
-<li>referrals from the initial medical review contractor to recovery auditors (RACs) for noncompliance with the two-midnight rule;</li>
+<li>referrals from the first-line review contractor (the MAC; before September 2025, the BFCC-QIO) to recovery auditors (RACs) for noncompliance with the two-midnight rule;</li>
 <li>recovery-auditor reviews of “patient status”, meaning site of service.</li>
 </ul>
 <p>Review contractors may still look at these claims to educate providers, “but claims identified as noncompliant are not denied with respect to the site-of-service under Medicare Part A” (${fr('91 FR 70573')}). Short-stay reviews moved from the quality improvement organizations (BFCC-QIOs) to the Medicare administrative contractors on September 1, 2025 (${fr('90 FR 53829')}).</p>
@@ -393,7 +400,7 @@ export function exemption(ctx) {
 <li><strong>The two-midnight rule itself.</strong> “Providers are still required to comply with the 2-midnight rule during the exemption period” (${fr('90 FR 53830')}). The exemption is from certain review, not from the rule (${fr('85 FR 86120')}).</li>
 <li><strong>Fraud and abuse review.</strong> CMS or its contractors “may still conduct patient status medical review in cases in which there is evidence of systemic fraud or abuse occurring” (${fr('90 FR 53830')}).</li>
 <li><strong>Other payers.</strong> The exemption is a fee-for-service Medicare review policy. Medicare Advantage plans must follow the two-midnight benchmark (${fr('90 FR 53831')}), but this site does not speak to how any plan audits.</li>
-<li><strong>Everything else about the claim.</strong> Medical necessity of the procedure, coding and documentation are reviewed as always.</li>
+<li><strong>Review unrelated to patient status.</strong> Other medical review, such as the medical necessity of the procedure itself and its coding, is not affected (${fr('90 FR 53830')}).</li>
 </ul>
 </section>
 
@@ -404,18 +411,18 @@ export function exemption(ctx) {
 <div><dt>Removed during 2020</dt><dd>Two years from removal: January 1, 2020 through December 31, 2021 (${fr('84 FR 61365')}; ${fr('85 FR 86300')}).</dd></div>
 <div><dt>Removed in 2021 or later</dt><dd>Indefinite: until CMS determines the procedure is more commonly performed outpatient (${fr('85 FR 86119')}; ${fr('90 FR 54082')}).</dd></div>
 </dl>
-<p>To end a procedure’s exemption, CMS needs Medicare claims showing it “being performed more than 50 percent of the time in the outpatient setting in a single calendar year” (${fr('90 FR 53830')}), and it will announce the end through notice-and-comment rulemaking (${fr('90 FR 53832')}; ${fr('91 FR 70573')}). <strong>CMS has not ended any procedure’s exemption.</strong> When it does, this site will show the end date on that code.</p>
+<p>To end a procedure’s exemption, CMS needs Medicare claims showing it “being performed more than 50 percent of the time in the outpatient setting in a single calendar year” (${fr('90 FR 53830')}), and CMS has said the first such end will be announced through notice-and-comment rulemaking, with the process for later years to be set then (${fr('90 FR 53832')}). <strong>CMS has not ended any procedure’s exemption</strong> (${fr('91 FR 70573')}). When it does, this site will show the end date on that code.</p>
 </section>
 
 <section class="block" aria-labelledby="gap-h">
-<h2 id="gap-h">The 2022 to 2025 wrinkle</h2>
-<p>For dates of service in 2023, 2024 and 2025, read the regulation as it stood with care. In the CY 2022 rule CMS said it was returning to a two-year exemption for everything removed on or after January 1, 2020, and it rewrote one paragraph of the regulation to say so (${fr('86 FR 63740')}; ${fr('86 FR 63992')}). It did not delete the paragraph that made the exemption indefinite for removals from 2021 on. In the CY 2026 rule CMS called that a drafting oversight and said the result was that “the exemption period was not changed to two years as we intended and instead remained the indefinite exemption period” (${fr('90 FR 53829')}).</p>
-<p>This matters for ${plural(stats.disputedCodes, 'code')}: the five that stayed off the list after 2021, and the eleven removed in 2023. On those dates this site reports the exemption as in effect, as CMS now describes it, and flags the conflict.</p>
+<h2 id="gap-h">The 2022 to 2025 conflict in the regulation</h2>
+<p>For dates of service in 2023, 2024 and 2025 the regulation contradicted itself. In the CY 2022 rule CMS said it was resuming a two-year exemption for everything removed on or after January 1, 2020, and it rewrote one paragraph of the regulation to say so (${fr('86 FR 63739')}; ${fr('86 FR 63992')}). It did not delete the paragraph that made the exemption indefinite for removals from 2021 on. CMS’s CY 2023 rule still described the exemption as lasting two years (${fr('87 FR 72009')}). In the CY 2026 rule CMS called the leftover paragraph a drafting oversight and said the result was that “the exemption period was not changed to two years as we intended and instead remained the indefinite exemption period” (${fr('90 FR 53829')}).</p>
+<p>This matters for ${plural(ctx.disputedCodes, 'code')}: the five that stayed off the list after 2021, and the eleven removed in 2023. On those dates this site reports the exemption as in effect, as CMS now describes it, and flags the conflict.</p>
 </section>
 
 <section class="block" aria-labelledby="who-h">
 <h2 id="who-h">Which codes</h2>
-<p><strong>${num(stats.exemptNow)} codes are exempt on ${formatDate(ctx.today)}.</strong> A code that was removed and later put back on the list has no exemption while it is on the list; if it is removed again, the exemption runs from the new removal.</p>
+<p><strong>${num(ctx.exemptNow)} codes are exempt on ${formatDate(ctx.today)}</strong>, the day this page was built. A code that was removed and later put back on the list has no exemption while it is on the list. If it is removed again, this site counts the exemption from the new removal, which is how the regulation reads.</p>
 ${cohorts}
 <p class="note">Look up any code for its exemption on a given date of service: <a href="/">Lookup</a>.</p>
 </section>`;
@@ -457,7 +464,7 @@ export function methods(ctx) {
 <li>${ctx.counts.quotes} passages quoted from the Federal Register appear on the pages cited.</li>
 </ul>
 <h3>Differences, explained</h3>
-<ul class="plain gaps">${gaps}</ul>
+<ul class="plain">${gaps}${ctx.notes.map((note) => `<li><strong>From ${formatDate(note.from)}, CMS’s text and files disagree.</strong> For each of these codes: ${esc(note.text)} (${fr(note.cite)}) <span class="gap__codes">${note.codes.map((code) => codeLink(data, code)).join(' ')}</span></li>`).join('')}</ul>
 <p>CMS’s removal file for 2021 also carries full procedure descriptions, and several rows have the wrong description for their code. This site does not use CMS’s descriptions.</p>
 </section>
 
@@ -506,4 +513,3 @@ export function notFound(ctx) {
   });
 }
 
-export { chip };

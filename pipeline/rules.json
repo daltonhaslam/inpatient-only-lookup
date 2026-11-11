@@ -22,7 +22,16 @@
    "doc": "2018-24243",
    "stated": [],
    "table": null,
-   "event_cites": {}
+   "event_cites": {
+    "removed": "83 FR 58999"
+   },
+   "code_cites": {
+    "31241": "83 FR 58999",
+    "01402": "83 FR 59000",
+    "0266T": "83 FR 59001",
+    "00670": "83 FR 59002"
+   },
+   "ipo_section": "83 FR 58998-59002"
   },
   {
    "cy": 2020,
@@ -56,7 +65,7 @@
        "00670"
       ],
       "side": "removed",
-      "why": "Table 49 lists this anesthesia code as removed for CY 2020, but the CY 2019 final rule's Addendum B already shows it with status N. In CMS's files it left status C a year before the table says."
+      "why": "Table 49 lists this anesthesia code as removed for CY 2020, but the CY 2019 final rule had already removed it (83 FR 59002), and that rule's Addendum B shows it with status N. In CMS's files it left status C a year before Table 49 says."
      },
      {
       "codes": [
@@ -90,6 +99,16 @@
    },
    "event_cites": {
     "removed": "84 FR 61358"
+   },
+   "code_cites": {
+    "27130": "84 FR 61355",
+    "01214": "84 FR 61355",
+    "22633": "84 FR 61357",
+    "22634": "84 FR 61357",
+    "63265": "84 FR 61357",
+    "63266": "84 FR 61357",
+    "63267": "84 FR 61357",
+    "63268": "84 FR 61357"
    }
   },
   {
@@ -864,8 +883,8 @@
     ]
    },
    "event_cites": {
-    "new": "88 FR 81859",
-    "added": "88 FR 81859"
+    "new": "88 FR 81861",
+    "added": "88 FR 81861"
    }
   },
   {
@@ -1294,5 +1313,19 @@
   }
  ],
  "exemption_regimes_note": "Which medical-review exemption attaches to a removal, by the date of the removal; the last regime on or before that date applies. years: a fixed length. two_year_text_until: until this date the regulation also carried a two-year paragraph for removals on or after January 1, 2020 (86 FR 63992); CMS later said the indefinite exemption had remained in effect (90 FR 53829).",
- "event_cites_note": "Where each final rule finalizes its January 1 changes, by kind of change. A change with no page here is cited to the rule as a whole and to the Addendum B file that shows it."
+ "event_cites_note": "Where each final rule finalizes its January 1 changes, by kind of change. A change with no page here is cited to the rule as a whole and to the Addendum B file that shows it.",
+ "code_cites_note": "Where a rule finalizes one code's change on a different page from the rest of that year's changes.",
+ "notes": [
+  {
+   "codes": [
+    "59514",
+    "59525",
+    "59620"
+   ],
+   "from": "2027-01-01",
+   "cite": "91 FR 70574",
+   "text": "CMS says in the CY 2027 final rule that the AMA is deleting this code and that it will no longer be effective starting in CY 2027. The rule's own Addendum B and Addendum E still list it with status C. CMS's January 2027 file should settle which is right."
+  }
+ ],
+ "notes_note": "Cautions shown on a code's page from a date on, where CMS's text and CMS's files disagree."
 }

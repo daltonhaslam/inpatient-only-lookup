@@ -942,6 +942,66 @@
    "quote": "(ii) For those services and procedures removed on or after January 1, 2021, the exemption in this paragraph (d)(2) will last until the Secretary determines that the service or procedure is more commonly performed in the outpatient setting.",
    "cite": "85 FR 86300",
    "source": "fr-2020-26819"
+  },
+  "Y19-31241": {
+   "claim": "CY2019 final rule removes 31241",
+   "quote": "remove CPT code 31241 from the IPO list and to assign the procedure to C-APC 5153 (Level 3 Airway Endoscopy) with a status indicator of ``J1''.",
+   "cite": "83 FR 58999",
+   "source": "fr-2018-24243"
+  },
+  "Y19-01402": {
+   "claim": "CY2019 final rule removes anesthesia code 01402",
+   "quote": "remove the procedure described by CPT code 01402 from the IPO list.",
+   "cite": "83 FR 59000",
+   "source": "fr-2018-24243"
+  },
+  "Y19-0266T": {
+   "claim": "CY2019 final rule removes 0266T",
+   "quote": "we are removing the procedure described by CPT code 0266T from the IPO list for CY 2019.",
+   "cite": "83 FR 59001",
+   "source": "fr-2018-24243"
+  },
+  "Y19-00670": {
+   "claim": "CY2019 final rule removes anesthesia code 00670",
+   "quote": "we are removing the procedure described by CPT code 00670 from the IPO list for CY 2019.",
+   "cite": "83 FR 59002",
+   "source": "fr-2018-24243"
+  },
+  "Y23-22632-returned": {
+   "claim": "CY2023: 22632 was removed in CY2021 and returned for CY2022",
+   "quote": "CPT code 22632 was previously removed from the IPO list in CY 2021 as part of the first stage of the elimination of the IPO list, but was then returned to the list for CY 2022 when the elimination of the IPO list was halted.",
+   "cite": "87 FR 72006",
+   "source": "fr-2022-23918"
+  },
+  "Y23-21255": {
+   "claim": "CY2023 final removes 47550 and 21255",
+   "quote": "we are removing CPT code 47550 and reassigning it to status indicator ``N'' and removing CPT code 21255 and reassigning it to status indicator ``J1''",
+   "cite": "87 FR 72009",
+   "source": "fr-2022-23918"
+  },
+  "Y24-final": {
+   "claim": "CY2024 final: the new codes and 0646T assigned to the IPO list",
+   "quote": "we are finalizing our proposal to assign CPT codes 0790T, 22836, 22837, 22838, 61889, 76984, 76987, 76988, 76989, and",
+   "cite": "88 FR 81861",
+   "source": "fr-2023-24293"
+  },
+  "Y27-selected": {
+   "claim": "CY2027: selected less-complex services from the named families",
+   "quote": "we proposed to remove selected less-complex services in the auditory, digestive, endocrine, female genital, hemic and lymphatic systems, integumentary, male genital, maternity care and delivery, mediastinum and diaphragm, respiratory, and urinary clinical families from the IPO list",
+   "cite": "91 FR 70571",
+   "source": "fr-2026-22739"
+  },
+  "E26-other-review": {
+   "claim": "CY2026: review unrelated to patient status is not affected by the exemption",
+   "quote": "other types of medical review, unrelated to patient status, would not be impacted by the proposed exemption.",
+   "cite": "90 FR 53830",
+   "source": "fr-2025-20907"
+  },
+  "E27-MA-setting": {
+   "claim": "CY2027: MA plans may not treat removal as requiring outpatient performance",
+   "quote": "MA plans must comply with the 2-midnight rule and may not treat removal from the IPO list as requiring those procedures to be performed in the outpatient setting.",
+   "cite": "91 FR 70572",
+   "source": "fr-2026-22739"
   }
  }
 }
