@@ -200,8 +200,14 @@ class Group(unittest.TestCase):
         self.assertEqual(self.group(["0SRA0J9", "0SRR0J9"], "M1611")["drgs"], ["469", "470"])
         self.assertEqual(self.group(["0SRT0J9", "0SRV0J9"], "M1711")["drgs"], ["469", "470"])
         self.assertEqual(self.group(["0SRC0J9", "0SRD0J9"], "M1711")["drgs"], ["461", "462"])
-        # A revision on one side still goes where its removal does (463-465 ranks above).
-        self.assertEqual(self.group(["0SPC0JZ", "0SRC0J9", "0SRD0J9"], "M1711")["drgs"], ["463", "464", "465"])
+        # A revision on one side (cluster 0SPC0JZ+0SRC0J9, a right knee site) with a left knee
+        # replacement is two sites: the cluster's 461-462 row replaces the removal's 463-465.
+        self.assertEqual(self.group(["0SPC0JZ", "0SRC0J9", "0SRD0J9"], "M1711")["drgs"], ["461", "462"])
+        # Bilateral knee revision: 461-462, also with a periprosthetic infection diagnosis (an
+        # open ambiguity: v44 does not say whether 403-404 would win; see the module docstring).
+        bilateral = ["0SPC0JZ", "0SRC0J9", "0SPD0JZ", "0SRD0J9"]
+        self.assertEqual(self.group(bilateral, "M1711")["drgs"], ["461", "462"])
+        self.assertEqual(self.group(bilateral, "T8453XA")["drgs"], ["461", "462"])
 
     def test_joint_site_pairs_are_the_bilateral_clusters(self):
         pairs = {frozenset(entry) for entries in self.ref.joint_sites.values() for entry in entries
@@ -212,8 +218,26 @@ class Group(unittest.TestCase):
         self.assertEqual(len(pairs), 1528)
 
     def test_procedure_clusters(self):
-        # Resection of uterus, cervix and supporting structures: radical hysterectomy 734-735.
-        self.assertEqual(self.group(["0UT40ZZ", "0UT90ZZ", "0UTC0ZZ"], "D259")["drgs"], ["734", "735"])
+        # A cluster with a row here whose condition holds is grouped in place of its codes.
+        def drgs(codes, dx):
+            for code in codes:
+                self.assertIn(code, self.ref.pcs)
+            self.assertIn(dx, self.ref.cm)
+            return self.group(codes, dx)["drgs"]
+        # Mastectomy with axillary node resection: 582-583, not the node resection's 579-581.
+        self.assertEqual(drgs(["07T50ZZ"], "C50911"), ["579", "580", "581"])
+        self.assertEqual(drgs(["07T50ZZ", "0HTT0ZZ"], "C50911"), ["582", "583"])
+        # Resection of uterus, cervix and supporting structures: radical hysterectomy 734-735,
+        # for malignancy too (the uterus code's 731-733 row gives way).
+        self.assertEqual(drgs(["0UT40ZZ", "0UT90ZZ", "0UTC0ZZ"], "D259"), ["734", "735"])
+        self.assertEqual(drgs(["0UT40ZZ", "0UT90ZZ", "0UTC0ZZ"], "C539"), ["734", "735"])
+        # Repair of small intestine with stoma repair: minor bowel 344-346, not 329-331.
+        self.assertEqual(drgs(["0DQ80ZZ"], "K5730"), ["329", "330", "331"])
+        self.assertEqual(drgs(["0DQ80ZZ", "0WQFXZ2"], "K5730"), ["344", "345", "346"])
+        # Bladder repair with stoma repair: minor bladder 662-664, not major bladder 653-655.
+        self.assertEqual(drgs(["0TQB0ZZ"], "N320"), ["653", "654", "655"])
+        self.assertEqual(drgs(["0TQB0ZZ", "0WQFXZ2"], "N320"), ["662", "663", "664"])
+        self.assertEqual(drgs(["0TQB0ZZ", "0WQFXZZ"], "N320"), ["662", "663", "664"])
         self.assertEqual(self.group(["0UT90ZZ", "0UTC0ZZ"], "D259")["drgs"], ["742", "743"])
         # Pre-MDC: insertion of a short-term heart assist system with removal of one is 001-002.
         self.assertEqual(self.group(["02HA0RS"], "I5022")["drgs"], ["215"])

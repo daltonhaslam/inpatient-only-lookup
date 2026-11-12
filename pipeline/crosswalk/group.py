@@ -20,9 +20,12 @@ What this cannot see, and so does not model:
 - Secondary diagnoses, except where noted. Pancreas transplant DRGs need diabetes (and 008/019
   renal failure); they are assumed present.
 - Appendix E Part 4 (MDC 14 obstetric logic) is not parsed. Part 2 procedure clusters
-  (combinations CMS lists under a class, e.g. uterus, cervix and supporting structures under
-  radical hysterectomy 734-735) add their rows to their codes' own (_clusters); Part 3
-  combinations (bile duct stent exchanges) are made non-OR.
+  ("grouped differently than their constituent codes", e.g. uterus, cervix and supporting
+  structures to radical hysterectomy 734-735) replace their codes' own rows in an MDC where a
+  cluster row's condition holds, else the codes keep theirs (_clusters). So a bilateral hip or
+  knee revision is 461-462 even with a periprosthetic infection diagnosis (each removal's
+  403-404 row gives way to its cluster's 461-462); v44 does not say which wins, so this is an
+  open ambiguity. Part 3 combinations (bile duct stent exchanges) are made non-OR.
 - Conditions other than the principal diagnosis and the other codes present (number of
   spinal levels beyond the codes, device types); see _in_mdc.
 - Non-OR procedures that CMS lets lead to a surgical or a procedure-driven medical DRG
@@ -119,7 +122,7 @@ def group(pcs_codes, principal_dx, ref, sex=None):
         return {"mdc": family_mdc, "drgs": list(drgs), "family": family, "basis": basis,
                 "or_codes": or_codes, "mdc_ambiguous": ambiguous}
 
-    found = _pre_mdc(codes, principal_dx, ref)
+    found = _pre_mdc(codes, or_codes, principal_dx, ref)
     if found:
         return result(PRE, found[0], found[1], "pre-mdc")
     found = _in_mdc(codes, or_codes, mdc, principal_dx, ref)
@@ -206,9 +209,11 @@ def _principal_mdc(dx, codes, sex, ref):
 def _clusters(codes, ref):
     """{"A+B": rows} the Appendix E Part 2 clusters the codes complete, keyed by their codes.
 
-    A cluster's rows are read like one more code's: CMS lists it under each class whose logic
-    names the combination, and its codes keep their own rows (v44 groups a knee removal plus
-    replacement, cluster 0SPC0JZ+0SRC0J9, by the removal's 463-465 row).
+    Appendix E: clusters "are grouped differently than their constituent codes". In an MDC (or
+    Pre-MDC) where one of a cluster's rows has its condition met, the cluster is read as one
+    code with the cluster's rows and its codes' own rows are set aside (_set_aside); otherwise
+    the codes keep their rows. A one-joint knee removal plus replacement (0SPC0JZ+0SRC0J9) has
+    only a 461-462 row, which needs two sites, so it groups by the removal's 463-465 row.
     """
     present, found = set(codes), {}
     for cluster in ref.clusters:
@@ -216,6 +221,11 @@ def _clusters(codes, ref):
             key = "+".join(sorted(code for group in cluster["groups"] for code in group & present))
             found.setdefault(key, []).extend(cluster["rows"])
     return found
+
+
+def _set_aside(clusters):
+    """The codes of these clusters (keys of _clusters), whose own rows give way to them."""
+    return {code for key in clusters for code in key.split("+")}
 
 
 # ---------------------------------------------------------------- Pre-MDC
@@ -242,7 +252,7 @@ def _pre_role(code, rows):
     return None
 
 
-def _pre_mdc(codes, dx, ref):
+def _pre_mdc(codes, or_codes, dx, ref):
     """(drgs, family) of the first Appendix D Pre-MDC family the case qualifies for, or None.
 
     The conditions are the ones the v44 Pre-MDC tables state that the codes and principal
@@ -253,23 +263,23 @@ def _pre_mdc(codes, dx, ref):
     pancreas transplant without a kidney is 010 (Appendix D ranks 010 above 008 and 019, which
     would otherwise make them unreachable).
     """
+    clusters = {key: [row for row in rows if row["mdc"] == PRE] for key, rows in _clusters(codes, ref).items()}
+    clusters = {key: rows for key, rows in clusters.items() if rows}
     roles, candidates = {}, []
     for code in codes:
         rows = [row for row in ref.proc_index.get(code, ()) if row["mdc"] == PRE]
-        if rows:
+        if rows and code not in _set_aside(clusters):
             roles[code] = _pre_role(code, rows)
             candidates.extend((code, row) for row in rows)
-    for key, rows in _clusters(codes, ref).items():
-        rows = [row for row in rows if row["mdc"] == PRE]
-        if rows:
-            roles[key] = None
-            candidates.extend((key, row) for row in rows)
+    for key, rows in clusters.items():
+        roles[key] = None
+        candidates.extend((key, row) for row in rows)
     if not candidates:
         return None
     has = set(roles.values())
     face_mouth_neck = "011" in ref.dx_pre_drgs.get(dx, ())
     tracheostomy = "tracheostomy" in has and ("ventilation" in has or not face_mouth_neck)
-    major_or = any(ref.unrelated.get(code) == "extensive" and roles.get(code) != "tracheostomy" for code in codes)
+    major_or = any(ref.unrelated[code] == "extensive" and roles.get(code) != "tracheostomy" for code in or_codes)
     allowed = {
         ("003",): tracheostomy and major_or,
         ("004",): tracheostomy and not major_or,
@@ -314,7 +324,8 @@ def _in_mdc(codes, or_codes, mdc, dx, ref):
     transplant with hemodialysis, combined spinal fusions) or a principal diagnosis (521-522
     hip fracture, 731-733 malignancy). A code listed under a lower family as well can only land
     there when a higher one's condition fails, so for each OR code, and each Appendix E Part 2
-    cluster the codes complete (as one more code with the cluster's rows):
+    cluster the codes complete with a row here whose condition holds (as one code with the
+    cluster's rows, in place of its codes; see _clusters):
     - rows whose stated v44 condition the codes do not show are dropped (_condition_met);
     - a diagnosis-specific row (DRGs Appendix B lists for some diagnosis) keeps the DRGs listed
       for this diagnosis, else its other DRGs, else is dropped (unless it is the code's only
@@ -328,8 +339,10 @@ def _in_mdc(codes, or_codes, mdc, dx, ref):
       valve plus catheterization is 216-218 and bypass plus catheterization 233-234.
     """
     listed = set(ref.dx_drgs.get(dx, ()))
-    entries = {code: ref.proc_index[code] for code in or_codes}
-    entries.update(_clusters(codes, ref))
+    clusters = {key: rows for key, rows in _clusters(codes, ref).items()
+                if any(row["mdc"] == mdc and _condition_met(mdc, row["drgs"], codes, ref) for row in rows)}
+    entries = {code: ref.proc_index[code] for code in or_codes if code not in _set_aside(clusters)}
+    entries.update(clusters)
     families = {code: frozenset(_row_rank(mdc, row["drgs"], ref) for row in ref.proc_index.get(code, ())
                                 if row["mdc"] == mdc)
                 for code in codes}

@@ -360,6 +360,8 @@ def load_clusters():
         if not match:
             raise parse.ParseError("Appendix E Part 2: unexpected line %r" % line[:60])
         joiner, code, mdc, drgs, category = match.groups()
+        if joiner == "and " and not code:
+            raise parse.ParseError("Appendix E Part 2: 'and' with no code: %r" % line[:60])
         if joiner in (None, "One of") and current is None:
             current = {"groups": [], "rows": []}
         elif joiner in (None, "One of") or current is None:
