@@ -1,0 +1,352 @@
+[
+ {
+  "code": "00176",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00192",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00474",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00524",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00540",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00542",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00546",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00604",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00792",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00794",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00844",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00846",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00848",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00864",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00866",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00904",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00908",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00932",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00934",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "00936",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "0095T",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "0098T",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "01140",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "01150",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "01212",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "01232",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "01234",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "01274",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "01404",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "01634",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "01636",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "0164T",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "0165T",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "01756",
+  "mappable": false,
+  "unmapped_reason": "anesthesia code"
+ },
+ {
+  "code": "11008",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "16036",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "22116",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "22208",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "22216",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "22226",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "22328",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "22534",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "22841",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "22843",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "22844",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "22846",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "22847",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "22860",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "32501",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "32506",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "32507",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "32667",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "32668",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "32674",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "38102",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "38746",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "38747",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "43283",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "43338",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "43635",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "44015",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "44121",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "44128",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "44139",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "44203",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "44213",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "48400",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "49412",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "49905",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ },
+ {
+  "code": "58611",
+  "mappable": false,
+  "unmapped_reason": "packaged: no separate outpatient payment"
+ }
+]
