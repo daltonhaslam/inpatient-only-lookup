@@ -7,7 +7,8 @@
 Reads   pipeline/derived/ipo-history.json, data/labels.json, the pinned CMS files (data/raw/),
         the mapping passes (data/crosswalk/passes/), adjudications.json, reviews.json and
         resolutions.json
-Writes  <out>/crosswalk.json (default pipeline/derived/), only when every check passes
+Writes  <out>/crosswalk.json (default pipeline/derived/), only when every check passes, and with it
+        <out>/crosswalk.xlsx (workbook.py), except under --allow-missing
         pipeline/out/crosswalk-checks.txt (or --checks), always
 
 One entry per code with a removal dated 2026-01-01 or 2027-01-01: the CY 2027 outpatient
@@ -29,7 +30,7 @@ if __name__ == "__main__":
 import fetch      # noqa: E402
 import history    # noqa: E402
 import parse      # noqa: E402
-from crosswalk import checks, mapper, mappings, reviews, sources, status   # noqa: E402
+from crosswalk import checks, mapper, mappings, reviews, sources, status, workbook   # noqa: E402
 from crosswalk.group import _ANY_OR, Ref, _clusters, group     # noqa: E402
 from crosswalk.price import family_range   # noqa: E402
 
@@ -275,6 +276,8 @@ def assemble(inputs):
                    "tiers": tiers, "statuses": statuses, "batches": len(batches)},
         "rates": {"operating": rates["operating_wi_gt1"], "capital": rates["capital"],
                   "combined": round(rates["operating_wi_gt1"] + rates["capital"], 2),
+                  "labor_share": rates["labor_share_gt1"], "operating_wi_le1": rates["operating_wi_le1"],
+                  "labor_share_le1": rates["labor_share_le1"],
                   "operating_table": "Table 1A, CMS-1849-CN: national operating standardized amount, full update "
                                      "(quality data submitted, meaningful EHR user), wage index above 1",
                   "capital_table": "Table 1D, CMS-1849-CN: national capital federal rate",
@@ -308,6 +311,9 @@ def main(argv=None):
     else:
         fetch.write_json(target, doc)
         lines.append("All checks passed. Wrote %s (%d codes)." % (target.name, len(doc["codes"])))
+        if not args.allow_missing:
+            sheet = workbook.write(doc, args.out / "crosswalk.xlsx")
+            lines.append("Wrote %s." % sheet.name)
     args.checks.parent.mkdir(parents=True, exist_ok=True)
     args.checks.write_text("\n".join(lines) + "\n")
     print("\n".join(lines))
