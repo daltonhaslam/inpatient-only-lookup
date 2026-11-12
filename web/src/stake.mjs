@@ -179,7 +179,7 @@ ${draft()}
 <ul class="plain">
 <li><strong>Confirmed:</strong> two different reviewers agree with the current mapping, at least one with an inpatient coding credential (${INPATIENT_CREDS}), and no one has disputed it.</li>
 <li><strong>Each reviewer counts once.</strong> Agreements under the same name count as one reviewer. Anonymous agreements with the same credential in the same hour also count as one.</li>
-<li><strong>Tier 3 codes</strong>, where the DRG family depends on the principal diagnosis or the two AI passes disagreed, also need a tiebreak. Two reviewers agreeing show “Two reviewers agree · needs a tiebreak”.</li>
+<li><strong>Tier 3 codes</strong>, where the DRG family depends on the principal diagnosis or on which variant of the operation is coded, or where the two AI passes disagreed, also need a tiebreak. Two reviewers agreeing show “Two reviewers agree · needs a tiebreak”.</li>
 <li><strong>Disputed:</strong> a reviewer said something is wrong. It stays disputed until the mapping is changed or the dispute is settled.</li>
 <li><strong>A changed mapping starts over.</strong> Each review records the mapping it saw. When a mapping changes, earlier reviews stop counting and the card says so.</li>
 </ul>
