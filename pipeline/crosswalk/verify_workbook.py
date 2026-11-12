@@ -37,10 +37,8 @@ def evaluate(path):
 
 
 def number(value):
-    """A float, or None for an empty or blank result."""
-    if value is None or isinstance(value, str) or type(value).__name__ in ("XlError", "Empty"):
-        return None if (value is None or isinstance(value, str) and value == "" or type(value).__name__ == "Empty") else value
-    return float(value)
+    """A float, or None for an empty result."""
+    return float(value) if isinstance(value, (int, float)) else None
 
 
 def expected_rows(doc):

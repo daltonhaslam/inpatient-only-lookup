@@ -28,7 +28,7 @@ def doc():
     packaged = {"si": "N", "apc": None, "apc_title": None, "rate": None, "asc": None, "proposed": None, "packaged": True}
     review = {"status": "unreviewed", "agrees": 0, "disputes": 0, "stale": 0, "last": None}
     return {"meta": {"built": "2026-11-11", "counts": {"codes": 2, "removed_2026": 1, "removed_2027": 1},
-                     "rates": {"operating": 6848.0, "capital": 539.95, "labor_share": 0.676},
+                     "rates": {"operating": 6848.0, "capital": 539.95, "labor_share": 0.66, "labor_share_le1": 0.62},
                      "sources": {"ipps-2027-table5": {"label": "T5", "landing": "https://example.test/t5", "file": "t5"},
                                  "addenda-2027": {"label": "Add B", "landing": "https://example.test/b", "file": "b"}}},
             "codes": {
@@ -59,7 +59,11 @@ class Workbook(unittest.TestCase):
         for name in ("OpStd", "CapRate", "LaborShare", "WageIndex", "IME", "DSH", "CapGAF", "OppsLaborShare", "OppsWageIndex",
                      "DrgNum", "DrgWeight", "ApcNum", "ApcRate"):
             self.assertIn(name, self.wb.defined_names)
-        self.assertEqual(self.wb["Inputs"]["B8"].value, 1.0)      # WageIndex
+        inputs = self.wb["Inputs"]
+        self.assertEqual(inputs["B8"].value, 1.0)      # WageIndex
+        self.assertEqual(inputs["B7"].value, 0.66)      # LaborShare
+        self.assertIn("66.0%", inputs["C7"].value)
+        self.assertIn("62%", inputs["C7"].value)
 
     def test_amounts_are_formulas(self):
         ws = self.wb["Crosswalk"]

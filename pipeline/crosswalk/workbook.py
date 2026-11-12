@@ -49,10 +49,11 @@ COL = {name: n for n, (name, _) in enumerate(CROSSWALK_COLUMNS, 1)}
 
 # name -> (default or crosswalk meta key, format, note)
 INPUTS = [
-    ("OpStd", "Operating standardized amount", "National operating standardized amount, FY 2027 IPPS Table 1A, full update, "
-     "wage index above 1. Replace it with the Table 1B amount (and its labor share) for a wage index of 1 or below."),
+    ("OpStd", "Operating standardized amount", "National operating standardized amount, FY 2027 IPPS Table 1A, full update. "
+     "Table 1B gives the same amount."),
     ("CapRate", "Capital federal rate", "National capital federal rate, FY 2027 IPPS Table 1D."),
-    ("LaborShare", "Operating labor share", "Share of the operating amount adjusted by the wage index (Table 1A: 67.6%; Table 1B: 62%)."),
+    ("LaborShare", "Operating labor share", "Share of the operating amount the wage index adjusts: {gt1:.1%} when the wage index is above 1 "
+     "(Table 1A). If your wage index is 1.0 or below, set LaborShare to {le1:.0%} (Table 1B)."),
     ("WageIndex", "Hospital wage index (inpatient)", "Your hospital's FY 2027 IPPS wage index. 1.0 = national, unadjusted."),
     ("IME", "IME adjustment", "Indirect medical education add-on to operating payment, as a decimal (0.05 = 5%). 0 = none."),
     ("DSH", "DSH adjustment", "Disproportionate share add-on to operating payment, as a decimal (0.05 = 5%). 0 = none."),
@@ -218,7 +219,7 @@ def _inputs_sheet(wb, doc):
     ws["A2"] = ("Defaults are national and unadjusted, which is how the site headlines every figure. Enter your hospital's own "
                 "values and the Crosswalk tab recalculates. " + BADGE + ".")
     _header(ws, 4, ["Input", "Value", "Note"], [38, 14, 110])
-    defaults = {"OpStd": rates["operating"], "CapRate": rates["capital"], "LaborShare": rates.get("labor_share", 0.676),
+    defaults = {"OpStd": rates["operating"], "CapRate": rates["capital"], "LaborShare": rates["labor_share"],
                 "WageIndex": 1.0, "IME": 0, "DSH": 0, "CapGAF": 1.0, "OppsLaborShare": 0.60, "OppsWageIndex": 1.0}
     for r, (name, label, note) in enumerate(INPUTS, 5):
         ws.cell(row=r, column=1, value="%s (%s)" % (label, name))
@@ -226,7 +227,7 @@ def _inputs_sheet(wb, doc):
         cell.fill = INPUT_FILL
         cell.number_format = (CURRENCY if name in ("OpStd", "CapRate") else "0.0%" if "Share" in name or name in ("IME", "DSH")
                               else "0.0000")
-        ws.cell(row=r, column=3, value=note)
+        ws.cell(row=r, column=3, value=note.format(gt1=rates["labor_share"], le1=rates["labor_share_le1"]))
         wb.defined_names[name] = DefinedName(name, attr_text="Inputs!$B$%d" % r)
     return ws
 
@@ -264,7 +265,7 @@ def _readme_sheet(wb, doc):
         ("2. Outpatient: the CY 2027 OPPS Addendum B rate for the code's APC, with the CY 2027 ASC rate shown for reference. Packaged codes have no separate payment.", None),
         ("3. Map: two separate AI passes each chose the ICD-10-PCS code or codes a hospital would report for the same operation, and a typical principal diagnosis. A third pass adjudicated where they disagreed.", None),
         ("4. Group: a deterministic MS-DRG v44 grouper turns each mapping into a DRG family (the with MCC, with CC and without CC/MCC levels).", None),
-        ("5. Price: DRG relative weight x (operating standardized amount + capital federal rate), from the FY 2027 IPPS correction-notice tables. Inpatient low and high are the lowest and highest DRG in the family. Gap = outpatient minus inpatient; negative means the hospital is paid less outpatient.", None),
+        ("5. Price: DRG relative weight x (operating standardized amount + capital federal rate), from the FY 2027 IPPS correction-notice tables. The wage index applies to the labor share of the operating amount, IME and DSH apply to the operating amount only, and the capital rate uses the capital factor (CapGAF). Inpatient low and high are the lowest and highest DRG in the family. Gap = outpatient minus inpatient; negative means the hospital is paid less outpatient.", None),
         ("", None),
         ("Years", "h"),
         ("Outpatient: CY 2027 OPPS (from Jan 1, 2027).", None),
