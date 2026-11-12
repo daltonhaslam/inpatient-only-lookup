@@ -42,18 +42,18 @@ describe('revenue at stake', { skip }, () => {
   const codes = model ? Object.keys(model.codes) : [];
   const items = model ? Object.values(model.codes) : [];
 
-  test('the trimmed browser model draws the same cards as the full one, and stays under 600 KB', () => {
+  test('the trimmed browser model draws the same cards as the full one, and stays under 700 KB', () => {
     const slim = clientModel(model, [], ['27447']);
     const text = JSON.stringify(slim);
-    assert.ok(text.length < 600000, `client JSON is ${text.length} bytes`);
+    assert.ok(text.length < 700000, `client JSON is ${text.length} bytes`);
     assert.ok(!('27447' in slim.codes) && slim.siteCodes.includes('27447'));
     const back = hydrate(JSON.parse(text));
     for (const code of codes) assert.equal(card(back.codes[code], model.meta, { detail: false }), card(model.codes[code], model.meta, { detail: false }), code);
   });
 
-  test('browser cards never carry the review buttons or the work; code-page cards do', () => {
+  test('browser cards carry the review buttons but not the work; code-page cards carry both', () => {
     const compared = items.find((item) => item.kind === 'compare');
-    assert.ok(!card(compared, model.meta, { detail: false }).includes('forms/d/e'));
+    assert.ok(card(compared, model.meta, { detail: false }).includes('forms/d/e'));
     assert.ok(!card(compared, model.meta, { detail: false }).includes('Show the work</summary>'));
     assert.ok(card(compared, model.meta).includes('Show the work</summary>'));
   });

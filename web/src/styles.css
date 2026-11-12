@@ -439,3 +439,7 @@ td a[target] { white-space: nowrap; }
 .scard__more { margin-top: 0.7rem; font-size: 0.95rem; }
 .scard[tabindex='-1']:focus-visible { outline-offset: 4px; }
 @media print { .sfilter, .sfilter__count, .sresults__more { display: none; } }
+
+.stake-tablewrap { max-width: none; margin-top: 1.6rem; }
+.stake-tablewrap > summary { font-weight: 600; }
+.stake-tablewrap > h2 { margin-top: 1rem; }

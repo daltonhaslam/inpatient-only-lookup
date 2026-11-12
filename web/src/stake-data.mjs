@@ -2,6 +2,8 @@
 // them). Everything else on the site, build and browser, uses the shape normalize() returns, so a
 // renamed key in the pipeline is a one-line change here.
 
+import { mappingSummary } from './stake-card.mjs';
+
 const list = (value) => (Array.isArray(value) ? value : []);
 const numberOr = (value) => (typeof value === 'number' && Number.isFinite(value) ? value : null);
 
@@ -121,8 +123,8 @@ export function credits(reviews, model) {
 
 /**
  * What the browser needs to search, filter and draw cards, and nothing else: the card without
- * "Show the work" and without the review buttons (both stay on each code page, where the mapping is
- * visible). Repeated strings (tier wording, DRG family names) go in tables. `siteCodes` are codes
+ * "Show the work" (it stays on each code page) and with only the fingerprint and prefill summary the
+ * review links need. Repeated strings (tier wording, DRG family names) go in tables. `siteCodes` are codes
  * that have a page on the site but are not in the crosswalk. hydrate() reverses this in the browser.
  */
 export function clientModel(model, groups, siteCodes = []) {
@@ -141,6 +143,7 @@ export function clientModel(model, groups, siteCodes = []) {
         low: item.ip.low, high: item.ip.high,
         families: item.ip.families.map((f) => ({ condition: f.condition, dx: f.dx ? { code: f.dx.code } : undefined, name: ref(f.name), basis: f.basis, drgs: f.drgs.map((d) => ({ drg: d.drg })), low: f.low, high: f.high, caveat: f.caveat || undefined, when: f.when && (f.when.dx || f.when.variant) ? f.when : undefined })),
       };
+      slim.map = { fp: item.map.fp, summary: mappingSummary(item) };   // all the Agree / Something's wrong links need
     }
     codes[code] = slim;
   }

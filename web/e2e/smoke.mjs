@@ -389,6 +389,9 @@ if (!hasStake) {
     assert(await card.locator('.badge').count() === 1, 'card has a review status');
     assert(await card.locator('a[href="/code/32480/#stake-h"]').count() === 1, 'card links to its code page');
     assert(await card.locator('.scard__work').count() === 0, 'client cards leave the work to the code page');
+    const forms = await card.locator('.scard__act a').evaluateAll((as) => as.map((a) => a.href));
+    eq(forms.length, 2, 'Agree and Something\'s wrong');
+    assert(forms.every((h) => h.includes('entry.53591076=32480') && /entry\.1873233910=[0-9a-f]{8}%20/.test(h)), `form links: ${forms}`);
     has(page.url(), 'q=32480', 'URL remembers the search');
   });
 
@@ -482,10 +485,21 @@ if (!hasStake) {
     assert(wide.length === 0, wide.join('\n'));
   }, { viewport: { width: 375, height: 800 } });
 
+  await check('stake: with JavaScript on the table is collapsed into a closed details', async (page) => {
+    await openStake(page);
+    const wrap = page.locator('details.stake-tablewrap');
+    eq(await wrap.count(), 1, 'details');
+    has(await wrap.locator('summary').textContent(), 'codes as a table', 'summary');
+    assert(!(await wrap.evaluate((d) => d.open)), 'closed by default');
+    await wrap.locator('summary').click();
+    assert(await page.locator('tr[data-code="32480"]').isVisible(), 'table opens');
+  });
+
   await check('stake: with JavaScript off the table is still there', async (page) => {
     await page.goto(`${base}/revenue-at-stake/`);
     assert(await page.locator('tr[data-code="32480"]').count() === 1, 'table row for 32480');
     eq(await page.locator('[data-stake-app] *').count(), 0, 'app is empty without JS');
+    eq(await page.locator('details.stake-tablewrap').count(), 0, 'table not wrapped without JS');
   }, { javaScriptEnabled: false });
 }
 

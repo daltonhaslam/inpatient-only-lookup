@@ -40,6 +40,18 @@ function missing(miss) {
 <p class="scard__more">${where}</p></div>`;
 }
 
+/** The cards replace the long table; keep it one click away. Without JS it is never touched. */
+function collapseTable(total) {
+  const section = $('[data-stake-table]');
+  if (!section || section.querySelector('.stake-tablewrap')) return;
+  const wrap = document.createElement('details');
+  wrap.className = 'stake-tablewrap';
+  wrap.innerHTML = `<summary>All ${total.toLocaleString('en-US')} codes as a table</summary>`;
+  wrap.append(...section.childNodes);
+  section.append(wrap);
+  document.documentElement.classList.add('stake-live');
+}
+
 export function start(model) {
   const host = $('[data-stake-app]');
   if (!host) return;
@@ -48,6 +60,7 @@ export function start(model) {
   let matches = [];
   let shown = 0;
 
+  collapseTable(data.items.length);
   host.innerHTML = form(data, state);
   const results = $('[data-results]', host);
   const more = $('[data-more]', host);
