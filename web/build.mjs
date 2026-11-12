@@ -1,14 +1,18 @@
 // Builds the static site into ../docs from the committed pipeline tables. No raw CMS files needed.
 //   node build.mjs            build
 //   BUILD_DATE=2026-11-11 node build.mjs   build as of a fixed date (for reproducible output)
+//   CROSSWALK_JSON=/path/to/crosswalk.json node build.mjs   Revenue at stake from another crosswalk
+//     (default pipeline/derived/crosswalk.json; without one the section is left out with a warning)
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync, rmSync, copyFileSync, existsSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build as bundle } from 'esbuild';
 import { SITE } from './src/site.mjs';
 import { todayISO, isDate, monthYear, formatDate, clampDate, periodIndex, siAt, countsAt, exemptCodes, lookup, eventsOf, csv } from './src/engine.mjs';
 import * as pages from './src/pages.mjs';
+import * as stake from './src/stake.mjs';
+import { normalize, credits } from './src/stake-data.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -135,7 +139,10 @@ function sourceRows(sources, periods) {
     }
     return s.kind === 'removal_file' ? 'Check on the computed removals' : 'Quotes and citations';
   };
-  return Object.values(sources).map((s) => ({ label: label(s), use: use(s), landing: s.landing, sha256: s.sha256 }));
+  // The crosswalk's own sources (IPPS tables, MS-DRG definitions, code sets, ASC) are listed on the
+  // Revenue at stake methods page instead.
+  const lookupKinds = new Set(['addendum_b', 'rule_addenda', 'removal_file', 'fr_text']);
+  return Object.values(sources).filter((s) => lookupKinds.has(s.kind)).map((s) => ({ label: label(s), use: use(s), landing: s.landing, sha256: s.sha256 }));
 }
 
 // The first year of the phase-out in 42 CFR 419.22(n); each January from here on is a phase.
@@ -238,6 +245,23 @@ function historyCsv(ctx) {
   return csv(rows);
 }
 
+/** The Revenue at stake model, or null (with a warning) when there is no crosswalk to build it from. */
+function stakeData(ctx) {
+  const path = process.env.CROSSWALK_JSON ? resolve(process.env.CROSSWALK_JSON) : join(root, 'pipeline/derived/crosswalk.json');
+  if (!existsSync(path)) {
+    console.warn(`No crosswalk at ${process.env.CROSSWALK_JSON ? path : 'pipeline/derived/crosswalk.json'}: building without the Revenue at stake section. Run python3 pipeline/crosswalk/build.py, or set CROSSWALK_JSON.`);
+    return null;
+  }
+  const model = normalize(JSON.parse(readFileSync(path, 'utf8')));
+  const missing = Object.keys(model.codes).filter((code) => !ctx.data.codes[code]);
+  if (missing.length) throw new Error(`crosswalk.json has codes with no page on this site: ${missing.slice(0, 10).join(', ')}`);
+  const reviewsPath = join(root, 'data/crosswalk/reviews.json');
+  const reviews = existsSync(reviewsPath) ? JSON.parse(readFileSync(reviewsPath, 'utf8')) : [];
+  const xlsx = join(dirname(path), 'crosswalk.xlsx');
+  if (!existsSync(xlsx)) console.warn('No crosswalk.xlsx next to crosswalk.json: the Excel download is left out.');
+  return { ...stake.stakeContext(model, credits(reviews, model), ctx.data.groups, { xlsx: existsSync(xlsx) }), xlsxPath: xlsx };
+}
+
 const FONTS = [
   ['Archivo', '@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2', '100 900'],
   ['Besley', '@fontsource-variable/besley/files/besley-latin-wght-normal.woff2', '400 900'],
@@ -247,6 +271,8 @@ async function main() {
   const today = process.env.BUILD_DATE || todayISO();
   if (!isDate(today)) throw new Error(`BUILD_DATE must be YYYY-MM-DD, got ${today}`);
   const ctx = context(today);
+  ctx.stake = stakeData(ctx);
+  if (ctx.stake) ctx.stakeBlock = (code) => stake.codeBlock(ctx, code);
 
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });
@@ -265,6 +291,7 @@ async function main() {
     js: hashed('assets', 'app', 'js', script.outputFiles[0].contents),
     data: hashed('data', 'ipo', 'json', JSON.stringify(ctx.data)),
     other: hashed('data', 'other', 'json', JSON.stringify(packOther())),
+    stake: ctx.stake ? hashed('data', 'stake', 'json', JSON.stringify(ctx.stake.model)) : null,
     preload: faces.map((f) => `<link rel="preload" href="${f.url}" as="font" type="font/woff2" crossorigin>`).join('\n'),
   };
 
@@ -277,8 +304,15 @@ async function main() {
   write('methods/index.html', pages.methods(ctx));
   write('404.html', pages.notFound(ctx));
   write('data/inpatient-only-history.csv', historyCsv(ctx));
+  if (ctx.stake) {
+    write('revenue-at-stake/index.html', stake.mainPage(ctx));
+    write('revenue-at-stake/help-review/index.html', stake.helpPage(ctx));
+    write('revenue-at-stake/methods/index.html', stake.methodsPage(ctx));
+    write('data/revenue-at-stake.csv', stake.csvText(ctx.stake));
+    if (ctx.stake.xlsx) copyFileSync(ctx.stake.xlsxPath, join(out, 'data/revenue-at-stake.xlsx'));
+  }
 
-  const urls = ['/', '/history/', '/phase-out/', '/exemption/', '/methods/', ...ctx.data.groups.map(([id]) => `/group/${id}/`), ...ctx.codes.map((code) => `/code/${code}/`)];
+  const urls = ['/', '/history/', '/phase-out/', '/exemption/', '/methods/', ...(ctx.stake ? stake.PATHS : []), ...ctx.data.groups.map(([id]) => `/group/${id}/`), ...ctx.codes.map((code) => `/code/${code}/`)];
   write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `<url><loc>${SITE.url}${u}</loc><lastmod>${today}</lastmod></url>`).join('\n')}\n</urlset>\n`);
   write('robots.txt', `User-agent: *\nAllow: /\nSitemap: ${SITE.url}/sitemap.xml\n`);
   for (const file of ['favicon.svg', 'og.png']) {

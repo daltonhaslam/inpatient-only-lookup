@@ -55,6 +55,7 @@ export const num = (n) => n.toLocaleString('en-US');
 /** Rows of strings as CSV text. A cell a spreadsheet would run as a formula gets a leading apostrophe. */
 export function csv(rows) {
   const cell = (value) => {
+    if (typeof value === 'number') return String(value);     // a plain number is never a formula
     const text = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
     return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
   };

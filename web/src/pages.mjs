@@ -8,6 +8,7 @@ const NAV = [
   ['/history/', 'History'],
   ['/phase-out/', 'Phase-out'],
   ['/exemption/', 'Exemption'],
+  ['/revenue-at-stake/', 'Revenue at stake'],
   ['/methods/', 'Methods'],
 ];
 
@@ -18,7 +19,8 @@ const codeLink = (data, code) => `<a href="/code/${esc(code)}/" title="${esc(dat
 
 export function layout(ctx, { path, title, description, page, body }) {
   const full = path === '/' ? `${SITE.name}: Medicare’s inpatient-only list by date of service` : `${title} | ${SITE.name}`;
-  const nav = NAV.map(([href, text]) => {
+  // Revenue at stake is linked only when the build has its crosswalk (ctx.stake).
+  const nav = NAV.filter(([href]) => ctx.stake || href !== '/revenue-at-stake/').map(([href, text]) => {
     const here = href === path || (href !== '/' && path.startsWith(href)) || (href === '/' && (path.startsWith('/code/') || path.startsWith('/group/')));
     return `<a href="${href}"${here ? ' aria-current="page"' : ''}>${text}</a>`;
   }).join('');
@@ -43,7 +45,7 @@ ${ctx.assets.preload}${LIVE.has(page) ? `\n<link rel="preload" href="${ctx.asset
 <script defer src="${ctx.assets.js}"></script>
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
-<body data-page="${page}"${LIVE.has(page) ? ` data-ipo="${ctx.assets.data}" data-other="${ctx.assets.other}"` : ''}>
+<body data-page="${page}"${LIVE.has(page) ? ` data-ipo="${ctx.assets.data}" data-other="${ctx.assets.other}"` : ''}${page === 'stake' ? ` data-stake="${ctx.assets.stake}"` : ''}>
 <a class="skip" href="#main">Skip to content</a>
 <header class="top">
 <a class="top__name" href="/">${SITE.name}</a>
@@ -155,6 +157,7 @@ ${wholeList(ctx, date)}
 <p><strong>${num(newest.removed)} codes ${newest.past ? 'left' : 'leave'} on ${formatDate(newest.date)}.</strong> They follow the ${num(ctx.phases[0].removed)} that left in ${ctx.phases[0].year}. CMS expects to remove the rest for ${ctx.nextYear}, and the regulation says the list is gone by January 1, 2029. <a href="/phase-out/">The schedule</a></p>
 <p><strong><span data-count="exempt">${num(ctx.exemptNow)}</span> codes are exempt from certain medical review on <span data-dos-text>${formatDate(date)}</span>.</strong> A procedure removed in 2021 or later keeps its exemption until CMS ends it, code by code. None has ended. <a href="/exemption/">What the exemption covers</a></p>
 <p><strong>This has happened before.</strong> CMS removed 298 codes in 2021 and put 293 of them back in 2022. A code’s status depends on the date. <a href="/history/">Year by year</a></p>
+${ctx.stake ? `<p><strong>What removal does to payment.</strong> For each of the ${num(ctx.stake.items.length)} codes removed in 2026 and 2027, the national outpatient payment next to the inpatient MS-DRG family it would group to. A draft under coder review. <a href="/revenue-at-stake/">Revenue at stake</a></p>` : ''}
 </div>
 <p class="status__after">The date of service will still matter after the list ends. Audits and appeals turn on what was true that day, and on whether a code’s exemption was still running.</p>
 </section>`;
@@ -184,6 +187,7 @@ ${verdict(data, code, date, ctx.today, null, { title: 'h1', heading: 'h2' })}
 <div data-events-host="${code}">${eventList(data, code, date, ctx.today)}</div>
 <p class="note">Dates before 2020 come from each year’s final rule, so a change is dated January 1 of its year. From 2020 on, changes are dated to the quarter CMS’s Addendum B first shows them.</p>
 </section>
+${ctx.stakeBlock ? ctx.stakeBlock(code) : ''}
 ${siblings.length ? `<section class="block" aria-labelledby="sib-h">
 <h2 id="sib-h">Related codes: ${esc(family)}</h2>
 <ul class="rows" data-rows>${siblings.map((other) => codeRow(data, other, date)).join('')}</ul>
