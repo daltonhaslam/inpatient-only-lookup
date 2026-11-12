@@ -30,6 +30,10 @@ class RefObject(unittest.TestCase):
         with self.assertRaises(AttributeError):
             ref.not_a_table
 
+    def test_a_failing_derived_table_shows_its_cause(self):
+        with self.assertRaisesRegex(RuntimeError, "Ref.rank failed: .*items"):
+            Ref(hierarchy=None).rank
+
     @unittest.skipUnless(RAW_PRESENT, "raw CMS files not downloaded; run pipeline/fetch.py")
     def test_load_is_shared_and_reads_the_loaders(self):
         self.assertIs(Ref.load(), Ref.load())
@@ -127,16 +131,27 @@ class Group(unittest.TestCase):
         self.assertEqual(self.group(["02RF0KZ"], "I350")["drgs"], ["219", "220", "221"])
         cath = "4A023N7"     # non-OR; rows in 212, 216-218, 233-234, 275, 286-287
         self.assertEqual(self.group(["02RF0KZ", cath], "I350")["drgs"], ["216", "217", "218"])
-        # Coronary bypass: 235-236 alone, 233-234 with catheterization, 231-232 with PTCA.
+        # 212 needs aortic + mitral + a concomitant procedure; 216-218 needs a catheterization.
+        self.assertEqual(self.group(["02RF0KZ", "02RG07Z"], "I350")["drgs"], ["219", "220", "221"])
+        self.assertEqual(self.group(["02RF0KZ", "02RG07Z", cath], "I350")["drgs"], ["212"])
+        self.assertEqual(self.group(["02RF0KZ", "021009W"], "I350")["drgs"], ["219", "220", "221"])
+        # Coronary bypass: 235-236 alone (also with two grafts), 233-234 with catheterization,
+        # 231-232 with PTCA.
         self.assertEqual(self.group(["021009W"], "I2510")["drgs"], ["235", "236"])
+        self.assertEqual(self.group(["021009W", "021109W"], "I2510")["drgs"], ["235", "236"])
         self.assertEqual(self.group(["021009W", cath], "I2510")["drgs"], ["233", "234"])
         self.assertEqual(self.group(["021009W", "0270346"], "I2510")["drgs"], ["231", "232"])
-        # Lumbar fusion: single level 450-451; anterior plus posterior 402; 2+ levels 447-448.
+        # Lumbar fusion: single level 450-451; anterior column (qualifier J) plus posterior
+        # column (qualifier 1) is 402; two codes from one column list, or a 2+ level code, 447-448.
         self.assertEqual(self.group(["0SG00AJ"], "M4316")["drgs"], ["450", "451"])
-        self.assertEqual(self.group(["0SG00A0", "0SG00AJ"], "M4316")["drgs"], ["402"])
+        self.assertEqual(self.group(["0SG00AJ", "0SG0071"], "M4316")["drgs"], ["402"])
+        self.assertEqual(self.group(["0SG00AJ", "0SG30AJ"], "M4316")["drgs"], ["447", "448"])
         self.assertEqual(self.group(["0SG10AJ"], "M4316")["drgs"], ["447", "448"])
-        # Known miss (documented in _in_mdc): aortic plus mitral is 212 in v44.
-        self.assertEqual(self.group(["02RF0KZ", "02RG07Z"], "I350")["drgs"], ["216", "217", "218"])
+        # Bilateral hip replacement: two codes of the same kind do pair outside MDC 05.
+        self.assertEqual(self.group(["0SR9019", "0SRB019"], "M1611")["drgs"], ["461", "462"])
+        # Bile duct exploration: 411-413 only with a cholecystectomy, else 408-410.
+        self.assertEqual(self.group(["0FC90ZZ"], "K8050")["drgs"], ["408", "409", "410"])
+        self.assertEqual(self.group(["0FT40ZZ", "0FC90ZZ"], "K8000")["drgs"], ["411", "412", "413"])
         # Kidney transplant: 650-651 needs hemodialysis.
         self.assertEqual(self.group(["0TY00Z0"], "N186")["drgs"], ["652"])
         self.assertEqual(self.group(["0TY00Z0", "5A1D70Z"], "N186")["drgs"], ["650", "651"])
@@ -148,6 +163,40 @@ class Group(unittest.TestCase):
         # Hip replacement: hip fracture family only with a hip-fracture principal diagnosis.
         self.assertEqual(self.group(["0SR9019"], "S72001A")["drgs"], ["521", "522"])
         self.assertEqual(self.group(["0SR9019"], "M1611")["drgs"], ["469", "470"])
+
+    def test_any_or_procedure_families(self):
+        # v44 DRGs defined as a principal diagnosis plus ANY O.R. procedure (no Appendix E rows).
+        def family(codes, dx):
+            result = self.group(codes, dx)
+            self.assertEqual(result["basis"], "in-mdc", (codes, dx))
+            return result["drgs"]
+        antepartum = ["817", "818", "819"]
+        self.assertEqual(family(["0UT50ZZ"], "O00101"), antepartum)    # salpingectomy, ectopic
+        self.assertEqual(family(["10T20ZZ"], "O00101"), antepartum)    # ectopic resection
+        self.assertEqual(family(["0UVC0ZZ"], "O3431"), antepartum)     # cerclage
+        self.assertEqual(family(["0DTJ4ZZ"], "O99611"), antepartum)    # appendectomy in pregnancy
+        self.assertEqual(family(["0DTJ4ZZ"], "O080"), ["769"])          # post-abortion diagnosis
+        self.assertEqual(family(["0WJG0ZZ"], "A419"), ["853", "854", "855"])
+        self.assertEqual(family(["0W9G0ZZ"], "T8143XA"), ["856", "857", "858"])   # non-extensive too
+        self.assertEqual(family(["0DTJ4ZZ"], "F329"), ["876"])
+        self.assertEqual(family(["0DTJ4ZZ"], "B20"), ["969", "970"])
+
+    def test_any_or_families_have_no_appendix_e_rows(self):
+        named = {drg for rows in self.ref.proc_index.values() for row in rows for drg in row["drgs"]}
+        for mdc, families in group_module._ANY_OR.items():
+            for drgs, _ in families:
+                self.assertIn(tuple(drgs), self.ref.hierarchy[mdc])
+                self.assertFalse(named & set(drgs), drgs)
+
+    def test_delivery_families_need_a_delivery(self):
+        self.assertEqual(self.group(["10D00Z1", "0UT70ZZ"], "O80")["drgs"], ["783", "784", "785"])
+        self.assertEqual(self.group(["10E0XZZ", "0UT70ZZ"], "O80")["drgs"], ["796", "797", "798"])
+        self.assertEqual(self.group(["10D00Z1"], "O80")["drgs"], ["786", "787", "788"])
+
+    def test_medical_drops_drgs_the_case_cannot_show(self):
+        self.assertEqual(self.group([], "A419")["drgs"], ["871", "872"])          # 870 needs MV > 96 hours
+        self.assertEqual(self.group(["5A1955Z"], "A419")["drgs"], ["870", "871", "872"])
+        self.assertEqual(self.group([], "I214")["drgs"], ["280", "281", "282"])   # 283-285: expired
 
     def test_pre_mdc(self):
         def pre(codes, dx):

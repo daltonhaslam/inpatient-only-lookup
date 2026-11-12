@@ -9,8 +9,11 @@ it. group() picks it the way the CMS grouper does, from the v44 Definitions Manu
 3. In the MDC: the OR procedures (Appendix E codes without *) with a row in that MDC; of the
    rows whose condition the case shows, the one whose family comes first in the MDC's
    Appendix D hierarchy wins (see _in_mdc).
-4. OR procedures, none in the MDC: 981-983, or 987-989 when every one is non-extensive.
-5. No OR procedure: the principal diagnosis's medical DRGs in its MDC (Appendix B).
+4. OR procedures, none with a row in the MDC: the MDC's "principal diagnosis with any O.R.
+   procedure" family where v44 has one (_ANY_OR: 769, 817-819, 853-858, 876, 939-941,
+   969-970), else 981-983, or 987-989 when every one is non-extensive.
+5. No OR procedure: the principal diagnosis's medical DRGs in its MDC (Appendix B), less
+   those that need a procedure or a discharge status the case does not show (_medical).
 
 What this cannot see, and so does not model:
 - CC/MCC: a family is returned as the whole severity set; pricing gives its range.
@@ -20,10 +23,11 @@ What this cannot see, and so does not model:
   revisions with removals), Part 3 non-OR combinations and Part 4 MDC 14 obstetric logic are
   not parsed. Cluster-only codes have no Appendix E row, so they group as non-OR.
 - Conditions other than the principal diagnosis and the other codes present (number of
-  spinal levels, device types, "except only cholecystectomy"); see _in_mdc.
+  spinal levels beyond the codes, device types); see _in_mdc.
 - Non-OR procedures that CMS lets lead to a surgical or a procedure-driven medical DRG
   (debridement to 579-581, cardiac catheterization to 286-287, MV > 96 hours to 207): per the
   spec, a case with no OR procedure groups by diagnosis.
+- MDC 25 with only non-extensive OR procedures goes to 987-989 (v44 not checked for this).
 
 Shared tables come from Ref and are never mutated.
 """
@@ -54,6 +58,14 @@ class Ref:
         self.__dict__.update(tables)
 
     def __getattr__(self, name):
+        descriptor = type(self).__dict__.get(name)
+        if descriptor is not None:
+            # Python lands here when a property raised AttributeError; surface that cause
+            # instead of reporting the property itself as missing.
+            try:
+                return descriptor.__get__(self, type(self))
+            except AttributeError as error:
+                raise RuntimeError("Ref.%s failed: %s" % (name, error)) from error
         if name.startswith("_") or "load_" + name not in sources.SOURCE_OF:
             raise AttributeError(name)
         value = getattr(sources, "load_" + name)()
@@ -111,13 +123,54 @@ def group(pcs_codes, principal_dx, ref, sex=None):
         return result(mdc, found[0], found[1], "in-mdc")
     if or_codes:
         extensive = any(ref.unrelated[code] == "extensive" for code in or_codes)
+        drgs = _any_or(mdc, principal_dx, extensive, ref)
+        if drgs:
+            return result(mdc, drgs, _title(drgs, ref), "in-mdc")
         drgs = EXTENSIVE if extensive else NONEXTENSIVE
         return result(mdc, drgs, _title(drgs, ref), "unrelated-extensive" if extensive else "unrelated-nonextensive")
-    drgs = [drg for drg in ref.dx_drgs[principal_dx]
-            if ref.drg_titles[drg]["type"] == "MED" and ref.drg_titles[drg]["mdc"] == mdc]
+    drgs = _medical(codes, mdc, principal_dx, ref)
     if not drgs:
         raise ValueError("%s has no medical MS-DRG in MDC %s (v44 groups it to 998)" % (principal_dx, mdc))
     return result(mdc, drgs, _title(drgs, ref), "medical")
+
+
+# v44 families defined as a principal diagnosis plus ANY operating room procedure, so Appendix
+# E has no rows for them: {mdc: [(drgs, who)]} in Appendix D order. who is "listed" (Appendix B
+# lists the principal diagnosis for the family), "any" (any principal diagnosis of the MDC; for
+# 853-855 "from MDC 18 except" the 856-858 list, checked first) or "extensive" (969-970: "all
+# procedures not listed in Appendix F, DRGs 987, 988, or 989").
+_ANY_OR = {
+    "14": [(("817", "818", "819"), "listed"), (("769",), "listed")],
+    "18": [(("856", "857", "858"), "listed"), (("853", "854", "855"), "any")],
+    "19": [(("876",), "any")],
+    "23": [(("939", "940", "941"), "any")],
+    "25": [(("969", "970"), "extensive")],
+}
+
+
+def _any_or(mdc, dx, extensive, ref):
+    """The MDC's any-OR-procedure family this principal diagnosis takes, or None."""
+    listed = ref.dx_drgs.get(dx, ())
+    for drgs, who in _ANY_OR.get(mdc, ()):
+        if who == "any" or (who == "listed" and drgs[0] in listed) or (who == "extensive" and extensive):
+            return list(drgs)
+    return None
+
+
+# Medical DRGs that need a procedure Appendix E names (thrombolytic, ventilation, cardiac
+# catheterization, rehabilitation therapy), and ones that need a discharge status (expired,
+# left against medical advice). Appendix B lists them for every diagnosis they can take, which
+# would put their amounts into ranges for cases that show neither.
+_NEEDS_PROCEDURE = frozenset(("061", "062", "063", "207", "208", "286", "287", "870", "895"))
+_NEEDS_DISCHARGE_STATUS = frozenset(("283", "284", "285", "894"))
+
+
+def _medical(codes, mdc, dx, ref):
+    """The principal diagnosis's medical DRGs in its MDC (Appendix B)."""
+    named = {drg for code in codes for row in ref.proc_index.get(code, ()) for drg in row["drgs"]}
+    return [drg for drg in ref.dx_drgs[dx]
+            if ref.drg_titles[drg]["type"] == "MED" and ref.drg_titles[drg]["mdc"] == mdc
+            and drg not in _NEEDS_DISCHARGE_STATUS and (drg not in _NEEDS_PROCEDURE or drg in named)]
 
 
 def _title(drgs, ref):
@@ -237,47 +290,114 @@ def _in_mdc(codes, or_codes, mdc, dx, ref):
     transplant with hemodialysis, combined spinal fusions) or a principal diagnosis (521-522
     hip fracture, 731-733 malignancy). A code listed under a lower family as well can only land
     there when a higher one's condition fails, so for each OR code:
+    - rows whose stated v44 condition the codes do not show are dropped (_condition_met);
     - a diagnosis-specific row (DRGs Appendix B lists for some diagnosis) keeps the DRGs listed
       for this diagnosis, else its other DRGs, else is dropped (unless it is the code's only
       row in the MDC: then the listing is for other logic and the row stands);
     - its lowest-ranked remaining row (its base) always qualifies;
-    - a higher row qualifies when the diagnosis is listed for it;
-    - of the higher rows in a family where another of the codes also has a row, the
-      lowest-ranked qualifies. Lowest, because a partner code is often listed under several
-      of them: a catheterization has rows in 212 and 216-218 (and 233-234), so valve plus
-      catheterization is 216-218 and bypass plus catheterization 233-234; anterior plus
-      posterior single-level lumbar fusion is 402, not multi-level 426-428.
-    Known misses, where the tables cannot show the condition: aortic plus mitral valve gets
-    216-218, not 212 (three conditions); a bile duct exploration alone gets its base 411-413,
-    not 408-410 ("except only cholecystectomy").
+    - a higher row qualifies when the diagnosis is listed for it, or (212) its procedure
+      condition was checked in full;
+    - of the higher rows in a family where another of the codes is an acceptable partner
+      (_partner_ok), the lowest-ranked qualifies. Lowest, because a partner code is often
+      listed under several of them: a catheterization has rows in 212, 216-218 and 233-234, so
+      valve plus catheterization is 216-218 and bypass plus catheterization 233-234.
     """
     listed = set(ref.dx_drgs.get(dx, ()))
-    families = {code: {_row_rank(mdc, row["drgs"], ref) for row in ref.proc_index.get(code, ()) if row["mdc"] == mdc}
+    families = {code: frozenset(_row_rank(mdc, row["drgs"], ref) for row in ref.proc_index.get(code, ())
+                                if row["mdc"] == mdc)
                 for code in codes}
+    hierarchy = ref.hierarchy.get(mdc, ())
     best = None
     for code in or_codes:
-        rows = [row for row in ref.proc_index[code] if row["mdc"] == mdc]
+        rows = [row for row in ref.proc_index[code]
+                if row["mdc"] == mdc and _condition_met(mdc, row["drgs"], codes, ref)]
         kept = []
         for row in rows:
-            drgs, dx_listed = row["drgs"], False
+            # A row qualifies outright when its whole condition is shown: the diagnosis is
+            # listed for it, or (212) _condition_met checked all three procedure groups.
+            drgs, shown = row["drgs"], mdc == "05" and row["drgs"][0] == "212"
             specific = [drg for drg in drgs if drg in ref.dx_specific]
             if specific:
                 matched = [drg for drg in specific if drg in listed]
-                dx_listed = bool(matched)
+                shown = bool(matched)
                 drgs = matched or [drg for drg in drgs if drg not in ref.dx_specific]
                 if not drgs and len(rows) == 1:
                     drgs = row["drgs"]
             if drgs:
-                kept.append((_row_rank(mdc, row["drgs"], ref), drgs, row["family"], dx_listed))
+                kept.append((_row_rank(mdc, row["drgs"], ref), drgs, row["family"], shown))
         if not kept:
             continue
         base = max(rank for rank, _, _, _ in kept)
-        partnered = [rank for rank, _, _, _ in kept
-                     if rank < base and any(rank in families[other] for other in codes if other != code)]
+
+        def paired(rank):
+            return any(rank in families[other] and _partner_ok(mdc, hierarchy[rank][0], code, other, families)
+                       for other in codes if other != code)
+
+        partnered = [rank for rank, _, _, _ in kept if rank < base and paired(rank)]
         partner = max(partnered) if partnered else None
-        for rank, drgs, family, dx_listed in kept:
-            if rank in (base, partner) or dx_listed:
+        for rank, drgs, family, shown in kept:
+            if rank in (base, partner) or shown:
                 key = (rank, int(drgs[0]), len(drgs))
                 if best is None or key < best[0]:
                     best = (key, list(drgs), family)
     return (best[1], best[2]) if best else None
+
+
+def _has_row(code, mdc, drgs, ref):
+    """Whether one of the code's rows in the MDC names one of these DRGs."""
+    return any(row["mdc"] == mdc and not drgs.isdisjoint(row["drgs"]) for row in ref.proc_index.get(code, ()))
+
+
+_DELIVERY_FAMILIES = ("783", "786", "768", "796")   # cesarean, vaginal delivery with O.R./sterilization
+_DELIVERY = frozenset(("786", "805"))               # rows of cesarean and vaginal delivery codes
+_CHOLECYSTECTOMY = frozenset(("414", "417"))        # rows 411-416 (open) and 417-419 (laparoscopic)
+_COMBINED_FUSION = ("402", "426", "429")            # combined anterior and posterior fusion families
+
+
+def _condition_met(mdc, drgs, codes, ref):
+    """False for a row whose family needs something v44 states and the codes do not show:
+    - MDC 14 cesarean and vaginal-delivery families need a delivery code (a cesarean, or a
+      code with a vaginal delivery 805-807 row); without one, a salpingectomy for an ectopic
+      pregnancy is not "vaginal delivery with sterilization";
+    - MDC 07 411-413 (cholecystectomy with C.D.E.) needs a cholecystectomy; a bile duct
+      exploration alone is 408-410 ("biliary tract procedures except only cholecystectomy");
+    - 212 needs an aortic valve (02xF) and a mitral valve (02xG) procedure plus at least one
+      concomitant procedure (a third code listed for 212).
+    """
+    first = drgs[0]
+    if mdc == "14" and first in _DELIVERY_FAMILIES:
+        return any(_has_row(code, "14", _DELIVERY, ref) for code in codes)
+    if mdc == "07" and tuple(drgs) == ("411", "412", "413"):
+        return any(_has_row(code, "07", _CHOLECYSTECTOMY, ref) for code in codes)
+    if mdc == "05" and first == "212":
+        listed = [code for code in codes if _has_row(code, "05", {"212"}, ref)]
+        valves = {code[3] for code in listed if code[1] == "2"}
+        return {"F", "G"} <= valves and len(listed) >= 3
+    return True
+
+
+def _fusion_column(code):
+    """"anterior" or "posterior" for an ICD-10-PCS spinal fusion (0RG/0SG) by its qualifier,
+    as v44 sorts them into the anterior (0, J) and posterior lists of DRGs 402, 426 and 429;
+    None for anything else (new-technology XRG fusions are not sorted)."""
+    if code[:3] in ("0RG", "0SG"):
+        return "anterior" if code[6] in "0J" else "posterior"
+    return None
+
+
+def _partner_ok(mdc, family, code, other, families):
+    """Whether other can be the second procedure that the family (its first DRG) needs:
+    - MDC 05 families are "X with Y" (212, 216-218, 231-234, 317): two codes listed under the
+      same set of families (two grafts, two valves) are the same kind and do not pair;
+    - combined fusions (402, 426-428, 429-430) need an anterior and a posterior column code;
+    - 447-448 by two single-level codes needs two from the same column list.
+    Elsewhere (bilateral joints 461-462, kidney with hemodialysis) any listed code pairs.
+    """
+    if mdc == "05":
+        return families[other] != families[code]
+    if family in _COMBINED_FUSION:
+        return None not in (_fusion_column(code), _fusion_column(other)) and \
+            _fusion_column(code) != _fusion_column(other)
+    if family == "447":
+        return _fusion_column(code) is not None and _fusion_column(code) == _fusion_column(other)
+    return True
