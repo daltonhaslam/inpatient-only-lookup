@@ -29,6 +29,9 @@ XLSX_PATH = fetch.DERIVED / "crosswalk.xlsx"
 BADGE = "Draft · built with Claude Code · under coder review"
 HELP_URL = "https://inpatient-only-lookup.vercel.app/revenue-at-stake/help-review/"
 ALT_FLAG = "Alternative family (depends on diagnosis)"
+# Leading characters a spreadsheet may read as a formula. Text from data that starts with one is
+# stored as an explicit string, never a formula (openpyxl treats any "=..." value as a formula).
+FORMULA_LEAD = ("=", "+", "-", "@", "\t", "\r")
 CURRENCY = '$#,##0.00;[Red]-$#,##0.00'
 HEADER_FILL = PatternFill("solid", fgColor="1F3A5F")
 HEADER_FONT = Font(bold=True, color="FFFFFF")
@@ -60,6 +63,23 @@ INPUTS = [
     ("OppsLaborShare", "Outpatient labor share", "OPPS labor-related share of the payment rate: 60%."),
     ("OppsWageIndex", "Hospital wage index (outpatient)", "Your hospital's OPPS wage index. 1.0 = national, unadjusted. Outpatient gets no IME."),
 ]
+
+
+def _plain(cell):
+    """A cell written from data: text that could read as a formula is stored as a plain string."""
+    if isinstance(cell.value, str) and cell.value.startswith(FORMULA_LEAD):
+        cell.data_type = "s"
+    return cell
+
+
+def _put(ws, row, column, value):
+    return _plain(ws.cell(row=row, column=column, value=value))
+
+
+def _append(ws, values):
+    ws.append(values)
+    for cell in ws[ws.max_row]:
+        _plain(cell)
 
 
 def _header(ws, row, names, widths=None):
@@ -128,7 +148,7 @@ def _crosswalk_sheet(wb, doc):
     letter = {name: col(n) for name, n in COL.items()}
     for r, (cells, drgs) in enumerate(_crosswalk_rows(doc), 2):
         for name, value in cells.items():
-            ws.cell(row=r, column=COL[name], value=value)
+            _put(ws, r, COL[name], value)
         if cells.get("APC"):
             ws.cell(row=r, column=COL["Outpatient national rate"],
                     value="=" + _outpatient_amount("%s%d" % (letter["APC"], r)))
@@ -174,8 +194,8 @@ def _pcs_sheet(wb, doc):
                 seen = list(dict.fromkeys(
                     (r["mdc"] or "", ", ".join(r["drgs"]), r["family"] or "", r["non_or"], r.get("note") or "") for r in rows))
                 join = lambda i: " | ".join(dict.fromkeys(str(x[i]) for x in seen if x[i] != ""))      # noqa: E731
-                ws.append([code, item["label"], s, entry["note"], pcs["code"], pcs["title"], join(0), join(1), join(2),
-                           ("yes" if any(x[3] for x in seen) else "no") if seen else None, join(4)])
+                _append(ws, [code, item["label"], s, entry["note"], pcs["code"], pcs["title"], join(0), join(1), join(2),
+                             ("yes" if any(x[3] for x in seen) else "no") if seen else None, join(4)])
     ws.freeze_panes = "C2"
     ws.auto_filter.ref = ws.dimensions
     return ws
@@ -188,7 +208,7 @@ def _lookup_sheet(wb, title, name, header, rows, source, widths, key_name, value
     ws["A1"].font = Font(bold=True, size=13)
     _header(ws, 5, header, widths)
     for row in rows:
-        ws.append(row)
+        _append(ws, row)
     last = ws.max_row
     for r in range(6, last + 1):
         ws.cell(row=r, column=len(header)).number_format = value_format
@@ -236,7 +256,7 @@ def _review_log_sheet(wb, reviews):
     _header(ws, 1, ["Code", "Mapping fingerprint", "Verdict", "Credential", "Date", "Name (if given)", "Reason"],
             [10, 18, 10, 14, 12, 28, 80])
     for r in reviews:
-        ws.append([r.get("code"), r.get("fp"), r.get("verdict"), r.get("credential"), r.get("date"), r.get("name"), r.get("reason")])
+        _append(ws, [r.get("code"), r.get("fp"), r.get("verdict"), r.get("credential"), r.get("date"), r.get("name"), r.get("reason")])
     if not reviews:
         ws.append(["No reviews yet"])
     ws.freeze_panes = "A2"

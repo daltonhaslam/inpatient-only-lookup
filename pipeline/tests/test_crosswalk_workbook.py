@@ -109,5 +109,35 @@ class Workbook(unittest.TestCase):
         self.assertIn("/revenue-at-stake/help-review/", text)
 
 
+class FormulaInjection(unittest.TestCase):
+    """Text from reviewers or data that starts like a formula is stored as text, never evaluated."""
+
+    NAME = '=HYPERLINK("https://evil.test/","click")'
+
+    def test_reviewer_text_and_crosswalk_text_are_plain_strings(self):
+        bad = doc()
+        bad["codes"]["32480"]["label"] = "=1+1"
+        bad["codes"]["32480"]["inpatient"]["families"][0]["condition"] = "@SUM(A1)"
+        reviews = [{"code": "32480", "fp": "3fa9c1d2", "verdict": "wrong", "credential": "CCS", "date": "2026-11-12",
+                    "name": self.NAME, "reason": "+cmd|' /C calc'!A0"},
+                   {"code": "32480", "fp": "3fa9c1d2", "verdict": "agree", "credential": "CIC", "date": "2026-11-12",
+                    "name": "-2+3", "reason": "\tx"}]
+        with tempfile.TemporaryDirectory() as tmp:
+            wb = openpyxl.load_workbook(workbook.write(bad, Path(tmp) / "x.xlsx", reviews=reviews))
+        log = wb["Review log"]
+        self.assertEqual((log["F2"].value, log["F2"].data_type), (self.NAME, "s"))
+        self.assertEqual((log["G2"].value, log["G2"].data_type), ("+cmd|' /C calc'!A0", "s"))
+        self.assertEqual((log["F3"].value, log["F3"].data_type), ("-2+3", "s"))
+        ws = wb["Crosswalk"]
+        header = {c.value: c.column_letter for c in ws[1]}
+        self.assertEqual((ws["%s3" % header["Plain label"]].value, ws["%s3" % header["Plain label"]].data_type), ("=1+1", "s"))
+        self.assertEqual(ws["%s3" % header["Condition / principal dx"]].data_type, "s")
+        self.assertEqual(ws["%s3" % header["Inpatient low"]].data_type, "f")       # the workbook's own formulas stay formulas
+        pcs = wb["PCS detail"]
+        self.assertEqual((pcs["B2"].value, pcs["B2"].data_type), ("=1+1", "s"))
+        formulas = [c.coordinate for sheet in (log, pcs) for row in sheet.iter_rows() for c in row if c.data_type == "f"]
+        self.assertEqual(formulas, [])
+
+
 if __name__ == "__main__":
     unittest.main()
