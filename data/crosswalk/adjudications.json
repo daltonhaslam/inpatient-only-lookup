@@ -3175,5 +3175,54 @@
   "rationale": "Carotid body Resection plus the arterial objective: Excision of the sacrificed external carotid, or Replacement when the internal carotid is resected and grafted.",
   "confidence": "medium",
   "note": "Took B: the external carotid is the artery usually sacrificed (037-039); internal carotid resection needs a graft (Replacement, 040-042); D446 is where the index sends carotid body tumors."
+ },
+ "19305": {
+  "code": "19305",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0HTT0ZZ",
+     "0KTH0ZZ",
+     "07T50ZZ"
+    ],
+    "note": "right, pectorals as Resection (CMS radical-mastectomy cluster)"
+   },
+   {
+    "codes": [
+     "0HTU0ZZ",
+     "0KTJ0ZZ",
+     "07T60ZZ"
+    ],
+    "note": "left, pectorals as Resection (CMS radical-mastectomy cluster)"
+   },
+   {
+    "codes": [
+     "0HTT0ZZ",
+     "0KBH0ZZ",
+     "07T50ZZ"
+    ],
+    "note": "right, pectorals as Excision (part of thorax muscle body part)"
+   },
+   {
+    "codes": [
+     "0HTU0ZZ",
+     "0KBJ0ZZ",
+     "07T60ZZ"
+    ],
+    "note": "left, pectorals as Excision (part of thorax muscle body part)"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C50911",
+    "condition": "breast cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Radical mastectomy = Resection of breast + removal of pectoralis major/minor + Resection of axillary lymphatics (distinct objective); the muscle root operation is a judgment call.",
+  "confidence": "medium",
+  "note": "Merged both passes. B's Resection of the thorax muscle matches the v44 Appendix E radical-mastectomy cluster, which groups to 582-583. A's Excision is the strict reading, because the pectorals are only part of the thorax muscle body part, and it groups to 579-581. Both readings are kept."
  }
 }
