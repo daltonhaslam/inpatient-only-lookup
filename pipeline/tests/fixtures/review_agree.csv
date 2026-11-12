@@ -1,0 +1,6 @@
+Timestamp,Code,Mapping reviewed,Your credential,Name to show in the credit list
+11/12/2026 09:00:00,32480,aaaa1111 · lung lobectomy,CCS,"Jane Doe, CCS"
+11/12/2026 09:30:00,32480,aaaa1111 · lung lobectomy,MD/DO,
+11/12/2026 10:00:00,44150,bbbb2222 · colectomy,CPC,jane@example.com
+11/12/2026 10:00:30,44150,bbbb2222 · colectomy,CPC,
+11/12/2026 10:01:00,44150,bbbb2222 · colectomy,CPC,

@@ -1,0 +1,4 @@
+Timestamp,Code,Mapping reviewed,Your credential,Where do you code?,Are the ICD-10-PCS codes right?,"If not, which PCS codes would you use?",Is the DRG family and principal diagnosis right?,"If not, what would you expect?",Your reasoning,Name to show in the credit list,"Email, if you're open to a follow-up question"
+11/12/2026 11:00:00,48150,cccc3333 · whipple,CIC,Inpatient facility,No,0FT00ZZ,Yes,,Approach differs from what we code.,,secret@example.org
+11/12/2026 11:05:00,48150,cccc3333 · whipple,CCS,Both,Yes,,No,,Saw it for Mr. Smith last week,,
+11/12/2026 11:06:00,48150,cccc3333 · whipple,CCS,Both,Yes,,No,,"DOB 01/02/1950 and MRN 1234567",,
