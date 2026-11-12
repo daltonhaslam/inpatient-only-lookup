@@ -255,6 +255,9 @@ function stakeData(ctx) {
   const model = normalize(JSON.parse(readFileSync(path, 'utf8')));
   const missing = Object.keys(model.codes).filter((code) => !ctx.data.codes[code]);
   if (missing.length) throw new Error(`crosswalk.json has codes with no page on this site: ${missing.slice(0, 10).join(', ')}`);
+  // The review ingest reads the first 8-hex word of the prefilled mapping; anything else would lose reviews.
+  const badFp = Object.values(model.codes).filter((item) => item.map && !/^[0-9a-f]{8}$/.test(item.map.fp)).map((item) => item.code);
+  if (badFp.length) throw new Error(`crosswalk.json has mapping fingerprints that are not 8 hex digits: ${badFp.slice(0, 10).join(', ')}`);
   const reviewsPath = join(root, 'data/crosswalk/reviews.json');
   const reviews = existsSync(reviewsPath) ? JSON.parse(readFileSync(reviewsPath, 'utf8')) : [];
   const xlsx = join(dirname(path), 'crosswalk.xlsx');
@@ -272,7 +275,10 @@ async function main() {
   if (!isDate(today)) throw new Error(`BUILD_DATE must be YYYY-MM-DD, got ${today}`);
   const ctx = context(today);
   ctx.stake = stakeData(ctx);
-  if (ctx.stake) ctx.stakeBlock = (code) => stake.codeBlock(ctx, code);
+  if (ctx.stake) {
+    ctx.stakeBlock = (code) => stake.codeBlock(ctx, code);
+    ctx.stakeSummary = stake.coverageSentence(ctx.stake);
+  }
 
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });

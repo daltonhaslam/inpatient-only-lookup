@@ -121,8 +121,11 @@ def inpatient(rec, ref):
     """{"families", "low", "high"} over every pcs_set x principal_dx, typical diagnosis first.
 
     One family per diagnosis and DRG family. Where the sets give one diagnosis several families,
-    each is labeled with its condition and the notes of the sets that lead to it. Raises
-    ValueError when a combination does not group."""
+    each is labeled with its condition and the notes of the sets that lead to it. Each family's
+    "when" says what selects it: {"dx": condition when the families differ by diagnosis, "variant":
+    the set notes (else its PCS codes) when they differ by PCS set under this diagnosis}, None
+    where that does not split them. Raises ValueError when a combination does not group."""
+    by_dx = status.split_drivers(rec, ref)[0]
     families = []
     for dx in sorted(rec["principal_dx"], key=lambda d: d["role"] != "typical"):
         found = {}
@@ -138,7 +141,9 @@ def inpatient(rec, ref):
                 "dx": {"code": dx["code"], "title": ref.cm[dx["code"]]},
                 "mdc": result["mdc"], "family": result["family"], "basis": result["basis"],
                 "drgs": priced["drgs"], "low": priced["low"], "high": priced["high"],
-                "index_rows": index_rows(codes, result, ref)})
+                "index_rows": index_rows(codes, result, ref),
+                "when": {"dx": condition if by_dx else None,
+                         "variant": ("; ".join(notes) or "+".join(codes)) if len(found) > 1 else None}})
             if drgs == REVISION_DRGS and any(pcs[:3] == "0SP" and pcs[3] in REVISION_JOINTS for pcs in codes):
                 families[-1]["caveat"] = REVISION_CAVEAT
     return {"families": families, "low": min(f["low"] for f in families), "high": max(f["high"] for f in families)}

@@ -2,7 +2,7 @@
 // would group to. Pure HTML from the normalized model (stake-data.mjs), so the build and the
 // browser draw the same card. Inpatient dollars never appear without their range and review status.
 import { esc, out } from './views.mjs';
-import { agreeHref, wrongHref } from './site.mjs';
+import { agreeHref, wrongHref, STATUS as SI_STATUS } from './site.mjs';
 
 export const BADGE = 'Draft · built with Claude Code · under coder review';
 
@@ -49,13 +49,26 @@ const BASIS = {
 };
 const basisText = (basis) => BASIS[basis] || (basis.startsWith('unrelated') ? 'unrelated to principal diagnosis: the operating-room procedure is outside the diagnosis’s MDC' : '');
 
+/** "status indicator Q1 (outpatient service, packaged when ...)" for a code with no national rate. */
+export const siText = (si) => (si ? `status indicator ${si}${SI_STATUS[si] ? ` (${SI_STATUS[si]})` : ''}` : 'no status indicator');
+
+/** What selects a family when a code has several: diagnosis, operation variant, or both. */
+function whenParts(f) {
+  const when = f.when || { dx: f.condition, variant: null };
+  const parts = [];
+  if (when.dx) parts.push({ kind: 'dx', text: when.dx });
+  if (when.variant) parts.push({ kind: 'variant', text: when.variant });
+  return parts.length ? parts : [{ kind: 'dx', text: f.condition }];
+}
+export const whenLabel = (f) => whenParts(f).map((p) => (p.kind === 'dx' ? p.text : `coded as ${p.text}`)).join(', ');
+
 /** The prefilled "Mapping reviewed" summary after the fingerprint. */
 export function mappingSummary(item) {
   const first = item.map.sets[0];
   const more = item.map.sets.length - 1;
   const pcs = `PCS ${first.codes.map((c) => c.code).join('+')}${more ? ` (+${more} alt)` : ''}`;
   const families = item.ip.families;
-  const lead = `DRG ${drgList(families[0].drgs).replace('–', '-')} (${families[0].condition})`;
+  const lead = `DRG ${drgList(families[0].drgs).replace('–', '-')} (${families.length > 1 ? whenLabel(families[0]) : families[0].condition})`;
   return `${pcs} | ${lead}${families.length > 1 ? `; +${families.length - 1} more` : ''}`;
 }
 
@@ -63,7 +76,7 @@ export function mappingSummary(item) {
 export function gapText(item) {
   const d = item.diff;
   const what = item.ip.families.length > 1 ? 'the inpatient DRG families' : 'the inpatient DRG family';
-  if (!d) return 'No national outpatient rate in Addendum B, so no difference is shown.';
+  if (!d) return `No national outpatient rate for ${siText(item.op.si)}, so no difference is shown.`;
   if (d.high <= 0) return `Outpatient pays ${moneyRange(-d.high, -d.low)} less than ${what}.`;
   if (d.low >= 0) return `Outpatient pays ${moneyRange(d.low, d.high)} more than ${what}.`;
   return `Outpatient pays from ${money(-d.low)} less to ${money(d.high)} more than ${what}.`;
@@ -79,14 +92,19 @@ export const noCompareText = (item) => NO_COMPARE[item.kind];
 
 function opLine(item) {
   const op = item.op;
-  if (op.rate === null) return `<span class="scard__amt">No separate payment</span><span class="scard__what">Status indicator ${esc(op.si || 'none')}</span>`;
+  if (op.rate === null) return `<span class="scard__amt">No national rate</span><span class="scard__what">${esc(siText(op.si).replace(/^s/, 'S'))}</span>`;
   return `<span class="scard__amt">${money(op.rate)}</span><span class="scard__what">APC ${esc(op.apc)}${op.apcTitle ? ` ${esc(op.apcTitle)}` : ''}</span>${op.asc !== null ? `<span class="scard__asc">Surgery center (ASC): ${money(op.asc)}</span>` : ''}`;
 }
 
 function familyLine(f, many) {
   const basis = basisText(f.basis);
+  const code = f.dx ? ` (${esc(dxCode(f.dx.code))})` : '';
+  const lines = many
+    ? whenParts(f).map((p) => (p.kind === 'dx' ? `If the principal diagnosis is ${esc(p.text)}${code}` : `If coded as: ${esc(p.text)}`))
+    : [`Principal diagnosis: ${esc(f.condition)}${code}`];
+  if (basis) lines.push(esc(basis.charAt(0).toUpperCase() + basis.slice(1)));
   return `<div class="scard__fam"><span class="scard__amt">${moneyRange(f.low, f.high)}</span><span class="scard__what">MS-DRG ${esc(drgList(f.drgs))} ${esc(f.name)}</span>`
-    + `<span class="scard__cond">${many ? 'If the principal diagnosis is' : 'Principal diagnosis'}: ${esc(f.condition)}${f.dx ? ` (${esc(dxCode(f.dx.code))})` : ''}${basis ? `; ${esc(basis)}` : ''}</span>`
+    + lines.map((line) => `<span class="scard__cond">${line}</span>`).join('')
     + `${f.caveat ? `<span class="scard__caveat">${esc(f.caveat)}</span>` : ''}</div>`;
 }
 
@@ -98,7 +116,7 @@ function scaleBar(item) {
   const lane = (name, bar) => `<div class="sbar__lane"><span class="sbar__name">${esc(name)}</span><span class="sbar__track">${bar}</span></div>`;
   const lanes = [lane('Outpatient', item.op.rate !== null ? `<i class="sbar__op" style="width:${pct(item.op.rate / top)}"></i>` : '')];
   for (const f of item.ip.families) {
-    lanes.push(lane(item.ip.families.length > 1 ? `Inpatient, ${f.condition}` : 'Inpatient', `<i class="sbar__ip" style="left:${pct(f.low / top)};width:${pct(Math.max(f.high - f.low, top * 0.006) / top)}"></i>`));
+    lanes.push(lane(item.ip.families.length > 1 ? `Inpatient, ${whenLabel(f)}` : 'Inpatient', `<i class="sbar__ip" style="left:${pct(f.low / top)};width:${pct(Math.max(f.high - f.low, top * 0.006) / top)}"></i>`));
   }
   return `<div class="sbar" aria-hidden="true">${lanes.join('')}<div class="sbar__axis"><span>$0</span><span>${money(top)}</span></div></div>`;
 }
@@ -120,7 +138,7 @@ function work(item, meta) {
     const index = f.indexRows.map((r) => `<li><code>${esc(r.pcs)}</code> ${r.drgs.length
       ? `MDC ${esc(r.mdc)}, DRGs ${esc(r.drgs.join(', '))}${r.family ? ` ${esc(r.family)}` : ''}${r.nonOr ? ' (non-OR)' : ''}`
       : ''}${r.note ? ` <span class="work__note">${esc(r.note)}</span>` : (r.drgs.length ? '' : ' no row for this family')}</li>`).join('');
-    return `<p class="work__fam">MDC ${esc(f.mdc || '')}, ${esc(f.name)}${ip.families.length > 1 ? `, for ${esc(f.condition)}` : ''}${basis ? `: ${esc(basis)}` : ''}</p>
+    return `<p class="work__fam">MDC ${esc(f.mdc || '')}, ${esc(f.name)}${ip.families.length > 1 ? `, ${esc(whenLabel(f).replace(/^(?!coded as)/, 'for '))}` : ''}${basis ? `: ${esc(basis)}` : ''}</p>
 ${index ? `<p class="work__sub">MS-DRG v44 Appendix E rows behind it:</p><ul class="work__list">${index}</ul>` : ''}${f.caveat ? `<p class="work__stale">${esc(f.caveat)}</p>` : ''}
 <div class="scroll" tabindex="0" role="region" aria-label="MS-DRG ${esc(drgList(f.drgs))} amounts"><table class="work__drgs"><thead><tr><th scope="col">MS-DRG</th><th scope="col">Title</th><th scope="col" class="num">Weight</th><th scope="col" class="num">Weight × ${cents(rates.combined)}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }).join('');
@@ -142,7 +160,7 @@ ${families}
 <p>${op.rate !== null ? `Status indicator ${esc(op.si)}, APC ${esc(op.apc)}${op.apcTitle ? ` ${esc(op.apcTitle)}` : ''}, national rate ${cents(op.rate)} (${srcLink(meta, 'addenda-2027', 'CY 2027 Addenda A and B')}).` : `Status indicator ${esc(op.si || 'none')}: no national rate.`}${op.asc !== null ? ` Surgery-center rate ${cents(op.asc)} (${srcLink(meta, 'asc-2027-aa', 'ASC Addendum AA')}).` : ''}${proposed}</p>
 ${sum}
 <p class="work__h">Who mapped it</p>
-<p>${map.passesAgree ? `Two separate AI mapping passes, made with Claude, agree on ${ip.families.length > 1 ? 'these DRG families' : 'this DRG family'}.` : 'The two AI mapping passes, made with Claude, did not agree; an adjudicator chose.'}${map.rationale ? ` Mapper’s note: ${esc(map.rationale)}` : ''}${map.adjudication ? ` Adjudicator’s note: ${esc(map.adjudication)}` : ''}</p>
+<p>${map.passesAgree ? `Two separate AI mapping passes, made with Claude, agree on ${ip.families.length > 1 ? 'these DRG families' : 'this DRG family'}.` : 'Two AI mapping passes, made with Claude, disagreed; an adjudicating pass chose this mapping.'}${map.rationale ? ` Mapper’s note: ${esc(map.rationale)}` : ''}${map.adjudication ? ` Adjudicator’s note: ${esc(map.adjudication)}` : ''}</p>
 ${stale}
 <p class="work__meta">Mapping <code>${esc(map.fp)}</code>. ${esc(years.outpatient)}. ${esc(years.inpatient)}. <a href="/revenue-at-stake/methods/">Methods</a></p>
 </div>

@@ -64,11 +64,32 @@ class Tiering(unittest.TestCase):
         result = self.tier(rec([("0BTC0ZZ",)], [("C3411", "typical"), ("I2510", "alternative")]))
         self.assertEqual(result, {"tier": 3, "why": status.TIER3_DX_WHY})
 
+    def test_tier_3_depends_on_variant(self):
+        result = self.tier(rec([("0BTC0ZZ",), ("0YQ50ZZ",)], [("C3411", "typical")]))
+        self.assertEqual(result, {"tier": 3, "why": status.TIER3_VARIANT_WHY})
+
+    def test_tier_3_depends_on_dx_and_variant(self):
+        both = rec([("0BTC0ZZ",), ("0YQ50ZZ",)], [("C3411", "typical"), ("I2510", "alternative")])
+        self.assertEqual(status.split_drivers(both, self.ref), (True, True))
+        self.assertEqual(self.tier(both), {"tier": 3, "why": status.TIER3_BOTH_WHY})
+
+    def test_split_drivers(self):
+        self.assertEqual(status.split_drivers(LUNG, self.ref), (False, False))
+        by_dx = rec([("0BTC0ZZ",)], [("C3411", "typical"), ("I2510", "alternative")])
+        self.assertEqual(status.split_drivers(by_dx, self.ref), (True, False))
+        same = rec([("0BTC0ZZ",), ("0BTD0ZZ",)], [("C3411", "typical")])
+        self.assertEqual(status.split_drivers(same, self.ref), (False, False))
+
     def test_tier_3_adjudicated(self):
         other = rec([("0BTC0ZZ",)], [("I2510", "typical")])
         result = self.tier(LUNG, other, final=LUNG)
-        self.assertEqual(result["tier"], 3)
-        self.assertIn("two passes disagreed; an adjudicator chose", result["why"].lower())
+        self.assertEqual(result, {"tier": 3, "why": status.TIER3_ADJUDICATED_WHY})
+        self.assertNotIn("principal diagnosis", result["why"])
+
+    def test_tier_3_adjudicated_but_split_says_what_splits_it(self):
+        split = rec([("0BTC0ZZ",), ("0YQ50ZZ",)], [("C3411", "typical")])
+        result = self.tier(LUNG, split, final=split)
+        self.assertEqual(result, {"tier": 3, "why": status.TIER3_VARIANT_WHY})
 
     def test_unmappable_has_no_tier(self):
         gone = {"code": "X", "mappable": False, "unmapped_reason": "packaged"}

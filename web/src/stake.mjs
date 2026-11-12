@@ -22,11 +22,22 @@ export function stakeContext(model, credits, groups, { xlsx = false } = {}) {
     reviewed: compared.filter((item) => item.review.status !== 'unreviewed').length,
     confirmed: compared.filter((item) => item.review.status === 'confirmed').length,
     disputed: compared.filter((item) => item.review.status === 'disputed').length,
+    packaged: items.filter((item) => item.kind === 'packaged' || item.kind === 'anesthesia').length,
+    unmapped: items.filter((item) => item.kind === 'unmapped' || item.kind === 'pending').length,
   };
-  return { model, credits, groups: shown, groupName: Object.fromEntries(groups), xlsx, items, byGroup, progress };
+  return { model, credits, groups: shown, summary: coverage(items.length, progress), groupName: Object.fromEntries(groups), xlsx, items, byGroup, progress };
 }
 
 const plural = (n, one, many = `${one}s`) => `${num(n)} ${n === 1 ? one : many}`;
+
+/** "922 procedures left the list; 852 have a comparison; the rest ..." from the data, never assumed. */
+function coverage(total, p) {
+  const rest = [p.packaged ? `${num(p.packaged)} have no separate outpatient payment (packaged)` : '',
+    p.unmapped ? `${num(p.unmapped)} name no single operation to map` : ''].filter(Boolean);
+  return { total, compared: p.compared, rest: rest.join(' and ') };
+}
+/** One sentence for the home page and the meta description. */
+export const coverageSentence = (stake) => `Of the ${num(stake.summary.total)} procedures removed from Medicare’s inpatient-only list in 2026 and 2027, ${num(stake.summary.compared)} have a comparison${stake.summary.rest ? `; ${stake.summary.rest}` : ''}.`;
 const draft = () => `<p class="draft">${esc(BADGE)}</p>`;
 
 function guardrail() {
@@ -50,10 +61,10 @@ function years(meta) {
 
 function tableRow(item) {
   const compare = item.kind === 'compare';
-  const op = item.op.rate !== null ? money(item.op.rate) : 'Packaged';
+  const op = item.op.rate !== null ? money(item.op.rate) : (item.op.si === 'N' ? 'Packaged' : `No rate (SI ${esc(item.op.si || 'none')})`);
   const many = compare && item.ip.families.length > 1;
   const ip = compare
-    ? `${moneyRange(item.ip.low, item.ip.high)}<span class="stab__sub">MS-DRG ${esc(drgList(item.ip.families[0].drgs))}${many ? `, ${item.ip.families.length} families by diagnosis` : ''}</span>`
+    ? `${moneyRange(item.ip.low, item.ip.high)}<span class="stab__sub">${many ? `${item.ip.families.length} families` : `MS-DRG ${esc(drgList(item.ip.families[0].drgs))}`}</span>`
     : `<span class="stab__sub">${item.kind === 'pending' ? 'Not mapped yet' : 'No comparison'}</span>`;
   const status = compare ? esc(statusText(item.review)) : '<span class="stab__sub">Not applicable</span>';
   const attrs = `data-code="${esc(item.code)}" data-group="${esc(item.group)}" data-kind="${esc(item.kind)}" data-status="${esc(compare ? item.review.status : '')}" data-tier="${item.tier ? item.tier.n : ''}" data-year="${item.year}"`;
@@ -95,7 +106,7 @@ export function mainPage(ctx) {
   const { meta } = stake.model;
   const body = `<section class="stake-head" aria-labelledby="stake-h1">
 <h1 id="stake-h1">Revenue at stake</h1>
-<p class="lede">For each of the ${num(stake.items.length)} procedures Medicare removed from the inpatient-only list in 2026 and 2027, what the hospital outpatient system pays next to the inpatient MS-DRG family the same operation would group to. National, unadjusted amounts from CMS’s ${esc(meta.years.outpatient)} outpatient and ${esc(meta.years.inpatient)} inpatient final rules.</p>
+<p class="lede">${coverageSentence(stake)} For those ${num(stake.summary.compared)}: what outpatient pays next to the inpatient MS-DRG family the same operation would group to, national and unadjusted, from CMS’s ${esc(meta.years.outpatient)} and ${esc(meta.years.inpatient)} final rules.</p>
 ${draft()}
 ${years(meta)}
 ${progressBar(stake)}
@@ -107,7 +118,7 @@ ${codeTables(stake)}
 <p class="note">How the mappings, families and amounts are built, and their limits: <a href="${ROOT}methods/">Methods</a>.</p>`;
   return layout(ctx, {
     path: ROOT, page: 'stake', title: 'Revenue at stake: outpatient vs inpatient payment for removed procedures', body,
-    description: `For the ${stake.items.length} procedures removed from Medicare’s inpatient-only list in 2026 and 2027: the national CY 2027 outpatient payment next to the FY 2027 inpatient MS-DRG family range, with each mapping’s coder-review status.`,
+    description: `${coverageSentence(stake)} For those, the national CY 2027 outpatient payment next to the FY 2027 inpatient MS-DRG family range, with each mapping’s coder-review status.`,
   });
 }
 
@@ -205,6 +216,7 @@ export function methodsPage(ctx) {
   const lines = yearLines(meta);
   const tiers = meta.counts.tiers;
   const drg165 = stake.items.flatMap((item) => (item.ip ? item.ip.families : [])).flatMap((f) => f.drgs).find((d) => d.drg === '165');
+  const formula = drg165 ? `: DRG 165 (major chest procedures without CC/MCC) is its relative weight, ${drg165.weight.toFixed(4)}, × ${cents(r.combined)}, before any of them` : '';
   const files = meta.sources.map((s) => `<tr><td>${out(s.landing, esc(s.label))}</td><td>${esc(s.file).replace(/; /g, '<br>')}</td></tr>`).join('');
   const body = `<nav class="crumbs" aria-label="Breadcrumb"><a href="${ROOT}">Revenue at stake</a> <span aria-hidden="true">/</span> <span>Methods</span></nav>
 <h1>Revenue at stake: methods</h1>
@@ -230,8 +242,8 @@ ${draft()}
 
 <section class="block" aria-labelledby="m-nat-h">
 <h2 id="m-nat-h">National, unadjusted</h2>
-<p>Every dollar figure here is a national amount with no hospital-specific adjustment: ${esc(r.adjusters)}. A hospital’s own inpatient payment is usually higher. Its wage index adjusts the labor share of the operating amount, and teaching (IME) and disproportionate-share (DSH) add-ons raise it further. Published hand-worked examples, such as a figure of about $20,000 for a lobectomy, generally include those adjustments${drg165 ? `; the national amount for DRG 165 (major chest procedures without CC/MCC) is ${cents(drg165.amount)}` : ''}.</p>
-<p>Outpatient payments are wage-adjusted too (60% of the rate), but get no IME or DSH add-on, so for a teaching or safety-net hospital the real gap is usually wider than shown. ${stake.xlsx ? 'The Excel download has an Inputs tab where you can enter your own wage index, IME and DSH; every amount recalculates.' : ''}</p>
+<p>Every dollar figure here is a national amount with no hospital-specific adjustment: ${esc(r.adjusters)}. A hospital’s own inpatient payment is usually higher. Its wage index adjusts the labor share of the operating amount, and teaching (IME) and disproportionate-share (DSH) add-ons raise it further. Published hand-worked examples, such as a figure of about $20,000 for a lobectomy, may include those adjustments. The figures here do not${formula}.</p>
+<p>Outpatient payments are wage-adjusted too (60% of the rate), but get no IME or DSH add-on. ${stake.xlsx ? 'The Excel download has an Inputs tab where you can enter your own wage index, IME and DSH; every amount recalculates.' : ''}</p>
 </section>
 
 <section class="block" aria-labelledby="m-tier-h">
@@ -240,7 +252,7 @@ ${draft()}
 <ul class="plain">
 <li><strong>Tier 1</strong> (${num(tiers['1'] || 0)} codes): two separate AI mapping passes agree on one DRG family. Not yet checked by a coder.</li>
 <li><strong>Tier 2</strong> (${num(tiers['2'] || 0)}): one family, but several PCS codes are reported together, the passes chose different PCS codes, or the family comes from the diagnosis rather than an in-MDC operation.</li>
-<li><strong>Tier 3</strong> (${num(tiers['3'] || 0)}): the family depends on the principal diagnosis, or the passes disagreed and an adjudicator chose. Each family is shown with its diagnosis. Reviewers wanted.</li>
+<li><strong>Tier 3</strong> (${num(tiers['3'] || 0)}): the family depends on the principal diagnosis, on which variant of the operation is done and how it is coded, or both; or the two passes disagreed and an adjudicating pass chose the mapping. Each family is labeled with what selects it. Reviewers wanted.</li>
 </ul>
 <p>The two passes are not fully independent: both are AI, working from the code, CMS’s short descriptor and this site’s label, not from the AMA’s full descriptors. Agreement makes a wrong map less likely, not impossible. A coder’s review is what moves a code to confirmed. <a href="${ROOT}help-review/">How review works</a></p>
 </section>
@@ -251,7 +263,7 @@ ${guardrail()}
 <h2 id="m-lim-h">Limits</h2>
 <ul class="plain">
 <li>Facility payment only. The surgeon’s professional fee is the same idea under a different fee schedule and is not shown.</li>
-<li>Packaged codes (status indicator N) and anesthesia codes are listed without a comparison: they have no separate outpatient payment. Surgical add-on codes are among them.</li>
+<li>Packaged codes (status indicator N) and anesthesia codes are listed without a comparison: they have no separate outpatient payment.</li>
 <li>The range is the whole MS-DRG family. Where a real case lands depends on its secondary diagnoses (CC/MCC), which this cannot know.</li>
 <li>The expected principal diagnosis is one typical choice, with an alternative only where it changes the family. Real cases vary.</li>
 <li>Outliers, transfers, post-acute transfer reductions, new-technology add-on payments and device credits are not modelled.</li>
@@ -274,7 +286,7 @@ ${guardrail()}
 
 <section class="block" aria-labelledby="m-ai-h">
 <h2 id="m-ai-h">Built with Claude Code</h2>
-<p>This section was built by ${esc(SITE.author)} using Claude Code, Anthropic’s AI coding tool. Claude wrote the pipeline, the grouper and the pages, made the two mapping passes and the adjudications, and wrote the first-pass diagnosis choices. The CMS files, the grouping rules and the arithmetic are checked by code; the clinical and coding judgment in each mapping is checked only by the coders who review it. Until a card says confirmed, treat its mapping as a draft.</p>
+<p>This section was built by ${esc(SITE.author)} using Claude Code, Anthropic’s AI coding tool. Claude wrote the pipeline, the grouper and the pages, made the two mapping passes and the adjudications, and wrote the first-pass diagnosis choices. Each build checks, and fails if any check fails, that every PCS and ICD-10-CM code is valid in the FY 2027 code sets; that every PCS set and diagnosis regroups to its family and traces to an MS-DRG v44 Appendix E row; that DRG weights, titles and MDCs match Table 5 and Appendix A; that APC and surgery-center rates match the addenda; that every dollar amount and difference recomputes to the cent; and that no published text copies a CPT descriptor. None of that checks whether a mapping is the right clinical or coding choice; only the coders who review it do. Until a card says confirmed, treat its mapping as a draft.</p>
 </section>
 
 <section class="block" aria-labelledby="m-src-h">
@@ -313,14 +325,14 @@ export function codeBlock(ctx, code) {
 <h2 id="stake-h">Revenue at stake</h2>
 <p class="stake-block__lede">Left the list ${formatDate(item.removed)}. ${item.kind === 'compare' ? 'What Medicare pays for it as a hospital outpatient, next to the inpatient MS-DRG family the same operation would group to.' : 'Why there is no payment comparison for it:'}</p>
 ${card(item, stake.model.meta, { title: false })}
-<p class="stake-block__more"><a href="${ROOT}">All ${num(stake.items.length)} removed codes compared</a> <span aria-hidden="true">/</span> <a href="${ROOT}methods/">How the numbers are built</a></p>
+<p class="stake-block__more"><a href="${ROOT}">All ${num(stake.items.length)} removed codes</a> <span aria-hidden="true">/</span> <a href="${ROOT}methods/">How the numbers are built</a></p>
 </section>`;
 }
 
 // ---- downloads ----------------------------------------------------------------------------
 
 export const CSV_HEADER = ['code', 'label', 'body_system', 'removed', 'outpatient_status_indicator', 'apc', 'apc_title',
-  'outpatient_rate', 'asc_rate', 'comparison', 'family_order', 'principal_dx', 'principal_dx_condition', 'mdc', 'drg_family',
+  'outpatient_rate', 'asc_rate', 'comparison', 'family_order', 'principal_dx', 'principal_dx_condition', 'coded_as', 'mdc', 'drg_family',
   'drgs', 'inpatient_low', 'inpatient_high', 'outpatient_minus_inpatient_low', 'outpatient_minus_inpatient_high', 'tier',
   'review_status', 'mapping_fingerprint'];
 
@@ -334,13 +346,13 @@ export function csvRows(stake) {
     const base = [item.code, item.label, stake.groupName[item.group] || item.group, item.removed, item.op.si || '', item.op.apc || '',
       item.op.apcTitle || '', blank(item.op.rate), blank(item.op.asc)];
     if (item.kind !== 'compare') {
-      rows.push([...base, noCompareText(item), '', '', '', '', '', '', '', '', '', '', '', '', '']);
+      rows.push([...base, noCompareText(item), ...CSV_HEADER.slice(base.length + 1).map(() => '')]);
       continue;
     }
     item.ip.families.forEach((f, i) => {
       const diff = item.op.rate === null ? ['', ''] : [round2(item.op.rate - f.high), round2(item.op.rate - f.low)];
       rows.push([...base, 'compared', i === 0 ? 'primary' : 'alternative family (depends on diagnosis)', f.dx ? dxCode(f.dx.code) : '',
-        f.condition, f.mdc || '', f.name, f.drgs.map((d) => d.drg).join(' '), f.low, f.high, ...diff,
+        f.condition, f.when && f.when.variant ? f.when.variant : '', f.mdc || '', f.name, f.drgs.map((d) => d.drg).join(' '), f.low, f.high, ...diff,
         item.tier ? item.tier.n : '', item.review.status, item.map.fp]);
     });
   }

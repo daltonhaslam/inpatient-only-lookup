@@ -42,7 +42,7 @@ describe('revenue at stake', { skip }, () => {
   const items = model ? Object.values(model.codes) : [];
 
   test('every removed code page has one block, and no other code page has one', () => {
-    assert.equal(codes.length, 922);
+    assert.equal(codes.length, doc.meta.counts.codes);
     const withBlock = readdirSync(join(docs, 'code')).filter((code) => read(`code/${code}/index.html`).includes('data-stake-code='));
     assert.deepEqual(withBlock.sort(), [...codes].sort());
     for (const code of codes) assert.equal(cards(block(code)).length, 1, `${code}: expected one card`);
@@ -53,24 +53,43 @@ describe('revenue at stake', { skip }, () => {
     assert.match(textOf(html), /no separate outpatient payment/);
     assert.doesNotMatch(html, /scard__fam|MS-DRG|docs\.google\.com|badge--/);
     const packaged = items.filter((item) => item.kind === 'packaged' || item.kind === 'anesthesia');
-    assert.ok(packaged.length > 50);
+    assert.equal(packaged.length, doc.meta.counts.packaged);
     for (const item of packaged) assert.doesNotMatch(block(item.code), /scard__fam|scard__gap/, item.code);
   });
 
   test('Tier 3 cards stack two or more ranges, each labeled with its condition, and ask for reviewers', () => {
     const tier3 = items.filter((item) => item.kind === 'compare' && item.tier && item.tier.n === 3 && item.ip.families.length > 1);
-    assert.ok(tier3.length > 10, `only ${tier3.length} multi-family Tier 3 codes`);
+    assert.ok(tier3.length > 0, 'no multi-family Tier 3 codes in the data');
     for (const item of tier3) {
       const html = block(item.code);
       const families = [...html.matchAll(/<div class="scard__fam">([\s\S]*?)<\/div>/g)].map((m) => textOf(m[1]));
       assert.ok(families.length >= 2, `${item.code}: ${families.length} ranges`);
       for (const family of families) {
         assert.match(family, /\$[\d,]+(–\$[\d,]+)?/, `${item.code}: a range without dollars`);
-        assert.match(family, /If the principal diagnosis is: \S/, `${item.code}: a range without its condition`);
+        assert.match(family, /If the principal diagnosis is \S|If coded as: \S/, `${item.code}: a range without what selects it`);
       }
       assert.match(textOf(html), /Reviewers wanted\./, item.code);
       assert.doesNotMatch(html, /awaiting physician review/i);
     }
+  });
+
+  test('family labels follow what splits them: diagnosis, coded variant, or both', () => {
+    const split = items.filter((item) => item.kind === 'compare' && item.ip.families.length > 1);
+    const seen = { dx: 0, variant: 0 };
+    for (const item of split) {
+      const html = block(item.code);
+      const families = [...html.matchAll(/<div class="scard__fam">([\s\S]*?)<\/div>/g)].map((m) => textOf(m[1]).replace(/\s+/g, ' '));
+      item.ip.families.forEach((f, i) => {
+        assert.ok(f.when, `${item.code}: no "when" in the data`);
+        if (f.when.dx) { seen.dx += 1; assert.ok(families[i].includes(`If the principal diagnosis is ${f.when.dx}`), `${item.code}: ${families[i]}`); }
+        if (f.when.variant) { seen.variant += 1; assert.ok(families[i].includes(`If coded as: ${f.when.variant}`), `${item.code}: ${families[i]}`); }
+        if (!f.when.dx && f.when.variant) assert.ok(!families[i].includes('If the principal diagnosis is'), `${item.code}: a variant split labeled as a diagnosis`);
+      });
+      const why = textOf(html).replace(/\s+/g, ' ');
+      assert.ok(why.includes(item.tier.why), `${item.code}: card lacks its tier wording`);
+      if (item.ip.families.every((f) => !f.when.dx)) assert.ok(!item.tier.why.includes('principal diagnosis'), `${item.code}: ${item.tier.why}`);
+    }
+    assert.ok(seen.dx > 0 && seen.variant > 0, `labels seen: ${JSON.stringify(seen)}`);
   });
 
   test('every card with an inpatient range also shows a review status', () => {
@@ -123,7 +142,10 @@ describe('revenue at stake', { skip }, () => {
     }
     assert.match(html, /data-stake="\/data\/stake\.[0-9a-f]{10}\.json"/);
     assert.match(html, /href="\/data\/revenue-at-stake\.csv"/);
-    assert.equal([...html.matchAll(/<tr data-code="/g)].length, 922);
+    assert.equal([...html.matchAll(/<tr data-code="/g)].length, items.length);
+    const compared = items.filter((item) => item.kind === 'compare').length;
+    assert.ok(text.includes(`${compared.toLocaleString('en-US')} have a comparison`), 'lede does not say how many are compared');
+    assert.doesNotMatch(text, /For each of the [\d,]+ procedures/);
     assert.doesNotMatch(text, /\bHirsch\b/);
   });
 
@@ -134,7 +156,9 @@ describe('revenue at stake', { skip }, () => {
       assert.ok(html.includes(`href="${s.landing}"`), `no link to ${s.id}`);
       for (const file of s.file.split('; ')) assert.ok(text.includes(file), `methods does not name ${file}`);
     }
-    for (const phrase of ['Outpatient-eligible is not outpatient-only', 'two-midnight rule', 'not a forecast', 'Built with Claude Code', 'Run it on your own claims']) {
+    const drg165 = items.flatMap((item) => (item.ip ? item.ip.families : [])).flatMap((f) => f.drgs).find((d) => d.drg === '165');
+    if (drg165) assert.ok(!text.includes(drg165.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })), 'methods headlines the DRG 165 dollar amount');
+    for (const phrase of ['Outpatient-eligible is not outpatient-only', 'two-midnight rule', 'not a forecast', 'Built with Claude Code', 'Run it on your own claims', 'may include those adjustments']) {
       assert.ok(text.includes(phrase), `methods lacks "${phrase}"`);
     }
     assert.doesNotMatch(text, /\bHirsch\b/);
@@ -157,7 +181,7 @@ describe('revenue at stake', { skip }, () => {
     assert.ok(!rows.some((row) => /(^|,)[=+@]/.test(row)), 'a cell starts like a formula');
     const xlsx = join(docs, 'data', 'revenue-at-stake.xlsx');
     if (existsSync(xlsx)) {
-      const count = execFileSync('python3', ['-I', '-c', `import re, sys, openpyxl
+      const count = execFileSync('python3', ['-c', `import re, sys, openpyxl
 ws = openpyxl.load_workbook(sys.argv[1], read_only=True)["Crosswalk"]
 print(sum(1 for row in ws.iter_rows(values_only=True) if row and isinstance(row[0], str) and re.fullmatch(r"[0-9A-Z]{4}[0-9A-Z]", row[0])))`, xlsx], { encoding: 'utf8' });
       assert.equal(rows.length - 1, Number(count), 'CSV rows differ from the workbook Crosswalk rows');

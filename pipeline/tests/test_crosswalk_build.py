@@ -61,6 +61,8 @@ class InpatientFamilies(unittest.TestCase):
                          [("lung cancer: lobectomy; middle lobe", "in-mdc"),
                           ("lung cancer: hernia repair", "unrelated-nonextensive")])
         self.assertEqual(result["low"], min(f["low"] for f in result["families"]))
+        self.assertEqual([f["when"] for f in result["families"]],
+                         [{"dx": None, "variant": "lobectomy; middle lobe"}, {"dx": None, "variant": "hernia repair"}])
         unrelated = result["families"][1]["index_rows"]
         self.assertEqual([(r["pcs"], r["mdc"], r["non_or"]) for r in unrelated], [("0YQ50ZZ", None, False)])
         self.assertIn("unrelated to the principal diagnosis (Appendix F, non-extensive)", unrelated[0]["note"])
@@ -75,6 +77,16 @@ class InpatientFamilies(unittest.TestCase):
         lobectomy = {"pcs_sets": [{"codes": ["0BTC0ZZ"], "note": "x"}],
                      "principal_dx": [{"code": "C3411", "condition": "lung cancer", "role": "typical"}]}
         self.assertNotIn("caveat", build.inpatient(lobectomy, build.Ref.load())["families"][0])
+        self.assertEqual(build.inpatient(lobectomy, build.Ref.load())["families"][0]["when"], {"dx": None, "variant": None})
+
+    def test_families_split_by_diagnosis_and_by_variant_say_which(self):
+        rec = {"pcs_sets": [{"codes": ["0BTC0ZZ"], "note": "lobectomy"}, {"codes": ["0YQ50ZZ"], "note": None}],
+               "principal_dx": [{"code": "C3411", "condition": "lung cancer", "role": "typical"},
+                                {"code": "I2510", "condition": "heart disease", "role": "alternative"}]}
+        whens = [f["when"] for f in build.inpatient(rec, build.Ref.load())["families"]]
+        self.assertIn({"dx": "lung cancer", "variant": "lobectomy"}, whens)
+        self.assertIn({"dx": "lung cancer", "variant": "0YQ50ZZ"}, whens)
+        self.assertTrue(all(w["dx"] in ("lung cancer", "heart disease") for w in whens))
 
     def test_a_cluster_driven_family_shows_the_part_2_row(self):
         # Extensive fusion 523-525 comes from an Appendix E Part 2 cluster, not a Part 1 row.

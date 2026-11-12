@@ -36,6 +36,7 @@ function inpatient(raw) {
       cluster: r.cluster || null, note: r.note || null,
     })),
     caveat: f.caveat || null,
+    when: f.when ? { dx: f.when.dx || null, variant: f.when.variant || null } : null,
   }));
   return families.length ? { low: raw.low, high: raw.high, families } : null;
 }
@@ -74,7 +75,7 @@ function entry(code, raw) {
     op: outpatient(raw.outpatient),
     ip: compare ? inpatient(raw.inpatient) : null,
     diff: compare && raw.difference ? { low: raw.difference.low, high: raw.difference.high } : null,
-    tier: raw.tier && raw.tier.tier ? { n: raw.tier.tier, why: raw.tier.why } : null,
+    tier: raw.tier && raw.tier.tier ? { n: Number(raw.tier.tier), why: raw.tier.why } : null,
     review: review(raw.review),
     map: compare ? mapping(raw.mapping) : null,
     batch: raw.batch || null,

@@ -157,7 +157,7 @@ ${wholeList(ctx, date)}
 <p><strong>${num(newest.removed)} codes ${newest.past ? 'left' : 'leave'} on ${formatDate(newest.date)}.</strong> They follow the ${num(ctx.phases[0].removed)} that left in ${ctx.phases[0].year}. CMS expects to remove the rest for ${ctx.nextYear}, and the regulation says the list is gone by January 1, 2029. <a href="/phase-out/">The schedule</a></p>
 <p><strong><span data-count="exempt">${num(ctx.exemptNow)}</span> codes are exempt from certain medical review on <span data-dos-text>${formatDate(date)}</span>.</strong> A procedure removed in 2021 or later keeps its exemption until CMS ends it, code by code. None has ended. <a href="/exemption/">What the exemption covers</a></p>
 <p><strong>This has happened before.</strong> CMS removed 298 codes in 2021 and put 293 of them back in 2022. A code’s status depends on the date. <a href="/history/">Year by year</a></p>
-${ctx.stake ? `<p><strong>What removal does to payment.</strong> For each of the ${num(ctx.stake.items.length)} codes removed in 2026 and 2027, the national outpatient payment next to the inpatient MS-DRG family it would group to. A draft under coder review. <a href="/revenue-at-stake/">Revenue at stake</a></p>` : ''}
+${ctx.stake ? `<p><strong>What removal does to payment.</strong> ${ctx.stakeSummary} For those, the national outpatient payment next to the inpatient MS-DRG family. A draft under coder review. <a href="/revenue-at-stake/">Revenue at stake</a></p>` : ''}
 </div>
 <p class="status__after">The date of service will still matter after the list ends. Audits and appeals turn on what was true that day, and on whether a code’s exemption was still running.</p>
 </section>`;
