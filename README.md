@@ -88,6 +88,75 @@ python3 pipeline/fetch.py && python3 pipeline/build.py && python3 pipeline/run_t
 
 Python 3.9+ with the standard library only; Node 20+.
 
+## Revenue at stake
+
+For the 922 codes removed from the inpatient-only list in 2026 and 2027, the site sets CY 2027 outpatient payment
+(APC, and ASC where CMS lists one) next to the FY 2027 inpatient MS-DRG family range. Figures are national and
+unadjusted: no wage index, IME, DSH or outlier. It is an estimate of revenue at stake, not a forecast. It is not a
+reason to keep a case inpatient. Status decisions stay clinical, under the two-midnight rule.
+
+How it is built:
+
+- **Mapping.** Two independent AI passes each map every code to ICD-10-PCS codes plus a typical principal
+  diagnosis. A third pass adjudicates where they disagree.
+- **Grouping.** A partial MS-DRG v44 grouper turns each mapping into a DRG family. It covers surgical families,
+  procedure clusters, and the unrelated, any-OR and medical fallbacks, and is built from CMS's definitions text.
+- **Pricing.** FY 2027 Table 5 weight x ($6,848.00 operating + $539.95 capital). The result is a low to high range
+  across the family, because CC/MCC severity is not known.
+- **Checks.** The build fails closed unless every check passes. Results are written to
+  `pipeline/out/crosswalk-checks.txt`.
+
+The mappings were made with Claude Code and are under review by credentialed coders. Treat each as an estimate
+until its review status says otherwise.
+
+Files:
+
+```
+pipeline/crosswalk/               mapper, grouper, pricing, checks, workbook, review ingest
+data/crosswalk/                   the mappings, adjudications and review log (see its README)
+pipeline/derived/crosswalk.json   the result, one entry per code
+pipeline/derived/crosswalk.xlsx   the same, with amounts as live formulas over an Inputs tab
+```
+
+Site pages: `/revenue-at-stake/` (search and filter), `/help-review/` (how to review a mapping), `/methods/`.
+
+### Refreshing the estimate
+
+- **Each October** (new FY weights and grouper): update the pinned sources, rebuild, re-run the checks, and look
+  at every family that changed.
+- **Each January** (new APC rates, next year's removals): map the new codes with `mapper.py`, two passes, then
+  adjudicate.
+
+```bash
+python3 pipeline/crosswalk/build.py                  # assemble, check, write crosswalk.json and .xlsx
+python3 pipeline/crosswalk/mapper.py batches         # list mapping batches
+python3 pipeline/crosswalk/mapper.py batch m01       # a mapper's brief for one batch
+python3 pipeline/crosswalk/mapper.py check data/crosswalk/passes/a/m01.json
+```
+
+`pipeline/crosswalk/verify_workbook.py` recomputes the workbook with an independent evaluator. It needs
+`pip install formulas openpyxl` in a virtual environment.
+
+### Review loop
+
+Responses to the review forms are private (Google Forms). Export the tabs as CSV, then:
+
+```bash
+python3 pipeline/crosswalk/reviews.py ingest agree.csv wrong.csv [--claims claims.csv] [--drop-reasons]
+python3 pipeline/crosswalk/build.py
+```
+
+`ingest` writes de-identified rows (credential, verdict, date, optional display name) to
+`data/crosswalk/reviews.json`, shows what it will write, and waits for a yes. Emails and free text from
+agreements are never kept. Dispute reasons are cut and dropped if they look like PHI.
+
+### Known limits
+
+- The grouper is partial. Not modelled: the CC/MCC severity choice (shown as a range), MDC 14 Appendix E
+  obstetric logic, and non-OR procedures that qualify a surgical DRG.
+- Hip and knee revisions group to 463-465 in v44.
+- No long CPT descriptors were available to the mappers, so the two passes are not fully independent.
+
 ## CPT content
 
 CPT descriptors belong to the American Medical Association and are not in this repository or on the site. CMS's

@@ -13,10 +13,13 @@ mapper's own words only, never CPT descriptor text.
 - `passes/a/<batch-id>.json`, `passes/b/<batch-id>.json`: two independent mapping passes, one
   JSON list of records per mapping batch (`m01` ... `m22`, 40 codes each, in batch order).
   List the batches with `mapper.py batches`; a mapper's brief is `mapper.py batch <id>`.
-- `adjudications.json`: object keyed by code; each value is a full record that settles a code the
-  passes disagree on. An adjudication always wins.
-- `reviews/`: credentialed-coder review notes on mappings.
-- `resolutions/`: how each reviewed code was resolved.
+- `adjudications.json`: one merged file, an object keyed by code; each value is a full record that settles a
+  code the passes disagree on. An adjudication always wins.
+- `notes/<pass>-<batch-id>.md`: each mapper's working notes for a batch (`a-m01.md`, `b-m01.md`, ...).
+- `reviews.json`: de-identified coder reviews (credential, verdict, date, optional display name), written by
+  `python3 pipeline/crosswalk/reviews.py ingest`.
+- `resolutions.json`: how each disputed code was resolved, keyed by code.
+- `claims.json`: counts of claimed review batches, written by `reviews.py ingest --claims`.
 
 `mappings.final_mapping(code, passes, adjudications, ref)` picks the record to use: the
 adjudication if there is one, else pass A when both passes group to the same DRG families,
