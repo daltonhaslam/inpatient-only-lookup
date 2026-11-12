@@ -1,0 +1,1093 @@
+[
+ {
+  "code": "27882",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Y6H0Z3"
+    ],
+    "note": "right, distal (guillotine/supramalleolar)"
+   },
+   {
+    "codes": [
+     "0Y6J0Z3"
+    ],
+    "note": "left, distal"
+   },
+   {
+    "codes": [
+     "0Y6H0Z2"
+    ],
+    "note": "right, mid-shaft"
+   },
+   {
+    "codes": [
+     "0Y6J0Z2"
+    ],
+    "note": "left, mid-shaft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E1152",
+    "condition": "diabetic foot gangrene",
+    "role": "typical"
+   },
+   {
+    "code": "E1169",
+    "condition": "diabetic foot osteomyelitis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Open guillotine below-knee amputation = Detachment, lower leg; qualifier by tibial level (often low/supramalleolar when staged for wet gangrene).",
+  "confidence": "medium"
+ },
+ {
+  "code": "27886",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Y6H0Z1"
+    ],
+    "note": "right, re-amputation to higher tibial level"
+   },
+   {
+    "codes": [
+     "0Y6J0Z1"
+    ],
+    "note": "left"
+   },
+   {
+    "codes": [
+     "0Y6H0Z2"
+    ],
+    "note": "right, mid-shaft"
+   },
+   {
+    "codes": [
+     "0Y6J0Z2"
+    ],
+    "note": "left, mid-shaft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8743",
+    "condition": "infected BKA stump",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Re-amputation of a below-knee stump with more tibia/fibula removed = Detachment, lower leg at the new level; Excision of tibia/fibula is the alternative if only bone end is trimmed.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27888",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Y6M0Z0"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0Y6N0Z0"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E1152",
+    "condition": "diabetic foot gangrene",
+    "role": "typical"
+   },
+   {
+    "code": "E1169",
+    "condition": "diabetic foot osteomyelitis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Ankle disarticulation removing the whole foot = Detachment, foot, complete; Detachment lower leg low is the other defensible choice (same DRG family).",
+  "confidence": "medium"
+ },
+ {
+  "code": "28800",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Y6M0Z0"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0Y6N0Z0"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E1152",
+    "condition": "diabetic foot gangrene",
+    "role": "typical"
+   },
+   {
+    "code": "E1169",
+    "condition": "diabetic foot osteomyelitis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Midtarsal amputation is proximal to the tarsometatarsal joint, so Detachment, foot, complete is the closest qualifier.",
+  "confidence": "medium"
+ },
+ {
+  "code": "47010",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F9000Z"
+    ],
+    "note": "drain left in place"
+   },
+   {
+    "codes": [
+     "0F900ZZ"
+    ],
+    "note": "no drain left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K750",
+    "condition": "liver abscess",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open evacuation of liver abscess/cyst = Drainage, liver, open; device value when a drain is left.",
+  "confidence": "high"
+ },
+ {
+  "code": "47015",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F900ZZ"
+    ],
+    "note": "aspiration of cyst"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "B670",
+    "condition": "hydatid liver cyst",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open aspiration of a liver parasitic cyst = Drainage, liver, open; scolicidal injection adds no DRG-relevant code.",
+  "confidence": "medium"
+ },
+ {
+  "code": "47100",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FB00ZX"
+    ],
+    "note": "diagnostic wedge"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C787",
+    "condition": "liver metastases",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open wedge biopsy = Excision, liver, open, diagnostic qualifier.",
+  "confidence": "medium"
+ },
+ {
+  "code": "47120",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FB10ZZ"
+    ],
+    "note": "right lobe"
+   },
+   {
+    "codes": [
+     "0FB20ZZ"
+    ],
+    "note": "left lobe"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C787",
+    "condition": "liver metastases",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Partial hepatectomy short of a whole lobe = Excision of the lobe involved, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "47122",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FT10ZZ",
+     "0FB20ZZ"
+    ],
+    "note": "extended right (segments 4-8)"
+   },
+   {
+    "codes": [
+     "0FT20ZZ",
+     "0FB10ZZ"
+    ],
+    "note": "extended left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C787",
+    "condition": "liver metastases",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Trisegmentectomy = Resection of one whole lobe plus Excision of part of the other lobe (separate body parts per B3.2a).",
+  "confidence": "medium"
+ },
+ {
+  "code": "47125",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FT20ZZ"
+    ],
+    "note": "left lobe"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C787",
+    "condition": "liver metastases",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total left hepatic lobectomy = Resection, left lobe liver, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "47130",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FT10ZZ"
+    ],
+    "note": "right lobe"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C787",
+    "condition": "liver metastases",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total right hepatic lobectomy = Resection, right lobe liver, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "47300",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FB00ZZ"
+    ],
+    "note": "cyst wall excised/unroofed"
+   },
+   {
+    "codes": [
+     "0F900ZZ"
+    ],
+    "note": "coded as drainage"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K7689",
+    "condition": "liver cyst",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Marsupialization of a liver cyst removes part of the cyst wall = Excision, liver; Drainage is the alternate index path.",
+  "confidence": "medium"
+ },
+ {
+  "code": "47350",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FQ00ZZ"
+    ],
+    "note": "suture repair"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S36115A",
+    "condition": "liver laceration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Simple suture of liver laceration = Repair, liver, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "47360",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FQ00ZZ"
+    ],
+    "note": "complex suture"
+   },
+   {
+    "codes": [
+     "0FQ00ZZ",
+     "04L30ZZ"
+    ],
+    "note": "with hepatic artery ligation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S36116A",
+    "condition": "major liver laceration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Complex liver laceration suture = Repair, liver; hepatic artery ligation adds Occlusion, hepatic artery when done.",
+  "confidence": "high"
+ },
+ {
+  "code": "47361",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FB00ZZ"
+    ],
+    "note": "debridement of devitalized liver"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S36116A",
+    "condition": "major liver laceration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Extensive debridement of devitalized liver = Excision, liver; per B3.7 the excision, not Control, is coded; packing and closure not coded.",
+  "confidence": "medium"
+ },
+ {
+  "code": "47362",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WJG0ZZ"
+    ],
+    "note": "re-laparotomy, packs removed"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S36116A",
+    "condition": "major liver laceration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Planned take-back to remove intra-abdominal packs has no device/matter root op fit; coded as Inspection of peritoneal cavity (alternative Extirpation 0WCG0ZZ).",
+  "confidence": "low"
+ },
+ {
+  "code": "47380",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F500ZZ"
+    ],
+    "note": "liver"
+   },
+   {
+    "codes": [
+     "0F510ZZ"
+    ],
+    "note": "right lobe"
+   },
+   {
+    "codes": [
+     "0F520ZZ"
+    ],
+    "note": "left lobe"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C787",
+    "condition": "liver metastases",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open radiofrequency ablation = Destruction, liver (lobe if specified), open.",
+  "confidence": "high"
+ },
+ {
+  "code": "47381",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F500ZZ"
+    ],
+    "note": "liver"
+   },
+   {
+    "codes": [
+     "0F510ZZ"
+    ],
+    "note": "right lobe"
+   },
+   {
+    "codes": [
+     "0F520ZZ"
+    ],
+    "note": "left lobe"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C787",
+    "condition": "liver metastases",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open cryoablation = Destruction, liver (lobe if specified), open.",
+  "confidence": "high"
+ },
+ {
+  "code": "47400",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FC70ZZ"
+    ],
+    "note": "common hepatic duct stones"
+   },
+   {
+    "codes": [
+     "0FC50ZZ"
+    ],
+    "note": "right hepatic duct"
+   },
+   {
+    "codes": [
+     "0FC60ZZ"
+    ],
+    "note": "left hepatic duct"
+   },
+   {
+    "codes": [
+     "0F9700Z"
+    ],
+    "note": "exploration with drainage only"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K8051",
+    "condition": "bile duct stones",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Hepaticotomy for stones = Extirpation of matter, hepatic duct; drainage-only variant = Drainage with device.",
+  "confidence": "medium"
+ },
+ {
+  "code": "47420",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FC90ZZ"
+    ],
+    "note": "stone removal"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K8051",
+    "condition": "bile duct stones",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open choledochotomy with stone removal = Extirpation of matter, common bile duct, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "47425",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FC90ZZ",
+     "0F7C0ZZ"
+    ],
+    "note": "stones plus transduodenal sphincterotomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K8051",
+    "condition": "bile duct stones",
+    "role": "typical"
+   }
+  ],
+  "rationale": "CBD stone extirpation plus sphincterotomy coded as Dilation of ampulla (objective is to enlarge the orifice; no Division value for ampulla).",
+  "confidence": "medium"
+ },
+ {
+  "code": "47460",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F7C0ZZ"
+    ],
+    "note": "sphincterotomy/sphincteroplasty"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K831",
+    "condition": "bile duct obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transduodenal sphincterotomy/sphincteroplasty enlarges the ampullary opening = Dilation, ampulla of Vater, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "47480",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F9400Z"
+    ],
+    "note": "cholecystostomy tube"
+   },
+   {
+    "codes": [
+     "0FC40ZZ"
+    ],
+    "note": "stone removal"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K8000",
+    "condition": "acute calculous cholecystitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open cholecystostomy = Drainage, gallbladder with drainage device; stone removal = Extirpation, gallbladder.",
+  "confidence": "high"
+ },
+ {
+  "code": "47570",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F144ZB"
+    ],
+    "note": "to jejunum"
+   },
+   {
+    "codes": [
+     "0F144Z3"
+    ],
+    "note": "to duodenum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparoscopic cholecystoenterostomy = Bypass gallbladder to small intestine/duodenum, percutaneous endoscopic.",
+  "confidence": "high"
+ },
+ {
+  "code": "47600",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FT40ZZ"
+    ],
+    "note": "open cholecystectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K8000",
+    "condition": "acute calculous cholecystitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open cholecystectomy = Resection, gallbladder, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "47605",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FT40ZZ",
+     "BF101ZZ"
+    ],
+    "note": "with intraoperative cholangiogram"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K8000",
+    "condition": "acute calculous cholecystitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Resection, gallbladder, open plus fluoroscopy of bile ducts for the cholangiogram (no DRG effect).",
+  "confidence": "high"
+ },
+ {
+  "code": "47610",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FT40ZZ",
+     "0FC90ZZ"
+    ],
+    "note": "with CBD stone removal"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K8063",
+    "condition": "gallstones with CBD stones",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open cholecystectomy plus common duct exploration = Resection gallbladder + Extirpation, common bile duct.",
+  "confidence": "high"
+ },
+ {
+  "code": "47612",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FT40ZZ",
+     "0F190ZB"
+    ],
+    "note": "choledochojejunostomy"
+   },
+   {
+    "codes": [
+     "0FT40ZZ",
+     "0F190Z3"
+    ],
+    "note": "choledochoduodenostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K8071",
+    "condition": "gallstones with CBD stones",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open cholecystectomy plus choledochoenterostomy = Resection gallbladder + Bypass common bile duct to bowel.",
+  "confidence": "high"
+ },
+ {
+  "code": "47620",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FT40ZZ",
+     "0F7C0ZZ"
+    ],
+    "note": "with transduodenal sphincterotomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K8071",
+    "condition": "gallstones with CBD stones",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open cholecystectomy plus transduodenal sphincterotomy/plasty = Resection gallbladder + Dilation, ampulla of Vater.",
+  "confidence": "medium"
+ },
+ {
+  "code": "47700",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FJB0ZZ",
+     "BF131ZZ"
+    ],
+    "note": "exploration with cholangiogram"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q442",
+    "condition": "biliary atresia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Exploration without repair = Inspection, hepatobiliary duct, open, plus operative cholangiogram.",
+  "confidence": "medium"
+ },
+ {
+  "code": "47701",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FT90ZZ",
+     "0FT40ZZ",
+     "0F170ZB"
+    ],
+    "note": "remnant excision + Roux portoenterostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q442",
+    "condition": "biliary atresia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Kasai: Resection of atretic extrahepatic ducts and gallbladder plus Bypass hepatic duct to jejunum; no PCS value for porta hepatis itself.",
+  "confidence": "low"
+ },
+ {
+  "code": "47711",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FB90ZZ"
+    ],
+    "note": "partial duct excision"
+   },
+   {
+    "codes": [
+     "0FT90ZZ"
+    ],
+    "note": "whole CBD resected"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C240",
+    "condition": "extrahepatic bile duct cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Excision of an extrahepatic bile duct tumor = Excision, common bile duct; Resection if the whole duct is removed.",
+  "confidence": "medium"
+ },
+ {
+  "code": "47712",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FB50ZZ"
+    ],
+    "note": "right hepatic duct"
+   },
+   {
+    "codes": [
+     "0FB60ZZ"
+    ],
+    "note": "left hepatic duct"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C221",
+    "condition": "intrahepatic cholangiocarcinoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Excision of intrahepatic duct tumor = Excision, right or left hepatic duct, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "47715",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FT90ZZ",
+     "0F170ZB"
+    ],
+    "note": "cyst excision + hepaticojejunostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q444",
+    "condition": "choledochal cyst",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Choledochal cyst excision = Resection, common bile duct, plus Bypass common hepatic duct to jejunum for reconstruction.",
+  "confidence": "medium"
+ },
+ {
+  "code": "47720",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F140ZB"
+    ],
+    "note": "to jejunum"
+   },
+   {
+    "codes": [
+     "0F140Z3"
+    ],
+    "note": "to duodenum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open cholecystoenterostomy = Bypass gallbladder to small intestine/duodenum, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "47721",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F140ZB",
+     "0D160ZA"
+    ],
+    "note": "to jejunum + gastrojejunostomy"
+   },
+   {
+    "codes": [
+     "0F140Z3",
+     "0D160ZA"
+    ],
+    "note": "to duodenum + gastrojejunostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Double bypass: Bypass gallbladder to bowel plus Bypass stomach to jejunum (separate body parts).",
+  "confidence": "high"
+ },
+ {
+  "code": "47740",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F140ZB"
+    ],
+    "note": "Roux limb jejunum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Roux-en-Y cholecystojejunostomy = Bypass gallbladder to small intestine; the enteroenterostomy is not coded separately.",
+  "confidence": "high"
+ },
+ {
+  "code": "47741",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F140ZB",
+     "0D160ZA"
+    ],
+    "note": "Roux cholecystojejunostomy + gastrojejunostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Roux cholecystojejunostomy plus gastrojejunostomy = Bypass gallbladder to small intestine + Bypass stomach to jejunum.",
+  "confidence": "high"
+ },
+ {
+  "code": "47760",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F190ZB"
+    ],
+    "note": "choledochojejunostomy"
+   },
+   {
+    "codes": [
+     "0F170ZB"
+    ],
+    "note": "hepaticojejunostomy"
+   },
+   {
+    "codes": [
+     "0F190Z3"
+    ],
+    "note": "choledochoduodenostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Extrahepatic duct-to-bowel anastomosis = Bypass common bile/common hepatic duct to small intestine or duodenum.",
+  "confidence": "high"
+ },
+ {
+  "code": "47765",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F150ZB"
+    ],
+    "note": "right hepatic duct"
+   },
+   {
+    "codes": [
+     "0F160ZB"
+    ],
+    "note": "left hepatic duct"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C240",
+    "condition": "hilar cholangiocarcinoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Intrahepatic duct-to-jejunum anastomosis = Bypass right or left hepatic duct to small intestine.",
+  "confidence": "medium"
+ }
+]

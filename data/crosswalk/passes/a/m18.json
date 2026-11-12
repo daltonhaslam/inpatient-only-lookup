@@ -1,0 +1,996 @@
+[
+ {
+  "code": "43121",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT20ZZ",
+     "0DT30ZZ",
+     "0DT40ZZ",
+     "0DX60Z5"
+    ],
+    "note": "distal two-thirds resected, gastric conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C155",
+    "condition": "distal esophageal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open distal esophagectomy: Resection of middle and lower esophagus and EG junction plus Transfer of stomach to esophagus for the conduit; Bypass coding of the anastomosis is the older alternative.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43122",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT30ZZ",
+     "0DT40ZZ",
+     "0DX60Z5"
+    ],
+    "note": "lower esophagus, gastric conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C155",
+    "condition": "distal esophageal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open (abdominal/thoracoabdominal) distal esophagectomy: Resection of lower esophagus and EG junction plus Transfer of stomach to esophagus.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43123",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT30ZZ",
+     "0DT40ZZ",
+     "0DXE0Z5"
+    ],
+    "note": "colon interposition"
+   },
+   {
+    "codes": [
+     "0DT30ZZ",
+     "0DT40ZZ",
+     "0DX80Z5"
+    ],
+    "note": "small bowel interposition"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C155",
+    "condition": "distal esophageal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open distal esophagectomy with pedicled bowel conduit: Resection of lower esophagus and EG junction plus Transfer of large or small intestine to esophagus.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43124",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT50ZZ",
+     "0D110Z4"
+    ],
+    "note": "esophagectomy with cervical esophagostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K223",
+    "condition": "esophageal perforation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open esophagectomy without reconstruction: Resection of esophagus plus Bypass of upper esophagus to cutaneous for the cervical spit fistula; usually done for perforation or necrosis.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43135",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DB30ZZ"
+    ],
+    "note": "diverticulum excised"
+   },
+   {
+    "codes": [
+     "0DB30ZZ",
+     "0D840ZZ"
+    ],
+    "note": "with myotomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K225",
+    "condition": "esophageal diverticulum",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transthoracic diverticulectomy: Excision of lower esophagus (epiphrenic pouch), open; add Division of EG junction when a myotomy is done.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43279",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D844ZZ",
+     "0DV44ZZ"
+    ],
+    "note": "myotomy with partial fundoplication"
+   },
+   {
+    "codes": [
+     "0D844ZZ"
+    ],
+    "note": "myotomy alone"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K220",
+    "condition": "achalasia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparoscopic Heller myotomy = Division of EG junction, perc endoscopic; the anti-reflux wrap is a distinct objective coded as Restriction of EG junction.",
+  "confidence": "high"
+ },
+ {
+  "code": "43286",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT54ZZ",
+     "0DT44ZZ",
+     "0DX64Z5"
+    ],
+    "note": "total esophagectomy, gastric conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C155",
+    "condition": "distal esophageal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparoscopic-assisted transhiatal total esophagectomy: Resection of esophagus and EG junction plus Transfer of stomach to esophagus, coded perc endoscopic per the lap approach.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43287",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT24ZZ",
+     "0DT34ZZ",
+     "0DT44ZZ",
+     "0DX64Z5"
+    ],
+    "note": "distal two-thirds, gastric conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C155",
+    "condition": "distal esophageal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Minimally invasive Ivor Lewis: Resection of middle and lower esophagus and EG junction plus Transfer of stomach to esophagus, all perc endoscopic.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43288",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT54ZZ",
+     "0DT44ZZ",
+     "0DX64Z5"
+    ],
+    "note": "total esophagectomy, gastric conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C155",
+    "condition": "distal esophageal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Minimally invasive McKeown: Resection of esophagus and EG junction plus Transfer of stomach to esophagus, perc endoscopic.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43300",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQ10ZZ"
+    ],
+    "note": "cervical esophagus"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K222",
+    "condition": "esophageal stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cervical esophagoplasty without fistula = Repair of upper esophagus, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43305",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQ10ZZ",
+     "0BQ10ZZ"
+    ],
+    "note": "cervical esophagus plus trachea"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J860",
+    "condition": "tracheoesophageal fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cervical esophagoplasty with fistula closure: Repair of upper esophagus plus Repair of trachea (separate body part, separate objective).",
+  "confidence": "medium"
+ },
+ {
+  "code": "43310",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQ20ZZ"
+    ],
+    "note": "middle esophagus"
+   },
+   {
+    "codes": [
+     "0DQ30ZZ"
+    ],
+    "note": "lower esophagus"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K222",
+    "condition": "esophageal stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transthoracic esophagoplasty without fistula = Repair of thoracic esophagus segment, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43312",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQ20ZZ",
+     "0BQ10ZZ"
+    ],
+    "note": "thoracic esophagus plus trachea"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J860",
+    "condition": "tracheoesophageal fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transthoracic esophagoplasty with fistula closure: Repair of middle esophagus plus Repair of trachea.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43313",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQ50ZZ"
+    ],
+    "note": "atresia repair"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q390",
+    "condition": "esophageal atresia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Congenital esophageal defect repair without fistula = Repair of esophagus, open; essentially pediatric, Medicare volume near zero.",
+  "confidence": "low"
+ },
+ {
+  "code": "43314",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQ50ZZ",
+     "0BQ10ZZ"
+    ],
+    "note": "atresia plus fistula repair"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q391",
+    "condition": "atresia with TEF",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Congenital atresia repair with fistula division: Repair of esophagus plus Repair of trachea; pediatric, Medicare volume near zero.",
+  "confidence": "low"
+ },
+ {
+  "code": "43320",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D130Z6"
+    ],
+    "note": "lower esophagus to stomach"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K222",
+    "condition": "esophageal stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Esophagogastrostomy (cardioplasty) = Bypass of lower esophagus to stomach, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43325",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DU407Z",
+     "0DV40ZZ"
+    ],
+    "note": "fundic patch plus wrap"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K222",
+    "condition": "esophageal stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Thal patch with Nissen: Supplement of EG junction with fundic tissue plus Restriction of EG junction for the wrap; Repair is the other defensible root for the patch.",
+  "confidence": "low"
+ },
+ {
+  "code": "43327",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DV40ZZ"
+    ],
+    "note": "open abdominal wrap"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K219",
+    "condition": "GERD",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open fundoplication = Restriction of EG junction, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "43328",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DV40ZZ"
+    ],
+    "note": "open thoracic wrap"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K219",
+    "condition": "GERD",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transthoracic fundoplication = Restriction of EG junction, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "43330",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D840ZZ"
+    ],
+    "note": "abdominal myotomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K220",
+    "condition": "achalasia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open Heller myotomy = Division of EG junction, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "43331",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D840ZZ"
+    ],
+    "note": "thoracic myotomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K220",
+    "condition": "achalasia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transthoracic myotomy = Division of EG junction, open (PCS has no Division value for upper/middle/lower esophagus).",
+  "confidence": "medium"
+ },
+ {
+  "code": "43332",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BQT0ZZ",
+     "0DV40ZZ"
+    ],
+    "note": "hiatal repair with fundoplication"
+   },
+   {
+    "codes": [
+     "0BQT0ZZ"
+    ],
+    "note": "hiatal repair alone"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K449",
+    "condition": "paraesophageal hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open abdominal paraesophageal hernia repair = Repair of diaphragm, open; fundoplication when done adds Restriction of EG junction.",
+  "confidence": "high"
+ },
+ {
+  "code": "43333",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BUT0JZ",
+     "0DV40ZZ"
+    ],
+    "note": "mesh repair with fundoplication"
+   },
+   {
+    "codes": [
+     "0BUT0JZ"
+    ],
+    "note": "mesh repair alone"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K449",
+    "condition": "paraesophageal hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open abdominal paraesophageal hernia repair with mesh = Supplement of diaphragm with synthetic substitute; plus Restriction of EG junction when wrapped.",
+  "confidence": "high"
+ },
+ {
+  "code": "43334",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BQT0ZZ",
+     "0DV40ZZ"
+    ],
+    "note": "hiatal repair with fundoplication"
+   },
+   {
+    "codes": [
+     "0BQT0ZZ"
+    ],
+    "note": "hiatal repair alone"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K449",
+    "condition": "paraesophageal hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transthoracic paraesophageal hernia repair = Repair of diaphragm, open; plus Restriction of EG junction when wrapped.",
+  "confidence": "high"
+ },
+ {
+  "code": "43335",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BUT0JZ",
+     "0DV40ZZ"
+    ],
+    "note": "mesh repair with fundoplication"
+   },
+   {
+    "codes": [
+     "0BUT0JZ"
+    ],
+    "note": "mesh repair alone"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K449",
+    "condition": "paraesophageal hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transthoracic mesh hiatal repair = Supplement of diaphragm with synthetic substitute, open; plus Restriction of EG junction when wrapped.",
+  "confidence": "high"
+ },
+ {
+  "code": "43336",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BQT0ZZ",
+     "0DV40ZZ"
+    ],
+    "note": "hiatal repair with fundoplication"
+   },
+   {
+    "codes": [
+     "0BQT0ZZ"
+    ],
+    "note": "hiatal repair alone"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K449",
+    "condition": "paraesophageal hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Thoracoabdominal paraesophageal hernia repair = Repair of diaphragm, open; plus Restriction of EG junction when wrapped.",
+  "confidence": "high"
+ },
+ {
+  "code": "43337",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BUT0JZ",
+     "0DV40ZZ"
+    ],
+    "note": "mesh repair with fundoplication"
+   },
+   {
+    "codes": [
+     "0BUT0JZ"
+    ],
+    "note": "mesh repair alone"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K449",
+    "condition": "paraesophageal hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Thoracoabdominal mesh hiatal repair = Supplement of diaphragm with synthetic substitute, open; plus Restriction of EG junction when wrapped.",
+  "confidence": "high"
+ },
+ {
+  "code": "43340",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D130ZA"
+    ],
+    "note": "lower esophagus to jejunum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K222",
+    "condition": "esophageal stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Esophagojejunostomy without gastrectomy = Bypass of lower esophagus to jejunum, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43341",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D130ZA"
+    ],
+    "note": "lower esophagus to jejunum"
+   },
+   {
+    "codes": [
+     "0D120ZA"
+    ],
+    "note": "middle esophagus to jejunum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K222",
+    "condition": "esophageal stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transthoracic esophagojejunostomy = Bypass of esophagus to jejunum, open; segment depends on level of anastomosis.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43351",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D120Z4"
+    ],
+    "note": "thoracic esophagostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K223",
+    "condition": "esophageal perforation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Thoracic external esophagostomy = Bypass of middle esophagus to cutaneous, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43352",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D110Z4"
+    ],
+    "note": "cervical esophagostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K223",
+    "condition": "esophageal perforation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cervical esophagostomy = Bypass of upper esophagus to cutaneous, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43360",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DX60Z5"
+    ],
+    "note": "gastric conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z434",
+    "condition": "esophagostomy takedown",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Delayed reconstruction with stomach = Transfer of stomach to esophagus, open; principal dx is attention to the prior esophagostomy.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43361",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DXE0Z5"
+    ],
+    "note": "colon conduit"
+   },
+   {
+    "codes": [
+     "0DX80Z5"
+    ],
+    "note": "small bowel conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z434",
+    "condition": "esophagostomy takedown",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Delayed reconstruction with pedicled colon or small bowel = Transfer of large or small intestine to esophagus, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43400",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "06L30ZZ"
+    ],
+    "note": "direct variceal ligation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I8511",
+    "condition": "bleeding esophageal varices",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open direct ligation of varices = Occlusion of esophageal vein, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43405",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DL40ZZ"
+    ],
+    "note": "EG junction exclusion"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K223",
+    "condition": "esophageal perforation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Stapling or ligation across the EG junction to exclude a perforated esophagus = Occlusion of EG junction, open; non-OR in MS-DRG terms, groups by diagnosis.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43410",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQ10ZZ"
+    ],
+    "note": "cervical esophagus"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K223",
+    "condition": "esophageal perforation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cervical suture of esophageal perforation = Repair of upper esophagus, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "43415",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQ30ZZ"
+    ],
+    "note": "lower esophagus"
+   },
+   {
+    "codes": [
+     "0DQ20ZZ"
+    ],
+    "note": "middle esophagus"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K223",
+    "condition": "esophageal perforation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transthoracic or abdominal suture of esophageal perforation = Repair of lower (typical) or middle esophagus, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "43425",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQ30ZZ"
+    ],
+    "note": "lower esophagus"
+   },
+   {
+    "codes": [
+     "0DQ20ZZ"
+    ],
+    "note": "middle esophagus"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K2289",
+    "condition": "esophageal fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transthoracic or abdominal closure of esophageal fistula or esophagostomy = Repair of esophagus segment, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43460",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W3P7ZZ"
+    ],
+    "note": "balloon tamponade"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I8511",
+    "condition": "bleeding esophageal varices",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Balloon tamponade of acute variceal bleeding = Control bleeding in GI tract, via natural opening (B3.7); Insertion of intraluminal device into esophagus is the other reading and would group medical.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43496",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CRM07Z",
+     "0DBA0ZZ"
+    ],
+    "note": "pharyngoesophageal reconstruction"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C139",
+    "condition": "hypopharyngeal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Free jejunal flap: Replacement of pharynx with autologous tissue substitute, open, plus Excision of jejunum for the harvest (B3.9); Replacement of esophagus only if the defect is purely cervical esophagus.",
+  "confidence": "medium"
+ }
+]

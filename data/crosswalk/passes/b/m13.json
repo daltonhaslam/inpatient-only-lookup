@@ -1,0 +1,1263 @@
+[
+ {
+  "code": "55840",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VT00ZZ",
+     "0VT30ZZ"
+    ],
+    "note": "prostate plus both seminal vesicles"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C61",
+    "condition": "prostate cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open retropubic radical prostatectomy = Resection of prostate, open; seminal vesicles are a separate PCS body part removed en bloc, so Resection of bilateral seminal vesicles is added (B3.2a).",
+  "confidence": "high"
+ },
+ {
+  "code": "55842",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VT00ZZ",
+     "0VT30ZZ",
+     "07BC0ZX"
+    ],
+    "note": "with pelvic node sampling"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C61",
+    "condition": "prostate cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open radical prostatectomy (prostate + seminal vesicles Resection) plus limited pelvic node sampling = Excision of pelvic lymphatic, diagnostic qualifier.",
+  "confidence": "high"
+ },
+ {
+  "code": "55845",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VT00ZZ",
+     "0VT30ZZ",
+     "07TC0ZZ"
+    ],
+    "note": "with full pelvic lymphadenectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C61",
+    "condition": "prostate cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open radical prostatectomy plus complete pelvic node chain removal coded as Resection of pelvic lymphatic (B3.10c).",
+  "confidence": "high"
+ },
+ {
+  "code": "55862",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VH001Z",
+     "07BC0ZX"
+    ],
+    "note": "open seed/needle placement with node biopsy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C61",
+    "condition": "prostate cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open exposure of prostate to place radioactive sources = Insertion of radioactive element into prostate, open; node biopsy = diagnostic Excision of pelvic lymphatic. Radiation-section brachytherapy delivery code not included.",
+  "confidence": "medium"
+ },
+ {
+  "code": "55865",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VH001Z",
+     "07TC0ZZ"
+    ],
+    "note": "open seed/needle placement with pelvic lymphadenectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C61",
+    "condition": "prostate cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open Insertion of radioactive element into prostate plus full pelvic lymphadenectomy as Resection of pelvic lymphatic. Radiation-section delivery code not included.",
+  "confidence": "medium"
+ },
+ {
+  "code": "26992",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Q920ZZ"
+    ],
+    "note": "right pelvic bone"
+   },
+   {
+    "codes": [
+     "0Q930ZZ"
+    ],
+    "note": "left pelvic bone"
+   },
+   {
+    "codes": [
+     "0Q960ZZ"
+    ],
+    "note": "right proximal femur"
+   },
+   {
+    "codes": [
+     "0Q970ZZ"
+    ],
+    "note": "left proximal femur"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M8668",
+    "condition": "pelvic osteomyelitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Opening the bone cortex to evacuate infection = Drainage of pelvic bone (or upper femur), open; no drain device assumed.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27005",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0L8J0ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0L8K0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M24551",
+    "condition": "hip flexion contracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open cutting of the iliopsoas/hip flexor tendon to lengthen it = Division of hip tendon, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27025",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0KNQ0ZZ"
+    ],
+    "note": "right thigh compartments"
+   },
+   {
+    "codes": [
+     "0KNR0ZZ"
+    ],
+    "note": "left thigh compartments"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T79A21A",
+    "condition": "traumatic compartment syndrome",
+    "role": "typical"
+   },
+   {
+    "code": "M79A21",
+    "condition": "nontraumatic compartment syndrome",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Decompressive thigh fasciotomy frees the muscle from the constricting fascia = Release of upper leg muscle, open; Division/Release of subcutaneous tissue and fascia (0J8L/0JNL) is the alternative reading for a fascia-lata release.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27030",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0S990ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0S9B0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M00051",
+    "condition": "septic hip arthritis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open arthrotomy to evacuate pus from the native hip = Drainage of hip joint, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27036",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SN90ZZ",
+     "0KNN0ZZ"
+    ],
+    "note": "right capsulotomy + hip flexor release"
+   },
+   {
+    "codes": [
+     "0SNB0ZZ",
+     "0KNP0ZZ"
+    ],
+    "note": "left capsulotomy + hip flexor release"
+   },
+   {
+    "codes": [
+     "0SB90ZZ",
+     "0KNN0ZZ"
+    ],
+    "note": "right capsulectomy + hip flexor release"
+   },
+   {
+    "codes": [
+     "0SBB0ZZ",
+     "0KNP0ZZ"
+    ],
+    "note": "left capsulectomy + hip flexor release"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M24551",
+    "condition": "hip contracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Capsulotomy for contracture = Release of hip joint (capsulectomy = Excision of hip joint); the accompanying hip flexor release is a distinct body part, Release of hip muscle (B3.2a).",
+  "confidence": "medium"
+ },
+ {
+  "code": "27054",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SB90ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0SBB0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M12251",
+    "condition": "pigmented villonodular synovitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Synovium is part of the joint body part; open synovectomy = Excision of hip joint, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27070",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QB20ZZ"
+    ],
+    "note": "right pelvic bone"
+   },
+   {
+    "codes": [
+     "0QB30ZZ"
+    ],
+    "note": "left pelvic bone"
+   },
+   {
+    "codes": [
+     "0QB60ZZ"
+    ],
+    "note": "right proximal femur/trochanter"
+   },
+   {
+    "codes": [
+     "0QB70ZZ"
+    ],
+    "note": "left proximal femur/trochanter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M8668",
+    "condition": "pelvic osteomyelitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Saucerization/sequestrectomy removes part of the infected bone = Excision of pelvic bone (or upper femur), open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27071",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QB20ZZ"
+    ],
+    "note": "right pelvic bone"
+   },
+   {
+    "codes": [
+     "0QB30ZZ"
+    ],
+    "note": "left pelvic bone"
+   },
+   {
+    "codes": [
+     "0QB60ZZ"
+    ],
+    "note": "right proximal femur/trochanter"
+   },
+   {
+    "codes": [
+     "0QB70ZZ"
+    ],
+    "note": "left proximal femur/trochanter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M8668",
+    "condition": "pelvic osteomyelitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Deep partial bone removal for infection = Excision of pelvic bone (or upper femur), open; depth does not change the PCS code.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27075",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QB20ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QB30ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C414",
+    "condition": "pelvic bone sarcoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Wide tumor resection of part of the ilium or one ramus removes only part of the pelvic bone body part = Excision of pelvic bone, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27076",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QT40ZZ",
+     "0QB20ZZ"
+    ],
+    "note": "right periacetabular"
+   },
+   {
+    "codes": [
+     "0QT50ZZ",
+     "0QB30ZZ"
+    ],
+    "note": "left periacetabular"
+   },
+   {
+    "codes": [
+     "0QB20ZZ"
+    ],
+    "note": "right, both pubic rami"
+   },
+   {
+    "codes": [
+     "0QB30ZZ"
+    ],
+    "note": "left, both pubic rami"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C414",
+    "condition": "pelvic bone sarcoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Periacetabular tumor resection removes the whole acetabulum (Resection, its own body part) plus adjoining ilium/pubis/ischium (Excision of pelvic bone); a both-rami resection is Excision of pelvic bone alone.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27077",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QT20ZZ",
+     "0QT40ZZ"
+    ],
+    "note": "right innominate"
+   },
+   {
+    "codes": [
+     "0QT30ZZ",
+     "0QT50ZZ"
+    ],
+    "note": "left innominate"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C414",
+    "condition": "pelvic bone sarcoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total innominate bone removal = Resection of pelvic bone plus Resection of acetabulum (separate PCS body parts), open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27078",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QB20ZZ",
+     "0QB60ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QB30ZZ",
+     "0QB70ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C414",
+    "condition": "pelvic bone sarcoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Tumor resection of the ischium with the greater trochanter = Excision of pelvic bone plus Excision of upper femur, open (two body parts).",
+  "confidence": "medium"
+ },
+ {
+  "code": "27090",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SP90JZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0SPB0JZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8451XA",
+    "condition": "infected hip prosthesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Taking out a hip arthroplasty without reimplant or spacer = Removal of synthetic substitute from hip joint, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27091",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SP90JZ",
+     "0SH908Z"
+    ],
+    "note": "right, static spacer"
+   },
+   {
+    "codes": [
+     "0SPB0JZ",
+     "0SHB08Z"
+    ],
+    "note": "left, static spacer"
+   },
+   {
+    "codes": [
+     "0SP90JZ",
+     "0SR90EZ"
+    ],
+    "note": "right, articulating spacer"
+   },
+   {
+    "codes": [
+     "0SPB0JZ",
+     "0SRB0EZ"
+    ],
+    "note": "left, articulating spacer"
+   },
+   {
+    "codes": [
+     "0SP90JZ"
+    ],
+    "note": "right, no spacer"
+   },
+   {
+    "codes": [
+     "0SPB0JZ"
+    ],
+    "note": "left, no spacer"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8451XA",
+    "condition": "infected hip prosthesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Complex prosthesis/cement removal = Removal of synthetic substitute from hip joint; a static antibiotic spacer adds Insertion of spacer, an articulating spacer is Replacement with articulating spacer.",
+  "confidence": "high"
+ },
+ {
+  "code": "27120",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QB40ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QB50ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M1631",
+    "condition": "dysplastic hip osteoarthritis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Reshaping/deepening the acetabulum by removing bone = Excision of acetabulum, open; low certainty because the legacy cup-type arthroplasty could instead read as Supplement or Replacement.",
+  "confidence": "low"
+ },
+ {
+  "code": "27122",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QB60ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QB70ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M86651",
+    "condition": "chronic femoral osteomyelitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Girdlestone removes the femoral head and neck, part of the upper femur body part = Excision of upper femur, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27125",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SRR019"
+    ],
+    "note": "right, cemented"
+   },
+   {
+    "codes": [
+     "0SRR01A"
+    ],
+    "note": "right, uncemented"
+   },
+   {
+    "codes": [
+     "0SRS019"
+    ],
+    "note": "left, cemented"
+   },
+   {
+    "codes": [
+     "0SRS01A"
+    ],
+    "note": "left, uncemented"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72001A",
+    "condition": "femoral neck fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Hemiarthroplasty replaces only the femoral side = Replacement of hip joint femoral surface with metal synthetic substitute, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27132",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SR904A",
+     "0QP604Z"
+    ],
+    "note": "right, with prior hardware removed"
+   },
+   {
+    "codes": [
+     "0SRB04A",
+     "0QP704Z"
+    ],
+    "note": "left, with prior hardware removed"
+   },
+   {
+    "codes": [
+     "0SR904A"
+    ],
+    "note": "right, no hardware"
+   },
+   {
+    "codes": [
+     "0SRB04A"
+    ],
+    "note": "left, no hardware"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M1651",
+    "condition": "post-traumatic hip osteoarthritis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total hip = Replacement of hip joint (ceramic-on-poly uncemented as the common construct); removal of prior femoral fixation is a distinct body part, Removal from upper femur.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27134",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SP90JZ",
+     "0SR904A"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0SPB0JZ",
+     "0SRB04A"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T84030A",
+    "condition": "loosened hip prosthesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Both-component revision = Removal of synthetic substitute from hip joint plus Replacement of hip joint, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27137",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SPA0JZ",
+     "0SRA00A"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0SPE0JZ",
+     "0SRE00A"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T84030A",
+    "condition": "loosened hip prosthesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Acetabular-only revision = Removal from and Replacement of hip joint acetabular surface, open; device value is a judgment call.",
+  "confidence": "high"
+ },
+ {
+  "code": "27138",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SPR0JZ",
+     "0SRR01A"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0SPS0JZ",
+     "0SRS01A"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T84030A",
+    "condition": "loosened hip prosthesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Femoral-only revision = Removal from and Replacement of hip joint femoral surface, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27140",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS604Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS704Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M21151",
+    "condition": "coxa vara",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cutting off the greater trochanter and fixing it in a new position = Reposition of upper femur with internal fixation, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27146",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS404Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS504Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q6589",
+    "condition": "acetabular dysplasia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Pelvic/periacetabular osteotomy reorients the acetabulum = Reposition of acetabulum with internal fixation, open; Reposition of pelvic bone (0QS2) is the alternative body-part reading.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27147",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS404Z",
+     "0SS90ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS504Z",
+     "0SSB0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q6501",
+    "condition": "congenital hip dislocation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Acetabular reorientation osteotomy (Reposition of acetabulum) plus open reduction of the hip = Reposition of hip joint, open (two body parts).",
+  "confidence": "medium"
+ },
+ {
+  "code": "27151",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS404Z",
+     "0QS604Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS504Z",
+     "0QS704Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q6589",
+    "condition": "acetabular dysplasia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Pelvic (acetabular) and proximal femoral osteotomies, each a Reposition with internal fixation of its own body part, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27156",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS404Z",
+     "0QS604Z",
+     "0SS90ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS504Z",
+     "0QS704Z",
+     "0SSB0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q6501",
+    "condition": "congenital hip dislocation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Acetabular and femoral Reposition osteotomies plus open reduction (Reposition of hip joint), open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27158",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS204Z",
+     "0QS304Z"
+    ],
+    "note": "bilateral iliac osteotomies"
+   },
+   {
+    "codes": [
+     "0QS404Z",
+     "0QS504Z"
+    ],
+    "note": "bilateral acetabular osteotomies"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q6410",
+    "condition": "bladder exstrophy",
+    "role": "typical"
+   },
+   {
+    "code": "Q651",
+    "condition": "bilateral hip dislocation",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Bilateral pelvic osteotomies = Reposition of right and left pelvic bone with fixation, open (exstrophy closure); for bilateral dysplasia, Reposition of each acetabulum.",
+  "confidence": "low"
+ },
+ {
+  "code": "27161",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS604Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS704Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M21151",
+    "condition": "coxa vara",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Femoral neck osteotomy realigns the proximal femur = Reposition of upper femur with internal fixation, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27165",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS604Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS704Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72001K",
+    "condition": "femoral neck nonunion",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Inter/subtrochanteric osteotomy with plate = Reposition of upper femur with internal fixation, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27170",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QU607Z",
+     "0QB20ZZ"
+    ],
+    "note": "right, iliac crest autograft"
+   },
+   {
+    "codes": [
+     "0QU707Z",
+     "0QB30ZZ"
+    ],
+    "note": "left, iliac crest autograft"
+   },
+   {
+    "codes": [
+     "0QU60KZ"
+    ],
+    "note": "right, allograft"
+   },
+   {
+    "codes": [
+     "0QU70KZ"
+    ],
+    "note": "left, allograft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M87051",
+    "condition": "femoral head osteonecrosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Packing graft into the femoral head/neck = Supplement of upper femur with autologous or nonautologous tissue; iliac crest harvest through a separate site coded as Excision of pelvic bone (B3.9).",
+  "confidence": "medium"
+ },
+ {
+  "code": "27175",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "2W6NX0Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "2W6PX0Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M93011",
+    "condition": "slipped capital epiphysis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Traction alone, no reduction = Placement section Traction of upper leg; non-OR in MS-DRG terms, groups by diagnosis.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27176",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QH634Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QH734Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M93021",
+    "condition": "slipped capital epiphysis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "In-situ pinning fixes without reduction = Insertion of internal fixation device into upper femur, percutaneous.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27177",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS604Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS704Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M93041",
+    "condition": "unstable slipped epiphysis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reduction and pinning of the slipped epiphysis = Reposition of upper femur with internal fixation, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27178",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS634Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS734Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M93041",
+    "condition": "unstable slipped epiphysis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Closed reduction with percutaneous pinning = Reposition of upper femur with internal fixation, percutaneous approach (approach follows the fixation).",
+  "confidence": "high"
+ },
+ {
+  "code": "27181",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS604Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS704Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M93021",
+    "condition": "slipped capital epiphysis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Corrective proximal femoral osteotomy with fixation = Reposition of upper femur with internal fixation, open.",
+  "confidence": "medium"
+ }
+]

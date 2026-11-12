@@ -1,0 +1,1393 @@
+[
+ {
+  "code": "20827",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0XML0ZZ"
+    ],
+    "note": "right thumb"
+   },
+   {
+    "codes": [
+     "0XMM0ZZ"
+    ],
+    "note": "left thumb"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S68511A",
+    "condition": "traumatic thumb amputation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Replant of a fully severed thumb = Reattachment, thumb, open; distal-to-MCP level fits a transphalangeal amputation dx.",
+  "confidence": "high"
+ },
+ {
+  "code": "23200",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PT90ZZ"
+    ],
+    "note": "right clavicle"
+   },
+   {
+    "codes": [
+     "0PTB0ZZ"
+    ],
+    "note": "left clavicle"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C413",
+    "condition": "clavicle bone cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Wide removal of the whole clavicle for tumor = Resection, clavicle, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "23210",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PT50ZZ"
+    ],
+    "note": "right scapula"
+   },
+   {
+    "codes": [
+     "0PT60ZZ"
+    ],
+    "note": "left scapula"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C4001",
+    "condition": "scapula bone cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Radical scapulectomy for tumor = Resection, scapula, open; partial scapulectomy would be Excision but same DRG family.",
+  "confidence": "medium"
+ },
+ {
+  "code": "23220",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PTC0ZZ"
+    ],
+    "note": "right humeral head"
+   },
+   {
+    "codes": [
+     "0PTD0ZZ"
+    ],
+    "note": "left humeral head"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C4001",
+    "condition": "humerus bone cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "En bloc removal of the proximal humerus = Resection, humeral head, open; reconstruction (prosthesis/allograft) is separately reported.",
+  "confidence": "medium"
+ },
+ {
+  "code": "23335",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RPJ0JZ",
+     "0RHJ08Z"
+    ],
+    "note": "right, spacer placed"
+   },
+   {
+    "codes": [
+     "0RPK0JZ",
+     "0RHK08Z"
+    ],
+    "note": "left, spacer placed"
+   },
+   {
+    "codes": [
+     "0RPJ0JZ"
+    ],
+    "note": "right, no spacer"
+   },
+   {
+    "codes": [
+     "0RPK0JZ"
+    ],
+    "note": "left, no spacer"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8459XA",
+    "condition": "infected shoulder prosthesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Explant of both shoulder components = Removal of synthetic substitute, shoulder joint, open; antibiotic spacer coded as Insertion of spacer when placed.",
+  "confidence": "medium"
+ },
+ {
+  "code": "23474",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RPJ0JZ",
+     "0RRJ00Z"
+    ],
+    "note": "right, revised to reverse"
+   },
+   {
+    "codes": [
+     "0RPK0JZ",
+     "0RRK00Z"
+    ],
+    "note": "left, revised to reverse"
+   },
+   {
+    "codes": [
+     "0RPJ0JZ",
+     "0RRJ0JZ"
+    ],
+    "note": "right, anatomic total"
+   },
+   {
+    "codes": [
+     "0RPK0JZ",
+     "0RRK0JZ"
+    ],
+    "note": "left, anatomic total"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T84038A",
+    "condition": "loose shoulder prosthesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Revision of both components = Removal of synthetic substitute plus Replacement, shoulder joint (reverse most common today).",
+  "confidence": "high"
+ },
+ {
+  "code": "23900",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0X600ZZ"
+    ],
+    "note": "right forequarter"
+   },
+   {
+    "codes": [
+     "0X610ZZ"
+    ],
+    "note": "left forequarter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C4911",
+    "condition": "upper limb sarcoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Forequarter amputation = Detachment, forequarter, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "23920",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0X620ZZ"
+    ],
+    "note": "right shoulder region"
+   },
+   {
+    "codes": [
+     "0X630ZZ"
+    ],
+    "note": "left shoulder region"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C4911",
+    "condition": "upper limb sarcoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Shoulder disarticulation = Detachment, shoulder region, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "24900",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0X680Z2"
+    ],
+    "note": "right upper arm, mid"
+   },
+   {
+    "codes": [
+     "0X690Z2"
+    ],
+    "note": "left upper arm, mid"
+   },
+   {
+    "codes": [
+     "0X680Z1"
+    ],
+    "note": "right upper arm, high"
+   },
+   {
+    "codes": [
+     "0X690Z1"
+    ],
+    "note": "left upper arm, high"
+   },
+   {
+    "codes": [
+     "0X680Z3"
+    ],
+    "note": "right upper arm, low"
+   },
+   {
+    "codes": [
+     "0X690Z3"
+    ],
+    "note": "left upper arm, low"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I96",
+    "condition": "upper limb gangrene",
+    "role": "typical"
+   },
+   {
+    "code": "M726",
+    "condition": "necrotizing fasciitis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Transhumeral amputation = Detachment, upper arm, open; qualifier set by level of bone cut.",
+  "confidence": "medium"
+ },
+ {
+  "code": "24920",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0X680Z2"
+    ],
+    "note": "right upper arm, mid"
+   },
+   {
+    "codes": [
+     "0X690Z2"
+    ],
+    "note": "left upper arm, mid"
+   },
+   {
+    "codes": [
+     "0X680Z1"
+    ],
+    "note": "right upper arm, high"
+   },
+   {
+    "codes": [
+     "0X690Z1"
+    ],
+    "note": "left upper arm, high"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M726",
+    "condition": "necrotizing fasciitis",
+    "role": "typical"
+   },
+   {
+    "code": "I96",
+    "condition": "upper limb gangrene",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Open (guillotine) transhumeral amputation is still Detachment, upper arm, open; leaving the wound open does not change the root operation.",
+  "confidence": "medium"
+ },
+ {
+  "code": "24930",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0X680Z1"
+    ],
+    "note": "right upper arm, high"
+   },
+   {
+    "codes": [
+     "0X690Z1"
+    ],
+    "note": "left upper arm, high"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8741",
+    "condition": "infected amputation stump",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Re-amputation with bone shortening is coded as Detachment at the new, more proximal level of the upper arm.",
+  "confidence": "medium"
+ },
+ {
+  "code": "24931",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0X680Z2",
+     "0PHF04Z"
+    ],
+    "note": "right, implant in humerus"
+   },
+   {
+    "codes": [
+     "0X690Z2",
+     "0PHG04Z"
+    ],
+    "note": "left, implant in humerus"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I96",
+    "condition": "upper limb gangrene",
+    "role": "typical"
+   },
+   {
+    "code": "M726",
+    "condition": "necrotizing fasciitis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Transhumeral Detachment plus Insertion of an internal device into the humeral shaft for the implant; no PCS device value specific to this implant.",
+  "confidence": "low"
+ },
+ {
+  "code": "24940",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0KX70Z0"
+    ],
+    "note": "right upper arm muscle with skin"
+   },
+   {
+    "codes": [
+     "0KX80Z0"
+    ],
+    "note": "left upper arm muscle with skin"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z89221",
+    "condition": "above-elbow amputee",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Skin-lined tunnel through arm muscle for prosthesis control; closest PCS is Transfer, upper arm muscle with skin. No exact PCS concept.",
+  "confidence": "low"
+ },
+ {
+  "code": "25900",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0X6D0Z2"
+    ],
+    "note": "right lower arm, mid"
+   },
+   {
+    "codes": [
+     "0X6F0Z2"
+    ],
+    "note": "left lower arm, mid"
+   },
+   {
+    "codes": [
+     "0X6D0Z1"
+    ],
+    "note": "right lower arm, high"
+   },
+   {
+    "codes": [
+     "0X6F0Z1"
+    ],
+    "note": "left lower arm, high"
+   },
+   {
+    "codes": [
+     "0X6D0Z3"
+    ],
+    "note": "right lower arm, low"
+   },
+   {
+    "codes": [
+     "0X6F0Z3"
+    ],
+    "note": "left lower arm, low"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I96",
+    "condition": "upper limb gangrene",
+    "role": "typical"
+   },
+   {
+    "code": "M726",
+    "condition": "necrotizing fasciitis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Transradial amputation = Detachment, lower arm, open; qualifier by level.",
+  "confidence": "medium"
+ },
+ {
+  "code": "25905",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0X6D0Z2"
+    ],
+    "note": "right lower arm, mid"
+   },
+   {
+    "codes": [
+     "0X6F0Z2"
+    ],
+    "note": "left lower arm, mid"
+   },
+   {
+    "codes": [
+     "0X6D0Z1"
+    ],
+    "note": "right lower arm, high"
+   },
+   {
+    "codes": [
+     "0X6F0Z1"
+    ],
+    "note": "left lower arm, high"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M726",
+    "condition": "necrotizing fasciitis",
+    "role": "typical"
+   },
+   {
+    "code": "I96",
+    "condition": "upper limb gangrene",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Open (guillotine) transradial amputation = Detachment, lower arm, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "25915",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0K890ZZ"
+    ],
+    "note": "right forearm muscles"
+   },
+   {
+    "codes": [
+     "0K8B0ZZ"
+    ],
+    "note": "left forearm muscles"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z89211",
+    "condition": "below-elbow amputee",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Splitting the forearm stump into radial and ulnar rami; closest PCS is Division, lower arm and wrist muscle. No exact PCS concept.",
+  "confidence": "low"
+ },
+ {
+  "code": "25920",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0X6J0Z0"
+    ],
+    "note": "right hand, complete"
+   },
+   {
+    "codes": [
+     "0X6K0Z0"
+    ],
+    "note": "left hand, complete"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I96",
+    "condition": "hand gangrene",
+    "role": "typical"
+   },
+   {
+    "code": "M726",
+    "condition": "necrotizing fasciitis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Wrist disarticulation = Detachment, hand, complete, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "25924",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0X6D0Z3"
+    ],
+    "note": "right lower arm, low"
+   },
+   {
+    "codes": [
+     "0X6F0Z3"
+    ],
+    "note": "left lower arm, low"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8741",
+    "condition": "infected amputation stump",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Re-amputation of a wrist-level stump shortens distal radius/ulna = Detachment, lower arm, low.",
+  "confidence": "medium"
+ },
+ {
+  "code": "25927",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0X6J0Z9",
+     "0X6J0ZB",
+     "0X6J0ZC",
+     "0X6J0ZD",
+     "0X6J0ZF"
+    ],
+    "note": "right hand, partial rays 1-5"
+   },
+   {
+    "codes": [
+     "0X6K0Z9",
+     "0X6K0ZB",
+     "0X6K0ZC",
+     "0X6K0ZD",
+     "0X6K0ZF"
+    ],
+    "note": "left hand, partial rays 1-5"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I96",
+    "condition": "hand gangrene",
+    "role": "typical"
+   },
+   {
+    "code": "M726",
+    "condition": "necrotizing fasciitis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Amputation through the metacarpal shafts = Detachment, hand, partial ray for each ray cut; Complete would mean through the CMC joints.",
+  "confidence": "medium"
+ },
+ {
+  "code": "26551",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0XRL07N",
+     "0QB20ZZ"
+    ],
+    "note": "right thumb from right toe, iliac graft"
+   },
+   {
+    "codes": [
+     "0XRM07P",
+     "0QB30ZZ"
+    ],
+    "note": "left thumb from left toe, iliac graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z89011",
+    "condition": "thumb loss",
+    "role": "typical"
+   },
+   {
+    "code": "S68011A",
+    "condition": "traumatic thumb amputation",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Wraparound great-toe flap to thumb = Replacement, thumb, autologous, toe qualifier (donor captured by qualifier); iliac bone graft harvest coded per B3.9.",
+  "confidence": "medium"
+ },
+ {
+  "code": "26553",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0XRL07N"
+    ],
+    "note": "right thumb from right toe"
+   },
+   {
+    "codes": [
+     "0XRM07P"
+    ],
+    "note": "left thumb from left toe"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z89011",
+    "condition": "thumb loss",
+    "role": "typical"
+   },
+   {
+    "code": "S68011A",
+    "condition": "traumatic thumb amputation",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Single lesser-toe transfer, most often to the thumb = Replacement, thumb, autologous, toe qualifier; finger recipients have no Replacement value.",
+  "confidence": "low"
+ },
+ {
+  "code": "26554",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0XRL07N",
+     "0XUN07Z",
+     "0Y6S0Z0"
+    ],
+    "note": "right thumb and index finger"
+   },
+   {
+    "codes": [
+     "0XUN07Z",
+     "0XUQ07Z",
+     "0Y6R0Z0",
+     "0Y6T0Z0"
+    ],
+    "note": "two right fingers"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z89021",
+    "condition": "finger loss",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Two toes to hand: thumb recipient = Replacement with toe qualifier; finger recipients = Supplement with autologous tissue plus Detachment of donor toe (B3.9).",
+  "confidence": "low"
+ },
+ {
+  "code": "26556",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RRW07Z",
+     "0SBP0ZZ"
+    ],
+    "note": "right finger PIP from right toe joint"
+   },
+   {
+    "codes": [
+     "0RRX07Z",
+     "0SBQ0ZZ"
+    ],
+    "note": "left finger PIP from left toe joint"
+   },
+   {
+    "codes": [
+     "0RRU07Z",
+     "0SBM0ZZ"
+    ],
+    "note": "right MCP from right MTP joint"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M19141",
+    "condition": "posttraumatic hand arthritis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Vascularized toe joint to finger = Replacement, finger joint, autologous tissue, plus Excision of donor toe joint (B3.9).",
+  "confidence": "medium"
+ },
+ {
+  "code": "11004",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0JBB0ZZ",
+     "0VB50ZZ"
+    ],
+    "note": "perineum and scrotum"
+   },
+   {
+    "codes": [
+     "0JBB0ZZ"
+    ],
+    "note": "perineum only"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N493",
+    "condition": "Fournier gangrene",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Excisional debridement of necrotizing infection to fascia = Excision, perineum subcutaneous tissue and fascia, plus scrotum when debrided (B3.2).",
+  "confidence": "medium"
+ },
+ {
+  "code": "11005",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0JB80ZZ"
+    ],
+    "note": "abdominal wall to fascia"
+   },
+   {
+    "codes": [
+     "0KBK0ZZ"
+    ],
+    "note": "abdominal wall to muscle"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M726",
+    "condition": "necrotizing fasciitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Excisional debridement coded to the deepest layer: Excision, abdomen subcutaneous tissue and fascia (muscle when debrided).",
+  "confidence": "medium"
+ },
+ {
+  "code": "11006",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0JBB0ZZ",
+     "0VB50ZZ",
+     "0JB80ZZ"
+    ],
+    "note": "perineum, scrotum, abdominal wall"
+   },
+   {
+    "codes": [
+     "0JBB0ZZ",
+     "0JB80ZZ"
+    ],
+    "note": "perineum and abdominal wall"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N493",
+    "condition": "Fournier gangrene",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Debridement of each separate body part coded separately (B3.2): perineum and abdomen subcutaneous tissue and fascia, plus scrotum.",
+  "confidence": "medium"
+ },
+ {
+  "code": "15756",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0JRN07Z",
+     "0KBF0ZZ"
+    ],
+    "note": "right lower leg, latissimus donor"
+   },
+   {
+    "codes": [
+     "0JRP07Z",
+     "0KBR0ZZ"
+    ],
+    "note": "left lower leg, gracilis donor"
+   },
+   {
+    "codes": [
+     "0JRQ07Z",
+     "0KBQ0ZZ"
+    ],
+    "note": "right foot, gracilis donor"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M86661",
+    "condition": "chronic tibial osteomyelitis",
+    "role": "typical"
+   },
+   {
+    "code": "L97914",
+    "condition": "chronic leg ulcer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Free muscle flap to a wound = Replacement of recipient subcutaneous tissue and fascia with autologous tissue plus Excision of donor muscle (B3.9).",
+  "confidence": "low"
+ },
+ {
+  "code": "15757",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0JRN07Z",
+     "0JBL0ZZ"
+    ],
+    "note": "right lower leg, thigh donor"
+   },
+   {
+    "codes": [
+     "0JRP07Z",
+     "0JBM0ZZ"
+    ],
+    "note": "left lower leg, thigh donor"
+   },
+   {
+    "codes": [
+     "0JRQ07Z",
+     "0JBG0ZZ"
+    ],
+    "note": "right foot, forearm donor"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M86661",
+    "condition": "chronic tibial osteomyelitis",
+    "role": "typical"
+   },
+   {
+    "code": "L97914",
+    "condition": "chronic leg ulcer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Free fasciocutaneous flap = Replacement of recipient subcutaneous tissue and fascia with autologous tissue plus Excision of donor site (B3.9).",
+  "confidence": "low"
+ },
+ {
+  "code": "15758",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0JRN07Z",
+     "0JB00ZZ"
+    ],
+    "note": "right lower leg, scalp fascia donor"
+   },
+   {
+    "codes": [
+     "0JRQ07Z",
+     "0JB00ZZ"
+    ],
+    "note": "right foot, scalp fascia donor"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M86661",
+    "condition": "chronic tibial osteomyelitis",
+    "role": "typical"
+   },
+   {
+    "code": "L97914",
+    "condition": "chronic leg ulcer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Free fascial flap = Replacement of recipient subcutaneous tissue and fascia plus Excision of donor fascia (B3.9).",
+  "confidence": "low"
+ },
+ {
+  "code": "15778",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0JU80JZ"
+    ],
+    "note": "abdomen fascial defect"
+   },
+   {
+    "codes": [
+     "0JUB0JZ"
+    ],
+    "note": "perineum fascial defect"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M726",
+    "condition": "necrotizing fasciitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Absorbable mesh bridging a debrided fascial defect = Supplement, subcutaneous tissue and fascia, synthetic substitute, open; 0WUF0JZ if coded as abdominal wall.",
+  "confidence": "medium"
+ },
+ {
+  "code": "19305",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0HTT0ZZ",
+     "0KBH0ZZ",
+     "07T50ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0HTU0ZZ",
+     "0KBJ0ZZ",
+     "07T60ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C50911",
+    "condition": "breast cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Resection of breast + Excision of pectoral (thorax) muscle + Resection of axillary lymphatics as a distinct objective (B3.10c).",
+  "confidence": "high"
+ },
+ {
+  "code": "19306",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0HTT0ZZ",
+     "0KBH0ZZ",
+     "07T50ZZ",
+     "07T80ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0HTU0ZZ",
+     "0KBJ0ZZ",
+     "07T60ZZ",
+     "07T90ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C50911",
+    "condition": "breast cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Radical mastectomy codes plus Resection of internal mammary lymphatics (B3.10c).",
+  "confidence": "medium"
+ },
+ {
+  "code": "19361",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0HRT075"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0HRU075"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z421",
+    "condition": "post-mastectomy reconstruction",
+    "role": "typical"
+   },
+   {
+    "code": "C50911",
+    "condition": "breast cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Latissimus flap breast reconstruction = Replacement, breast, latissimus dorsi myocutaneous flap qualifier.",
+  "confidence": "high"
+ },
+ {
+  "code": "19364",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0HRT077"
+    ],
+    "note": "right DIEP"
+   },
+   {
+    "codes": [
+     "0HRU077"
+    ],
+    "note": "left DIEP"
+   },
+   {
+    "codes": [
+     "0HRV077"
+    ],
+    "note": "bilateral DIEP"
+   },
+   {
+    "codes": [
+     "0HRT076"
+    ],
+    "note": "right free TRAM"
+   },
+   {
+    "codes": [
+     "0HRT079"
+    ],
+    "note": "right gluteal perforator"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z421",
+    "condition": "post-mastectomy reconstruction",
+    "role": "typical"
+   },
+   {
+    "code": "C50911",
+    "condition": "breast cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Free flap breast reconstruction = Replacement, breast, flap-type qualifier (DIEP most common); harvest is captured by the qualifier.",
+  "confidence": "high"
+ },
+ {
+  "code": "19367",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0HRT076"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0HRU076"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z421",
+    "condition": "post-mastectomy reconstruction",
+    "role": "typical"
+   },
+   {
+    "code": "C50911",
+    "condition": "breast cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Pedicled TRAM = Replacement, breast, TRAM flap qualifier.",
+  "confidence": "high"
+ },
+ {
+  "code": "19368",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0HRT076"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0HRU076"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z421",
+    "condition": "post-mastectomy reconstruction",
+    "role": "typical"
+   },
+   {
+    "code": "C50911",
+    "condition": "breast cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Supercharged pedicled TRAM = Replacement, breast, TRAM flap qualifier; extra anastomosis not separately coded.",
+  "confidence": "high"
+ },
+ {
+  "code": "19369",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0HRT076"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0HRU076"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z421",
+    "condition": "post-mastectomy reconstruction",
+    "role": "typical"
+   },
+   {
+    "code": "C50911",
+    "condition": "breast cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Bipedicled TRAM = Replacement, breast, TRAM flap qualifier.",
+  "confidence": "high"
+ },
+ {
+  "code": "20955",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NRT07Z",
+     "0QBJ0ZZ"
+    ],
+    "note": "right mandible, right fibula"
+   },
+   {
+    "codes": [
+     "0NRV07Z",
+     "0QBK0ZZ"
+    ],
+    "note": "left mandible, left fibula"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C031",
+    "condition": "lower gum cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Free fibula to mandible defect = Replacement, mandible, autologous tissue, plus Excision of fibula donor (B3.9).",
+  "confidence": "medium"
+ },
+ {
+  "code": "20956",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NRT07Z",
+     "0QB20ZZ"
+    ],
+    "note": "right mandible, right iliac"
+   },
+   {
+    "codes": [
+     "0NRV07Z",
+     "0QB30ZZ"
+    ],
+    "note": "left mandible, left iliac"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C031",
+    "condition": "lower gum cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Free iliac crest to mandible defect = Replacement, mandible, autologous tissue, plus Excision of pelvic bone donor (B3.9).",
+  "confidence": "medium"
+ },
+ {
+  "code": "20957",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NRT07Z",
+     "0QBN0ZZ"
+    ],
+    "note": "right mandible, right metatarsal"
+   },
+   {
+    "codes": [
+     "0NRV07Z",
+     "0QBP0ZZ"
+    ],
+    "note": "left mandible, left metatarsal"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C031",
+    "condition": "lower gum cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Free metatarsal to a bone defect = Replacement of recipient bone with autologous tissue plus Excision of metatarsal donor (B3.9).",
+  "confidence": "low"
+ }
+]

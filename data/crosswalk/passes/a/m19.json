@@ -1,0 +1,969 @@
+[
+ {
+  "code": "43500",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DC60ZZ"
+    ],
+    "note": "foreign body removed"
+   },
+   {
+    "codes": [
+     "0DJ00ZZ"
+    ],
+    "note": "exploration only"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T182XXA",
+    "condition": "stomach foreign body",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open gastrotomy: Extirpation of matter from stomach when an object is removed; exploration alone is Inspection of upper intestinal tract (non-OR in MS-DRG terms; groups by diagnosis).",
+  "confidence": "medium"
+ },
+ {
+  "code": "43501",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQ60ZZ"
+    ],
+    "note": "suture of bleeding gastric ulcer"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K254",
+    "condition": "bleeding gastric ulcer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Gastrotomy is the access; suture ligation of the ulcer bed = Repair, stomach, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43502",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQ40ZZ"
+    ],
+    "note": "suture of tear at GE junction"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K226",
+    "condition": "Mallory-Weiss tear",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Gastrotomy is access; suturing the mucosal tear at the cardia = Repair, esophagogastric junction, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "43520",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D870ZZ"
+    ],
+    "note": "pylorus muscle split"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K311",
+    "condition": "pyloric stenosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Splitting the pyloric muscle without entering the lumen = Division, pylorus, open; adult hypertrophic stenosis as the Medicare dx.",
+  "confidence": "high"
+ },
+ {
+  "code": "43605",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DB60ZX"
+    ],
+    "note": "diagnostic excision"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C169",
+    "condition": "stomach cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open biopsy of stomach = Excision, stomach, open, diagnostic qualifier.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43610",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DB60ZZ"
+    ],
+    "note": "local excision"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D131",
+    "condition": "benign stomach tumor",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Local (wedge) excision of a portion of stomach = Excision, stomach, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "43611",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DB60ZZ"
+    ],
+    "note": "local excision"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C49A2",
+    "condition": "gastric GIST",
+    "role": "typical"
+   },
+   {
+    "code": "C169",
+    "condition": "stomach cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Wedge excision of a malignant gastric tumor = Excision, stomach, open; GIST is the usual indication.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43620",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT60ZZ",
+     "0D150ZA"
+    ],
+    "note": "esophagojejunostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C169",
+    "condition": "stomach cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total gastrectomy = Resection, stomach; esophagus-to-jejunum reconstruction reroutes contents and is coded as Bypass esophagus to jejunum.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43621",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT60ZZ",
+     "0D150ZA"
+    ],
+    "note": "Roux-en-Y esophagojejunostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C169",
+    "condition": "stomach cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Resection, stomach plus Bypass esophagus to jejunum for the Roux limb; jejunojejunostomy not coded separately.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43622",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT60ZZ",
+     "0D150ZA"
+    ],
+    "note": "jejunal pouch to esophagus"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C169",
+    "condition": "stomach cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Resection, stomach plus Bypass esophagus to jejunum; the jejunal pouch is part of the reconstruction, no extra code.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43631",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DB60ZZ"
+    ],
+    "note": "Billroth I"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C163",
+    "condition": "antral cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Distal gastrectomy = Excision, stomach (part remains); the gastroduodenal anastomosis restores normal continuity, so no Bypass code.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43632",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DB60ZZ",
+     "0D160ZA"
+    ],
+    "note": "Billroth II"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C163",
+    "condition": "antral cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Excision, stomach plus Bypass stomach to jejunum for the gastrojejunal reconstruction.",
+  "confidence": "high"
+ },
+ {
+  "code": "43633",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DB60ZZ",
+     "0D160ZA"
+    ],
+    "note": "Roux-en-Y"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C163",
+    "condition": "antral cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Excision, stomach plus Bypass stomach to jejunum (Roux limb); jejunojejunostomy not coded separately.",
+  "confidence": "high"
+ },
+ {
+  "code": "43634",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DB60ZZ",
+     "0D160ZA"
+    ],
+    "note": "jejunal pouch"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C163",
+    "condition": "antral cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Excision, stomach plus Bypass stomach to jejunum; pouch is part of the reconstruction.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43640",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "008Q0ZZ",
+     "0DQ70ZZ"
+    ],
+    "note": "vagotomy + pyloroplasty"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K264",
+    "condition": "bleeding duodenal ulcer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Two objectives: Division, vagus nerve, open, and pyloroplasty without device = Repair, pylorus, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43641",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "008Q0ZZ",
+     "0DQ70ZZ"
+    ],
+    "note": "selective vagotomy + pyloroplasty"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K264",
+    "condition": "bleeding duodenal ulcer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Division of vagal branches is still Division, vagus nerve; pyloroplasty = Repair, pylorus, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43644",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D164ZA"
+    ],
+    "note": "gastrojejunal bypass"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E6601",
+    "condition": "morbid obesity",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparoscopic RYGB = Bypass stomach to jejunum, percutaneous endoscopic.",
+  "confidence": "high"
+ },
+ {
+  "code": "43645",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D164ZA"
+    ],
+    "note": "pouch to jejunal Roux limb"
+   },
+   {
+    "codes": [
+     "0D164ZB"
+    ],
+    "note": "pouch to ileum (very distal limb)"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E6601",
+    "condition": "morbid obesity",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Distal (long-limb) bypass = Bypass stomach to jejunum or ileum depending on the bowel segment anastomosed to the pouch.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43771",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DW64CZ"
+    ],
+    "note": "band component revised"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K9509",
+    "condition": "gastric band complication",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Repositioning/adjusting the existing band = Revision, extraluminal device, stomach, percutaneous endoscopic.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43775",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DB64Z3"
+    ],
+    "note": "sleeve gastrectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E6601",
+    "condition": "morbid obesity",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparoscopic sleeve = Excision, stomach, percutaneous endoscopic, vertical qualifier.",
+  "confidence": "high"
+ },
+ {
+  "code": "43800",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQ70ZZ"
+    ],
+    "note": "pyloroplasty"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K3184",
+    "condition": "gastroparesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Pyloroplasty without device = Repair, pylorus, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43810",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D160Z9"
+    ],
+    "note": "gastroduodenostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K311",
+    "condition": "gastric outlet obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "New stomach-to-duodenum anastomosis = Bypass stomach to duodenum, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43820",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D160ZA"
+    ],
+    "note": "gastrojejunostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   },
+   {
+    "code": "K311",
+    "condition": "gastric outlet obstruction",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Gastrojejunostomy = Bypass stomach to jejunum, open; usually palliation of malignant outlet obstruction.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43825",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D160ZA",
+     "008Q0ZZ"
+    ],
+    "note": "gastrojejunostomy + vagotomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K267",
+    "condition": "chronic duodenal ulcer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Bypass stomach to jejunum plus Division, vagus nerve as a distinct objective.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43832",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D160Z4"
+    ],
+    "note": "gastric tube to skin"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "R1310",
+    "condition": "dysphagia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Constructed gastric tube brought to the skin = Bypass stomach to cutaneous, open; non-OR in MS-DRG terms, groups by diagnosis.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43840",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQ90ZZ"
+    ],
+    "note": "perforated duodenal ulcer"
+   },
+   {
+    "codes": [
+     "0DQ60ZZ"
+    ],
+    "note": "perforated gastric ulcer"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K265",
+    "condition": "perforated duodenal ulcer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Suture closure (with pedicled omental patch) of a perforation = Repair of duodenum or stomach, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43843",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DB60Z3"
+    ],
+    "note": "open sleeve gastrectomy"
+   },
+   {
+    "codes": [
+     "0DV60CZ"
+    ],
+    "note": "open band restriction"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E6601",
+    "condition": "morbid obesity",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open restrictive procedure: sleeve = Excision, stomach, vertical; band-type restriction = Restriction, stomach, extraluminal device.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43845",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DB60Z3",
+     "0D190ZB"
+    ],
+    "note": "sleeve + duodenoileostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E6601",
+    "condition": "morbid obesity",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Duodenal switch: sleeve = Excision, stomach, vertical, plus Bypass duodenum to ileum; ileoileal anastomosis not coded separately.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43846",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D160ZA"
+    ],
+    "note": "gastrojejunal bypass"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E6601",
+    "condition": "morbid obesity",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open RYGB = Bypass stomach to jejunum, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "43847",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D160ZA"
+    ],
+    "note": "pouch to jejunal Roux limb"
+   },
+   {
+    "codes": [
+     "0D160ZB"
+    ],
+    "note": "pouch to ileum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E6601",
+    "condition": "morbid obesity",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open long-limb bypass = Bypass stomach to jejunum or ileum, open, by segment anastomosed.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43848",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D160ZA"
+    ],
+    "note": "conversion/redo gastric bypass"
+   },
+   {
+    "codes": [
+     "0DB60ZZ"
+    ],
+    "note": "pouch resizing"
+   },
+   {
+    "codes": [
+     "0DP60CZ"
+    ],
+    "note": "removal of gastroplasty ring"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K9589",
+    "condition": "bariatric complication",
+    "role": "typical"
+   }
+  ],
+  "rationale": "No device revision root applies for tissue revision; code what was done: redo Bypass stomach to jejunum, Excision of stomach, or Removal of extraluminal device.",
+  "confidence": "low"
+ },
+ {
+  "code": "43860",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D160ZA"
+    ],
+    "note": "anastomosis redone"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K287",
+    "condition": "marginal ulcer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Takedown and recreation of the gastrojejunostomy = Bypass stomach to jejunum, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43865",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D160ZA",
+     "008Q0ZZ"
+    ],
+    "note": "anastomosis redone + vagotomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K287",
+    "condition": "marginal ulcer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Redo Bypass stomach to jejunum plus Division, vagus nerve.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43880",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQ60ZZ",
+     "0DQL0ZZ"
+    ],
+    "note": "both fistula ends repaired"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K316",
+    "condition": "gastric fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fistula closure = Repair of each body part involved: stomach and transverse colon, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43881",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DH60MZ"
+    ],
+    "note": "antral leads"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K3184",
+    "condition": "gastroparesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Gastric stimulator electrodes = Insertion, stimulator lead, stomach, open (generator coded separately when placed); lead code is not assigned to MDC 6, so it groups to the unrelated-OR family.",
+  "confidence": "high"
+ },
+ {
+  "code": "43882",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DP60MZ"
+    ],
+    "note": "lead removed"
+   },
+   {
+    "codes": [
+     "0DW60MZ"
+    ],
+    "note": "lead revised"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8579XA",
+    "condition": "stimulator infection",
+    "role": "typical"
+   },
+   {
+    "code": "K3184",
+    "condition": "gastroparesis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Lead removal = Removal, stimulator lead, stomach; repositioning = Revision, stimulator lead, stomach, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50010",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TJ50ZZ"
+    ],
+    "note": "kidney explored"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N2889",
+    "condition": "kidney disorder",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open renal exploration without other work = Inspection, kidney, open.",
+  "confidence": "low"
+ },
+ {
+  "code": "50040",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T9300Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0T9400Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N136",
+    "condition": "pyonephrosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open nephrostomy tube = Drainage, kidney pelvis, with drainage device, open; by side.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50045",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TJ50ZZ"
+    ],
+    "note": "nephrotomy with exploration"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N2889",
+    "condition": "kidney disorder",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Incising the kidney only to explore = Inspection, kidney, open.",
+  "confidence": "low"
+ },
+ {
+  "code": "50060",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TC00ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0TC10ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N200",
+    "condition": "kidney stone",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Nephrolithotomy through the parenchyma = Extirpation of matter, kidney, open; by side.",
+  "confidence": "high"
+ }
+]

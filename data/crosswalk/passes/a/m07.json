@@ -1,0 +1,1225 @@
+[
+ {
+  "code": "21432",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSM04Z",
+     "0NSN04Z",
+     "0NSB04Z"
+    ],
+    "note": "bilateral zygoma + nasal reduced and wired/plated"
+   },
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NSM04Z",
+     "0NSN04Z"
+    ],
+    "note": "maxilla + bilateral zygoma fixed"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S02413A",
+    "condition": "LeFort III fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reduction of the separated midface = Reposition of each facial bone fixed (B3.2a), internal fixation device for wires/plates.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21433",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSM0ZZ",
+     "0NSN0ZZ",
+     "0NSB0ZZ"
+    ],
+    "note": "multiple approaches, no fixation device"
+   },
+   {
+    "codes": [
+     "0NSM04Z",
+     "0NSN04Z",
+     "0NSB04Z"
+    ],
+    "note": "wire fixation used"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S02413A",
+    "condition": "LeFort III fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Complex LeFort III open reduction via several incisions = Reposition of each facial bone; device value depends on whether hardware left.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21435",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NSM04Z",
+     "0NSN04Z",
+     "0NSB04Z"
+    ],
+    "note": "plate/screw fixation"
+   },
+   {
+    "codes": [
+     "0NSR05Z",
+     "0NSM04Z",
+     "0NSN04Z"
+    ],
+    "note": "external (halo) fixation of maxilla plus plates"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S02413A",
+    "condition": "LeFort III fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Complex LeFort III ORIF = Reposition of each fixed facial bone with internal (or maxillary external) fixation device.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21436",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NSM04Z",
+     "0NSN04Z",
+     "0NUR07Z",
+     "0NB30ZZ"
+    ],
+    "note": "split calvarial graft"
+   },
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NSM04Z",
+     "0NSN04Z",
+     "0NUR07Z",
+     "0QB20ZZ"
+    ],
+    "note": "iliac crest graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S02413A",
+    "condition": "LeFort III fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Complex LeFort III ORIF = Reposition per bone + Supplement with autograft + separate donor-site Excision (B3.9).",
+  "confidence": "medium"
+ },
+ {
+  "code": "31225",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NTR0ZZ"
+    ],
+    "note": "total maxillectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C310",
+    "condition": "maxillary sinus cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total maxillectomy with orbit spared = Resection of maxilla, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "31230",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NTR0ZZ",
+     "08T0XZZ"
+    ],
+    "note": "right, with right orbital exenteration"
+   },
+   {
+    "codes": [
+     "0NTR0ZZ",
+     "08T1XZZ"
+    ],
+    "note": "left, with left orbital exenteration"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C310",
+    "condition": "maxillary sinus cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Maxillectomy = Resection of maxilla; orbital exenteration = Resection of eye (index: Exenteration), separate body part.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32658",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "02CN4ZZ"
+    ],
+    "note": "clot/foreign body removed"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I312",
+    "condition": "hemopericardium",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Thoracoscopic removal of clot or foreign matter from pericardium = Extirpation, pericardium, percutaneous endoscopic.",
+  "confidence": "high"
+ },
+ {
+  "code": "32659",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W9D4ZZ"
+    ],
+    "note": "drainage of pericardial cavity"
+   },
+   {
+    "codes": [
+     "0W9D40Z"
+    ],
+    "note": "drain left in pericardial cavity"
+   },
+   {
+    "codes": [
+     "02BN4ZZ"
+    ],
+    "note": "window coded as Excision of pericardium"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I3139",
+    "condition": "pericardial effusion",
+    "role": "typical"
+   },
+   {
+    "code": "C3490",
+    "condition": "lung cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Thoracoscopic pericardial window for effusion = Drainage of pericardial cavity; Excision of pericardium if a pericardial segment is cut out as the window.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32661",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "02BN4ZZ"
+    ],
+    "note": "cyst or mass excised"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I318",
+    "condition": "pericardial cyst",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Thoracoscopic removal of a pericardial cyst or mass = Excision of pericardium, percutaneous endoscopic.",
+  "confidence": "high"
+ },
+ {
+  "code": "44005",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DN80ZZ"
+    ],
+    "note": "small bowel freed"
+   },
+   {
+    "codes": [
+     "0DNW0ZZ"
+    ],
+    "note": "peritoneal adhesions only"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K5652",
+    "condition": "adhesive bowel obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Adhesiolysis = Release of the body part freed (small intestine, or peritoneum), open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44010",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DB90ZX"
+    ],
+    "note": "biopsy"
+   },
+   {
+    "codes": [
+     "0DC90ZZ"
+    ],
+    "note": "foreign body/stone removed"
+   },
+   {
+    "codes": [
+     "0DJ00ZZ"
+    ],
+    "note": "exploration only"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C170",
+    "condition": "duodenal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Duodenotomy: biopsy = diagnostic Excision of duodenum; object retrieval = Extirpation; exploration only = Inspection of upper intestinal tract.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44020",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DCB0ZZ"
+    ],
+    "note": "gallstone/foreign body from ileum"
+   },
+   {
+    "codes": [
+     "0DCA0ZZ"
+    ],
+    "note": "gallstone/foreign body from jejunum"
+   },
+   {
+    "codes": [
+     "0DBB0ZX"
+    ],
+    "note": "biopsy ileum"
+   },
+   {
+    "codes": [
+     "0DBA0ZX"
+    ],
+    "note": "biopsy jejunum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K563",
+    "condition": "gallstone ileus",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Enterotomy for stone/foreign body = Extirpation of jejunum or ileum; for biopsy = diagnostic Excision.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44021",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D9800Z"
+    ],
+    "note": "decompression tube left"
+   },
+   {
+    "codes": [
+     "0D980ZZ"
+    ],
+    "note": "decompression, no tube"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K56601",
+    "condition": "bowel obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Enterotomy decompression = Drainage of small intestine, open; drainage device if a decompression tube is left.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44025",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DCN0ZZ"
+    ],
+    "note": "foreign body sigmoid"
+   },
+   {
+    "codes": [
+     "0DCE0ZZ"
+    ],
+    "note": "foreign body, colon site unspecified"
+   },
+   {
+    "codes": [
+     "0DBE0ZX"
+    ],
+    "note": "biopsy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T184XXA",
+    "condition": "colon foreign body",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Colotomy for retrieval = Extirpation of the colon segment; for biopsy = diagnostic Excision.",
+  "confidence": "low"
+ },
+ {
+  "code": "44050",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DS80ZZ"
+    ],
+    "note": "small bowel volvulus/internal hernia/intussusception reduced"
+   },
+   {
+    "codes": [
+     "0DSE0ZZ"
+    ],
+    "note": "large bowel detorsion"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K562",
+    "condition": "volvulus",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Detorsion or reduction of bowel = Reposition of the intestine, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44055",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DN90ZZ",
+     "0DTJ0ZZ"
+    ],
+    "note": "Ladd band division + appendectomy"
+   },
+   {
+    "codes": [
+     "0DN90ZZ"
+    ],
+    "note": "no appendectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q433",
+    "condition": "intestinal malrotation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Ladd procedure = Release of duodenum (band division) plus Resection of appendix as distinct body part.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44110",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBB0ZZ"
+    ],
+    "note": "ileum lesion"
+   },
+   {
+    "codes": [
+     "0DBA0ZZ"
+    ],
+    "note": "jejunum lesion"
+   },
+   {
+    "codes": [
+     "0DBN0ZZ"
+    ],
+    "note": "colon (sigmoid) lesion"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D1339",
+    "condition": "small bowel benign tumor",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Lesion removal through enterotomy without segment resection = Excision of the bowel body part, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44111",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBA0ZZ",
+     "0DBB0ZZ"
+    ],
+    "note": "lesions in jejunum and ileum"
+   },
+   {
+    "codes": [
+     "0DBB0ZZ"
+    ],
+    "note": "multiple lesions, ileum only"
+   },
+   {
+    "codes": [
+     "0DBA0ZZ"
+    ],
+    "note": "multiple lesions, jejunum only"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D1339",
+    "condition": "small bowel benign tumor",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Multiple enterotomies for lesions = Excision of each small-bowel body part involved (one code per body part).",
+  "confidence": "medium"
+ },
+ {
+  "code": "44120",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBB0ZZ"
+    ],
+    "note": "ileum segment"
+   },
+   {
+    "codes": [
+     "0DBA0ZZ"
+    ],
+    "note": "jejunum segment"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K5652",
+    "condition": "adhesive bowel obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Segmental small bowel resection = Excision of jejunum or ileum (partial body part); anastomosis not coded.",
+  "confidence": "high"
+ },
+ {
+  "code": "44125",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBB0ZZ",
+     "0D1B0Z4"
+    ],
+    "note": "ileum resected, end ileostomy"
+   },
+   {
+    "codes": [
+     "0DBA0ZZ",
+     "0D1A0Z4"
+    ],
+    "note": "jejunum resected, jejunostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K55021",
+    "condition": "small bowel infarction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Small bowel resection with stoma = Excision of jejunum/ileum + Bypass to cutaneous.",
+  "confidence": "high"
+ },
+ {
+  "code": "44126",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBA0ZZ"
+    ],
+    "note": "jejunal atresia"
+   },
+   {
+    "codes": [
+     "0DBB0ZZ"
+    ],
+    "note": "ileal atresia"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q411",
+    "condition": "jejunal atresia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Atretic segment resection = Excision of jejunum or ileum; anastomosis not coded.",
+  "confidence": "high"
+ },
+ {
+  "code": "44127",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBA0ZZ"
+    ],
+    "note": "jejunal atresia, tapering in same body part"
+   },
+   {
+    "codes": [
+     "0DBB0ZZ"
+    ],
+    "note": "ileal atresia, tapering in same body part"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q411",
+    "condition": "jejunal atresia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Atresia resection = Excision; tapering of the same body part is the same root op/body part, no extra code.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44130",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D1A0ZB"
+    ],
+    "note": "jejunum to ileum"
+   },
+   {
+    "codes": [
+     "0D1B0ZB"
+    ],
+    "note": "ileum to ileum"
+   },
+   {
+    "codes": [
+     "0D1A0ZA"
+    ],
+    "note": "jejunum to jejunum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K56691",
+    "condition": "malignant bowel obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Enteroenterostomy around an obstruction = Bypass of small bowel to downstream small bowel, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44140",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTN0ZZ"
+    ],
+    "note": "sigmoid colectomy"
+   },
+   {
+    "codes": [
+     "0DTG0ZZ"
+    ],
+    "note": "left hemicolectomy"
+   },
+   {
+    "codes": [
+     "0DTL0ZZ"
+    ],
+    "note": "transverse colectomy"
+   },
+   {
+    "codes": [
+     "0DTF0ZZ"
+    ],
+    "note": "right colon without ileum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C187",
+    "condition": "sigmoid colon cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open partial colectomy = Resection of the whole colon segment removed (sigmoid, left, transverse, right).",
+  "confidence": "high"
+ },
+ {
+  "code": "44141",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTN0ZZ",
+     "0D1M0Z4"
+    ],
+    "note": "sigmoid resected, descending colostomy"
+   },
+   {
+    "codes": [
+     "0DTM0ZZ",
+     "0D1L0Z4"
+    ],
+    "note": "descending resected, transverse colostomy"
+   },
+   {
+    "codes": [
+     "0DTK0ZZ",
+     "0D1H0Z4"
+    ],
+    "note": "ascending resected, cecostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C187",
+    "condition": "sigmoid colon cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Partial colectomy with stoma = Resection of the colon segment + Bypass of proximal colon to cutaneous.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44143",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTN0ZZ",
+     "0D1M0Z4"
+    ],
+    "note": "Hartmann: sigmoid resected, end descending colostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K5720",
+    "condition": "perforated diverticulitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Hartmann = Resection of sigmoid + Bypass descending colon to cutaneous; rectal stump closure not coded.",
+  "confidence": "high"
+ },
+ {
+  "code": "44144",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBN0ZZ",
+     "0D1M0Z4",
+     "0D1N0Z4"
+    ],
+    "note": "sigmoid partly resected, colostomy + sigmoid mucous fistula"
+   },
+   {
+    "codes": [
+     "0DTF0ZZ",
+     "0D1B0Z4",
+     "0D1L0Z4"
+    ],
+    "note": "right colon resected, ileostomy + transverse mucous fistula"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K5720",
+    "condition": "perforated diverticulitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Colectomy with stoma and mucous fistula = Excision/Resection of colon + Bypass of proximal and of distal limb to cutaneous.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44145",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTN0ZZ",
+     "0DBP0ZZ"
+    ],
+    "note": "sigmoid + upper rectum (low anterior resection)"
+   },
+   {
+    "codes": [
+     "0DTN0ZZ"
+    ],
+    "note": "sigmoid only, low colorectal anastomosis"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C20",
+    "condition": "rectal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Low anterior resection = Resection of sigmoid + Excision of rectum (partial); anastomosis not coded.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44146",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTN0ZZ",
+     "0DBP0ZZ",
+     "0D1B0Z4"
+    ],
+    "note": "LAR with diverting loop ileostomy"
+   },
+   {
+    "codes": [
+     "0DTN0ZZ",
+     "0DBP0ZZ",
+     "0D1L0Z4"
+    ],
+    "note": "LAR with diverting transverse colostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C20",
+    "condition": "rectal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "LAR with protective stoma = Resection sigmoid + Excision rectum + Bypass to cutaneous (diversion is a distinct objective).",
+  "confidence": "medium"
+ },
+ {
+  "code": "44147",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTN0ZZ",
+     "0DTP0ZZ"
+    ],
+    "note": "whole rectum removed, coloanal connection"
+   },
+   {
+    "codes": [
+     "0DTN0ZZ",
+     "0DBP0ZZ"
+    ],
+    "note": "partial rectum removed"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C20",
+    "condition": "rectal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Combined abdominal and transanal colorectal resection = Resection sigmoid + Resection/Excision of rectum, open approach.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44150",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTE0ZZ",
+     "0D1B0Z4"
+    ],
+    "note": "end ileostomy"
+   },
+   {
+    "codes": [
+     "0DTE0ZZ"
+    ],
+    "note": "ileorectal anastomosis"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "A0472",
+    "condition": "C. difficile colitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total abdominal colectomy = Resection of large intestine; end ileostomy = Bypass ileum to cutaneous; ileorectal anastomosis not coded.",
+  "confidence": "high"
+ },
+ {
+  "code": "44151",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTE0ZZ",
+     "0D1B0Z4"
+    ],
+    "note": "continent ileostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K5190",
+    "condition": "ulcerative colitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total colectomy with continent ileostomy = Resection of large intestine + Bypass ileum to cutaneous; pouch not coded separately.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44155",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTE0ZZ",
+     "0DTP0ZZ",
+     "0D1B0Z4"
+    ],
+    "note": "rectum removed, end ileostomy"
+   },
+   {
+    "codes": [
+     "0DTE0ZZ",
+     "0DTP0ZZ",
+     "0DTQ0ZZ",
+     "0D1B0Z4"
+    ],
+    "note": "anus also removed"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K5190",
+    "condition": "ulcerative colitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total proctocolectomy = Resection of large intestine + Resection of rectum (+ anus if removed) + Bypass ileum to cutaneous.",
+  "confidence": "high"
+ },
+ {
+  "code": "44156",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTE0ZZ",
+     "0DTP0ZZ",
+     "0D1B0Z4"
+    ],
+    "note": "continent ileostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K5190",
+    "condition": "ulcerative colitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Proctocolectomy with continent (Kock) ileostomy = Resection of large intestine + rectum + Bypass ileum to cutaneous.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44157",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTE0ZZ",
+     "0DTP0ZZ",
+     "0D1B0Z4"
+    ],
+    "note": "ileoanal + diverting loop ileostomy"
+   },
+   {
+    "codes": [
+     "0DTE0ZZ",
+     "0DTP0ZZ"
+    ],
+    "note": "no diverting ileostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K5190",
+    "condition": "ulcerative colitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Proctocolectomy with ileoanal anastomosis = Resection large intestine + rectum; anastomosis not coded; loop ileostomy = Bypass to cutaneous.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44158",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTE0ZZ",
+     "0DTP0ZZ",
+     "0D1B0Z4"
+    ],
+    "note": "J-pouch + diverting loop ileostomy"
+   },
+   {
+    "codes": [
+     "0DTE0ZZ",
+     "0DTP0ZZ"
+    ],
+    "note": "no diverting ileostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K5190",
+    "condition": "ulcerative colitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "IPAA with pouch = Resection large intestine + rectum; pouch/anastomosis not coded separately; loop ileostomy = Bypass to cutaneous.",
+  "confidence": "medium"
+ },
+ {
+  "code": "44160",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTF0ZZ",
+     "0DBB0ZZ"
+    ],
+    "note": "right hemicolectomy with terminal ileum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C182",
+    "condition": "ascending colon cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Right hemicolectomy = Resection of right large intestine + Excision of terminal ileum; ileocolic anastomosis not coded.",
+  "confidence": "high"
+ },
+ {
+  "code": "44187",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D1B4Z4"
+    ],
+    "note": "loop/end ileostomy"
+   },
+   {
+    "codes": [
+     "0D1A4Z4"
+    ],
+    "note": "jejunostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C20",
+    "condition": "rectal cancer",
+    "role": "typical"
+   },
+   {
+    "code": "L89154",
+    "condition": "sacral pressure ulcer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Laparoscopic stoma creation = Bypass ileum (or jejunum) to cutaneous, percutaneous endoscopic.",
+  "confidence": "high"
+ },
+ {
+  "code": "44188",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D1N4Z4"
+    ],
+    "note": "sigmoid colostomy"
+   },
+   {
+    "codes": [
+     "0D1L4Z4"
+    ],
+    "note": "transverse colostomy"
+   },
+   {
+    "codes": [
+     "0D1H4Z4"
+    ],
+    "note": "cecostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C20",
+    "condition": "rectal cancer",
+    "role": "typical"
+   },
+   {
+    "code": "L89154",
+    "condition": "sacral pressure ulcer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Laparoscopic colostomy = Bypass of the colon segment to cutaneous, percutaneous endoscopic.",
+  "confidence": "high"
+ },
+ {
+  "code": "44202",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBB4ZZ"
+    ],
+    "note": "ileum segment"
+   },
+   {
+    "codes": [
+     "0DBA4ZZ"
+    ],
+    "note": "jejunum segment"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C172",
+    "condition": "ileal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparoscopic segmental small bowel resection = Excision of jejunum or ileum, percutaneous endoscopic.",
+  "confidence": "high"
+ }
+]

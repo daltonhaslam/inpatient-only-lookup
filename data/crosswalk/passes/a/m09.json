@@ -1,0 +1,1091 @@
+[
+ {
+  "code": "45113",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTP0ZZ",
+     "0D1B0ZQ",
+     "0D1B0Z4"
+    ],
+    "note": "rectum removed, ileal pouch to anus, diverting loop ileostomy"
+   },
+   {
+    "codes": [
+     "0DTP0ZZ",
+     "0D1B0ZQ"
+    ],
+    "note": "no diverting ileostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K5100",
+    "condition": "ulcerative colitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Completion proctectomy with mucosectomy coded as Resection of rectum; ileal pouch-anal anastomosis is Bypass ileum to anus; loop ileostomy is a separate Bypass to cutaneous.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45114",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBP0ZZ"
+    ],
+    "note": "partial rectum, open"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C20",
+    "condition": "rectal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Partial rectal removal via abdominal plus transsacral route is Excision of rectum, open; colorectal anastomosis not coded separately.",
+  "confidence": "high"
+ },
+ {
+  "code": "45116",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBP0ZZ"
+    ],
+    "note": "partial rectum, open transsacral"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C20",
+    "condition": "rectal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transsacral partial rectal removal is Excision of rectum through an incision (open); anastomosis inherent.",
+  "confidence": "high"
+ },
+ {
+  "code": "45119",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTP0ZZ",
+     "0D1B0Z4"
+    ],
+    "note": "rectum removed, coloanal pouch, diverting loop ileostomy"
+   },
+   {
+    "codes": [
+     "0DTP0ZZ"
+    ],
+    "note": "no diverting stoma"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C20",
+    "condition": "rectal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Full rectal removal is Resection of rectum; colonic pouch-anal anastomosis is a closing step with no colon-to-anus Bypass value; diverting ileostomy coded as Bypass ileum to cutaneous.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45120",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTP0ZZ"
+    ],
+    "note": "rectum removed with colon pulled through to anus"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q431",
+    "condition": "Hirschsprung disease",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Complete rectal removal with colonic pull-through is Resection of rectum, open; the coloanal anastomosis is not separately coded.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45121",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTE0ZZ",
+     "0DTP0ZZ",
+     "0D1B0ZQ"
+    ],
+    "note": "total colectomy, ileum pulled through to anus"
+   },
+   {
+    "codes": [
+     "0DTL0ZZ",
+     "0DTG0ZZ",
+     "0DTP0ZZ"
+    ],
+    "note": "subtotal colectomy, right colon pulled through"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q431",
+    "condition": "Hirschsprung disease",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Rectal and colon Resections by body part removed; ileoanal pull-through after total colectomy is Bypass ileum to anus; leveling biopsies are on the resected specimen and not coded.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45123",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBP0ZZ"
+    ],
+    "note": "partial rectum via perineal incision"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C20",
+    "condition": "rectal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Perineal partial rectal removal without anastomosis is Excision of rectum; perineal incision treated as open approach.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45126",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTP0ZZ",
+     "0TTB0ZZ",
+     "0VT00ZZ",
+     "0T180ZC",
+     "0DBB0ZZ",
+     "0D1N0Z4"
+    ],
+    "note": "male total exenteration: rectum, bladder, prostate, ileal conduit, end colostomy"
+   },
+   {
+    "codes": [
+     "0DTP0ZZ",
+     "0TTB0ZZ",
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0UT20ZZ",
+     "0UT70ZZ",
+     "0T180ZC",
+     "0DBB0ZZ",
+     "0D1N0Z4"
+    ],
+    "note": "female total exenteration with hysterectomy and BSO"
+   },
+   {
+    "codes": [
+     "0DTP0ZZ",
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0UT20ZZ",
+     "0UT70ZZ",
+     "0D1N0Z4"
+    ],
+    "note": "female posterior exenteration, bladder spared"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C20",
+    "condition": "rectal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Each organ removed is a separate Resection; ureters to ileal conduit is Bypass to ileocutaneous with the ileal segment harvest coded per B3.9; end colostomy is Bypass sigmoid to cutaneous.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45130",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTP7ZZ"
+    ],
+    "note": "prolapsed rectum resected through the anus"
+   },
+   {
+    "codes": [
+     "0DTP7ZZ",
+     "0DBN7ZZ"
+    ],
+    "note": "with redundant sigmoid"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K623",
+    "condition": "rectal prolapse",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Perineal rectosigmoidectomy of exteriorized prolapse: Resection of rectum via natural opening (open approach is the competing reading); sigmoid portion as Excision when included.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45135",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTP0ZZ"
+    ],
+    "note": "rectum resected, abdominal and perineal"
+   },
+   {
+    "codes": [
+     "0DTP0ZZ",
+     "0DBN0ZZ"
+    ],
+    "note": "with redundant sigmoid"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K623",
+    "condition": "rectal prolapse",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Combined abdominal-perineal prolapse resection is Resection of rectum, open; part of sigmoid removed coded as Excision of sigmoid when included.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45136",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBB0ZZ",
+     "0D1B0Z4"
+    ],
+    "note": "pouch (ileum) excised, end ileostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K91858",
+    "condition": "ileal pouch failure",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Ileal pouch is ileum, so pouch removal is Excision of ileum; end ileostomy is Bypass ileum to cutaneous.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45395",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTP4ZZ",
+     "0DTQ0ZZ",
+     "0D1N4Z4"
+    ],
+    "note": "lap rectum, perineal anus excision, end colostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C20",
+    "condition": "rectal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "APR = Resection of rectum (laparoscopic) and Resection of anus (perineal, open), plus Bypass sigmoid to cutaneous for the end colostomy.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45397",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTP4ZZ",
+     "0D1B4Z4"
+    ],
+    "note": "lap rectum removed, coloanal pouch, diverting loop ileostomy"
+   },
+   {
+    "codes": [
+     "0DTP4ZZ"
+    ],
+    "note": "no diverting stoma"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C20",
+    "condition": "rectal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparoscopic Resection of rectum; coloanal pouch anastomosis not separately coded; diverting ileostomy as Bypass ileum to cutaneous.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45400",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DSP4ZZ"
+    ],
+    "note": "laparoscopic rectopexy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K623",
+    "condition": "rectal prolapse",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fixing the prolapsed rectum back in position is Reposition of rectum, laparoscopic.",
+  "confidence": "high"
+ },
+ {
+  "code": "45402",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DSP4ZZ",
+     "0DTN4ZZ"
+    ],
+    "note": "laparoscopic rectopexy with sigmoid resection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K623",
+    "condition": "rectal prolapse",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Reposition of rectum plus Resection of sigmoid colon, both laparoscopic (distinct objective and body part).",
+  "confidence": "high"
+ },
+ {
+  "code": "45540",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DSP0ZZ"
+    ],
+    "note": "open rectopexy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K623",
+    "condition": "rectal prolapse",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open abdominal rectopexy is Reposition of rectum, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "45550",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DSP0ZZ",
+     "0DTN0ZZ"
+    ],
+    "note": "open rectopexy with sigmoid resection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K623",
+    "condition": "rectal prolapse",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Reposition of rectum plus Resection of sigmoid colon, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "45562",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQP0ZZ"
+    ],
+    "note": "rectal injury repair"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S3663XA",
+    "condition": "rectal laceration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Repair of rectum, open; exploration and drain placement not coded separately.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45563",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQP0ZZ",
+     "0D1N0Z4"
+    ],
+    "note": "rectal repair with diverting colostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S3663XA",
+    "condition": "rectal laceration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Repair of rectum plus Bypass sigmoid colon to cutaneous for the diverting colostomy.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45800",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQP0ZZ",
+     "0TQB0ZZ"
+    ],
+    "note": "rectal and bladder sides closed"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N321",
+    "condition": "rectovesical fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fistula closure coded as Repair of each organ closed: rectum and bladder, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45805",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQP0ZZ",
+     "0TQB0ZZ",
+     "0D1N0Z4"
+    ],
+    "note": "fistula closure with colostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N321",
+    "condition": "rectovesical fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Repair of rectum and bladder plus Bypass sigmoid to cutaneous for colostomy.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45820",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQP0ZZ",
+     "0TQD0ZZ"
+    ],
+    "note": "rectal and urethral sides closed"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N360",
+    "condition": "rectourethral fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fistula closure coded as Repair of rectum and Repair of urethra, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "45825",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQP0ZZ",
+     "0TQD0ZZ",
+     "0D1N0Z4"
+    ],
+    "note": "fistula closure with colostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N360",
+    "condition": "rectourethral fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Repair of rectum and urethra plus Bypass sigmoid to cutaneous for colostomy.",
+  "confidence": "medium"
+ },
+ {
+  "code": "46705",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQQ0ZZ"
+    ],
+    "note": "anoplasty"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q423",
+    "condition": "congenital anal stenosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Anoplasty for stricture is Repair of anus, open (perianal incision).",
+  "confidence": "medium"
+ },
+ {
+  "code": "46710",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQB0ZZ",
+     "0UQG0ZZ"
+    ],
+    "note": "pouch-vaginal fistula"
+   },
+   {
+    "codes": [
+     "0DQB0ZZ"
+    ],
+    "note": "pouch-perineal fistula"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K91858",
+    "condition": "ileal pouch fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Pouch is ileum: fistula closure with pouch advancement coded as Repair of ileum, plus Repair of vagina when the vaginal side is closed; perineal incision = open.",
+  "confidence": "low"
+ },
+ {
+  "code": "46712",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQB0ZZ",
+     "0UQG0ZZ"
+    ],
+    "note": "pouch-vaginal fistula"
+   },
+   {
+    "codes": [
+     "0DQB0ZZ"
+    ],
+    "note": "pouch-perineal fistula"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K91858",
+    "condition": "ileal pouch fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Same as single-route pouch fistula repair (Repair of ileum, plus vagina when closed); the added abdominal route does not change the PCS codes.",
+  "confidence": "low"
+ },
+ {
+  "code": "46715",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQQ0ZZ"
+    ],
+    "note": "cutback anoplasty"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q422",
+    "condition": "imperforate anus with fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Opening the anoperineal fistula to form the anal outlet is Repair of anus, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "46716",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DSQ0ZZ"
+    ],
+    "note": "anal opening moved to sphincter center"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q422",
+    "condition": "imperforate anus with fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transposing the ectopic anal opening into the sphincter complex is Reposition of anus, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "46730",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DSP0ZZ"
+    ],
+    "note": "rectum brought down to perineum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q423",
+    "condition": "imperforate anus",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Posterior sagittal anorectoplasty: rectum mobilized and moved to the new anal site = Reposition of rectum, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "46735",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DSP0ZZ"
+    ],
+    "note": "rectum brought down, abdominal plus sacral"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q423",
+    "condition": "imperforate anus",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Reposition of rectum, open; the added abdominal route does not change the code.",
+  "confidence": "medium"
+ },
+ {
+  "code": "46740",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DSP0ZZ",
+     "0TQD0ZZ"
+    ],
+    "note": "male, rectourethral fistula closed"
+   },
+   {
+    "codes": [
+     "0DSP0ZZ",
+     "0UQG0ZZ"
+    ],
+    "note": "female, rectovaginal fistula closed"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q420",
+    "condition": "rectal atresia with fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Reposition of rectum plus Repair of the urethra or vagina where the fistula is divided and closed.",
+  "confidence": "medium"
+ },
+ {
+  "code": "46742",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DSP0ZZ",
+     "0TQD0ZZ"
+    ],
+    "note": "male, rectourethral fistula closed"
+   },
+   {
+    "codes": [
+     "0DSP0ZZ",
+     "0UQG0ZZ"
+    ],
+    "note": "female, rectovaginal fistula closed"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q420",
+    "condition": "rectal atresia with fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Reposition of rectum plus Repair of urethra or vagina; abdominal plus sacral route, all open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "46744",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DSP0ZZ",
+     "0USG0ZZ",
+     "0TQD0ZZ"
+    ],
+    "note": "rectum, vagina and urethra separated and repositioned"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q437",
+    "condition": "persistent cloaca",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cloacal repair: Reposition of rectum and of vagina, and Repair of urethra (urethroplasty), open.",
+  "confidence": "low"
+ },
+ {
+  "code": "46746",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DSP0ZZ",
+     "0USG0ZZ",
+     "0TQD0ZZ"
+    ],
+    "note": "rectum, vagina and urethra, abdominal plus sacroperineal"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q437",
+    "condition": "persistent cloaca",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Same codes as the sacroperineal cloacal repair; added abdominal route does not change PCS.",
+  "confidence": "low"
+ },
+ {
+  "code": "46748",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DSP0ZZ",
+     "0USG0ZZ",
+     "0TQD0ZZ",
+     "0UUG07Z",
+     "0DBN0ZZ"
+    ],
+    "note": "with sigmoid segment to lengthen vagina"
+   },
+   {
+    "codes": [
+     "0DSP0ZZ",
+     "0USG0ZZ",
+     "0TQD0ZZ",
+     "0UUG07Z",
+     "0DBB0ZZ"
+    ],
+    "note": "with ileal segment to lengthen vagina"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q437",
+    "condition": "persistent cloaca",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cloacal repair codes plus Supplement vagina with autologous tissue and Excision of the bowel segment harvested (B3.9).",
+  "confidence": "low"
+ },
+ {
+  "code": "46751",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQR0ZZ"
+    ],
+    "note": "anal sphincteroplasty"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "R159",
+    "condition": "fecal incontinence",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Sphincteroplasty is Repair of anal sphincter, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "20838",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0YMM0ZZ"
+    ],
+    "note": "right foot"
+   },
+   {
+    "codes": [
+     "0YMN0ZZ"
+    ],
+    "note": "left foot"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S98011A",
+    "condition": "traumatic foot amputation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Replantation of an amputated foot is Reattachment of foot, open, by side.",
+  "confidence": "high"
+ },
+ {
+  "code": "27303",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Q9B0ZZ"
+    ],
+    "note": "right lower femur"
+   },
+   {
+    "codes": [
+     "0Q9C0ZZ"
+    ],
+    "note": "left lower femur"
+   },
+   {
+    "codes": [
+     "0Q980ZZ"
+    ],
+    "note": "right femoral shaft"
+   },
+   {
+    "codes": [
+     "0Q990ZZ"
+    ],
+    "note": "left femoral shaft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M86651",
+    "condition": "chronic femur osteomyelitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Opening the cortex to drain infected bone is Drainage of femur, open, by segment and side.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27365",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QTB0ZZ"
+    ],
+    "note": "right distal femur segment removed"
+   },
+   {
+    "codes": [
+     "0QTC0ZZ"
+    ],
+    "note": "left distal femur segment removed"
+   },
+   {
+    "codes": [
+     "0QBB0ZZ"
+    ],
+    "note": "right distal femur, partial"
+   },
+   {
+    "codes": [
+     "0QBC0ZZ"
+    ],
+    "note": "left distal femur, partial"
+   },
+   {
+    "codes": [
+     "0QB80ZZ"
+    ],
+    "note": "right femoral shaft, partial"
+   },
+   {
+    "codes": [
+     "0QB90ZZ"
+    ],
+    "note": "left femoral shaft, partial"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C7951",
+    "condition": "bone metastasis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Radical bone tumor removal: Resection when the whole distal femur body part goes, else Excision; reconstruction reported separately.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27448",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QSB0ZZ"
+    ],
+    "note": "right distal femur"
+   },
+   {
+    "codes": [
+     "0QSC0ZZ"
+    ],
+    "note": "left distal femur"
+   },
+   {
+    "codes": [
+     "0QS80ZZ"
+    ],
+    "note": "right femoral shaft"
+   },
+   {
+    "codes": [
+     "0QS90ZZ"
+    ],
+    "note": "left femoral shaft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M21061",
+    "condition": "valgus knee deformity",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Corrective osteotomy to realign the femur is Reposition, open, no fixation device (Division is the competing reading).",
+  "confidence": "medium"
+ }
+]

@@ -1,0 +1,1179 @@
+[
+ {
+  "code": "69950",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "008N0ZZ"
+    ],
+    "note": "vestibular portion of eighth nerve cut via craniotomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "H8101",
+    "condition": "Meniere disease",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cutting the vestibular nerve via a skull opening = Division of acoustic nerve, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "56630",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UBM0ZZ"
+    ],
+    "note": "partial radical vulvectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C510",
+    "condition": "vulvar cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Wide deep removal of part of the vulva = Excision of vulva; deep dissection to fascia taken as open rather than external.",
+  "confidence": "medium"
+ },
+ {
+  "code": "56631",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UBM0ZZ",
+     "07TH0ZZ"
+    ],
+    "note": "right groin dissection"
+   },
+   {
+    "codes": [
+     "0UBM0ZZ",
+     "07TJ0ZZ"
+    ],
+    "note": "left groin dissection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C510",
+    "condition": "vulvar cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Partial vulva Excision plus full inguinofemoral node dissection coded as Resection of inguinal lymphatic (B3.10c).",
+  "confidence": "medium"
+ },
+ {
+  "code": "56632",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UBM0ZZ",
+     "07TH0ZZ",
+     "07TJ0ZZ"
+    ],
+    "note": "bilateral groin dissection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C510",
+    "condition": "vulvar cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Partial vulva Excision plus Resection of right and left inguinal lymphatics.",
+  "confidence": "medium"
+ },
+ {
+  "code": "56633",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UTM0ZZ"
+    ],
+    "note": "entire vulva removed"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C510",
+    "condition": "vulvar cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Whole vulva removed = Resection of vulva; radical depth taken as open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "56634",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UTM0ZZ",
+     "07TH0ZZ"
+    ],
+    "note": "right groin dissection"
+   },
+   {
+    "codes": [
+     "0UTM0ZZ",
+     "07TJ0ZZ"
+    ],
+    "note": "left groin dissection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C510",
+    "condition": "vulvar cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Vulva Resection plus one-side inguinal lymphatic Resection.",
+  "confidence": "medium"
+ },
+ {
+  "code": "56637",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UTM0ZZ",
+     "07TH0ZZ",
+     "07TJ0ZZ"
+    ],
+    "note": "bilateral groin dissection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C510",
+    "condition": "vulvar cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Vulva Resection plus right and left inguinal lymphatic Resection.",
+  "confidence": "medium"
+ },
+ {
+  "code": "56640",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UTM0ZZ",
+     "07TH0ZZ",
+     "07TJ0ZZ",
+     "07TC0ZZ"
+    ],
+    "note": "bilateral groin plus iliac/pelvic"
+   },
+   {
+    "codes": [
+     "0UTM0ZZ",
+     "07TH0ZZ",
+     "07TC0ZZ"
+    ],
+    "note": "right groin plus pelvic"
+   },
+   {
+    "codes": [
+     "0UTM0ZZ",
+     "07TJ0ZZ",
+     "07TC0ZZ"
+    ],
+    "note": "left groin plus pelvic"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C510",
+    "condition": "vulvar cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Vulva Resection plus inguinal lymphatic Resection and pelvis lymphatic Resection (iliac/obturator nodes map to pelvis lymphatic).",
+  "confidence": "medium"
+ },
+ {
+  "code": "57110",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UTG7ZZ"
+    ],
+    "note": "total vaginectomy, transvaginal"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N993",
+    "condition": "vault prolapse",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Entire vagina removed from below = Resection of vagina via natural opening; in elderly mostly total colpectomy for vault prolapse, vaginal cancer also groups the same.",
+  "confidence": "medium"
+ },
+ {
+  "code": "57111",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UTG0ZZ"
+    ],
+    "note": "radical vaginectomy with paravaginal tissue"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C52",
+    "condition": "vaginal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Whole vagina with paracolpos removed for cancer = Resection of vagina; radical paravaginal dissection taken as open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "57270",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UQF0ZZ"
+    ],
+    "note": "cul-de-sac obliteration"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N815",
+    "condition": "vaginal enterocele",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Abdominal closure of the cul-de-sac hernia sac with sutures = Repair of cul-de-sac, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "57280",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UUG0JZ"
+    ],
+    "note": "sacrocolpopexy with mesh"
+   },
+   {
+    "codes": [
+     "0USG0ZZ"
+    ],
+    "note": "native-tissue suspension, no mesh"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N993",
+    "condition": "vault prolapse",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Mesh bridging vaginal apex to sacrum = Supplement vagina with synthetic substitute; suture-only suspension = Reposition of vagina.",
+  "confidence": "medium"
+ },
+ {
+  "code": "57296",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UPH0JZ"
+    ],
+    "note": "mesh removal"
+   },
+   {
+    "codes": [
+     "0UWH0JZ"
+    ],
+    "note": "mesh revision"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T83711A",
+    "condition": "vaginal mesh erosion",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Taking out or adjusting prior vaginal-support mesh = Removal or Revision of synthetic substitute, vagina and cul-de-sac, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "57305",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQP0ZZ",
+     "0UQG0ZZ"
+    ],
+    "note": "rectal and vaginal sides closed"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N823",
+    "condition": "rectovaginal fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fistula tract divided and each wall closed = Repair of rectum and Repair of vagina, open (two body parts, B3.2a).",
+  "confidence": "medium"
+ },
+ {
+  "code": "57307",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQP0ZZ",
+     "0UQG0ZZ",
+     "0D1N0Z4"
+    ],
+    "note": "with diverting sigmoid colostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N823",
+    "condition": "rectovaginal fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Rectum and vagina Repair plus colostomy coded as Bypass sigmoid colon to cutaneous.",
+  "confidence": "medium"
+ },
+ {
+  "code": "57308",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQP0ZZ",
+     "0UQG0ZZ"
+    ],
+    "note": "perineal approach"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N823",
+    "condition": "rectovaginal fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Perineal-incision fistula closure = Repair of rectum and vagina, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "57311",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQD0ZZ",
+     "0UQG0ZZ",
+     "0KXM0Z1"
+    ],
+    "note": "Martius flap with labial fat"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N821",
+    "condition": "urethrovaginal fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Urethral and vaginal walls closed (Repair) plus pedicled bulbocavernosus/fat-pad flap = Transfer perineum muscle with subcutaneous tissue.",
+  "confidence": "medium"
+ },
+ {
+  "code": "57531",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UTC0ZZ",
+     "0UBG0ZZ",
+     "0UB40ZZ",
+     "07TC0ZZ",
+     "07BD0ZX"
+    ],
+    "note": "radical trachelectomy, uterus kept"
+   },
+   {
+    "codes": [
+     "0UTC0ZZ",
+     "0UBG0ZZ",
+     "0UB40ZZ",
+     "07TC0ZZ",
+     "07BD0ZX",
+     "0UT20ZZ",
+     "0UT70ZZ"
+    ],
+    "note": "with bilateral tubes and ovaries"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C539",
+    "condition": "cervical cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cervix Resection with upper-vagina and parametrial Excision, pelvic node dissection (Resection) and para-aortic sampling (diagnostic Excision).",
+  "confidence": "medium"
+ },
+ {
+  "code": "57540",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UTC0ZZ"
+    ],
+    "note": "cervical stump removed"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N8185",
+    "condition": "cervical stump prolapse",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Remaining cervix taken out entirely = Resection of cervix, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "57545",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UTC0ZZ",
+     "0KQM0ZZ"
+    ],
+    "note": "with pelvic floor repair"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N8185",
+    "condition": "cervical stump prolapse",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cervix Resection plus pelvic floor (perineal muscle) Repair as a separate body part.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58140",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UB90ZZ"
+    ],
+    "note": "open myomectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D251",
+    "condition": "uterine fibroids",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fibroids cut out of the uterus, uterus kept = Excision of uterus, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "58146",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UB90ZZ"
+    ],
+    "note": "open myomectomy, multiple/large"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D251",
+    "condition": "uterine fibroids",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Excision of uterus, open; fibroid count/weight does not change PCS.",
+  "confidence": "high"
+ },
+ {
+  "code": "58150",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT90ZZ",
+     "0UTC0ZZ"
+    ],
+    "note": "TAH, adnexa left"
+   },
+   {
+    "codes": [
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0UT20ZZ",
+     "0UT70ZZ"
+    ],
+    "note": "TAH with BSO"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C541",
+    "condition": "endometrial cancer",
+    "role": "typical"
+   },
+   {
+    "code": "D251",
+    "condition": "uterine fibroids",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Total hysterectomy = Resection of uterus plus Resection of cervix; add bilateral ovary and tube Resection when removed.",
+  "confidence": "high"
+ },
+ {
+  "code": "58152",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0TSC0ZZ"
+    ],
+    "note": "TAH with Burch"
+   },
+   {
+    "codes": [
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0TSC0ZZ",
+     "0UT20ZZ",
+     "0UT70ZZ"
+    ],
+    "note": "TAH with BSO and Burch"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N812",
+    "condition": "uterine prolapse",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Uterus and cervix Resection plus retropubic bladder-neck suspension = Reposition of bladder neck, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58180",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT90ZL"
+    ],
+    "note": "supracervical"
+   },
+   {
+    "codes": [
+     "0UT90ZL",
+     "0UT20ZZ",
+     "0UT70ZZ"
+    ],
+    "note": "supracervical with BSO"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D251",
+    "condition": "uterine fibroids",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Uterine body removed above the cervix = Resection of uterus with supracervical qualifier.",
+  "confidence": "high"
+ },
+ {
+  "code": "58200",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0UBG0ZZ",
+     "07BC0ZX",
+     "07BD0ZX"
+    ],
+    "note": "adnexa left"
+   },
+   {
+    "codes": [
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0UBG0ZZ",
+     "07BC0ZX",
+     "07BD0ZX",
+     "0UT20ZZ",
+     "0UT70ZZ"
+    ],
+    "note": "with BSO"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C541",
+    "condition": "endometrial cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Uterus and cervix Resection, upper-vagina Excision, pelvic and para-aortic node sampling as diagnostic Excision.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58210",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0UBG0ZZ",
+     "0UB40ZZ",
+     "07TC0ZZ",
+     "07BD0ZX"
+    ],
+    "note": "adnexa left"
+   },
+   {
+    "codes": [
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0UBG0ZZ",
+     "0UB40ZZ",
+     "07TC0ZZ",
+     "07BD0ZX",
+     "0UT20ZZ",
+     "0UT70ZZ"
+    ],
+    "note": "with BSO"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C539",
+    "condition": "cervical cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Radical hysterectomy: uterus and cervix Resection, upper-vagina and parametrial Excision, pelvic node Resection, para-aortic sampling.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58240",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0UTG0ZZ",
+     "0TTB0ZZ",
+     "0TTD0ZZ",
+     "0DTP0ZZ",
+     "0T180ZC",
+     "0DBB0ZZ",
+     "0D1N0Z4"
+    ],
+    "note": "total exenteration, conduit and colostomy"
+   },
+   {
+    "codes": [
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0UTG0ZZ",
+     "0TTB0ZZ",
+     "0TTD0ZZ",
+     "0T180ZC",
+     "0DBB0ZZ"
+    ],
+    "note": "anterior exenteration"
+   },
+   {
+    "codes": [
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0UTG0ZZ",
+     "0DTP0ZZ",
+     "0D1N0Z4"
+    ],
+    "note": "posterior exenteration"
+   },
+   {
+    "codes": [
+     "0UTG0ZZ",
+     "0TTB0ZZ",
+     "0TTD0ZZ",
+     "0DTP0ZZ",
+     "0T180ZC",
+     "0DBB0ZZ",
+     "0D1N0Z4"
+    ],
+    "note": "total exenteration after prior hysterectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C539",
+    "condition": "cervical cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Each organ removed = Resection; ileal conduit = Bypass ureters to ileocutaneous plus ileum Excision; end colostomy = Bypass sigmoid to cutaneous.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58267",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT97ZZ",
+     "0UTC7ZZ",
+     "0TSC0ZZ"
+    ],
+    "note": "vaginal hysterectomy with bladder-neck suspension"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N812",
+    "condition": "uterine prolapse",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Uterus and cervix Resection via natural opening plus Reposition of bladder neck, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58275",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT97ZZ",
+     "0UTC7ZZ",
+     "0UTG7ZZ"
+    ],
+    "note": "with total vaginectomy"
+   },
+   {
+    "codes": [
+     "0UT97ZZ",
+     "0UTC7ZZ",
+     "0UBG7ZZ"
+    ],
+    "note": "with partial vaginectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N813",
+    "condition": "uterine procidentia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Vaginal hysterectomy (uterus, cervix Resection via natural opening) plus vagina Resection or Excision.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58280",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT97ZZ",
+     "0UTC7ZZ",
+     "0UTG7ZZ",
+     "0UQF7ZZ"
+    ],
+    "note": "total vaginectomy plus enterocele repair"
+   },
+   {
+    "codes": [
+     "0UT97ZZ",
+     "0UTC7ZZ",
+     "0UBG7ZZ",
+     "0UQF7ZZ"
+    ],
+    "note": "partial vaginectomy plus enterocele repair"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N813",
+    "condition": "uterine procidentia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "As vaginal hysterectomy with vaginectomy, plus Repair of cul-de-sac via natural opening.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58285",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT97ZZ",
+     "0UTC7ZZ",
+     "0UBG7ZZ"
+    ],
+    "note": "radical vaginal hysterectomy"
+   },
+   {
+    "codes": [
+     "0UT97ZZ",
+     "0UTC7ZZ",
+     "0UBG7ZZ",
+     "0UT27ZZ",
+     "0UT77ZZ"
+    ],
+    "note": "with BSO"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C539",
+    "condition": "cervical cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Uterus and cervix Resection plus vaginal-cuff Excision, all via natural opening.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58400",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0US90ZZ"
+    ],
+    "note": "hysteropexy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N812",
+    "condition": "uterine prolapse",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Uterus moved back to normal position and fixed = Reposition of uterus, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58410",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0US90ZZ",
+     "01BM0ZZ"
+    ],
+    "note": "hysteropexy with presacral neurectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N812",
+    "condition": "uterine prolapse",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Reposition of uterus plus removal of a segment of the superior hypogastric plexus = Excision of abdominal sympathetic nerve.",
+  "confidence": "low"
+ },
+ {
+  "code": "58520",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UQ90ZZ"
+    ],
+    "note": "suture of uterine rupture"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S3763XA",
+    "condition": "uterine laceration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Closure of a non-obstetric uterine tear = Repair of uterus, open.",
+  "confidence": "low"
+ },
+ {
+  "code": "58540",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UQ90ZZ"
+    ],
+    "note": "metroplasty"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q513",
+    "condition": "bicornuate uterus",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Unification/reconstruction of a malformed uterus has no closer root than Repair of uterus, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58548",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT94ZZ",
+     "0UTC4ZZ",
+     "0UBG4ZZ",
+     "0UB44ZZ",
+     "07TC4ZZ",
+     "07BD4ZX"
+    ],
+    "note": "adnexa left"
+   },
+   {
+    "codes": [
+     "0UT94ZZ",
+     "0UTC4ZZ",
+     "0UBG4ZZ",
+     "0UB44ZZ",
+     "07TC4ZZ",
+     "07BD4ZX",
+     "0UT24ZZ",
+     "0UT74ZZ"
+    ],
+    "note": "with BSO"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C539",
+    "condition": "cervical cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparoscopic radical hysterectomy: same body parts as open radical, percutaneous endoscopic approach.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58575",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT94ZZ",
+     "0UTC4ZZ",
+     "0UT24ZZ",
+     "0UT74ZZ",
+     "0DBU4ZZ",
+     "0DBW4ZZ"
+    ],
+    "note": "with BSO"
+   },
+   {
+    "codes": [
+     "0UT94ZZ",
+     "0UTC4ZZ",
+     "0DBU4ZZ",
+     "0DBW4ZZ"
+    ],
+    "note": "adnexa previously removed"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C569",
+    "condition": "ovarian cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparoscopic uterus/cervix and adnexal Resection, infracolic omentectomy as omentum Excision, peritoneal tumor removal as peritoneum Excision.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58700",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT50ZZ"
+    ],
+    "note": "right tube"
+   },
+   {
+    "codes": [
+     "0UT60ZZ"
+    ],
+    "note": "left tube"
+   },
+   {
+    "codes": [
+     "0UT70ZZ"
+    ],
+    "note": "both tubes"
+   },
+   {
+    "codes": [
+     "0UB50ZZ"
+    ],
+    "note": "partial right tube"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N7011",
+    "condition": "chronic salpingitis",
+    "role": "typical"
+   },
+   {
+    "code": "O00101",
+    "condition": "tubal ectopic",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Whole tube removed = Resection of fallopian tube, open; partial = Excision.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58720",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT00ZZ",
+     "0UT50ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0UT10ZZ",
+     "0UT60ZZ"
+    ],
+    "note": "left"
+   },
+   {
+    "codes": [
+     "0UT20ZZ",
+     "0UT70ZZ"
+    ],
+    "note": "bilateral"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D279",
+    "condition": "benign ovarian tumor",
+    "role": "typical"
+   },
+   {
+    "code": "C569",
+    "condition": "ovarian cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Ovary and tube removed = Resection of each, open; bilateral body-part values when both sides.",
+  "confidence": "high"
+ }
+]

@@ -1,0 +1,1486 @@
+[
+ {
+  "code": "27450",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS804Z"
+    ],
+    "note": "right femoral shaft, plate"
+   },
+   {
+    "codes": [
+     "0QS904Z"
+    ],
+    "note": "left femoral shaft, plate"
+   },
+   {
+    "codes": [
+     "0QSB04Z"
+    ],
+    "note": "right distal femur, plate"
+   },
+   {
+    "codes": [
+     "0QSC04Z"
+    ],
+    "note": "left distal femur, plate"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72301P",
+    "condition": "femoral shaft malunion",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Corrective femoral osteotomy realigns the bone and fixes it: Reposition of femur with internal fixation, open; osteotomy itself not coded separately (Division is the index default but realignment is the objective).",
+  "confidence": "medium"
+ },
+ {
+  "code": "27454",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS806Z"
+    ],
+    "note": "right femur"
+   },
+   {
+    "codes": [
+     "0QS906Z"
+    ],
+    "note": "left femur"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q780",
+    "condition": "osteogenesis imperfecta",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Multiple shaft osteotomies realigned over an intramedullary rod = Reposition femoral shaft with intramedullary fixation device, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27455",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QSG04Z"
+    ],
+    "note": "right tibia, opening wedge"
+   },
+   {
+    "codes": [
+     "0QSH04Z"
+    ],
+    "note": "left tibia, opening wedge"
+   },
+   {
+    "codes": [
+     "0QSG04Z",
+     "0Q8J0ZZ"
+    ],
+    "note": "right tibia plus fibular osteotomy"
+   },
+   {
+    "codes": [
+     "0QSH04Z",
+     "0Q8K0ZZ"
+    ],
+    "note": "left tibia plus fibular osteotomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M92511",
+    "condition": "Blount disease",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Proximal tibial realignment osteotomy with fixation = Reposition tibia with internal fixation, open; a fibular osteotomy, when done, is a separate body part (Division fibula).",
+  "confidence": "medium"
+ },
+ {
+  "code": "27457",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QSG04Z"
+    ],
+    "note": "right tibia, opening wedge"
+   },
+   {
+    "codes": [
+     "0QSH04Z"
+    ],
+    "note": "left tibia, opening wedge"
+   },
+   {
+    "codes": [
+     "0QSG04Z",
+     "0Q8J0ZZ"
+    ],
+    "note": "right tibia plus fibular osteotomy"
+   },
+   {
+    "codes": [
+     "0QSH04Z",
+     "0Q8K0ZZ"
+    ],
+    "note": "left tibia plus fibular osteotomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M1711",
+    "condition": "knee osteoarthritis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Adult high tibial osteotomy for unicompartmental arthritis = Reposition tibia with internal fixation, open; fibular osteotomy coded separately as Division when performed.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27465",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QB80ZZ",
+     "0QH804Z"
+    ],
+    "note": "right femoral shaft, plate"
+   },
+   {
+    "codes": [
+     "0QB90ZZ",
+     "0QH904Z"
+    ],
+    "note": "left femoral shaft, plate"
+   },
+   {
+    "codes": [
+     "0QB80ZZ",
+     "0QH806Z"
+    ],
+    "note": "right femoral shaft, IM nail"
+   },
+   {
+    "codes": [
+     "0QB90ZZ",
+     "0QH906Z"
+    ],
+    "note": "left femoral shaft, IM nail"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M21751",
+    "condition": "limb length discrepancy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Segment of femoral shaft removed = Excision, open; fixation device has no slot in Excision so it is coded as Insertion (Reposition with device is the competing view).",
+  "confidence": "medium"
+ },
+ {
+  "code": "27466",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Q880ZZ",
+     "0QH807Z"
+    ],
+    "note": "right femur, lengthening nail"
+   },
+   {
+    "codes": [
+     "0Q890ZZ",
+     "0QH907Z"
+    ],
+    "note": "left femur, lengthening nail"
+   },
+   {
+    "codes": [
+     "0Q880ZZ",
+     "0QH808Z"
+    ],
+    "note": "right femur, lengthening external fixator"
+   },
+   {
+    "codes": [
+     "0Q890ZZ",
+     "0QH908Z"
+    ],
+    "note": "left femur, lengthening external fixator"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M21751",
+    "condition": "limb length discrepancy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Distraction lengthening: osteotomy transecting the shaft = Division, plus Insertion of the limb-lengthening device (intramedullary or external), open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27470",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS804Z"
+    ],
+    "note": "right femoral shaft, plate"
+   },
+   {
+    "codes": [
+     "0QS904Z"
+    ],
+    "note": "left femoral shaft, plate"
+   },
+   {
+    "codes": [
+     "0QS806Z"
+    ],
+    "note": "right femoral shaft, IM nail"
+   },
+   {
+    "codes": [
+     "0QS906Z"
+    ],
+    "note": "left femoral shaft, IM nail"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72301K",
+    "condition": "femur fracture nonunion",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Nonunion/malunion takedown with realignment and fixation, no graft = Reposition femur with internal fixation device, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27472",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS804Z",
+     "0QU807Z",
+     "0QB20ZZ"
+    ],
+    "note": "right femur, plate, iliac autograft"
+   },
+   {
+    "codes": [
+     "0QS904Z",
+     "0QU907Z",
+     "0QB20ZZ"
+    ],
+    "note": "left femur, plate, iliac autograft"
+   },
+   {
+    "codes": [
+     "0QS806Z",
+     "0QU807Z",
+     "0QB20ZZ"
+    ],
+    "note": "right femur, IM nail, iliac autograft"
+   },
+   {
+    "codes": [
+     "0QS804Z",
+     "0QU80KZ"
+    ],
+    "note": "right femur, plate, allograft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72301K",
+    "condition": "femur fracture nonunion",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Reposition femur with fixation, plus Supplement femur with bone graft; iliac crest autograft harvest coded separately per B3.9.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27486",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SPC09Z",
+     "0SUC09Z"
+    ],
+    "note": "right knee, tibial insert exchange"
+   },
+   {
+    "codes": [
+     "0SPD09Z",
+     "0SUD09Z"
+    ],
+    "note": "left knee, tibial insert exchange"
+   },
+   {
+    "codes": [
+     "0SPV0JZ",
+     "0SRV0J9"
+    ],
+    "note": "right knee, tibial component"
+   },
+   {
+    "codes": [
+     "0SPW0JZ",
+     "0SRW0J9"
+    ],
+    "note": "left knee, tibial component"
+   },
+   {
+    "codes": [
+     "0SPT0JZ",
+     "0SRT0J9"
+    ],
+    "note": "right knee, femoral component"
+   },
+   {
+    "codes": [
+     "0SPU0JZ",
+     "0SRU0J9"
+    ],
+    "note": "left knee, femoral component"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T84032A",
+    "condition": "loosened knee prosthesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Single-component revision = Removal of the old component plus Replacement of that joint surface; isolated insert exchange = Removal of liner plus Supplement with liner.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27487",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SPC0JZ",
+     "0SRC0J9"
+    ],
+    "note": "right knee, cemented"
+   },
+   {
+    "codes": [
+     "0SPD0JZ",
+     "0SRD0J9"
+    ],
+    "note": "left knee, cemented"
+   },
+   {
+    "codes": [
+     "0SPC0JZ",
+     "0SRC0JA"
+    ],
+    "note": "right knee, uncemented"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T84032A",
+    "condition": "loosened knee prosthesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Full revision = Removal of synthetic substitute from knee joint plus Replacement of knee joint with synthetic substitute, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27488",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SPC0JZ",
+     "0SHC08Z"
+    ],
+    "note": "right knee, static spacer"
+   },
+   {
+    "codes": [
+     "0SPD0JZ",
+     "0SHD08Z"
+    ],
+    "note": "left knee, static spacer"
+   },
+   {
+    "codes": [
+     "0SPC0JZ",
+     "0SRC0EZ"
+    ],
+    "note": "right knee, articulating spacer"
+   },
+   {
+    "codes": [
+     "0SPD0JZ",
+     "0SRD0EZ"
+    ],
+    "note": "left knee, articulating spacer"
+   },
+   {
+    "codes": [
+     "0SPC0JZ"
+    ],
+    "note": "right knee, no spacer"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8453XA",
+    "condition": "infected knee prosthesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Explant = Removal of synthetic substitute from knee joint; static spacer = Insertion of spacer, articulating spacer = Replacement with articulating spacer.",
+  "confidence": "high"
+ },
+ {
+  "code": "27495",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QH836Z"
+    ],
+    "note": "right femoral shaft, IM nail"
+   },
+   {
+    "codes": [
+     "0QH936Z"
+    ],
+    "note": "left femoral shaft, IM nail"
+   },
+   {
+    "codes": [
+     "0QH636Z"
+    ],
+    "note": "right proximal femur, cephalomedullary nail"
+   },
+   {
+    "codes": [
+     "0QH736Z"
+    ],
+    "note": "left proximal femur, cephalomedullary nail"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C7951",
+    "condition": "bone metastasis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Prophylactic fixation of an unbroken femur = Insertion of fixation device (no reduction, so not Reposition); nailing through small portals is percutaneous (open plating would be 0QH804Z, same family).",
+  "confidence": "medium"
+ },
+ {
+  "code": "27506",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS806Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS906Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72351A",
+    "condition": "femoral shaft fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fracture reduction with nail = Reposition femoral shaft with intramedullary device, open per the CPT; a closed-reduction nailing documented without opening the fracture would be percutaneous (0QS836Z), same family.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27507",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS804Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS904Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72351A",
+    "condition": "femoral shaft fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reduction with plate = Reposition femoral shaft with internal fixation device, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27511",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QSB04Z"
+    ],
+    "note": "right, plate"
+   },
+   {
+    "codes": [
+     "0QSC04Z"
+    ],
+    "note": "left, plate"
+   },
+   {
+    "codes": [
+     "0QSB06Z"
+    ],
+    "note": "right, retrograde nail"
+   },
+   {
+    "codes": [
+     "0QSC06Z"
+    ],
+    "note": "left, retrograde nail"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72451A",
+    "condition": "distal femur fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reduction internal fixation of supracondylar femur = Reposition lower femur with internal or intramedullary fixation, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27513",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QSB04Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QSC04Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72461A",
+    "condition": "distal femur fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Intra-articular distal femur ORIF = Reposition lower femur with internal fixation device, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27514",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QSB04Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QSC04Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72411A",
+    "condition": "femoral condyle fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Condylar fracture ORIF = Reposition lower femur with internal fixation device, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27519",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QSB04Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QSC04Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S79121A",
+    "condition": "distal femur physeal fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Physeal fracture ORIF = Reposition lower femur with internal fixation device, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27535",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QSG04Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QSH04Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S82121A",
+    "condition": "tibial plateau fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Plateau ORIF = Reposition tibia with internal fixation device, open (proximal tibia is within the tibia body part).",
+  "confidence": "high"
+ },
+ {
+  "code": "27536",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QSG04Z"
+    ],
+    "note": "right, internal fixation"
+   },
+   {
+    "codes": [
+     "0QSH04Z"
+    ],
+    "note": "left, internal fixation"
+   },
+   {
+    "codes": [
+     "0QSG05Z"
+    ],
+    "note": "right, external fixation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S82141A",
+    "condition": "tibial plateau fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Bicondylar plateau open reduction with fixation = Reposition tibia with fixation device, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27540",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QSG04Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QSH04Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S82111A",
+    "condition": "tibial spine fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reduction and fixation of tibial eminence or tubercle = Reposition tibia with internal fixation device, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27556",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SSC0ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0SSD0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S83114A",
+    "condition": "knee dislocation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reduction of tibiofemoral dislocation without fixation or ligament work = Reposition knee joint, open, no device.",
+  "confidence": "high"
+ },
+ {
+  "code": "27557",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SSC0ZZ",
+     "0MQN0ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0SSD0ZZ",
+     "0MQP0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S83114A",
+    "condition": "knee dislocation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reduction (Reposition knee joint) plus primary ligament repair (Repair knee bursa and ligament), distinct objectives on different body parts.",
+  "confidence": "high"
+ },
+ {
+  "code": "27558",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SSC0ZZ",
+     "0MQN0ZZ",
+     "0MRN0KZ"
+    ],
+    "note": "right, allograft reconstruction"
+   },
+   {
+    "codes": [
+     "0SSD0ZZ",
+     "0MQP0ZZ",
+     "0MRP0KZ"
+    ],
+    "note": "left, allograft reconstruction"
+   },
+   {
+    "codes": [
+     "0SSC0ZZ",
+     "0MQN0ZZ",
+     "0MUN0KZ"
+    ],
+    "note": "right, graft augmentation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S83114A",
+    "condition": "knee dislocation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Reposition knee joint plus Repair of ligament plus graft reconstruction of another ligament (Replacement knee bursa/ligament; Supplement if the native ligament is left and augmented).",
+  "confidence": "medium"
+ },
+ {
+  "code": "27580",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SGC04Z"
+    ],
+    "note": "right, internal fixation"
+   },
+   {
+    "codes": [
+     "0SGD04Z"
+    ],
+    "note": "left, internal fixation"
+   },
+   {
+    "codes": [
+     "0SGC05Z"
+    ],
+    "note": "right, external fixation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8453XA",
+    "condition": "infected knee prosthesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Knee arthrodesis = Fusion of knee joint with internal or external fixation device, open; prosthesis removal is a separate CPT, not included here.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27590",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Y6C0Z2"
+    ],
+    "note": "right, mid thigh"
+   },
+   {
+    "codes": [
+     "0Y6D0Z2"
+    ],
+    "note": "left, mid thigh"
+   },
+   {
+    "codes": [
+     "0Y6C0Z3"
+    ],
+    "note": "right, distal thigh"
+   },
+   {
+    "codes": [
+     "0Y6D0Z3"
+    ],
+    "note": "left, distal thigh"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E1152",
+    "condition": "diabetic gangrene",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transfemoral amputation = Detachment at upper leg, open, qualifier by level.",
+  "confidence": "high"
+ },
+ {
+  "code": "27591",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Y6C0Z2"
+    ],
+    "note": "right, mid thigh"
+   },
+   {
+    "codes": [
+     "0Y6D0Z2"
+    ],
+    "note": "left, mid thigh"
+   },
+   {
+    "codes": [
+     "0Y6C0Z3"
+    ],
+    "note": "right, distal thigh"
+   },
+   {
+    "codes": [
+     "0Y6D0Z3"
+    ],
+    "note": "left, distal thigh"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E1152",
+    "condition": "diabetic gangrene",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transfemoral amputation = Detachment at upper leg; immediate post-op prosthesis/cast is not separately coded.",
+  "confidence": "high"
+ },
+ {
+  "code": "27592",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Y6C0Z2"
+    ],
+    "note": "right, mid thigh"
+   },
+   {
+    "codes": [
+     "0Y6D0Z2"
+    ],
+    "note": "left, mid thigh"
+   },
+   {
+    "codes": [
+     "0Y6C0Z3"
+    ],
+    "note": "right, distal thigh"
+   },
+   {
+    "codes": [
+     "0Y6D0Z3"
+    ],
+    "note": "left, distal thigh"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E1152",
+    "condition": "diabetic gangrene",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open (guillotine) thigh amputation is still Detachment at upper leg, open; staged closure later is a different encounter.",
+  "confidence": "high"
+ },
+ {
+  "code": "27596",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Y6C0Z1"
+    ],
+    "note": "right, high thigh"
+   },
+   {
+    "codes": [
+     "0Y6D0Z1"
+    ],
+    "note": "left, high thigh"
+   },
+   {
+    "codes": [
+     "0Y6C0Z2"
+    ],
+    "note": "right, mid thigh"
+   },
+   {
+    "codes": [
+     "0Y6D0Z2"
+    ],
+    "note": "left, mid thigh"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8753",
+    "condition": "amputation stump necrosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Re-amputation with further femoral bone shortening = Detachment at the new, more proximal upper-leg level (soft-tissue-only revision would be Excision).",
+  "confidence": "medium"
+ },
+ {
+  "code": "27598",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Y6F0ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0Y6G0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E1152",
+    "condition": "diabetic gangrene",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Through-knee amputation = Detachment at knee region, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27645",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QBG0ZZ"
+    ],
+    "note": "right tibia"
+   },
+   {
+    "codes": [
+     "0QBH0ZZ"
+    ],
+    "note": "left tibia"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C4021",
+    "condition": "tibial sarcoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Wide segmental removal of tumor-bearing tibia = Excision of tibia, open (Resection only if the entire bone is removed); reconstruction coded under its own CPT.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27646",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QBJ0ZZ"
+    ],
+    "note": "right fibula"
+   },
+   {
+    "codes": [
+     "0QBK0ZZ"
+    ],
+    "note": "left fibula"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C4021",
+    "condition": "fibular sarcoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Wide removal of tumor-bearing fibula segment = Excision of fibula, open (Resection if the whole fibula is taken).",
+  "confidence": "medium"
+ },
+ {
+  "code": "27703",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SPF0JZ",
+     "0SRF0JA"
+    ],
+    "note": "right ankle, uncemented"
+   },
+   {
+    "codes": [
+     "0SPG0JZ",
+     "0SRG0JA"
+    ],
+    "note": "left ankle, uncemented"
+   },
+   {
+    "codes": [
+     "0SPF0JZ",
+     "0SRF0J9"
+    ],
+    "note": "right ankle, cemented"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T84038A",
+    "condition": "loosened ankle prosthesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Ankle arthroplasty revision = Removal of synthetic substitute from ankle joint plus Replacement of ankle joint, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27712",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QSG06Z"
+    ],
+    "note": "right tibia"
+   },
+   {
+    "codes": [
+     "0QSH06Z"
+    ],
+    "note": "left tibia"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q780",
+    "condition": "osteogenesis imperfecta",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Multiple tibial osteotomies realigned over an intramedullary rod = Reposition tibia with intramedullary fixation device, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27715",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Q8G0ZZ",
+     "0Q8J0ZZ",
+     "0QHG08Z"
+    ],
+    "note": "right, lengthening external fixator"
+   },
+   {
+    "codes": [
+     "0Q8H0ZZ",
+     "0Q8K0ZZ",
+     "0QHH08Z"
+    ],
+    "note": "left, lengthening external fixator"
+   },
+   {
+    "codes": [
+     "0Q8G0ZZ",
+     "0Q8J0ZZ",
+     "0QHG07Z"
+    ],
+    "note": "right, lengthening nail"
+   },
+   {
+    "codes": [
+     "0QBG0ZZ",
+     "0QBJ0ZZ",
+     "0QHG04Z"
+    ],
+    "note": "right, shortening with plate"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M21761",
+    "condition": "limb length discrepancy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Lengthening = Division of tibia and of fibula plus Insertion of limb-lengthening device; shortening = Excision of tibia and fibula segments plus Insertion of fixation.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27724",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QSG04Z",
+     "0QUG07Z",
+     "0QB20ZZ"
+    ],
+    "note": "right, plate, iliac autograft"
+   },
+   {
+    "codes": [
+     "0QSH04Z",
+     "0QUH07Z",
+     "0QB20ZZ"
+    ],
+    "note": "left, plate, iliac autograft"
+   },
+   {
+    "codes": [
+     "0QSG06Z",
+     "0QUG07Z",
+     "0QB20ZZ"
+    ],
+    "note": "right, IM nail, iliac autograft"
+   },
+   {
+    "codes": [
+     "0QSG04Z",
+     "0QUG0KZ"
+    ],
+    "note": "right, plate, allograft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S82201K",
+    "condition": "tibia fracture nonunion",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Reposition tibia with fixation, plus Supplement tibia with bone graft; separate-site iliac autograft harvest coded per B3.9.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27725",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QSJ04Z",
+     "0QUG07Z",
+     "0QB20ZZ"
+    ],
+    "note": "right, fibula moved to tibia with screws, iliac autograft"
+   },
+   {
+    "codes": [
+     "0QSK04Z",
+     "0QUH07Z",
+     "0QB20ZZ"
+    ],
+    "note": "left, fibula moved to tibia with screws, iliac autograft"
+   },
+   {
+    "codes": [
+     "0QSJ04Z"
+    ],
+    "note": "right, fibula moved to tibia, no graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S82201K",
+    "condition": "tibia fracture nonunion",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Tibiofibular synostosis: fibula osteotomized and shifted onto the tibia = Reposition fibula with fixation; graft bridging to tibia = Supplement tibia, harvest per B3.9.",
+  "confidence": "low"
+ },
+ {
+  "code": "27727",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QSG06Z",
+     "0QUG07Z",
+     "0QB20ZZ"
+    ],
+    "note": "right, IM rod, iliac autograft"
+   },
+   {
+    "codes": [
+     "0QSH06Z",
+     "0QUH07Z",
+     "0QB20ZZ"
+    ],
+    "note": "left, IM rod, iliac autograft"
+   },
+   {
+    "codes": [
+     "0QSG06Z"
+    ],
+    "note": "right, IM rod, no graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q742",
+    "condition": "congenital tibial pseudarthrosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Pseudarthrosis takedown, realignment and rodding = Reposition tibia with intramedullary device, plus Supplement with autograft and B3.9 harvest; excision of pseudarthrosis tissue treated as bone-end preparation.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27880",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Y6H0Z2"
+    ],
+    "note": "right, mid leg"
+   },
+   {
+    "codes": [
+     "0Y6J0Z2"
+    ],
+    "note": "left, mid leg"
+   },
+   {
+    "codes": [
+     "0Y6H0Z1"
+    ],
+    "note": "right, high leg"
+   },
+   {
+    "codes": [
+     "0Y6J0Z1"
+    ],
+    "note": "left, high leg"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E1152",
+    "condition": "diabetic gangrene",
+    "role": "typical"
+   },
+   {
+    "code": "E1169",
+    "condition": "diabetic foot osteomyelitis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Transtibial amputation = Detachment at lower leg, open, qualifier by level.",
+  "confidence": "high"
+ },
+ {
+  "code": "27881",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Y6H0Z2"
+    ],
+    "note": "right, mid leg"
+   },
+   {
+    "codes": [
+     "0Y6J0Z2"
+    ],
+    "note": "left, mid leg"
+   },
+   {
+    "codes": [
+     "0Y6H0Z1"
+    ],
+    "note": "right, high leg"
+   },
+   {
+    "codes": [
+     "0Y6J0Z1"
+    ],
+    "note": "left, high leg"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E1152",
+    "condition": "diabetic gangrene",
+    "role": "typical"
+   },
+   {
+    "code": "E1169",
+    "condition": "diabetic foot osteomyelitis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Transtibial amputation = Detachment at lower leg; immediate post-op prosthesis/cast not separately coded.",
+  "confidence": "high"
+ }
+]

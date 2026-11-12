@@ -1,0 +1,1238 @@
+[
+ {
+  "code": "50065",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TC00ZZ"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0TC10ZZ"
+    ],
+    "note": "left kidney"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N200",
+    "condition": "kidney stone",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open nephrolithotomy = Extirpation of matter from kidney, open; repeat-operation status does not change PCS.",
+  "confidence": "high"
+ },
+ {
+  "code": "50070",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TC00ZZ"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0TC10ZZ"
+    ],
+    "note": "left kidney"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N200",
+    "condition": "kidney stone",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open nephrolithotomy in an anomalous kidney = Extirpation, kidney, open; the anomaly is a secondary dx only.",
+  "confidence": "high"
+ },
+ {
+  "code": "50075",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TC00ZZ"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0TC10ZZ"
+    ],
+    "note": "left kidney"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N200",
+    "condition": "kidney stone",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open staghorn removal = Extirpation, kidney (calyces are part of kidney body part), open.",
+  "confidence": "high"
+ },
+ {
+  "code": "50100",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "04S90ZZ"
+    ],
+    "note": "right renal artery repositioned"
+   },
+   {
+    "codes": [
+     "04SA0ZZ"
+    ],
+    "note": "left renal artery repositioned"
+   },
+   {
+    "codes": [
+     "04L90ZZ"
+    ],
+    "note": "right renal artery divided/ligated"
+   },
+   {
+    "codes": [
+     "04LA0ZZ"
+    ],
+    "note": "left renal artery divided/ligated"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N130",
+    "condition": "UPJ obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Crossing lower-pole vessel: repositioning = Reposition renal artery; transection = Occlusion renal artery; open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50120",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TJ50ZZ"
+    ],
+    "note": "kidney (pelvis) inspection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N2889",
+    "condition": "renal pelvis disorder",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Pyelotomy for exploration only = Inspection of kidney, open (no laterality in the Inspection table).",
+  "confidence": "low"
+ },
+ {
+  "code": "50125",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T9300Z"
+    ],
+    "note": "right kidney pelvis, tube left"
+   },
+   {
+    "codes": [
+     "0T9400Z"
+    ],
+    "note": "left kidney pelvis, tube left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N136",
+    "condition": "pyonephrosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Pyelostomy tube = Drainage of kidney pelvis with drainage device, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50130",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TC30ZZ"
+    ],
+    "note": "right kidney pelvis"
+   },
+   {
+    "codes": [
+     "0TC40ZZ"
+    ],
+    "note": "left kidney pelvis"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N200",
+    "condition": "kidney stone",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Pyelolithotomy = Extirpation of matter from kidney pelvis, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "50205",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TB00ZX"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0TB10ZX"
+    ],
+    "note": "left kidney"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N179",
+    "condition": "acute kidney injury",
+    "role": "typical"
+   },
+   {
+    "code": "D4101",
+    "condition": "renal mass",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Open renal biopsy = Excision, kidney, open, diagnostic qualifier.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50220",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TT00ZZ"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0TT10ZZ"
+    ],
+    "note": "left kidney"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N261",
+    "condition": "nonfunctioning atrophic kidney",
+    "role": "typical"
+   },
+   {
+    "code": "C641",
+    "condition": "kidney cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Simple nephrectomy = Resection of kidney, open; dividing the upper ureter is part of the nephrectomy, not a separate objective.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50225",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TT00ZZ"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0TT10ZZ"
+    ],
+    "note": "left kidney"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N261",
+    "condition": "nonfunctioning atrophic kidney",
+    "role": "typical"
+   },
+   {
+    "code": "C641",
+    "condition": "kidney cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Complicated simple nephrectomy (prior surgery) = Resection of kidney, open; complexity does not change PCS.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50230",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TT00ZZ"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0TT10ZZ"
+    ],
+    "note": "left kidney"
+   },
+   {
+    "codes": [
+     "0TT00ZZ",
+     "0GT30ZZ"
+    ],
+    "note": "right kidney with right adrenal"
+   },
+   {
+    "codes": [
+     "0TT10ZZ",
+     "0GT20ZZ"
+    ],
+    "note": "left kidney with left adrenal"
+   },
+   {
+    "codes": [
+     "0TT00ZZ",
+     "07TD0ZZ"
+    ],
+    "note": "right kidney with para-aortic node dissection"
+   },
+   {
+    "codes": [
+     "0TT10ZZ",
+     "07TD0ZZ"
+    ],
+    "note": "left kidney with para-aortic node dissection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C641",
+    "condition": "kidney cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Radical nephrectomy = Resection of kidney, open; ipsilateral adrenalectomy and a formal node dissection (B3.10c) coded separately when done.",
+  "confidence": "high"
+ },
+ {
+  "code": "50234",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TT00ZZ",
+     "0TT60ZZ",
+     "0TBB0ZZ"
+    ],
+    "note": "right kidney, ureter, bladder cuff"
+   },
+   {
+    "codes": [
+     "0TT10ZZ",
+     "0TT70ZZ",
+     "0TBB0ZZ"
+    ],
+    "note": "left kidney, ureter, bladder cuff"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C651",
+    "condition": "renal pelvis cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Nephroureterectomy = Resection kidney + Resection ureter + Excision bladder (cuff), all open; separate body parts.",
+  "confidence": "high"
+ },
+ {
+  "code": "50236",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TT00ZZ",
+     "0TT60ZZ",
+     "0TBB0ZZ"
+    ],
+    "note": "right kidney, ureter, bladder cuff"
+   },
+   {
+    "codes": [
+     "0TT10ZZ",
+     "0TT70ZZ",
+     "0TBB0ZZ"
+    ],
+    "note": "left kidney, ureter, bladder cuff"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C651",
+    "condition": "renal pelvis cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Nephroureterectomy via two incisions = same three open codes (kidney, ureter, bladder cuff); extra incision does not change PCS.",
+  "confidence": "high"
+ },
+ {
+  "code": "50240",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TB00ZZ"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0TB10ZZ"
+    ],
+    "note": "left kidney"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C641",
+    "condition": "kidney cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Partial nephrectomy = Excision of kidney, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "50250",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T500ZZ"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0T510ZZ"
+    ],
+    "note": "left kidney"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C641",
+    "condition": "kidney cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open cryoablation of renal mass = Destruction of kidney, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "50280",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TB00ZZ"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0TB10ZZ"
+    ],
+    "note": "left kidney"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N281",
+    "condition": "acquired kidney cyst",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cyst excision/unroofing = Excision of kidney, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "50290",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WBH0ZZ"
+    ],
+    "note": "retroperitoneum (perirenal space)"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N281",
+    "condition": "perinephric cyst",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Perinephric cyst lies outside the kidney: Excision of retroperitoneum, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50400",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TB30ZZ"
+    ],
+    "note": "right kidney pelvis (dismembered)"
+   },
+   {
+    "codes": [
+     "0TB40ZZ"
+    ],
+    "note": "left kidney pelvis (dismembered)"
+   },
+   {
+    "codes": [
+     "0TQ30ZZ"
+    ],
+    "note": "right kidney pelvis (non-dismembered flap)"
+   },
+   {
+    "codes": [
+     "0TQ40ZZ"
+    ],
+    "note": "left kidney pelvis (non-dismembered flap)"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N130",
+    "condition": "UPJ obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Dismembered pyeloplasty excises the UPJ segment = Excision kidney pelvis, open; flap (non-dismembered) plasty = Repair.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50405",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TB30ZZ"
+    ],
+    "note": "right kidney pelvis (dismembered)"
+   },
+   {
+    "codes": [
+     "0TB40ZZ"
+    ],
+    "note": "left kidney pelvis (dismembered)"
+   },
+   {
+    "codes": [
+     "0TQ30ZZ"
+    ],
+    "note": "right kidney pelvis (non-dismembered flap)"
+   },
+   {
+    "codes": [
+     "0TQ40ZZ"
+    ],
+    "note": "left kidney pelvis (non-dismembered flap)"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N130",
+    "condition": "UPJ obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Complicated pyeloplasty: same Excision (dismembered) or Repair of kidney pelvis, open; complexity does not change PCS.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50500",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQ00ZZ"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0TQ10ZZ"
+    ],
+    "note": "left kidney"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S37061A",
+    "condition": "kidney laceration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Suture repair of kidney injury = Repair of kidney, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "50520",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQ00ZZ"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0TQ10ZZ"
+    ],
+    "note": "left kidney"
+   },
+   {
+    "codes": [
+     "0TQ30ZZ"
+    ],
+    "note": "right kidney pelvis (pyelocutaneous)"
+   },
+   {
+    "codes": [
+     "0TQ40ZZ"
+    ],
+    "note": "left kidney pelvis (pyelocutaneous)"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N2889",
+    "condition": "renal fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fistula closure = Repair of the urinary organ the tract arises from (kidney or kidney pelvis), open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50525",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQ00ZZ",
+     "0DQK0ZZ"
+    ],
+    "note": "right kidney + ascending colon"
+   },
+   {
+    "codes": [
+     "0TQ10ZZ",
+     "0DQM0ZZ"
+    ],
+    "note": "left kidney + descending colon"
+   },
+   {
+    "codes": [
+     "0TQ00ZZ",
+     "0DQ90ZZ"
+    ],
+    "note": "right kidney + duodenum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N2889",
+    "condition": "renal fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Nephrovisceral fistula closure = Repair of kidney plus Repair of the involved bowel segment (separate body parts), open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50526",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQ00ZZ"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0TQ10ZZ"
+    ],
+    "note": "left kidney"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N2889",
+    "condition": "renal fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transthoracic fistula closure = Repair of kidney, open; any chest-side repair varies and is not assumed.",
+  "confidence": "low"
+ },
+ {
+  "code": "50540",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T820ZZ"
+    ],
+    "note": "isthmus of horseshoe kidney"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q631",
+    "condition": "horseshoe kidney",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Symphysiotomy = Division of bilateral kidneys, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "50545",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TT04ZZ"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0TT14ZZ"
+    ],
+    "note": "left kidney"
+   },
+   {
+    "codes": [
+     "0TT04ZZ",
+     "0GT34ZZ"
+    ],
+    "note": "right kidney with right adrenal"
+   },
+   {
+    "codes": [
+     "0TT14ZZ",
+     "0GT24ZZ"
+    ],
+    "note": "left kidney with left adrenal"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C641",
+    "condition": "kidney cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparoscopic radical nephrectomy = Resection of kidney, perc. endoscopic (hand-assisted qualifier G if used); adrenal coded when removed.",
+  "confidence": "high"
+ },
+ {
+  "code": "50546",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TT04ZZ"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0TT14ZZ"
+    ],
+    "note": "left kidney"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N261",
+    "condition": "nonfunctioning atrophic kidney",
+    "role": "typical"
+   },
+   {
+    "code": "C641",
+    "condition": "kidney cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Laparoscopic simple nephrectomy = Resection of kidney, perc. endoscopic.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50548",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TT04ZZ",
+     "0TT64ZZ",
+     "0TBB4ZZ"
+    ],
+    "note": "right kidney, ureter, bladder cuff"
+   },
+   {
+    "codes": [
+     "0TT14ZZ",
+     "0TT74ZZ",
+     "0TBB4ZZ"
+    ],
+    "note": "left kidney, ureter, bladder cuff"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C651",
+    "condition": "renal pelvis cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparoscopic nephroureterectomy = Resection kidney + Resection ureter + Excision bladder cuff, perc. endoscopic.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50600",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T960ZZ"
+    ],
+    "note": "right ureter"
+   },
+   {
+    "codes": [
+     "0T970ZZ"
+    ],
+    "note": "left ureter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N131",
+    "condition": "ureteral obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Ureterotomy for drainage/exploration = Drainage of ureter, open (Inspection 0TJ90ZZ if nothing drained).",
+  "confidence": "low"
+ },
+ {
+  "code": "50605",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T760DZ"
+    ],
+    "note": "right ureter"
+   },
+   {
+    "codes": [
+     "0T770DZ"
+    ],
+    "note": "left ureter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N131",
+    "condition": "ureteral stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open stent placement in ureter = Dilation of ureter with intraluminal device, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50610",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TC60ZZ"
+    ],
+    "note": "right ureter"
+   },
+   {
+    "codes": [
+     "0TC70ZZ"
+    ],
+    "note": "left ureter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N201",
+    "condition": "ureteral stone",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open ureterolithotomy (upper third) = Extirpation of matter from ureter, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "50620",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TC60ZZ"
+    ],
+    "note": "right ureter"
+   },
+   {
+    "codes": [
+     "0TC70ZZ"
+    ],
+    "note": "left ureter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N201",
+    "condition": "ureteral stone",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open ureterolithotomy (middle third) = Extirpation of matter from ureter, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "50630",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TC60ZZ"
+    ],
+    "note": "right ureter"
+   },
+   {
+    "codes": [
+     "0TC70ZZ"
+    ],
+    "note": "left ureter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N201",
+    "condition": "ureteral stone",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open ureterolithotomy (lower third) = Extirpation of matter from ureter, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "50650",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TT60ZZ",
+     "0TBB0ZZ"
+    ],
+    "note": "right ureter + bladder cuff"
+   },
+   {
+    "codes": [
+     "0TT70ZZ",
+     "0TBB0ZZ"
+    ],
+    "note": "left ureter + bladder cuff"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C661",
+    "condition": "ureter cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Ureterectomy with cuff = Resection of ureter + Excision of bladder, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "50660",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TT60ZZ"
+    ],
+    "note": "right ureter"
+   },
+   {
+    "codes": [
+     "0TT70ZZ"
+    ],
+    "note": "left ureter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q6263",
+    "condition": "ectopic ureter",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total removal of ectopic ureter = Resection of ureter, open (combined approaches still open).",
+  "confidence": "medium"
+ },
+ {
+  "code": "50700",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQ60ZZ"
+    ],
+    "note": "right ureter"
+   },
+   {
+    "codes": [
+     "0TQ70ZZ"
+    ],
+    "note": "left ureter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N131",
+    "condition": "ureteral stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Ureteroplasty = Repair of ureter, open (graft would be Supplement).",
+  "confidence": "medium"
+ },
+ {
+  "code": "50715",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TN60ZZ"
+    ],
+    "note": "right ureter"
+   },
+   {
+    "codes": [
+     "0TN70ZZ"
+    ],
+    "note": "left ureter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N131",
+    "condition": "ureteral obstruction",
+    "role": "typical"
+   },
+   {
+    "code": "K682",
+    "condition": "retroperitoneal fibrosis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Ureterolysis = Release of ureter, open; Reposition 0TS6/0TS7/0TS8 only if the ureter is relocated.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50722",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TN60ZZ"
+    ],
+    "note": "right ureter"
+   },
+   {
+    "codes": [
+     "0TN70ZZ"
+    ],
+    "note": "left ureter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N138",
+    "condition": "ovarian vein syndrome",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Ureterolysis for ovarian vein compression = Release of ureter, open (right side typical).",
+  "confidence": "medium"
+ },
+ {
+  "code": "50725",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TS60ZZ"
+    ],
+    "note": "right ureter moved anterior to vena cava"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q6262",
+    "condition": "retrocaval ureter",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Retrocaval ureter is moved in front of the cava and re-joined = Reposition right ureter, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50728",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQB0ZZ",
+     "0WQF0ZZ"
+    ],
+    "note": "ileal conduit stoma + abdominal wall repair"
+   },
+   {
+    "codes": [
+     "0DQB0ZZ",
+     "0WUF0JZ"
+    ],
+    "note": "ileal conduit stoma + mesh hernia repair"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N99523",
+    "condition": "urostomy hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Urostomy revision = Repair of conduit (ileum) plus separate parastomal hernia repair of abdominal wall (Repair, or Supplement if mesh), open.",
+  "confidence": "low"
+ },
+ {
+  "code": "50740",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T130Z6"
+    ],
+    "note": "right kidney pelvis to right ureter"
+   },
+   {
+    "codes": [
+     "0T140Z7"
+    ],
+    "note": "left kidney pelvis to left ureter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N130",
+    "condition": "UPJ obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Ureteropyelostomy reroutes urine between pelvis and ureter = Bypass kidney pelvis to ureter, open.",
+  "confidence": "medium"
+ }
+]

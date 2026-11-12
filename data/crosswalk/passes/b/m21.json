@@ -1,0 +1,1275 @@
+[
+ {
+  "code": "50750",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T130Z6"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0T140Z7"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N130",
+    "condition": "UPJ obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Urine rerouted from the lower-pole calyx into the ureter; calyx falls under the kidney, and PCS bypass offers kidney pelvis to ureter as the closest value; lower-pole amputation is the access step (B3.1b).",
+  "confidence": "medium"
+ },
+ {
+  "code": "50760",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TB60ZZ"
+    ],
+    "note": "right, strictured segment excised"
+   },
+   {
+    "codes": [
+     "0TB70ZZ"
+    ],
+    "note": "left, strictured segment excised"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N131",
+    "condition": "ureteral stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Diseased ureter segment cut out and ends rejoined: Excision of ureter, anastomosis not coded; urine route unchanged so not Bypass (pure reanastomosis without excision would be Reposition).",
+  "confidence": "medium"
+ },
+ {
+  "code": "50770",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T160Z7"
+    ],
+    "note": "right ureter into left ureter"
+   },
+   {
+    "codes": [
+     "0T170Z6"
+    ],
+    "note": "left ureter into right ureter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N131",
+    "condition": "ureteral stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Donor ureter routed across and joined to the opposite ureter: Bypass ureter to contralateral ureter, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "50780",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T160ZB"
+    ],
+    "note": "right, distal segment bypassed"
+   },
+   {
+    "codes": [
+     "0T170ZB"
+    ],
+    "note": "left, distal segment bypassed"
+   },
+   {
+    "codes": [
+     "0TS60ZZ"
+    ],
+    "note": "right, orifice relocated for reflux"
+   },
+   {
+    "codes": [
+     "0TS70ZZ"
+    ],
+    "note": "left, orifice relocated for reflux"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N131",
+    "condition": "ureteral stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Adult distal stricture/injury: ureter divided above the lesion and joined to a new bladder site = Bypass ureter to bladder; reflux reimplant with unchanged route = Reposition.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50782",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TS60ZZ"
+    ],
+    "note": "right duplex system, common sheath"
+   },
+   {
+    "codes": [
+     "0TS70ZZ"
+    ],
+    "note": "left duplex system, common sheath"
+   },
+   {
+    "codes": [
+     "0T160ZB"
+    ],
+    "note": "right, bypass variant"
+   },
+   {
+    "codes": [
+     "0T170ZB"
+    ],
+    "note": "left, bypass variant"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q625",
+    "condition": "duplicated ureter",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Both ureters of one duplex side moved together to a new tunnel: Reposition, one code per side (same body-part value); Bypass if divided above disease.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50783",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TS60ZZ",
+     "0TB60ZZ"
+    ],
+    "note": "right, reimplant plus tapering"
+   },
+   {
+    "codes": [
+     "0TS70ZZ",
+     "0TB70ZZ"
+    ],
+    "note": "left, reimplant plus tapering"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q622",
+    "condition": "megaureter",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Megaureter reimplant (Reposition) plus excisional tapering of the redundant ureter wall as a distinct objective (Excision, B3.2c).",
+  "confidence": "medium"
+ },
+ {
+  "code": "50785",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T160ZB",
+     "0TSB0ZZ"
+    ],
+    "note": "right, psoas hitch"
+   },
+   {
+    "codes": [
+     "0T170ZB",
+     "0TSB0ZZ"
+    ],
+    "note": "left, psoas hitch"
+   },
+   {
+    "codes": [
+     "0T160ZB"
+    ],
+    "note": "right, Boari bladder flap"
+   },
+   {
+    "codes": [
+     "0T170ZB"
+    ],
+    "note": "left, Boari bladder flap"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N131",
+    "condition": "ureteral stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Ureter joined to bladder above a long distal defect (Bypass ureter to bladder); psoas hitch moves and fixes the bladder (Reposition bladder); a Boari flap is bladder tissue, so no device.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50800",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T160ZA"
+    ],
+    "note": "right to ileum"
+   },
+   {
+    "codes": [
+     "0T170ZA"
+    ],
+    "note": "left to ileum"
+   },
+   {
+    "codes": [
+     "0T160Z8"
+    ],
+    "note": "right to colon"
+   },
+   {
+    "codes": [
+     "0T170Z8"
+    ],
+    "note": "left to colon"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N131",
+    "condition": "ureteral stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Ureter anastomosed into bowel (often redo of a ureteroenteric anastomosis): Bypass ureter to ileum or colon.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50810",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T180Z8",
+     "0D1M0Z4"
+    ],
+    "note": "bilateral ureters to isolated sigmoid, proximal colostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Ureters routed into an isolated sigmoid reservoir (Bypass bilateral ureters to colon) plus fecal diversion by colostomy (Bypass descending colon to cutaneous).",
+  "confidence": "low"
+ },
+ {
+  "code": "50815",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T180Z9",
+     "0DBN0ZZ"
+    ],
+    "note": "sigmoid colon conduit"
+   },
+   {
+    "codes": [
+     "0T180Z9",
+     "0DBL0ZZ"
+    ],
+    "note": "transverse colon conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   },
+   {
+    "code": "N319",
+    "condition": "neurogenic bladder",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Colon conduit: Bypass bilateral ureters to colocutaneous; the colon segment taken out of continuity is a separate donor site (B3.9).",
+  "confidence": "medium"
+ },
+ {
+  "code": "50820",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T180ZC",
+     "0DBB0ZZ"
+    ],
+    "note": "bilateral ureters"
+   },
+   {
+    "codes": [
+     "0T160ZC",
+     "0DBB0ZZ"
+    ],
+    "note": "solitary right ureter"
+   },
+   {
+    "codes": [
+     "0T170ZC",
+     "0DBB0ZZ"
+    ],
+    "note": "solitary left ureter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   },
+   {
+    "code": "N319",
+    "condition": "neurogenic bladder",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Ileal conduit: Bypass ureters to ileocutaneous plus excision of the harvested ileal segment (B3.9).",
+  "confidence": "medium"
+ },
+ {
+  "code": "50825",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T180Z9",
+     "0DTH0ZZ",
+     "0DBB0ZZ"
+    ],
+    "note": "ileocecal (Indiana-type) pouch"
+   },
+   {
+    "codes": [
+     "0T180ZC",
+     "0DBB0ZZ"
+    ],
+    "note": "all-ileal (Kock-type) pouch"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   },
+   {
+    "code": "N319",
+    "condition": "neurogenic bladder",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Continent cutaneous reservoir: Bypass ureters to colocutaneous or ileocutaneous, plus the bowel harvested to build it (B3.9).",
+  "confidence": "medium"
+ },
+ {
+  "code": "50830",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T180ZB"
+    ],
+    "note": "bilateral ureters back to bladder"
+   },
+   {
+    "codes": [
+     "0T180ZB",
+     "0DBB0ZZ"
+    ],
+    "note": "with removal of old ileal conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z436",
+    "condition": "urostomy takedown",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Undiversion reconnects the upper tracts to the native bladder: Bypass bilateral ureters to bladder; excision of an abandoned bowel conduit coded when removed.",
+  "confidence": "low"
+ },
+ {
+  "code": "50840",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T1307B",
+     "0DBB0ZZ"
+    ],
+    "note": "right ileal ureter"
+   },
+   {
+    "codes": [
+     "0T1407B",
+     "0DBB0ZZ"
+    ],
+    "note": "left ileal ureter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N131",
+    "condition": "ureteral stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Ileal segment interposed from renal pelvis to bladder: Bypass kidney pelvis to bladder with autologous tissue substitute plus ileum harvest (B3.9); Replacement if the native ureter is excised.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50845",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T1B07D",
+     "0DTJ0ZZ"
+    ],
+    "note": "appendix as catheterizable channel"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N319",
+    "condition": "neurogenic bladder",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Appendix tunneled from bladder to skin: Bypass bladder to cutaneous with autologous tissue substitute, plus Resection of appendix as donor site (B3.9).",
+  "confidence": "medium"
+ },
+ {
+  "code": "50860",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T160ZD"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0T170ZD"
+    ],
+    "note": "left"
+   },
+   {
+    "codes": [
+     "0T180ZD"
+    ],
+    "note": "bilateral"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   },
+   {
+    "code": "N131",
+    "condition": "ureteral stricture",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Ureter brought to the skin: Bypass ureter to cutaneous, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "50900",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQ60ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0TQ70ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S3713XA",
+    "condition": "ureter laceration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Suture closure of a ureteral wound: Repair ureter, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "50920",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQ60ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0TQ70ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N2889",
+    "condition": "ureteral fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fistula closure at the ureter: Repair ureter, open (skin tract excision is part of the closure).",
+  "confidence": "medium"
+ },
+ {
+  "code": "50930",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQ60ZZ",
+     "0DQN0ZZ"
+    ],
+    "note": "right ureter-sigmoid fistula"
+   },
+   {
+    "codes": [
+     "0TQ70ZZ",
+     "0DQN0ZZ"
+    ],
+    "note": "left ureter-sigmoid fistula"
+   },
+   {
+    "codes": [
+     "0TQ60ZZ",
+     "0DQB0ZZ"
+    ],
+    "note": "right ureter-ileum fistula"
+   },
+   {
+    "codes": [
+     "0TQ70ZZ",
+     "0DQB0ZZ"
+    ],
+    "note": "left ureter-ileum fistula"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N2889",
+    "condition": "ureteral fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fistula closed on both organs: Repair ureter plus Repair of the involved bowel segment (separate body systems).",
+  "confidence": "low"
+ },
+ {
+  "code": "50940",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TN60ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0TN70ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N9989",
+    "condition": "postop ureter ligation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cutting away a constricting ligature frees the ureter: Release ureter, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "51525",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TBB0ZZ"
+    ],
+    "note": "diverticulectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N323",
+    "condition": "bladder diverticulum",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Diverticulum cut out through cystotomy: Excision of bladder, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "51530",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TBB0ZZ"
+    ],
+    "note": "open tumor excision"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Tumor cut out of the bladder wall through cystotomy: Excision of bladder, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "51550",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TBB0ZZ"
+    ],
+    "note": "partial cystectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Portion of bladder removed: Excision of bladder, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "51555",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TBB0ZZ"
+    ],
+    "note": "partial cystectomy, complicated"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Portion of bladder removed in a difficult field: Excision of bladder, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "51565",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TBB0ZZ",
+     "0T160ZB"
+    ],
+    "note": "right ureter reimplanted"
+   },
+   {
+    "codes": [
+     "0TBB0ZZ",
+     "0T170ZB"
+    ],
+    "note": "left ureter reimplanted"
+   },
+   {
+    "codes": [
+     "0TBB0ZZ",
+     "0T180ZB"
+    ],
+    "note": "both ureters reimplanted"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Partial cystectomy (Excision bladder) plus ureter rejoined to the remaining bladder (Bypass ureter to bladder) as a distinct objective.",
+  "confidence": "medium"
+ },
+ {
+  "code": "51570",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TTB0ZZ"
+    ],
+    "note": "simple cystectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Whole bladder removed: Resection of bladder; diversion reported by its own code.",
+  "confidence": "high"
+ },
+ {
+  "code": "51575",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "07TC0ZZ",
+     "0VT00ZZ",
+     "0VT30ZZ"
+    ],
+    "note": "male, prostate and seminal vesicles"
+   },
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "07TC0ZZ"
+    ],
+    "note": "female"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Radical cystectomy: Resection bladder plus pelvic node dissection (Resection pelvis lymphatic, B3.10c); male cases add prostate and seminal vesicle resection.",
+  "confidence": "medium"
+ },
+ {
+  "code": "51580",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "0T180Z8"
+    ],
+    "note": "ureters to sigmoid"
+   },
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "0T180ZD"
+    ],
+    "note": "ureters to skin"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Resection of bladder plus ureteral diversion (Bypass bilateral ureters to colon or cutaneous).",
+  "confidence": "high"
+ },
+ {
+  "code": "51585",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "0T180Z8",
+     "07TC0ZZ",
+     "0VT00ZZ",
+     "0VT30ZZ"
+    ],
+    "note": "male, ureters to sigmoid"
+   },
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "0T180ZD",
+     "07TC0ZZ",
+     "0VT00ZZ",
+     "0VT30ZZ"
+    ],
+    "note": "male, ureters to skin"
+   },
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "0T180ZD",
+     "07TC0ZZ"
+    ],
+    "note": "female, ureters to skin"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Radical cystectomy with ureterosigmoid or cutaneous diversion plus pelvic node resection (B3.10c); prostate and seminal vesicles in males.",
+  "confidence": "medium"
+ },
+ {
+  "code": "51590",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "0T180ZC",
+     "0DBB0ZZ"
+    ],
+    "note": "ileal conduit"
+   },
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "0T180Z9",
+     "0DBN0ZZ"
+    ],
+    "note": "sigmoid conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Resection of bladder plus conduit diversion (Bypass ureters to ileo- or colocutaneous) and bowel segment harvest (B3.9).",
+  "confidence": "high"
+ },
+ {
+  "code": "51595",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "0T180ZC",
+     "0DBB0ZZ",
+     "07TC0ZZ",
+     "0VT00ZZ",
+     "0VT30ZZ"
+    ],
+    "note": "male, ileal conduit"
+   },
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "0T180ZC",
+     "0DBB0ZZ",
+     "07TC0ZZ"
+    ],
+    "note": "female, ileal conduit"
+   },
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "0T180Z9",
+     "0DBN0ZZ",
+     "07TC0ZZ",
+     "0VT00ZZ",
+     "0VT30ZZ"
+    ],
+    "note": "male, sigmoid conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Radical cystectomy with conduit: Resection bladder, Bypass ureters to ileocutaneous/colocutaneous, bowel harvest (B3.9), pelvic node resection (B3.10c); prostate and seminal vesicles in males.",
+  "confidence": "high"
+ },
+ {
+  "code": "51596",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TRB07Z",
+     "0DBB0ZZ",
+     "0VT00ZZ",
+     "0VT30ZZ"
+    ],
+    "note": "male, orthotopic ileal neobladder"
+   },
+   {
+    "codes": [
+     "0TRB07Z",
+     "0DBB0ZZ"
+    ],
+    "note": "female, orthotopic ileal neobladder"
+   },
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "0T180Z9",
+     "0DTH0ZZ",
+     "0DBB0ZZ"
+    ],
+    "note": "continent cutaneous ileocecal pouch"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Orthotopic neobladder = Replacement of bladder with autologous tissue (removal included in Replacement) plus ileum harvest; continent cutaneous pouch = Resection bladder + Bypass ureters to colocutaneous + bowel harvest.",
+  "confidence": "medium"
+ },
+ {
+  "code": "51597",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "0VT00ZZ",
+     "0VT30ZZ",
+     "0DTP0ZZ",
+     "0D1N0Z4",
+     "0T180ZC",
+     "0DBB0ZZ"
+    ],
+    "note": "male total exenteration, ileal conduit, end colostomy"
+   },
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0UTG0ZZ",
+     "0DTP0ZZ",
+     "0D1N0Z4",
+     "0T180ZC",
+     "0DBB0ZZ"
+    ],
+    "note": "female total exenteration, ileal conduit, end colostomy"
+   },
+   {
+    "codes": [
+     "0TTB0ZZ",
+     "0VT00ZZ",
+     "0VT30ZZ",
+     "0T180ZC",
+     "0DBB0ZZ"
+    ],
+    "note": "male anterior exenteration, ileal conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Each pelvic organ removed is a separate Resection (B3.2a), plus urinary conduit (Bypass ureters to ileocutaneous + ileum harvest) and end colostomy when the rectum goes.",
+  "confidence": "medium"
+ },
+ {
+  "code": "51800",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T7C0ZZ"
+    ],
+    "note": "Y-V plasty of contracted bladder neck"
+   },
+   {
+    "codes": [
+     "0TBC0ZZ"
+    ],
+    "note": "posterior bladder neck wedge resection"
+   },
+   {
+    "codes": [
+     "0TBB0ZZ"
+    ],
+    "note": "reduction cystoplasty (fundus resection)"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N320",
+    "condition": "bladder neck obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Bladder neck widened by incising the wall and advancing a flap = Dilation (non-OR in MS-DRG terms; groups by diagnosis); wedge resection = Excision bladder neck; fundus reduction = Excision bladder.",
+  "confidence": "low"
+ },
+ {
+  "code": "51820",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TVC0ZZ",
+     "0TS80ZZ"
+    ],
+    "note": "bladder neck tubularized, both ureters relocated"
+   },
+   {
+    "codes": [
+     "0TQC0ZZ",
+     "0TS80ZZ"
+    ],
+    "note": "bladder neck reconstructed, both ureters relocated"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N393",
+    "condition": "stress incontinence",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Bladder neck tubularized to raise outlet resistance (Restriction bladder neck) with ureters moved up out of the trigone (Reposition bilateral ureters).",
+  "confidence": "low"
+ },
+ {
+  "code": "51840",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TSC0ZZ"
+    ],
+    "note": "retropubic suspension, bladder neck"
+   },
+   {
+    "codes": [
+     "0TSD0ZZ"
+    ],
+    "note": "retropubic suspension, urethra"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N393",
+    "condition": "stress incontinence",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Bladder neck/urethrovesical junction lifted and fixed retropubically: Reposition bladder neck, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "51841",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TSC0ZZ"
+    ],
+    "note": "redo suspension, bladder neck"
+   },
+   {
+    "codes": [
+     "0TSD0ZZ"
+    ],
+    "note": "redo suspension, urethra"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N393",
+    "condition": "stress incontinence",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Secondary retropubic suspension still moves and fixes the bladder neck: Reposition bladder neck, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "51865",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQB0ZZ"
+    ],
+    "note": "bladder laceration"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S3723XA",
+    "condition": "bladder laceration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Layered suture of a bladder wound: Repair bladder, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "51900",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQB0ZZ",
+     "0UQG0ZZ"
+    ],
+    "note": "transabdominal closure, both walls"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N820",
+    "condition": "vesicovaginal fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fistula separated and each organ closed: Repair bladder plus Repair vagina (different body systems).",
+  "confidence": "medium"
+ },
+ {
+  "code": "51920",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQB0ZZ",
+     "0UQ90ZZ"
+    ],
+    "note": "uterus preserved"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N821",
+    "condition": "vesicouterine fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fistula divided and both walls closed: Repair bladder plus Repair uterus.",
+  "confidence": "medium"
+ }
+]

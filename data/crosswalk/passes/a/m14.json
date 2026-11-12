@@ -1,0 +1,1213 @@
+[
+ {
+  "code": "27185",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QQ60ZZ"
+    ],
+    "note": "right, drilling/curettage arrest"
+   },
+   {
+    "codes": [
+     "0QQ70ZZ"
+    ],
+    "note": "left, drilling/curettage arrest"
+   },
+   {
+    "codes": [
+     "0QH604Z"
+    ],
+    "note": "right, screw or staple arrest"
+   },
+   {
+    "codes": [
+     "0QH704Z"
+    ],
+    "note": "left, screw or staple arrest"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M9111",
+    "condition": "Perthes disease",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Growth-plate arrest of the trochanteric apophysis indexes to Repair (no device) or Insertion of internal fixation (screws/staples), upper femur, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27187",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QH606Z"
+    ],
+    "note": "right, intramedullary nail"
+   },
+   {
+    "codes": [
+     "0QH706Z"
+    ],
+    "note": "left, intramedullary nail"
+   },
+   {
+    "codes": [
+     "0QH604Z"
+    ],
+    "note": "right, plate/screws"
+   },
+   {
+    "codes": [
+     "0QH704Z"
+    ],
+    "note": "left, plate/screws"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C7951",
+    "condition": "bone metastasis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Prophylactic fixation of intact upper femur = Insertion of fixation device (no fracture, so not Reposition); nail most common; open approach assumed.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27222",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS4XZZ"
+    ],
+    "note": "right acetabulum"
+   },
+   {
+    "codes": [
+     "0QS5XZZ"
+    ],
+    "note": "left acetabulum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S32431A",
+    "condition": "acetabular fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Closed manipulation of acetabular fracture = Reposition, acetabulum, external; non-OR in MS-DRG terms, groups by diagnosis.",
+  "confidence": "high"
+ },
+ {
+  "code": "27226",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS404Z"
+    ],
+    "note": "right acetabulum"
+   },
+   {
+    "codes": [
+     "0QS504Z"
+    ],
+    "note": "left acetabulum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S32421A",
+    "condition": "acetabular wall fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reduction internal fixation of acetabular wall = Reposition, acetabulum, with internal fixation, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27227",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS404Z"
+    ],
+    "note": "right acetabulum"
+   },
+   {
+    "codes": [
+     "0QS504Z"
+    ],
+    "note": "left acetabulum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S32431A",
+    "condition": "acetabular column fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "ORIF of single-column or transverse acetabular fracture = Reposition, acetabulum, with internal fixation, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27228",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS404Z"
+    ],
+    "note": "right acetabulum"
+   },
+   {
+    "codes": [
+     "0QS504Z"
+    ],
+    "note": "left acetabulum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S32491A",
+    "condition": "acetabular fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "ORIF of both-column acetabular fracture = Reposition, acetabulum, with internal fixation, open; both-column has no unique CM code so other specified acetabular fracture.",
+  "confidence": "high"
+ },
+ {
+  "code": "27232",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS6XZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS7XZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72001A",
+    "condition": "femoral neck fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Closed manipulation of femoral neck fracture = Reposition, upper femur, external; non-OR in MS-DRG terms, groups by diagnosis.",
+  "confidence": "high"
+ },
+ {
+  "code": "27236",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SRR0J9"
+    ],
+    "note": "right hemiarthroplasty, cemented"
+   },
+   {
+    "codes": [
+     "0SRS0J9"
+    ],
+    "note": "left hemiarthroplasty, cemented"
+   },
+   {
+    "codes": [
+     "0SRR0JA"
+    ],
+    "note": "right hemiarthroplasty, uncemented"
+   },
+   {
+    "codes": [
+     "0QS604Z"
+    ],
+    "note": "right open reduction internal fixation"
+   },
+   {
+    "codes": [
+     "0QS704Z"
+    ],
+    "note": "left open reduction internal fixation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72001A",
+    "condition": "femoral neck fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Prosthetic variant = Replacement, hip joint femoral surface (hemiarthroplasty, the usual Medicare case); fixation variant = Reposition, upper femur, with internal fixation, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27240",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS6XZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS7XZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72141A",
+    "condition": "intertrochanteric fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Closed manipulation of trochanteric fracture = Reposition, upper femur, external; non-OR in MS-DRG terms, groups by diagnosis.",
+  "confidence": "high"
+ },
+ {
+  "code": "27244",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS604Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS704Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72141A",
+    "condition": "intertrochanteric fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Sliding hip screw/plate fixation = Reposition, upper femur, with internal fixation device, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27245",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS606Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS706Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72141A",
+    "condition": "intertrochanteric fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cephalomedullary nail fixation = Reposition, upper femur, with intramedullary internal fixation device, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27248",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS604Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS704Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72111A",
+    "condition": "greater trochanter fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open fixation of trochanteric fragment = Reposition, upper femur, with internal fixation, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27253",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SS90ZZ"
+    ],
+    "note": "right hip"
+   },
+   {
+    "codes": [
+     "0SSB0ZZ"
+    ],
+    "note": "left hip"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S73014A",
+    "condition": "posterior hip dislocation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reduction of dislocated hip without fixation = Reposition, hip joint, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27254",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SS90ZZ",
+     "0QS404Z",
+     "0QS604Z"
+    ],
+    "note": "right: joint reduction + acetabular wall and femoral head fixation"
+   },
+   {
+    "codes": [
+     "0SSB0ZZ",
+     "0QS504Z",
+     "0QS704Z"
+    ],
+    "note": "left: joint reduction + acetabular wall and femoral head fixation"
+   },
+   {
+    "codes": [
+     "0SS90ZZ",
+     "0QS404Z"
+    ],
+    "note": "right: femoral head fragment not fixed"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S32421A",
+    "condition": "acetabular wall fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fracture-dislocation: separate body parts (hip joint, acetabulum, upper femur) each get a Reposition code per B3.2; femoral head fixation only when done.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27258",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SS90ZZ"
+    ],
+    "note": "right hip"
+   },
+   {
+    "codes": [
+     "0SSB0ZZ"
+    ],
+    "note": "left hip"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q6501",
+    "condition": "developmental hip dislocation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reduction of developmental dislocation = Reposition, hip joint, open; capsular and tendon release are steps of the reduction.",
+  "confidence": "high"
+ },
+ {
+  "code": "27259",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SS90ZZ",
+     "0QB60ZZ",
+     "0QS604Z"
+    ],
+    "note": "right: reduction + shortening osteotomy with plate"
+   },
+   {
+    "codes": [
+     "0SSB0ZZ",
+     "0QB70ZZ",
+     "0QS704Z"
+    ],
+    "note": "left: reduction + shortening osteotomy with plate"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q6501",
+    "condition": "developmental hip dislocation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Hip Reposition plus proximal femoral shortening: bone segment removal (Excision, upper femur) and fixation of the osteotomy (Reposition with internal fixation) as distinct objectives.",
+  "confidence": "low"
+ },
+ {
+  "code": "27268",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS6XZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0QS7XZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72061A",
+    "condition": "femoral head fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Closed manipulation of femoral head fracture = Reposition, upper femur, external; non-OR in MS-DRG terms, groups by diagnosis.",
+  "confidence": "high"
+ },
+ {
+  "code": "27269",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS604Z"
+    ],
+    "note": "right, with fixation"
+   },
+   {
+    "codes": [
+     "0QS704Z"
+    ],
+    "note": "left, with fixation"
+   },
+   {
+    "codes": [
+     "0QS60ZZ"
+    ],
+    "note": "right, no fixation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S72061A",
+    "condition": "femoral head fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open treatment of femoral head fracture = Reposition, upper femur, open, with internal fixation when placed.",
+  "confidence": "high"
+ },
+ {
+  "code": "27280",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SG704Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0SG804Z"
+    ],
+    "note": "left"
+   },
+   {
+    "codes": [
+     "0SG704Z",
+     "0SG804Z"
+    ],
+    "note": "bilateral"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M533",
+    "condition": "sacroiliac joint dysfunction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open SI fusion = Fusion, sacroiliac joint, open; implant chosen as device value (graft-first hierarchy B3.10c strictly covers vertebral joints; 0SG707Z is the alternative).",
+  "confidence": "medium"
+ },
+ {
+  "code": "27282",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QH204Z",
+     "0QU207Z"
+    ],
+    "note": "plate across symphysis plus autograft (right side coded)"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M25359",
+    "condition": "pelvic joint instability",
+    "role": "typical"
+   }
+  ],
+  "rationale": "PCS has no pubic symphysis joint and no Fusion value for pelvic bone, so symphysis arthrodesis is built as Insertion of internal fixation plus Supplement with bone graft, pelvic bone, open.",
+  "confidence": "low"
+ },
+ {
+  "code": "27284",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SG904Z"
+    ],
+    "note": "right hip"
+   },
+   {
+    "codes": [
+     "0SGB04Z"
+    ],
+    "note": "left hip"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M1651",
+    "condition": "post-traumatic hip arthritis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Hip arthrodesis = Fusion, hip joint, open, with internal fixation device (graft value 0SG907Z if no hardware).",
+  "confidence": "medium"
+ },
+ {
+  "code": "27286",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SG904Z",
+     "0QS604Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0SGB04Z",
+     "0QS704Z"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M1651",
+    "condition": "post-traumatic hip arthritis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Hip Fusion plus a separate body part: proximal femoral osteotomy = Reposition, upper femur, with fixation, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "27290",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Y620ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0Y630ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C414",
+    "condition": "pelvic bone sarcoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Hindquarter amputation = Detachment, hindquarter, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "27295",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Y670ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0Y680ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I70261",
+    "condition": "limb gangrene",
+    "role": "typical"
+   },
+   {
+    "code": "M86651",
+    "condition": "femur osteomyelitis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Hip disarticulation = Detachment at femoral region (the lower-limb analog of shoulder-region disarticulation); 0Y6C0Z1 (upper leg, high) is the competing choice.",
+  "confidence": "medium"
+ },
+ {
+  "code": "G0412",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS204Z"
+    ],
+    "note": "right ilium"
+   },
+   {
+    "codes": [
+     "0QS304Z"
+    ],
+    "note": "left ilium"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S32391A",
+    "condition": "iliac wing fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "ORIF of iliac wing/spine fracture = Reposition, pelvic bone, with internal fixation, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "G0414",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS204Z"
+    ],
+    "note": "right pubic rami"
+   },
+   {
+    "codes": [
+     "0QS304Z"
+    ],
+    "note": "left pubic rami"
+   },
+   {
+    "codes": [
+     "0QS204Z",
+     "0QS304Z"
+    ],
+    "note": "symphysis plating, both pubic bodies"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S32591A",
+    "condition": "pubic rami fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Anterior ring ORIF = Reposition, pelvic bone (pubis), with internal fixation, open; symphyseal disruption fixes both pubic bodies.",
+  "confidence": "high"
+ },
+ {
+  "code": "G0415",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS104Z"
+    ],
+    "note": "sacrum"
+   },
+   {
+    "codes": [
+     "0SS704Z"
+    ],
+    "note": "right sacroiliac joint"
+   },
+   {
+    "codes": [
+     "0SS804Z"
+    ],
+    "note": "left sacroiliac joint"
+   },
+   {
+    "codes": [
+     "0QS204Z"
+    ],
+    "note": "right ilium"
+   },
+   {
+    "codes": [
+     "0QS304Z"
+    ],
+    "note": "left ilium"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S3210XA",
+    "condition": "sacral fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Posterior ring ORIF = Reposition with internal fixation, open, of the body part fixed (sacrum, SI joint, or ilium).",
+  "confidence": "high"
+ },
+ {
+  "code": "59120",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT50ZZ"
+    ],
+    "note": "right tube"
+   },
+   {
+    "codes": [
+     "0UT60ZZ"
+    ],
+    "note": "left tube"
+   },
+   {
+    "codes": [
+     "0UT00ZZ"
+    ],
+    "note": "right ovary"
+   },
+   {
+    "codes": [
+     "0UT10ZZ"
+    ],
+    "note": "left ovary"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "O00101",
+    "condition": "tubal ectopic pregnancy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open salpingectomy/oophorectomy for ectopic = Resection of tube or ovary; pregnancy removed with the organ, no separate obstetrics code.",
+  "confidence": "medium"
+ },
+ {
+  "code": "59121",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "10D20ZZ"
+    ],
+    "note": "open salpingostomy/ovarian evacuation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "O00101",
+    "condition": "tubal ectopic pregnancy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Organ-sparing removal of ectopic pregnancy = Extraction, products of conception, ectopic, open (10T20ZZ Resection is the older alternative).",
+  "confidence": "medium"
+ },
+ {
+  "code": "59130",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "10D20ZZ"
+    ],
+    "note": "open removal"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "O0000",
+    "condition": "abdominal pregnancy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparotomy removal of abdominal pregnancy = Extraction, products of conception, ectopic, open (placenta often left in situ; 10T20ZZ if fully cut out).",
+  "confidence": "medium"
+ },
+ {
+  "code": "59136",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UB90ZZ"
+    ],
+    "note": "cornual wedge resection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "O00121",
+    "condition": "interstitial ectopic pregnancy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Partial uterine resection removing the interstitial pregnancy = Excision, uterus, open; pregnancy removed with the tissue (10T20ZZ if coded on the conceptus).",
+  "confidence": "medium"
+ },
+ {
+  "code": "59140",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "10D27ZZ"
+    ],
+    "note": "vaginal evacuation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "O0041",
+    "condition": "cervical ectopic pregnancy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Evacuation of cervical pregnancy = Extraction, products of conception, ectopic, via natural opening.",
+  "confidence": "medium"
+ },
+ {
+  "code": "59325",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UVC0CZ"
+    ],
+    "note": "abdominal cerclage"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "O3431",
+    "condition": "cervical insufficiency",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transabdominal cerclage = Restriction, cervix, with extraluminal device, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "59350",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UQ90ZZ"
+    ],
+    "note": "uterine repair"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "O711",
+    "condition": "uterine rupture in labor",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Hysterorrhaphy = Repair, uterus, open; delivery code (cesarean) is a separate operation not included here.",
+  "confidence": "medium"
+ },
+ {
+  "code": "59830",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "10D17ZZ"
+    ],
+    "note": "evacuation of retained tissue"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "O0337",
+    "condition": "septic incomplete abortion",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Surgical completion of septic abortion = Extraction, products of conception, retained, via natural opening.",
+  "confidence": "high"
+ },
+ {
+  "code": "20802",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0XM80ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0XM90ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S48111A",
+    "condition": "traumatic arm amputation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Arm replantation = Reattachment, upper arm, open; bone, vessel and nerve repair are included.",
+  "confidence": "high"
+ },
+ {
+  "code": "20805",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0XMD0ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0XMF0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S58111A",
+    "condition": "traumatic forearm amputation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Forearm replantation = Reattachment, lower arm, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "20808",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0XMJ0ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0XMK0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S68411A",
+    "condition": "traumatic hand amputation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Hand replantation = Reattachment, hand, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "20816",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0XMN0ZZ"
+    ],
+    "note": "right index"
+   },
+   {
+    "codes": [
+     "0XMQ0ZZ"
+    ],
+    "note": "right middle"
+   },
+   {
+    "codes": [
+     "0XMS0ZZ"
+    ],
+    "note": "right ring"
+   },
+   {
+    "codes": [
+     "0XMP0ZZ"
+    ],
+    "note": "left index"
+   },
+   {
+    "codes": [
+     "0XMR0ZZ"
+    ],
+    "note": "left middle"
+   },
+   {
+    "codes": [
+     "0XMV0ZZ"
+    ],
+    "note": "right little"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S68610A",
+    "condition": "traumatic finger amputation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Digit replantation = Reattachment of the specific finger, open; multiple digits each coded.",
+  "confidence": "high"
+ },
+ {
+  "code": "20824",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0XML0ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0XMM0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S68511A",
+    "condition": "traumatic thumb amputation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Thumb replantation = Reattachment, thumb, open.",
+  "confidence": "high"
+ }
+]

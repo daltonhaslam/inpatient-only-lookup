@@ -1,0 +1,354 @@
+[
+ {
+  "code": "51925",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0TQB0ZZ"
+    ],
+    "note": "total abdominal hysterectomy (uterus + cervix) with bladder fistula repair"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N821",
+    "condition": "vesicouterine fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open hysterectomy coded as Resection of uterus and cervix (separate body parts) plus open Repair of bladder for the fistula closure, a distinct objective.",
+  "confidence": "medium"
+ },
+ {
+  "code": "51940",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQB0ZZ"
+    ],
+    "note": "primary closure of exstrophic bladder"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q6410",
+    "condition": "bladder exstrophy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Closing the open bladder plate restores its structure without a device or transfer = Repair of bladder, open; Reposition is the other plausible root if the plate is mobilized into the pelvis.",
+  "confidence": "medium"
+ },
+ {
+  "code": "51960",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TUB07Z",
+     "0DBB0ZZ"
+    ],
+    "note": "ileocystoplasty; ileal segment harvest coded separately"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N319",
+    "condition": "neurogenic bladder",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Augmentation with a bowel patch = Supplement of bladder with autologous tissue; the ileal segment taken for the graft is a separate body part so its Excision is coded per B3.9; bowel anastomosis not coded.",
+  "confidence": "high"
+ },
+ {
+  "code": "51980",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T1B0ZD"
+    ],
+    "note": "cutaneous vesicostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N319",
+    "condition": "neurogenic bladder",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Creating a bladder-to-skin stoma = Bypass bladder to cutaneous, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "53415",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TBD0ZZ"
+    ],
+    "note": "stricture excision with primary anastomosis (perineal)"
+   },
+   {
+    "codes": [
+     "0TUD07Z",
+     "0CB4XZZ"
+    ],
+    "note": "substitution urethroplasty with buccal mucosa graft plus graft harvest"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N99112",
+    "condition": "postprocedural urethral stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "One-stage posterior urethroplasty is usually excision of the stenotic segment with end-to-end anastomosis (Excision of urethra, open); graft-augmented repairs are Supplement with the buccal donor site coded separately per B3.9.",
+  "confidence": "medium"
+ },
+ {
+  "code": "53448",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TPD0LZ",
+     "0THD0LZ"
+    ],
+    "note": "urethral cuff (male)"
+   },
+   {
+    "codes": [
+     "0TPB0LZ",
+     "0THC0LZ"
+    ],
+    "note": "bladder neck cuff (female)"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T83591A",
+    "condition": "infected urinary sphincter",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Taking out the infected device and placing a new one = Removal plus Insertion of artificial sphincter at the cuff site; irrigation not coded and debridement coded only if documented as excisional.",
+  "confidence": "medium"
+ },
+ {
+  "code": "35372",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "04CK0ZZ"
+    ],
+    "note": "right profunda"
+   },
+   {
+    "codes": [
+     "04CL0ZZ"
+    ],
+    "note": "left profunda"
+   },
+   {
+    "codes": [
+     "04CK0ZZ",
+     "04UK0KZ"
+    ],
+    "note": "right, with patch profundaplasty"
+   },
+   {
+    "codes": [
+     "04CL0ZZ",
+     "04UL0KZ"
+    ],
+    "note": "left, with patch profundaplasty"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I70221",
+    "condition": "leg PAD rest pain",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Endarterectomy = Extirpation of matter; the profunda femoris falls under the femoral artery body part; a patch closure is coded as Supplement when documented.",
+  "confidence": "high"
+ },
+ {
+  "code": "35800",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W360ZZ"
+    ],
+    "note": "re-exploration to stop postoperative bleeding/hematoma"
+   },
+   {
+    "codes": [
+     "03CK0ZZ"
+    ],
+    "note": "re-exploration with thrombectomy, right internal carotid"
+   },
+   {
+    "codes": [
+     "03CL0ZZ"
+    ],
+    "note": "re-exploration with thrombectomy, left internal carotid"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I97618",
+    "condition": "post-op neck bleeding",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Return to the neck for postoperative bleeding = Control of bleeding in neck (B3.7); for postoperative thrombosis the clot removal is Extirpation of the carotid; exploration with no intervention would be Inspection.",
+  "confidence": "medium"
+ },
+ {
+  "code": "37182",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "06183J4"
+    ],
+    "note": "TIPS with covered stent"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K7031",
+    "condition": "alcoholic cirrhosis ascites",
+    "role": "typical"
+   }
+  ],
+  "rationale": "TIPS = percutaneous Bypass portal vein to hepatic vein with synthetic substitute (FY2025+ hepatic-vein qualifier).",
+  "confidence": "high"
+ },
+ {
+  "code": "37617",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "04L00ZZ"
+    ],
+    "note": "abdominal aorta"
+   },
+   {
+    "codes": [
+     "04LC0ZZ"
+    ],
+    "note": "right common iliac"
+   },
+   {
+    "codes": [
+     "04LD0ZZ"
+    ],
+    "note": "left common iliac"
+   },
+   {
+    "codes": [
+     "04LE0ZZ"
+    ],
+    "note": "right internal iliac"
+   },
+   {
+    "codes": [
+     "04LF0ZZ"
+    ],
+    "note": "left internal iliac"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T827XXA",
+    "condition": "infected aortic graft",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Tying off a vessel completely = Occlusion, open; body part per artery ligated; the indication mix (graft infection, hemorrhage, aneurysm) is uncertain.",
+  "confidence": "low"
+ },
+ {
+  "code": "60600",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0GT70ZZ"
+    ],
+    "note": "right carotid body"
+   },
+   {
+    "codes": [
+     "0GT60ZZ"
+    ],
+    "note": "left carotid body"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D355",
+    "condition": "carotid body paraganglioma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "The tumor replaces the carotid body and the whole body is removed = Resection of carotid body, open (Excision if partial); carotid body dx sits in MDC 1 whose OR list lacks 0GT6/0GT7, so it groups 981-983.",
+  "confidence": "medium"
+ },
+ {
+  "code": "60605",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0GT70ZZ",
+     "03BK0ZZ"
+    ],
+    "note": "right, with internal carotid segment excision"
+   },
+   {
+    "codes": [
+     "0GT60ZZ",
+     "03BL0ZZ"
+    ],
+    "note": "left, with internal carotid segment excision"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D355",
+    "condition": "carotid body paraganglioma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Resection of carotid body plus Excision of the involved internal carotid segment (distinct body part); if the segment is reconstructed with a graft, Replacement of the carotid replaces the Excision code.",
+  "confidence": "medium"
+ }
+]

@@ -1,0 +1,1360 @@
+[
+ {
+  "code": "58740",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UN70ZZ",
+     "0UN20ZZ"
+    ],
+    "note": "bilateral tubes and ovaries freed"
+   },
+   {
+    "codes": [
+     "0UN70ZZ"
+    ],
+    "note": "bilateral tubes only"
+   },
+   {
+    "codes": [
+     "0UN50ZZ",
+     "0UN00ZZ"
+    ],
+    "note": "right tube and ovary"
+   },
+   {
+    "codes": [
+     "0UN60ZZ",
+     "0UN10ZZ"
+    ],
+    "note": "left tube and ovary"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N736",
+    "condition": "pelvic adhesions",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open lysis of adnexal adhesions = Release; body part is the structure freed, separate codes for tube and ovary (B3.13).",
+  "confidence": "high"
+ },
+ {
+  "code": "58750",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0U150Z5",
+     "0U160Z6"
+    ],
+    "note": "bilateral tubal reanastomosis"
+   },
+   {
+    "codes": [
+     "0U150Z5"
+    ],
+    "note": "right only"
+   },
+   {
+    "codes": [
+     "0U160Z6"
+    ],
+    "note": "left only"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z310",
+    "condition": "sterilization reversal",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open tube-to-tube reanastomosis around the occluded segment = Bypass fallopian tube to same tube (dedicated qualifier); Repair 0UQ is the other defensible root, same family.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58752",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0U150Z9",
+     "0U160Z9"
+    ],
+    "note": "bilateral tubouterine implantation"
+   },
+   {
+    "codes": [
+     "0U150Z9"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0U160Z9"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N971",
+    "condition": "tubal infertility",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reimplantation of tube into uterine cavity reroutes flow past blocked cornual segment = Bypass fallopian tube to uterus.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58760",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UQ70ZZ"
+    ],
+    "note": "bilateral"
+   },
+   {
+    "codes": [
+     "0UQ50ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0UQ60ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N971",
+    "condition": "tubal infertility",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reconstruction of the fimbriated end = Repair fallopian tube (no more specific root fits); Release if only fimbrial adhesions lysed.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58822",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0U9000Z"
+    ],
+    "note": "right ovary, drain left in"
+   },
+   {
+    "codes": [
+     "0U9100Z"
+    ],
+    "note": "left ovary, drain left in"
+   },
+   {
+    "codes": [
+     "0U900ZZ"
+    ],
+    "note": "right ovary, no drain"
+   },
+   {
+    "codes": [
+     "0U910ZZ"
+    ],
+    "note": "left ovary, no drain"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N7002",
+    "condition": "ovarian abscess",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Abdominal (open) drainage of ovarian abscess = Drainage ovary, open; device value if a drain is left.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58825",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0US20ZZ"
+    ],
+    "note": "bilateral"
+   },
+   {
+    "codes": [
+     "0US00ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0US10ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C539",
+    "condition": "cervical cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open moving of ovary(ies) out of planned radiation field = Reposition ovary.",
+  "confidence": "high"
+ },
+ {
+  "code": "58940",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT00ZZ"
+    ],
+    "note": "right total"
+   },
+   {
+    "codes": [
+     "0UT10ZZ"
+    ],
+    "note": "left total"
+   },
+   {
+    "codes": [
+     "0UT20ZZ"
+    ],
+    "note": "bilateral total"
+   },
+   {
+    "codes": [
+     "0UB00ZZ"
+    ],
+    "note": "right partial"
+   },
+   {
+    "codes": [
+     "0UB10ZZ"
+    ],
+    "note": "left partial"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D270",
+    "condition": "benign ovarian tumor",
+    "role": "typical"
+   },
+   {
+    "code": "C561",
+    "condition": "ovarian cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Open oophorectomy = Resection ovary (total) or Excision (partial).",
+  "confidence": "high"
+ },
+ {
+  "code": "58943",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT20ZZ",
+     "0UT70ZZ",
+     "07BC0ZX",
+     "07BD0ZX",
+     "0DBW0ZX",
+     "0DBU0ZZ"
+    ],
+    "note": "BSO, node and peritoneal biopsies, omentectomy"
+   },
+   {
+    "codes": [
+     "0UT00ZZ",
+     "0UT50ZZ",
+     "07BC0ZX",
+     "07BD0ZX",
+     "0DBW0ZX",
+     "0DBU0ZZ"
+    ],
+    "note": "right salpingo-oophorectomy with staging"
+   },
+   {
+    "codes": [
+     "0UT10ZZ",
+     "0UT60ZZ",
+     "07BC0ZX",
+     "07BD0ZX",
+     "0DBW0ZX",
+     "0DBU0ZZ"
+    ],
+    "note": "left salpingo-oophorectomy with staging"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C561",
+    "condition": "ovarian cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open oophorectomy (Resection) plus distinct staging objectives: diagnostic Excision of pelvic/aortic nodes and peritoneum, infracolic omentectomy (Excision).",
+  "confidence": "medium"
+ },
+ {
+  "code": "58950",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT20ZZ",
+     "0UT70ZZ",
+     "0DBU0ZZ"
+    ],
+    "note": "BSO + infracolic omentectomy"
+   },
+   {
+    "codes": [
+     "0UT20ZZ",
+     "0UT70ZZ",
+     "0DTU0ZZ"
+    ],
+    "note": "BSO + total omentectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C561",
+    "condition": "ovarian cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open Resection of both ovaries and tubes plus omentectomy (Excision if infracolic, Resection if total).",
+  "confidence": "high"
+ },
+ {
+  "code": "58951",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT20ZZ",
+     "0UT70ZZ",
+     "0DBU0ZZ",
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "07BC0ZZ",
+     "07BD0ZZ"
+    ],
+    "note": "BSO, omentectomy, TAH, pelvic + para-aortic lymphadenectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C561",
+    "condition": "ovarian cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Adds total hysterectomy (Resection uterus + cervix) and lymphadenectomy as a distinct objective (B3.10c); Excision of pelvic/aortic lymphatic unless whole chain removed (then Resection 07T).",
+  "confidence": "medium"
+ },
+ {
+  "code": "58952",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT20ZZ",
+     "0UT70ZZ",
+     "0DBU0ZZ",
+     "0DBW0ZZ"
+    ],
+    "note": "BSO, omentectomy, peritoneal tumor debulking"
+   },
+   {
+    "codes": [
+     "0UT20ZZ",
+     "0UT70ZZ",
+     "0DBU0ZZ",
+     "0DBW0ZZ",
+     "0DBV0ZZ"
+    ],
+    "note": "plus mesenteric implants"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C561",
+    "condition": "ovarian cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "BSO + omentectomy plus radical debulking of peritoneal/mesenteric implants = Excision peritoneum (and mesentery when involved).",
+  "confidence": "medium"
+ },
+ {
+  "code": "58953",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT20ZZ",
+     "0UT70ZZ",
+     "0DBU0ZZ",
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0DBW0ZZ"
+    ],
+    "note": "BSO, omentectomy, TAH, peritoneal debulking"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C561",
+    "condition": "ovarian cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open BSO + TAH (Resection uterus and cervix) + omentectomy + debulking of peritoneal disease (Excision peritoneum).",
+  "confidence": "medium"
+ },
+ {
+  "code": "58954",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT20ZZ",
+     "0UT70ZZ",
+     "0DBU0ZZ",
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0DBW0ZZ",
+     "07BC0ZZ",
+     "07BD0ZZ"
+    ],
+    "note": "as 58953 plus pelvic + para-aortic lymphadenectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C561",
+    "condition": "ovarian cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "As the BSO/TAH/omentectomy/debulking set plus distinct pelvic and aortic lymphadenectomy (Excision lymphatic, B3.10c).",
+  "confidence": "medium"
+ },
+ {
+  "code": "58956",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT20ZZ",
+     "0UT70ZZ",
+     "0DTU0ZZ",
+     "0UT90ZZ",
+     "0UTC0ZZ"
+    ],
+    "note": "BSO, total omentectomy, TAH"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C561",
+    "condition": "ovarian cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open Resection of ovaries, tubes, uterus and cervix plus total omentectomy (Resection omentum); uterine-cancer use groups to the same family.",
+  "confidence": "high"
+ },
+ {
+  "code": "58958",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBW0ZZ",
+     "0DBU0ZZ",
+     "07BC0ZZ",
+     "07BD0ZZ"
+    ],
+    "note": "intraperitoneal recurrence + omentectomy + nodes"
+   },
+   {
+    "codes": [
+     "0WBH0ZZ",
+     "07BC0ZZ",
+     "07BD0ZZ"
+    ],
+    "note": "retroperitoneal recurrence + nodes"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C561",
+    "condition": "ovarian cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Recurrent-tumor resection = Excision of the involved region (peritoneum or retroperitoneum) plus distinct pelvic and aortic lymphadenectomy; recurrence coded to the primary site.",
+  "confidence": "medium"
+ },
+ {
+  "code": "58960",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "07BC0ZZ",
+     "07BD0ZZ",
+     "0DBW0ZX",
+     "0DBU0ZZ"
+    ],
+    "note": "lymphadenectomy, peritoneal biopsies, omentectomy"
+   },
+   {
+    "codes": [
+     "07BC0ZZ",
+     "07BD0ZZ",
+     "0DBW0ZX"
+    ],
+    "note": "without omentectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C561",
+    "condition": "ovarian cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Staging/second-look laparotomy: exploration not coded; code pelvic/aortic node Excision, diagnostic peritoneal biopsies, omentectomy if done.",
+  "confidence": "medium"
+ },
+ {
+  "code": "20661",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NH035Z"
+    ],
+    "note": "halo pins into skull"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S12110A",
+    "condition": "dens fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Halo ring pinned through the scalp into outer table = Insertion external fixation device into skull, percutaneous; non-OR in MS-DRG terms, groups by diagnosis.",
+  "confidence": "high"
+ },
+ {
+  "code": "20664",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NH035Z"
+    ],
+    "note": "halo, multiple pins"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S12110A",
+    "condition": "dens fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Same as standard halo; pin count does not change PCS. Non-OR in MS-DRG terms, groups by diagnosis.",
+  "confidence": "high"
+ },
+ {
+  "code": "21045",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NBT0ZZ"
+    ],
+    "note": "right segmental/marginal"
+   },
+   {
+    "codes": [
+     "0NBV0ZZ"
+    ],
+    "note": "left segmental/marginal"
+   },
+   {
+    "codes": [
+     "0NTT0ZZ"
+    ],
+    "note": "right hemimandibulectomy"
+   },
+   {
+    "codes": [
+     "0NTV0ZZ"
+    ],
+    "note": "left hemimandibulectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C031",
+    "condition": "lower gum cancer",
+    "role": "typical"
+   },
+   {
+    "code": "C411",
+    "condition": "mandible bone cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Open removal of tumor-bearing mandible: Excision for segmental resection, Resection when the whole side (hemimandible) is removed.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21145",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NUR07Z",
+     "0QB20ZZ"
+    ],
+    "note": "plated LeFort I, autograft from iliac crest"
+   },
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NUR07Z",
+     "0NB30ZZ"
+    ],
+    "note": "autograft from calvarium"
+   },
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NUR0KZ"
+    ],
+    "note": "banked bone graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M2602",
+    "condition": "maxillary hypoplasia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "LeFort I osteotomy moves the maxilla = Reposition maxilla with internal fixation; graft = Supplement maxilla; autograft donor coded separately (B3.9). Segment count does not change PCS.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21146",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NUR07Z",
+     "0QB20ZZ"
+    ],
+    "note": "plated LeFort I, autograft from iliac crest"
+   },
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NUR07Z",
+     "0NB30ZZ"
+    ],
+    "note": "autograft from calvarium"
+   },
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NUR0KZ"
+    ],
+    "note": "banked bone graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M2602",
+    "condition": "maxillary hypoplasia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "LeFort I osteotomy moves the maxilla = Reposition maxilla with internal fixation; graft = Supplement maxilla; autograft donor coded separately (B3.9). Segment count does not change PCS.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21147",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NUR07Z",
+     "0QB20ZZ"
+    ],
+    "note": "plated LeFort I, autograft from iliac crest"
+   },
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NUR07Z",
+     "0NB30ZZ"
+    ],
+    "note": "autograft from calvarium"
+   },
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NUR0KZ"
+    ],
+    "note": "banked bone graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M2602",
+    "condition": "maxillary hypoplasia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "LeFort I osteotomy moves the maxilla = Reposition maxilla with internal fixation; graft = Supplement maxilla; autograft donor coded separately (B3.9). Segment count does not change PCS.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21151",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NSB04Z",
+     "0NUR07Z",
+     "0QB20ZZ"
+    ],
+    "note": "maxilla + nasal pyramid, iliac graft"
+   },
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NSB04Z",
+     "0NUR07Z",
+     "0NB30ZZ"
+    ],
+    "note": "calvarial graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M2602",
+    "condition": "maxillary hypoplasia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "LeFort II moves the nasomaxillary pyramid = Reposition maxilla and nasal bone (separate body parts) with fixation, plus graft Supplement and donor-site Excision.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21154",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NSM04Z",
+     "0NSN04Z",
+     "0NSB04Z",
+     "0NUR07Z",
+     "0NB30ZZ"
+    ],
+    "note": "LeFort III midface advance, calvarial graft"
+   },
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NSM04Z",
+     "0NSN04Z",
+     "0NSB04Z",
+     "0NUR07Z",
+     "0QB20ZZ"
+    ],
+    "note": "iliac graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q751",
+    "condition": "craniofacial dysostosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "LeFort III advances maxilla, both zygomas and nasal bones = Reposition of each body part with fixation; added LeFort I cut is the same maxilla body part (no extra code); graft Supplement + donor Excision.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21155",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NSM04Z",
+     "0NSN04Z",
+     "0NSB04Z",
+     "0NUR07Z",
+     "0NB30ZZ"
+    ],
+    "note": "LeFort III midface advance, calvarial graft"
+   },
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NSM04Z",
+     "0NSN04Z",
+     "0NSB04Z",
+     "0NUR07Z",
+     "0QB20ZZ"
+    ],
+    "note": "iliac graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q751",
+    "condition": "craniofacial dysostosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "LeFort III advances maxilla, both zygomas and nasal bones = Reposition of each body part with fixation; added LeFort I cut is the same maxilla body part (no extra code); graft Supplement + donor Excision.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21159",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NS104Z",
+     "0NSP04Z",
+     "0NSQ04Z",
+     "0NSR04Z",
+     "0NSM04Z",
+     "0NSN04Z",
+     "0NSB04Z",
+     "0NUR07Z",
+     "0NB30ZZ"
+    ],
+    "note": "monobloc frontofacial advance, calvarial graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q751",
+    "condition": "craniofacial dysostosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Monobloc adds frontal bone and whole orbits to the LeFort III segment = Reposition frontal bone, both orbits, maxilla, zygomas, nasal bone; graft Supplement + donor Excision.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21160",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NS104Z",
+     "0NSP04Z",
+     "0NSQ04Z",
+     "0NSR04Z",
+     "0NSM04Z",
+     "0NSN04Z",
+     "0NSB04Z",
+     "0NUR07Z",
+     "0NB30ZZ"
+    ],
+    "note": "monobloc frontofacial advance, calvarial graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q751",
+    "condition": "craniofacial dysostosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Monobloc adds frontal bone and whole orbits to the LeFort III segment = Reposition frontal bone, both orbits, maxilla, zygomas, nasal bone; graft Supplement + donor Excision.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21179",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NU10JZ"
+    ],
+    "note": "alloplastic implant/cement"
+   },
+   {
+    "codes": [
+     "0NU10KZ"
+    ],
+    "note": "banked bone"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M952",
+    "condition": "acquired head deformity",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Contour reconstruction of forehead/brow with non-autologous material = Supplement frontal bone.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21180",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NU107Z",
+     "0NB30ZZ"
+    ],
+    "note": "split calvarial graft"
+   },
+   {
+    "codes": [
+     "0NU107Z",
+     "0QB20ZZ"
+    ],
+    "note": "iliac graft"
+   },
+   {
+    "codes": [
+     "0NU107Z",
+     "0PB10ZZ"
+    ],
+    "note": "rib graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M952",
+    "condition": "acquired head deformity",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Forehead/brow contour reconstruction with own bone = Supplement frontal bone, autologous; donor site coded separately (B3.9).",
+  "confidence": "medium"
+ },
+ {
+  "code": "21182",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NR107Z",
+     "0NB30ZZ"
+    ],
+    "note": "frontal bone/supraorbital rims replaced"
+   },
+   {
+    "codes": [
+     "0NR107Z",
+     "0NRP07Z",
+     "0NB30ZZ"
+    ],
+    "note": "plus right orbit"
+   },
+   {
+    "codes": [
+     "0NR107Z",
+     "0NRQ07Z",
+     "0NB30ZZ"
+    ],
+    "note": "plus left orbit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M8508",
+    "condition": "fibrous dysplasia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Tumorous frontal/orbital bone removed and rebuilt with autograft = Replacement (removal included) with autologous tissue; donor-site Excision coded separately. Graft area does not change PCS.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21183",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NR107Z",
+     "0NB30ZZ"
+    ],
+    "note": "frontal bone/supraorbital rims replaced"
+   },
+   {
+    "codes": [
+     "0NR107Z",
+     "0NRP07Z",
+     "0NB30ZZ"
+    ],
+    "note": "plus right orbit"
+   },
+   {
+    "codes": [
+     "0NR107Z",
+     "0NRQ07Z",
+     "0NB30ZZ"
+    ],
+    "note": "plus left orbit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M8508",
+    "condition": "fibrous dysplasia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Tumorous frontal/orbital bone removed and rebuilt with autograft = Replacement (removal included) with autologous tissue; donor-site Excision coded separately. Graft area does not change PCS.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21184",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NR107Z",
+     "0NB30ZZ"
+    ],
+    "note": "frontal bone/supraorbital rims replaced"
+   },
+   {
+    "codes": [
+     "0NR107Z",
+     "0NRP07Z",
+     "0NB30ZZ"
+    ],
+    "note": "plus right orbit"
+   },
+   {
+    "codes": [
+     "0NR107Z",
+     "0NRQ07Z",
+     "0NB30ZZ"
+    ],
+    "note": "plus left orbit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M8508",
+    "condition": "fibrous dysplasia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Tumorous frontal/orbital bone removed and rebuilt with autograft = Replacement (removal included) with autologous tissue; donor-site Excision coded separately. Graft area does not change PCS.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21188",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSM04Z",
+     "0NUM07Z",
+     "0NB30ZZ"
+    ],
+    "note": "right zygomatic osteotomy + graft"
+   },
+   {
+    "codes": [
+     "0NSN04Z",
+     "0NUN07Z",
+     "0NB30ZZ"
+    ],
+    "note": "left zygomatic osteotomy + graft"
+   },
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NUR07Z",
+     "0NB30ZZ"
+    ],
+    "note": "maxillary segment + graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M952",
+    "condition": "acquired head deformity",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Non-LeFort midface osteotomies move a bone segment = Reposition (zygoma or maxilla) with fixation + graft Supplement + donor Excision.",
+  "confidence": "low"
+ },
+ {
+  "code": "21247",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RRC07Z",
+     "0PB10ZZ"
+    ],
+    "note": "right condyle, costochondral graft"
+   },
+   {
+    "codes": [
+     "0RRD07Z",
+     "0PB10ZZ"
+    ],
+    "note": "left condyle, costochondral graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M26611",
+    "condition": "TMJ ankylosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Condyle rebuilt with bone-cartilage autograft = Replacement of TMJ (articular component, like hemiarthroplasty) with autologous tissue + rib donor Excision; Replacement of mandible 0NRT/0NRV07Z is the alternative body-part reading.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21268",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSP04Z",
+     "0NUP07Z",
+     "0NB30ZZ"
+    ],
+    "note": "right orbit"
+   },
+   {
+    "codes": [
+     "0NSQ04Z",
+     "0NUQ07Z",
+     "0NB30ZZ"
+    ],
+    "note": "left orbit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q107",
+    "condition": "orbital malformation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Box osteotomy moving one orbit via craniotomy and facial incisions = Reposition orbit with fixation + graft Supplement + donor Excision; craniotomy is access only.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21343",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NS104Z"
+    ],
+    "note": "with plate fixation"
+   },
+   {
+    "codes": [
+     "0NS10ZZ"
+    ],
+    "note": "reduction without fixation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S0219XA",
+    "condition": "frontal sinus fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open elevation of depressed frontal sinus fracture = Reposition frontal bone, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "21344",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NS104Z"
+    ],
+    "note": "with plate fixation"
+   },
+   {
+    "codes": [
+     "0NS10ZZ"
+    ],
+    "note": "reduction without fixation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S0219XA",
+    "condition": "frontal sinus fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Complex open frontal sinus fracture repair via coronal flap = Reposition frontal bone; approach incisions are access only.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21348",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NSB04Z",
+     "0NUR07Z",
+     "0QB20ZZ"
+    ],
+    "note": "maxilla + nasal, iliac graft"
+   },
+   {
+    "codes": [
+     "0NSR04Z",
+     "0NSB04Z",
+     "0NUR07Z",
+     "0NB30ZZ"
+    ],
+    "note": "calvarial graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S02412A",
+    "condition": "LeFort II fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reduction/fixation of nasomaxillary complex = Reposition maxilla and nasal bone with fixation; bone graft Supplement + donor Excision (B3.9).",
+  "confidence": "medium"
+ },
+ {
+  "code": "21423",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSR04Z"
+    ],
+    "note": "open reduction internal fixation maxilla"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S02411A",
+    "condition": "LeFort I fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reduction and plating of LeFort I/palatal fracture = Reposition maxilla with internal fixation, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "21431",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSRXZZ"
+    ],
+    "note": "closed reduction, dental wiring/splint"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S02413A",
+    "condition": "LeFort III fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Closed reduction of craniofacial separation with interdental wiring = Reposition maxilla, external approach; non-OR in MS-DRG terms, groups by diagnosis.",
+  "confidence": "medium"
+ }
+]

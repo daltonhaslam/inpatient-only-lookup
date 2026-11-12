@@ -1,0 +1,1227 @@
+[
+ {
+  "code": "49000",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WJG0ZZ"
+    ],
+    "note": "negative/diagnostic laparotomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "R100",
+    "condition": "acute abdomen",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open look into the peritoneal cavity with no further definitive work = Inspection, peritoneal cavity, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "49002",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WJG0ZZ"
+    ],
+    "note": "re-exploration, nothing further"
+   },
+   {
+    "codes": [
+     "0W3G0ZZ"
+    ],
+    "note": "re-exploration for and control of bleeding"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K91840",
+    "condition": "postoperative hemorrhage",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Return to a fresh laparotomy: Inspection of peritoneal cavity, or Control bleeding when hemostasis is the objective.",
+  "confidence": "medium"
+ },
+ {
+  "code": "49010",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WJH0ZZ"
+    ],
+    "note": "exploration only"
+   },
+   {
+    "codes": [
+     "0WBH0ZX"
+    ],
+    "note": "exploration with biopsy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C786",
+    "condition": "retroperitoneal metastases",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open retroperitoneal exploration = Inspection, retroperitoneum; diagnostic Excision when biopsied (inspection then not coded).",
+  "confidence": "low"
+ },
+ {
+  "code": "49013",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W3J0ZZ"
+    ],
+    "note": "preperitoneal pelvic packing"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S32811A",
+    "condition": "unstable pelvic fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Packing the extraperitoneal pelvis to stop trauma bleeding = Control bleeding in pelvic cavity, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "49014",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WJJ0ZZ"
+    ],
+    "note": "packs removed, no rebleeding"
+   },
+   {
+    "codes": [
+     "0W3J0ZZ"
+    ],
+    "note": "repacked for ongoing bleeding"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S32811A",
+    "condition": "unstable pelvic fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Take-back to remove pelvic packs: Inspection of pelvic cavity; Control bleeding when repacking is needed (packing is not a PCS device).",
+  "confidence": "medium"
+ },
+ {
+  "code": "49020",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W9G0ZZ"
+    ],
+    "note": "no drain left"
+   },
+   {
+    "codes": [
+     "0W9G00Z"
+    ],
+    "note": "drain left in place"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K651",
+    "condition": "peritoneal abscess",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open drainage of an intraperitoneal abscess/purulent peritonitis = Drainage, peritoneal cavity, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "49040",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W9G0ZZ"
+    ],
+    "note": "no drain left"
+   },
+   {
+    "codes": [
+     "0W9G00Z"
+    ],
+    "note": "drain left in place"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K651",
+    "condition": "subphrenic abscess",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Subphrenic space is part of the peritoneal cavity: Drainage, peritoneal cavity, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "49060",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W9H0ZZ"
+    ],
+    "note": "no drain left"
+   },
+   {
+    "codes": [
+     "0W9H00Z"
+    ],
+    "note": "drain left in place"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K6819",
+    "condition": "retroperitoneal abscess",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open drainage of a retroperitoneal abscess = Drainage, retroperitoneum, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "49062",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W9J0ZZ"
+    ],
+    "note": "pelvic lymphocele fenestrated into peritoneum"
+   },
+   {
+    "codes": [
+     "0W9H0ZZ"
+    ],
+    "note": "extraperitoneal iliac-fossa lymphocele"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I9789",
+    "condition": "postoperative lymphocele",
+    "role": "typical"
+   },
+   {
+    "code": "T8619",
+    "condition": "kidney transplant complication",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Internal drainage of a lymphocele into the peritoneum = Drainage of the cavity holding it (pelvic cavity or retroperitoneum), open.",
+  "confidence": "low"
+ },
+ {
+  "code": "49186",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WBH0ZZ"
+    ],
+    "note": "retroperitoneal mass"
+   },
+   {
+    "codes": [
+     "0DBV0ZZ"
+    ],
+    "note": "mesenteric mass/cyst"
+   },
+   {
+    "codes": [
+     "0DBW0ZZ"
+    ],
+    "note": "peritoneal tumor/implant"
+   },
+   {
+    "codes": [
+     "0DBU0ZZ"
+    ],
+    "note": "omental mass"
+   },
+   {
+    "codes": [
+     "0D5W0ZZ"
+    ],
+    "note": "ablation/fulguration of peritoneal implants"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C786",
+    "condition": "peritoneal metastases",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open removal of a small intra-abdominal tumor/cyst = Excision at the involved body part (retroperitoneum, mesentery, peritoneum, omentum), or Destruction when ablated.",
+  "confidence": "medium"
+ },
+ {
+  "code": "49187",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WBH0ZZ"
+    ],
+    "note": "retroperitoneal mass"
+   },
+   {
+    "codes": [
+     "0DBV0ZZ"
+    ],
+    "note": "mesenteric mass/cyst"
+   },
+   {
+    "codes": [
+     "0DBW0ZZ"
+    ],
+    "note": "peritoneal tumor/implant"
+   },
+   {
+    "codes": [
+     "0DBU0ZZ"
+    ],
+    "note": "omental mass"
+   },
+   {
+    "codes": [
+     "0D5W0ZZ"
+    ],
+    "note": "ablation/fulguration of peritoneal implants"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C786",
+    "condition": "peritoneal metastases",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open removal of an intra-abdominal tumor/cyst = Excision at the involved body part, or Destruction when ablated.",
+  "confidence": "medium"
+ },
+ {
+  "code": "49188",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WBH0ZZ"
+    ],
+    "note": "retroperitoneal mass"
+   },
+   {
+    "codes": [
+     "0DBV0ZZ"
+    ],
+    "note": "mesenteric mass/cyst"
+   },
+   {
+    "codes": [
+     "0DBW0ZZ"
+    ],
+    "note": "peritoneal tumor/implant"
+   },
+   {
+    "codes": [
+     "0DBU0ZZ"
+    ],
+    "note": "omental mass"
+   },
+   {
+    "codes": [
+     "0D5W0ZZ"
+    ],
+    "note": "ablation/fulguration of peritoneal implants"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C480",
+    "condition": "retroperitoneal sarcoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open removal of a large intra-abdominal tumor = Excision at the involved body part (often retroperitoneum); no Resection value for these regions.",
+  "confidence": "medium"
+ },
+ {
+  "code": "49189",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WBH0ZZ"
+    ],
+    "note": "retroperitoneal mass"
+   },
+   {
+    "codes": [
+     "0DBV0ZZ"
+    ],
+    "note": "mesenteric mass/cyst"
+   },
+   {
+    "codes": [
+     "0DBW0ZZ"
+    ],
+    "note": "peritoneal tumor/implant"
+   },
+   {
+    "codes": [
+     "0DBU0ZZ"
+    ],
+    "note": "omental mass"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C480",
+    "condition": "retroperitoneal sarcoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open removal of a very large intra-abdominal tumor = Excision, usually retroperitoneum; no Resection value for these regions.",
+  "confidence": "medium"
+ },
+ {
+  "code": "49190",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WBH0ZZ"
+    ],
+    "note": "retroperitoneal mass"
+   },
+   {
+    "codes": [
+     "0DBV0ZZ"
+    ],
+    "note": "mesenteric mass/cyst"
+   },
+   {
+    "codes": [
+     "0DBW0ZZ"
+    ],
+    "note": "peritoneal tumor/implant"
+   },
+   {
+    "codes": [
+     "0DBU0ZZ"
+    ],
+    "note": "omental mass"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C480",
+    "condition": "retroperitoneal sarcoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open removal of a giant intra-abdominal tumor = Excision, usually retroperitoneum; no Resection value for these regions.",
+  "confidence": "medium"
+ },
+ {
+  "code": "49215",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WBH0ZZ"
+    ],
+    "note": "presacral mass excised"
+   },
+   {
+    "codes": [
+     "0WBH0ZZ",
+     "0QTS0ZZ"
+    ],
+    "note": "with coccygectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D367",
+    "condition": "benign presacral tumor",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Presacral space is extraperitoneal: Excision, retroperitoneum, open; add Resection of coccyx when the coccyx is taken en bloc.",
+  "confidence": "low"
+ },
+ {
+  "code": "49255",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTU0ZZ"
+    ],
+    "note": "total omentectomy"
+   },
+   {
+    "codes": [
+     "0DBU0ZZ"
+    ],
+    "note": "partial/infracolic omentectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C786",
+    "condition": "peritoneal metastases",
+    "role": "typical"
+   },
+   {
+    "code": "C569",
+    "condition": "ovarian cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Removal of the omentum = Resection, omentum, open; Excision when only part is taken.",
+  "confidence": "medium"
+ },
+ {
+  "code": "49425",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W1G0JW"
+    ],
+    "note": "peritoneal limb to jugular/SVC"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K7031",
+    "condition": "cirrhosis with ascites",
+    "role": "typical"
+   },
+   {
+    "code": "C786",
+    "condition": "malignant ascites",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Peritoneovenous shunt reroutes ascites to a central vein = Bypass, peritoneal cavity to upper vein, synthetic substitute, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "49428",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WWG0JZ"
+    ],
+    "note": "shunt tubing ligated"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T85898A",
+    "condition": "shunt complication",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Tying off an existing peritoneovenous shunt changes the device without removing it = Revision of synthetic substitute, peritoneal cavity; Occlusion of the vein is the other reading.",
+  "confidence": "low"
+ },
+ {
+  "code": "49596",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WUF0JZ"
+    ],
+    "note": "open, mesh"
+   },
+   {
+    "codes": [
+     "0WUF4JZ"
+    ],
+    "note": "laparoscopic/robotic, mesh"
+   },
+   {
+    "codes": [
+     "0WQF0ZZ"
+    ],
+    "note": "open, primary suture, no mesh"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K430",
+    "condition": "incarcerated incisional hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Large incarcerated ventral hernia repair = Supplement abdominal wall with mesh (Repair if no mesh); CPT spans open and laparoscopic.",
+  "confidence": "high"
+ },
+ {
+  "code": "49605",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WQF0ZZ"
+    ],
+    "note": "primary fascial closure"
+   },
+   {
+    "codes": [
+     "0WUF0JZ"
+    ],
+    "note": "closure with prosthetic patch"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q793",
+    "condition": "gastroschisis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Closing a large congenital abdominal wall defect = Repair, abdominal wall; Supplement when a prosthesis bridges it.",
+  "confidence": "medium"
+ },
+ {
+  "code": "49606",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WPF0JZ",
+     "0WQF0ZZ"
+    ],
+    "note": "silo out, fascial closure"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q793",
+    "condition": "gastroschisis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Staged closure: Removal of the silo (synthetic) from abdominal wall plus Repair of the abdominal wall defect.",
+  "confidence": "medium"
+ },
+ {
+  "code": "49610",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WQF0ZZ"
+    ],
+    "note": "skin flap coverage"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q792",
+    "condition": "omphalocele",
+    "role": "typical"
+   }
+  ],
+  "rationale": "First-stage omphalocele closure = Repair, abdominal wall, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "49611",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WQF0ZZ"
+    ],
+    "note": "fascial closure"
+   },
+   {
+    "codes": [
+     "0WUF0JZ"
+    ],
+    "note": "closure with prosthetic patch"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q792",
+    "condition": "omphalocele",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Second-stage omphalocele closure = Repair, abdominal wall; Supplement if prosthesis used.",
+  "confidence": "medium"
+ },
+ {
+  "code": "49616",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WUF0JZ"
+    ],
+    "note": "open, mesh"
+   },
+   {
+    "codes": [
+     "0WUF4JZ"
+    ],
+    "note": "laparoscopic/robotic, mesh"
+   },
+   {
+    "codes": [
+     "0WQF0ZZ"
+    ],
+    "note": "open, primary suture, no mesh"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K430",
+    "condition": "incarcerated incisional hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Recurrent incarcerated ventral hernia repair = Supplement abdominal wall with mesh (Repair if no mesh); CPT spans open and laparoscopic.",
+  "confidence": "high"
+ },
+ {
+  "code": "49617",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WUF0JZ"
+    ],
+    "note": "open, mesh"
+   },
+   {
+    "codes": [
+     "0WUF4JZ"
+    ],
+    "note": "laparoscopic/robotic, mesh"
+   },
+   {
+    "codes": [
+     "0WQF0ZZ"
+    ],
+    "note": "open, primary suture, no mesh"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K432",
+    "condition": "incisional hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Large recurrent reducible ventral hernia repair = Supplement abdominal wall with mesh (Repair if no mesh); CPT spans open and laparoscopic.",
+  "confidence": "high"
+ },
+ {
+  "code": "49618",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WUF0JZ"
+    ],
+    "note": "open, mesh"
+   },
+   {
+    "codes": [
+     "0WUF4JZ"
+    ],
+    "note": "laparoscopic/robotic, mesh"
+   },
+   {
+    "codes": [
+     "0WQF0ZZ"
+    ],
+    "note": "open, primary suture, no mesh"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K430",
+    "condition": "incarcerated incisional hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Large recurrent incarcerated ventral hernia repair = Supplement abdominal wall with mesh (Repair if no mesh); CPT spans open and laparoscopic.",
+  "confidence": "high"
+ },
+ {
+  "code": "49621",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WUF0JZ"
+    ],
+    "note": "open, mesh"
+   },
+   {
+    "codes": [
+     "0WUF4JZ"
+    ],
+    "note": "laparoscopic/robotic, mesh"
+   },
+   {
+    "codes": [
+     "0WQF0ZZ"
+    ],
+    "note": "open, primary suture, no mesh"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K435",
+    "condition": "parastomal hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Parastomal hernia repair = Supplement abdominal wall with mesh (Repair if no mesh); stoma not relocated.",
+  "confidence": "high"
+ },
+ {
+  "code": "49622",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WUF0JZ"
+    ],
+    "note": "open, mesh"
+   },
+   {
+    "codes": [
+     "0WUF4JZ"
+    ],
+    "note": "laparoscopic/robotic, mesh"
+   },
+   {
+    "codes": [
+     "0WQF0ZZ"
+    ],
+    "note": "open, primary suture, no mesh"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K433",
+    "condition": "incarcerated parastomal hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Incarcerated parastomal hernia repair = Supplement abdominal wall with mesh (Repair if no mesh).",
+  "confidence": "high"
+ },
+ {
+  "code": "49900",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WQF0ZZ"
+    ],
+    "note": "fascial re-closure"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T81321A",
+    "condition": "fascial dehiscence",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Re-closing a dehisced abdominal fascia = Repair, abdominal wall, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "49904",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DXU0ZV"
+    ],
+    "note": "to chest/sternal wound"
+   },
+   {
+    "codes": [
+     "0DXU0ZY"
+    ],
+    "note": "to groin wound"
+   },
+   {
+    "codes": [
+     "0DXU0ZX"
+    ],
+    "note": "to pelvis/perineum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8143XA",
+    "condition": "sternal wound infection",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Pedicled omentum moved to an extra-abdominal defect keeps its blood supply = Transfer, omentum, region qualifier.",
+  "confidence": "medium"
+ },
+ {
+  "code": "49906",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBU0ZZ",
+     "0JRN07Z"
+    ],
+    "note": "free omentum to lower leg defect"
+   },
+   {
+    "codes": [
+     "0DBU0ZZ",
+     "0JR007Z"
+    ],
+    "note": "free omentum to scalp defect"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "L97919",
+    "condition": "chronic leg ulcer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Free flap = Replacement at recipient site with autologous tissue plus Excision of omentum as the donor site (B3.9).",
+  "confidence": "low"
+ },
+ {
+  "code": "31290",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "00U247Z"
+    ],
+    "note": "autologous graft/flap (fat, fascia, mucosa)"
+   },
+   {
+    "codes": [
+     "00U24KZ"
+    ],
+    "note": "allograft/xenograft dural substitute"
+   },
+   {
+    "codes": [
+     "00Q24ZZ"
+    ],
+    "note": "primary repair without graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "G9601",
+    "condition": "spontaneous CSF leak",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Endonasal closure of anterior skull base dural defect = Supplement dura mater with graft; no natural-opening approach exists for dura, so percutaneous endoscopic.",
+  "confidence": "medium"
+ },
+ {
+  "code": "31291",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "00U247Z"
+    ],
+    "note": "autologous graft/flap (fat, fascia, mucosa)"
+   },
+   {
+    "codes": [
+     "00U24KZ"
+    ],
+    "note": "allograft/xenograft dural substitute"
+   },
+   {
+    "codes": [
+     "00Q24ZZ"
+    ],
+    "note": "primary repair without graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "G9601",
+    "condition": "spontaneous CSF leak",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Endonasal closure of sphenoid dural defect = Supplement dura mater with graft; no natural-opening approach exists for dura, so percutaneous endoscopic.",
+  "confidence": "medium"
+ },
+ {
+  "code": "31360",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CTS0ZZ"
+    ],
+    "note": "total laryngectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C320",
+    "condition": "glottic cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Removal of the whole larynx = Resection, larynx, open; end tracheostoma treated as part of the closure.",
+  "confidence": "high"
+ },
+ {
+  "code": "31365",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CTS0ZZ",
+     "07T10ZZ",
+     "0KT20ZZ",
+     "05BM0ZZ"
+    ],
+    "note": "right radical neck"
+   },
+   {
+    "codes": [
+     "0CTS0ZZ",
+     "07T20ZZ",
+     "0KT30ZZ",
+     "05BN0ZZ"
+    ],
+    "note": "left radical neck"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C321",
+    "condition": "supraglottic cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Resection of larynx plus radical neck dissection coded by body part: neck lymphatics and neck muscle resected, internal jugular excised.",
+  "confidence": "medium"
+ },
+ {
+  "code": "31367",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CTR0ZZ",
+     "0CBS0ZZ"
+    ],
+    "note": "epiglottis plus supraglottic larynx"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C321",
+    "condition": "supraglottic cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Supraglottic removal takes the whole epiglottis (Resection) and part of the larynx (Excision), two body parts.",
+  "confidence": "medium"
+ },
+ {
+  "code": "31368",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CTR0ZZ",
+     "0CBS0ZZ",
+     "07T10ZZ",
+     "0KT20ZZ",
+     "05BM0ZZ"
+    ],
+    "note": "right radical neck"
+   },
+   {
+    "codes": [
+     "0CTR0ZZ",
+     "0CBS0ZZ",
+     "07T20ZZ",
+     "0KT30ZZ",
+     "05BN0ZZ"
+    ],
+    "note": "left radical neck"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C321",
+    "condition": "supraglottic cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Supraglottic partial removal (epiglottis Resection, larynx Excision) plus radical neck dissection by body part.",
+  "confidence": "medium"
+ },
+ {
+  "code": "31370",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CTR0ZZ",
+     "0CBS0ZZ"
+    ],
+    "note": "horizontal partial with epiglottis"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C321",
+    "condition": "supraglottic cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Horizontal partial removal above the cords: Resection of epiglottis plus Excision of larynx.",
+  "confidence": "medium"
+ },
+ {
+  "code": "31375",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CTT0ZZ",
+     "0CBS0ZZ"
+    ],
+    "note": "right side"
+   },
+   {
+    "codes": [
+     "0CTV0ZZ",
+     "0CBS0ZZ"
+    ],
+    "note": "left side"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C320",
+    "condition": "glottic cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Vertical hemilaryngectomy: one vocal cord fully removed (Resection) plus partial larynx framework (Excision).",
+  "confidence": "medium"
+ },
+ {
+  "code": "31380",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CBT0ZZ",
+     "0CBV0ZZ",
+     "0CBS0ZZ"
+    ],
+    "note": "anterior commissure and both anterior cords"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C320",
+    "condition": "glottic cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Anterior vertical partial removal: Excision of both vocal cords' anterior parts plus Excision of larynx framework.",
+  "confidence": "medium"
+ }
+]

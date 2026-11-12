@@ -1,0 +1,1103 @@
+[
+ {
+  "code": "20962",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NRT07Z",
+     "0PB50ZZ"
+    ],
+    "note": "right mandible defect, right scapula donor"
+   },
+   {
+    "codes": [
+     "0NRV07Z",
+     "0PB60ZZ"
+    ],
+    "note": "left mandible defect, left scapula donor"
+   },
+   {
+    "codes": [
+     "0NRR07Z",
+     "0PB50ZZ"
+    ],
+    "note": "maxilla defect, scapula donor"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C031",
+    "condition": "oral cavity cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Vascularized bone takes the place of a resected jaw segment = Replacement with autologous tissue, open; bone harvest from a separate site coded as Excision per B3.9; scapula used as the representative non-fibula, non-iliac donor.",
+  "confidence": "medium"
+ },
+ {
+  "code": "20969",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NRT07Z",
+     "0QBJ0ZZ"
+    ],
+    "note": "right mandible defect, fibula osteocutaneous donor"
+   },
+   {
+    "codes": [
+     "0NRV07Z",
+     "0QBK0ZZ"
+    ],
+    "note": "left mandible defect, fibula osteocutaneous donor"
+   },
+   {
+    "codes": [
+     "0NRR07Z",
+     "0QBJ0ZZ"
+    ],
+    "note": "maxilla defect, fibula osteocutaneous donor"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C031",
+    "condition": "oral cavity cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Osteocutaneous free flap rebuilding a jaw segment = Replacement of mandible/maxilla with autologous tissue, open, plus Excision of the donor bone (B3.9); fibula is the usual donor in this code's range; skin paddle not coded separately.",
+  "confidence": "medium"
+ },
+ {
+  "code": "20970",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NRT07Z",
+     "0QB20ZZ"
+    ],
+    "note": "right mandible defect, right iliac crest donor"
+   },
+   {
+    "codes": [
+     "0NRV07Z",
+     "0QB30ZZ"
+    ],
+    "note": "left mandible defect, left iliac crest donor"
+   },
+   {
+    "codes": [
+     "0NRR07Z",
+     "0QB20ZZ"
+    ],
+    "note": "maxilla defect, iliac crest donor"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C031",
+    "condition": "oral cavity cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Iliac crest osteocutaneous free flap to a jaw defect = Replacement of mandible/maxilla with autologous tissue, open, plus Excision of pelvic bone at the donor site (B3.9).",
+  "confidence": "medium"
+ },
+ {
+  "code": "0202T",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SH00DZ",
+     "00NY0ZZ"
+    ],
+    "note": "lumbar level (e.g. L4-5) with decompression"
+   },
+   {
+    "codes": [
+     "0SH30DZ",
+     "00NY0ZZ"
+    ],
+    "note": "L5-S1 with decompression"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M48062",
+    "condition": "lumbar stenosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Posterior facet arthroplasty uses PCS's dedicated facet-replacement stabilization device under Insertion (device key); decompression of the neural elements is a separate objective coded as Release; Replacement 0SR00JZ is the competing reading.",
+  "confidence": "medium"
+ },
+ {
+  "code": "0219T",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RG13J1"
+    ],
+    "note": "cervical facet implant, percutaneous posterior"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M4722",
+    "condition": "cervical spondylotic radiculopathy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Intrafacet cage/graft placed to immobilize the facet = Fusion of cervical vertebral joint, posterior approach posterior column; image-guided docked access read as percutaneous; device J (cage) chosen since interbody device is not valid for posterior column; K if allograft dowel.",
+  "confidence": "low"
+ },
+ {
+  "code": "0220T",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RG63J1"
+    ],
+    "note": "thoracic facet implant, percutaneous posterior"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M4804",
+    "condition": "thoracic stenosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Same construct as the cervical version at a thoracic level = Fusion of thoracic vertebral joint, posterior column, percutaneous, synthetic substitute.",
+  "confidence": "low"
+ },
+ {
+  "code": "0656T",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS003Z"
+    ],
+    "note": "lumbar levels only"
+   },
+   {
+    "codes": [
+     "0PS403Z",
+     "0QS003Z"
+    ],
+    "note": "thoracolumbar span"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M41126",
+    "condition": "adolescent idiopathic scoliosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Anterior tether corrects the curve by moving vertebrae = Reposition with the vertebral body tether device value, open; one code per vertebra body-part value spanned.",
+  "confidence": "medium"
+ },
+ {
+  "code": "0657T",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PS403Z",
+     "0QS003Z"
+    ],
+    "note": "thoracolumbar span"
+   },
+   {
+    "codes": [
+     "0QS003Z"
+    ],
+    "note": "lumbar levels only"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M41125",
+    "condition": "adolescent idiopathic scoliosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Longer anterior tether construct, same coding as the shorter code: Reposition of thoracic and/or lumbar vertebra with tether device, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "0790T",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PW444Z"
+    ],
+    "note": "revision/augmentation of tether"
+   },
+   {
+    "codes": [
+     "0PP444Z",
+     "0PS443Z"
+    ],
+    "note": "tether replacement"
+   },
+   {
+    "codes": [
+     "0PP444Z"
+    ],
+    "note": "tether removal"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T84216A",
+    "condition": "broken spinal tether",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Thoracoscopic work on an existing thoracic tether: Revision or Removal (tether aggregates to internal fixation device in those tables); replacement = Removal plus new Reposition with tether.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22010",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0K920ZZ"
+    ],
+    "note": "cervical, right"
+   },
+   {
+    "codes": [
+     "0K930ZZ"
+    ],
+    "note": "cervical, left"
+   },
+   {
+    "codes": [
+     "0K9F0ZZ"
+    ],
+    "note": "thoracic, right"
+   },
+   {
+    "codes": [
+     "0K9G0ZZ"
+    ],
+    "note": "thoracic, left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8142XA",
+    "condition": "deep surgical-site infection",
+    "role": "typical"
+   },
+   {
+    "code": "M6008",
+    "condition": "paraspinal muscle abscess",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Opening and draining a subfascial paraspinal abscess = Drainage of neck or trunk muscle, open; deep wound infection after prior spine surgery is the usual Medicare indication.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22015",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0K9F0ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0K9G0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8142XA",
+    "condition": "deep surgical-site infection",
+    "role": "typical"
+   },
+   {
+    "code": "M6008",
+    "condition": "paraspinal muscle abscess",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Drainage of subfascial abscess in lumbar/sacral paraspinal (trunk) muscle, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22110",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB30ZZ"
+    ],
+    "note": "cervical"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C7951",
+    "condition": "bone metastasis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Removing part of a vertebral body for a bone lesion = Excision of cervical vertebra, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "22112",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB40ZZ"
+    ],
+    "note": "thoracic"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C7951",
+    "condition": "bone metastasis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Partial vertebral body removal for a bone lesion = Excision of thoracic vertebra, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "22114",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QB00ZZ"
+    ],
+    "note": "lumbar"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C7951",
+    "condition": "bone metastasis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Partial vertebral body removal for a bone lesion = Excision of lumbar vertebra, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "22206",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB40ZZ"
+    ],
+    "note": "thoracic"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M40204",
+    "condition": "thoracic kyphosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Closing-wedge three-column osteotomy removes a bone wedge = Excision of thoracic vertebra, open; companion fusion is a separate service.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22207",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QB00ZZ"
+    ],
+    "note": "lumbar"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M4036",
+    "condition": "lumbar flatback",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Pedicle subtraction wedge removed from a lumbar vertebra = Excision of lumbar vertebra, open; fusion reported separately.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22210",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB30ZZ"
+    ],
+    "note": "cervical"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M40202",
+    "condition": "cervical kyphosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Posterior-element wedge osteotomy = Excision of cervical vertebra, open; Excision of the vertebral joint is the competing body-part reading.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22212",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB40ZZ"
+    ],
+    "note": "thoracic"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M40204",
+    "condition": "thoracic kyphosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Posterior-element wedge osteotomy = Excision of thoracic vertebra, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22214",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QB00ZZ"
+    ],
+    "note": "lumbar"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M4036",
+    "condition": "lumbar flatback",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Posterior-element wedge osteotomy = Excision of lumbar vertebra, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22220",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB30ZZ",
+     "0RT30ZZ"
+    ],
+    "note": "cervical"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M40202",
+    "condition": "cervical kyphosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Anterior osteotomy cuts vertebral bone and removes the whole disc: Excision of cervical vertebra plus Resection of cervical disc (separate body parts, B3.2), open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22222",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB40ZZ",
+     "0RT90ZZ"
+    ],
+    "note": "thoracic"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M40204",
+    "condition": "thoracic kyphosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Excision of thoracic vertebra plus Resection of thoracic disc, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22224",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QB00ZZ",
+     "0ST20ZZ"
+    ],
+    "note": "lumbar level"
+   },
+   {
+    "codes": [
+     "0QB00ZZ",
+     "0ST40ZZ"
+    ],
+    "note": "L5-S1 disc"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M4036",
+    "condition": "lumbar flatback",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Excision of lumbar vertebra plus Resection of the lumbar or lumbosacral disc, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22318",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PS304Z"
+    ],
+    "note": "C2 dens, screw fixation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S12110A",
+    "condition": "type II dens fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reduction and screw fixation of the dens = Reposition of cervical vertebra with internal fixation device, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "22319",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PS304Z",
+     "0PU307Z",
+     "0QB20ZZ"
+    ],
+    "note": "iliac autograft"
+   },
+   {
+    "codes": [
+     "0PS304Z",
+     "0PU30KZ"
+    ],
+    "note": "allograft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S12110A",
+    "condition": "type II dens fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Reposition of C2 with internal fixation, plus Supplement of cervical vertebra with the graft; autograft donor site coded per B3.9.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22325",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QS004Z"
+    ],
+    "note": "lumbar fracture"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S32012A",
+    "condition": "lumbar burst fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open posterior reduction of a lumbar fracture with fixation = Reposition of lumbar vertebra with internal fixation device, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "22326",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PS304Z"
+    ],
+    "note": "cervical fracture"
+   },
+   {
+    "codes": [
+     "0RS104Z"
+    ],
+    "note": "cervical facet dislocation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S12400A",
+    "condition": "cervical vertebra fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open posterior reduction with fixation = Reposition of cervical vertebra (fracture) or cervical vertebral joint (dislocation) with internal fixation, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "22327",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PS404Z"
+    ],
+    "note": "thoracic fracture"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S22082A",
+    "condition": "thoracic burst fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open posterior reduction of a thoracic fracture with fixation = Reposition of thoracic vertebra with internal fixation device, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "22532",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RG60AJ"
+    ],
+    "note": "single thoracic level"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M5124",
+    "condition": "thoracic disc herniation",
+    "role": "typical"
+   },
+   {
+    "code": "C7951",
+    "condition": "spinal metastasis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Lateral extracavitary interbody fusion reaches the anterior column from behind = Fusion of thoracic vertebral joint, posterior approach anterior column, interbody device, open; limited disc prep integral.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22533",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SG00AJ"
+    ],
+    "note": "single lumbar level"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M5116",
+    "condition": "lumbar disc radiculopathy",
+    "role": "typical"
+   },
+   {
+    "code": "C7951",
+    "condition": "spinal metastasis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Fusion of lumbar vertebral joint, posterior approach anterior column, interbody device, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22548",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RG1070"
+    ],
+    "note": "C1-C2"
+   },
+   {
+    "codes": [
+     "0RG0070",
+     "0RG1070"
+    ],
+    "note": "clivus to C2"
+   },
+   {
+    "codes": [
+     "0RG1070",
+     "0PB30ZZ"
+    ],
+    "note": "C1-C2 with odontoid excision"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M532X1",
+    "condition": "atlantoaxial instability",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transoral/extraoral anterior fusion = Fusion of cervical (and occipital-cervical when clivus included) joint, anterior approach anterior column, autologous graft, open (incision through pharynx is open); optional dens removal = Excision of cervical vertebra.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22556",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RG60A0",
+     "0RT90ZZ"
+    ],
+    "note": "single thoracic interspace"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M5104",
+    "condition": "thoracic disc myelopathy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Anterior interbody fusion of one thoracic joint = Fusion, anterior approach anterior column, interbody device, open; full discectomy coded as Resection of thoracic disc.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22558",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SG30A0",
+     "0ST40ZZ"
+    ],
+    "note": "L5-S1"
+   },
+   {
+    "codes": [
+     "0SG00A0",
+     "0ST20ZZ"
+    ],
+    "note": "lumbar level above L5"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M4317",
+    "condition": "lumbosacral spondylolisthesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "ALIF = Fusion of lumbosacral or lumbar joint, anterior approach anterior column, interbody device, open; total discectomy coded as Resection of the disc.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22586",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SG33A0"
+    ],
+    "note": "L5-S1 presacral"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M4317",
+    "condition": "lumbosacral spondylolisthesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Presacral axial interbody fusion through a small paracoccygeal access = Fusion of lumbosacral joint, anterior approach anterior column, interbody device, percutaneous; supplemental posterior screws part of the same fusion.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22590",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RG0071",
+     "0RG1071"
+    ],
+    "note": "occiput to C2"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M532X1",
+    "condition": "craniocervical instability",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Posterior occiput-to-C2 fusion spans the occipital-cervical joint and C1-C2 = Fusion of each, posterior approach posterior column, autologous graft, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "22595",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RG1071"
+    ],
+    "note": "C1-C2"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S12110A",
+    "condition": "type II dens fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Posterior C1-C2 fusion = Fusion of cervical vertebral joint, posterior approach posterior column, autologous graft, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "22600",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RG1071"
+    ],
+    "note": "one subaxial cervical level"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M4712",
+    "condition": "cervical spondylotic myelopathy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Single-level posterior cervical fusion = Fusion of cervical vertebral joint, posterior approach posterior column, autologous graft, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "22610",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RG6071"
+    ],
+    "note": "one thoracic level"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S22082A",
+    "condition": "thoracic burst fracture",
+    "role": "typical"
+   },
+   {
+    "code": "C7951",
+    "condition": "spinal metastasis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Single-level posterolateral thoracic fusion = Fusion of thoracic vertebral joint, posterior approach posterior column, autologous graft, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "22800",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SG1071",
+     "0SG3071"
+    ],
+    "note": "lumbar to sacrum"
+   },
+   {
+    "codes": [
+     "0RGA071",
+     "0SG1071"
+    ],
+    "note": "thoracolumbar span"
+   },
+   {
+    "codes": [
+     "0RG7071"
+    ],
+    "note": "thoracic only"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M4186",
+    "condition": "adult degenerative scoliosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Posterior deformity fusion of up to 6 vertebrae = Fusion, posterior approach posterior column, autologous graft, open, one code per joint body-part value spanned.",
+  "confidence": "high"
+ },
+ {
+  "code": "22802",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RG7071",
+     "0RGA071",
+     "0SG1071",
+     "0SG3071"
+    ],
+    "note": "lower thoracic to sacrum"
+   },
+   {
+    "codes": [
+     "0RG7071",
+     "0RGA071",
+     "0SG1071"
+    ],
+    "note": "thoracolumbar, sparing L5-S1"
+   },
+   {
+    "codes": [
+     "0RG8071"
+    ],
+    "note": "thoracic only, 8+ joints"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M4186",
+    "condition": "adult degenerative scoliosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Posterior deformity fusion of 7-12 vertebrae = Fusion codes for each joint body-part value spanned, posterior approach posterior column, autologous graft, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "22804",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RG8071",
+     "0RGA071",
+     "0SG1071",
+     "0SG3071"
+    ],
+    "note": "upper thoracic to sacrum"
+   },
+   {
+    "codes": [
+     "0RG7071",
+     "0RGA071",
+     "0SG1071",
+     "0SG3071"
+    ],
+    "note": "mid thoracic to sacrum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M4186",
+    "condition": "adult degenerative scoliosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Posterior deformity fusion of 13+ vertebrae = Fusion codes for thoracic, thoracolumbar, lumbar and lumbosacral joints, posterior approach posterior column, autologous graft, open.",
+  "confidence": "high"
+ }
+]

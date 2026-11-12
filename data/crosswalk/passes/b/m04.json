@@ -1,0 +1,1166 @@
+[
+ {
+  "code": "39499",
+  "mappable": false,
+  "unmapped_reason": "unlisted code: no defined operation, body part or approach to map"
+ },
+ {
+  "code": "39501",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BQT0ZZ"
+    ],
+    "note": "suture repair of torn diaphragm"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S27803A",
+    "condition": "diaphragm laceration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Suture closure of a traumatic diaphragm tear = Repair, diaphragm, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "39503",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BQT0ZZ"
+    ],
+    "note": "primary suture repair"
+   },
+   {
+    "codes": [
+     "0BUT0JZ"
+    ],
+    "note": "synthetic patch repair"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q790",
+    "condition": "congenital diaphragmatic hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Viscera reduced (not coded) and defect closed = Repair diaphragm; large defects closed with a synthetic patch = Supplement.",
+  "confidence": "medium"
+ },
+ {
+  "code": "39540",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BQT0ZZ"
+    ],
+    "note": "primary suture repair"
+   },
+   {
+    "codes": [
+     "0BUT0JZ"
+    ],
+    "note": "mesh-reinforced repair"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S27803A",
+    "condition": "traumatic diaphragm rupture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Acute traumatic hernia: reduction is not coded; closing the torn diaphragm = Repair, open; mesh variant = Supplement.",
+  "confidence": "medium"
+ },
+ {
+  "code": "39541",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BQT0ZZ"
+    ],
+    "note": "primary suture repair"
+   },
+   {
+    "codes": [
+     "0BUT0JZ"
+    ],
+    "note": "mesh-reinforced repair"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K449",
+    "condition": "diaphragmatic hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Late traumatic hernia: reduction not coded; diaphragm closed = Repair, open, or Supplement when mesh is used; chronic hernia is coded to K44.",
+  "confidence": "medium"
+ },
+ {
+  "code": "39545",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BQT0ZZ"
+    ],
+    "note": "plication sutures"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J986",
+    "condition": "diaphragm paralysis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Plication folds and sutures the slack diaphragm in place; no tissue removed or device left, so Repair, diaphragm, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "39560",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BBT0ZZ"
+    ],
+    "note": "partial diaphragm removal, primary closure"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C493",
+    "condition": "diaphragm sarcoma",
+    "role": "typical"
+   },
+   {
+    "code": "C450",
+    "condition": "mesothelioma",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Part of the diaphragm is cut out and the edges sutured = Excision, diaphragm, open (closure not coded).",
+  "confidence": "medium"
+ },
+ {
+  "code": "39561",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BRT0JZ"
+    ],
+    "note": "synthetic mesh reconstruction"
+   },
+   {
+    "codes": [
+     "0BRT07Z"
+    ],
+    "note": "autologous tissue reconstruction"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C493",
+    "condition": "diaphragm sarcoma",
+    "role": "typical"
+   },
+   {
+    "code": "C450",
+    "condition": "mesothelioma",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Excised diaphragm segment is replaced by mesh or tissue that takes its place = Replacement (includes the excision); some coders would report Excision plus Supplement instead.",
+  "confidence": "medium"
+ },
+ {
+  "code": "39599",
+  "mappable": false,
+  "unmapped_reason": "unlisted code: no defined operation, body part or approach to map"
+ },
+ {
+  "code": "61624",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "03LG3DZ"
+    ],
+    "note": "intracranial target (AVM, fistula, tumor feeder)"
+   },
+   {
+    "codes": [
+     "03LM3DZ"
+    ],
+    "note": "right middle meningeal artery"
+   },
+   {
+    "codes": [
+     "03LN3DZ"
+    ],
+    "note": "left middle meningeal artery"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I6203",
+    "condition": "chronic subdural hematoma",
+    "role": "typical"
+   },
+   {
+    "code": "Q282",
+    "condition": "brain AVM",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Catheter-delivered coils/particles/liquid embolic = Occlusion with intraluminal device, percutaneous; middle meningeal artery has no own value and codes to its proximal named parent, the external carotid (B4.2).",
+  "confidence": "medium"
+ },
+ {
+  "code": "21510",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0P900ZZ"
+    ],
+    "note": "sternum"
+   },
+   {
+    "codes": [
+     "0P910ZZ"
+    ],
+    "note": "1-2 ribs"
+   },
+   {
+    "codes": [
+     "0P920ZZ"
+    ],
+    "note": "3 or more ribs"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M8668",
+    "condition": "chest wall osteomyelitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Opening the bone cortex to evacuate infected marrow/pus = Drainage of sternum or ribs, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21602",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB10ZZ",
+     "0WU80JZ"
+    ],
+    "note": "1-2 ribs, mesh reconstruction"
+   },
+   {
+    "codes": [
+     "0PB20ZZ",
+     "0WU80JZ"
+    ],
+    "note": "3+ ribs, mesh reconstruction"
+   },
+   {
+    "codes": [
+     "0PB20ZZ",
+     "0KXF0ZZ"
+    ],
+    "note": "3+ ribs, latissimus muscle flap"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C413",
+    "condition": "rib malignancy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Tumor taken out with part of the ribs = Excision of ribs; the chest-wall defect is reinforced with mesh (Supplement, chest wall) or a pedicled muscle flap (Transfer), a distinct objective.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21603",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB10ZZ",
+     "0WU80JZ",
+     "07T70ZZ"
+    ],
+    "note": "1-2 ribs, mesh, mediastinal node dissection"
+   },
+   {
+    "codes": [
+     "0PB20ZZ",
+     "0WU80JZ",
+     "07T70ZZ"
+    ],
+    "note": "3+ ribs, mesh, mediastinal node dissection"
+   },
+   {
+    "codes": [
+     "0PB20ZZ",
+     "0KXF0ZZ",
+     "07T70ZZ"
+    ],
+    "note": "3+ ribs, latissimus flap, node dissection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C413",
+    "condition": "rib malignancy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "As for chest wall tumor excision with reconstruction, plus mediastinal lymphadenectomy coded separately (B3.10c) as Resection of thorax lymphatic; Excision if only sampling.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21615",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "01N30ZZ"
+    ],
+    "note": "neurogenic outlet syndrome"
+   },
+   {
+    "codes": [
+     "05N50ZZ"
+    ],
+    "note": "venous outlet syndrome, right"
+   },
+   {
+    "codes": [
+     "05N60ZZ"
+    ],
+    "note": "venous outlet syndrome, left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "G540",
+    "condition": "thoracic outlet syndrome",
+    "role": "typical"
+   },
+   {
+    "code": "I82B11",
+    "condition": "subclavian vein thrombosis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Objective is decompressing the plexus or subclavian vein; the rib is restraining tissue taken out, so Release of the freed structure (B3.13); some coders would report Excision of 1-2 ribs instead.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21616",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "01N30ZZ",
+     "01BL0ZZ"
+    ],
+    "note": "plexus release plus sympathectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "G540",
+    "condition": "thoracic outlet syndrome",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Rib removal frees the brachial plexus (Release, B3.13) and a segment of the upper thoracic sympathetic chain is cut out as a separate objective (Excision).",
+  "confidence": "medium"
+ },
+ {
+  "code": "21620",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB00ZZ"
+    ],
+    "note": "partial sternectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8143XA",
+    "condition": "post-sternotomy osteomyelitis",
+    "role": "typical"
+   },
+   {
+    "code": "C7951",
+    "condition": "sternal metastasis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Part of the sternum is cut out = Excision, sternum, open; usual Medicare indication is post-cardiac-surgery sternal infection.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21627",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB00ZZ"
+    ],
+    "note": "excisional bone debridement"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8143XA",
+    "condition": "sternal wound infection",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Excisional debridement of devitalized sternal bone = Excision, sternum, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21630",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PT00ZZ"
+    ],
+    "note": "total sternectomy"
+   },
+   {
+    "codes": [
+     "0PB00ZZ"
+    ],
+    "note": "subtotal sternectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C413",
+    "condition": "sternal malignancy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Radical sternal resection removes all of the sternum = Resection; subtotal en bloc removal = Excision.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21705",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "01N30ZZ"
+    ],
+    "note": "scalene division with cervical rib removal"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "G540",
+    "condition": "thoracic outlet syndrome",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cutting the scalene and removing the cervical rib both free the brachial plexus = Release, brachial plexus (B3.13); alternative view is Division of neck muscle plus Excision of rib.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21740",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PS004Z"
+    ],
+    "note": "Ravitch with strut or bar"
+   },
+   {
+    "codes": [
+     "0PS00ZZ"
+    ],
+    "note": "Ravitch without fixation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q676",
+    "condition": "pectus excavatum",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cartilages resected and sternum osteotomized to move it to a normal position, usually held with a strut = Reposition, sternum, open; cartilage resection treated as part of the repositioning.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21750",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PS004Z"
+    ],
+    "note": "rewiring"
+   },
+   {
+    "codes": [
+     "0PS000Z"
+    ],
+    "note": "rigid plate fixation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T81328A",
+    "condition": "sternal dehiscence",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Separated sternal halves are brought back together and fixed = Reposition, sternum, with internal fixation; removal of broken wires not coded here.",
+  "confidence": "medium"
+ },
+ {
+  "code": "21825",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PS000Z"
+    ],
+    "note": "plate fixation"
+   },
+   {
+    "codes": [
+     "0PS004Z"
+    ],
+    "note": "wire fixation"
+   },
+   {
+    "codes": [
+     "0PS00ZZ"
+    ],
+    "note": "open reduction without fixation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S2222XA",
+    "condition": "sternal fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open reduction of the fractured sternum = Reposition, sternum, open, device per fixation used.",
+  "confidence": "high"
+ },
+ {
+  "code": "32800",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WQ80ZZ"
+    ],
+    "note": "primary closure of defect"
+   },
+   {
+    "codes": [
+     "0WU80JZ"
+    ],
+    "note": "mesh closure of defect"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J984",
+    "condition": "lung hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Lung reduced (not coded) and the chest wall defect closed = Repair, chest wall, open; mesh variant = Supplement.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32810",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WQ80ZZ"
+    ],
+    "note": "closure of open window"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J869",
+    "condition": "empyema",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Closing the open-drainage chest window = Repair, chest wall, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32820",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WQ80ZZ"
+    ],
+    "note": "primary reconstruction"
+   },
+   {
+    "codes": [
+     "0WU80JZ"
+    ],
+    "note": "mesh reconstruction"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S225XXA",
+    "condition": "flail chest",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Post-traumatic chest wall reconstruction = Repair, chest wall, open; with prosthetic material = Supplement.",
+  "confidence": "low"
+ },
+ {
+  "code": "32900",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB10ZZ"
+    ],
+    "note": "1-2 ribs"
+   },
+   {
+    "codes": [
+     "0PB20ZZ"
+    ],
+    "note": "3 or more ribs"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C413",
+    "condition": "rib malignancy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Rib segments removed outside the pleura = Excision of ribs, open; body part value by rib count.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32905",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB20ZZ"
+    ],
+    "note": "extrapleural thoracoplasty"
+   },
+   {
+    "codes": [
+     "0PB20ZZ",
+     "0BBN0ZZ"
+    ],
+    "note": "Schede type, right"
+   },
+   {
+    "codes": [
+     "0PB20ZZ",
+     "0BBP0ZZ"
+    ],
+    "note": "Schede type, left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J869",
+    "condition": "chronic empyema",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Multiple ribs taken out so the chest wall collapses into the cavity = Excision, 3+ ribs; Schede variant also excises parietal pleura.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32906",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB20ZZ",
+     "0BQ30ZZ"
+    ],
+    "note": "right main bronchus fistula"
+   },
+   {
+    "codes": [
+     "0PB20ZZ",
+     "0BQ70ZZ"
+    ],
+    "note": "left main bronchus fistula"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J860",
+    "condition": "empyema with fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Thoracoplasty (Excision, 3+ ribs) plus closure of the bronchial stump fistula, a distinct objective = Repair of the bronchus.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32664",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "01BL4ZZ"
+    ],
+    "note": "segment cut out"
+   },
+   {
+    "codes": [
+     "015L4ZZ"
+    ],
+    "note": "ablated or clipped"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I4720",
+    "condition": "ventricular tachycardia",
+    "role": "typical"
+   },
+   {
+    "code": "L74512",
+    "condition": "palmar hyperhidrosis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Thoracoscopic interruption of the thoracic sympathetic chain: excised segment = Excision, cautery ablation = Destruction, percutaneous endoscopic; Medicare inpatients are mostly cardiac denervation for refractory VT.",
+  "confidence": "low"
+ },
+ {
+  "code": "60254",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0GTK0ZZ",
+     "07T10ZZ"
+    ],
+    "note": "right neck dissection"
+   },
+   {
+    "codes": [
+     "0GTK0ZZ",
+     "07T20ZZ"
+    ],
+    "note": "left neck dissection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C73",
+    "condition": "thyroid cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total thyroidectomy = Resection, thyroid gland; neck dissection removes the node chain = Resection, neck lymphatic, coded separately.",
+  "confidence": "high"
+ },
+ {
+  "code": "60270",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0GTK0ZZ"
+    ],
+    "note": "total thyroidectomy"
+   },
+   {
+    "codes": [
+     "0GTH0ZZ"
+    ],
+    "note": "right lobe only"
+   },
+   {
+    "codes": [
+     "0GTG0ZZ"
+    ],
+    "note": "left lobe only"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E042",
+    "condition": "substernal multinodular goiter",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Thyroid removed with sternotomy for the substernal part; sternotomy is approach only. Resection of whole gland or lobe, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "60505",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0GTR0ZZ"
+    ],
+    "note": "single ectopic mediastinal gland"
+   },
+   {
+    "codes": [
+     "0GTQ0ZZ"
+    ],
+    "note": "multiple glands"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E210",
+    "condition": "primary hyperparathyroidism",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Ectopic mediastinal parathyroid found and removed through sternotomy = Resection, parathyroid gland, open; exploration not coded.",
+  "confidence": "medium"
+ },
+ {
+  "code": "60521",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "07TM0ZZ"
+    ],
+    "note": "total thymectomy"
+   },
+   {
+    "codes": [
+     "07BM0ZZ"
+    ],
+    "note": "partial thymectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C37",
+    "condition": "thymoma",
+    "role": "typical"
+   },
+   {
+    "code": "G7000",
+    "condition": "myasthenia gravis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Thymus removed through sternotomy = Resection (total) or Excision (partial), thymus, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "60522",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "07TM0ZZ",
+     "07T70ZZ"
+    ],
+    "note": "thymectomy with radical mediastinal dissection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C37",
+    "condition": "thymoma",
+    "role": "typical"
+   },
+   {
+    "code": "G7000",
+    "condition": "myasthenia gravis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Resection of thymus plus separate removal of mediastinal nodal tissue (B3.10c) = Resection, thorax lymphatic; Excision if not the whole chain.",
+  "confidence": "medium"
+ },
+ {
+  "code": "60540",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0GT30ZZ"
+    ],
+    "note": "right total"
+   },
+   {
+    "codes": [
+     "0GT20ZZ"
+    ],
+    "note": "left total"
+   },
+   {
+    "codes": [
+     "0GB30ZZ"
+    ],
+    "note": "right partial"
+   },
+   {
+    "codes": [
+     "0GB20ZZ"
+    ],
+    "note": "left partial"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D3501",
+    "condition": "adrenal adenoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open adrenalectomy = Resection (whole gland) or Excision (partial), adrenal, open; exploration alone would not be coded this way.",
+  "confidence": "high"
+ },
+ {
+  "code": "60545",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0GT30ZZ",
+     "0WBH0ZZ"
+    ],
+    "note": "right adrenal plus retroperitoneal tumor"
+   },
+   {
+    "codes": [
+     "0GT20ZZ",
+     "0WBH0ZZ"
+    ],
+    "note": "left adrenal plus retroperitoneal tumor"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C7401",
+    "condition": "adrenocortical carcinoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Resection of the adrenal plus separate removal of adjacent retroperitoneal tumor = Excision, retroperitoneum (distinct body part).",
+  "confidence": "medium"
+ },
+ {
+  "code": "60650",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0GT34ZZ"
+    ],
+    "note": "right total"
+   },
+   {
+    "codes": [
+     "0GT24ZZ"
+    ],
+    "note": "left total"
+   },
+   {
+    "codes": [
+     "0GB34ZZ"
+    ],
+    "note": "right partial"
+   },
+   {
+    "codes": [
+     "0GB24ZZ"
+    ],
+    "note": "left partial"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D3501",
+    "condition": "adrenal adenoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparoscopic adrenalectomy = Resection (or Excision if partial), adrenal, percutaneous endoscopic.",
+  "confidence": "high"
+ },
+ {
+  "code": "69155",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "09B30ZZ",
+     "07T10ZZ"
+    ],
+    "note": "right ear canal with right neck dissection"
+   },
+   {
+    "codes": [
+     "09B40ZZ",
+     "07T20ZZ"
+    ],
+    "note": "left ear canal with left neck dissection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C44222",
+    "condition": "ear canal carcinoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "En bloc removal of the ear canal = Excision, external auditory canal, open (no Resection value exists); neck dissection coded separately as Resection, neck lymphatic.",
+  "confidence": "medium"
+ },
+ {
+  "code": "69535",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NB50ZZ"
+    ],
+    "note": "right lateral/subtotal"
+   },
+   {
+    "codes": [
+     "0NB60ZZ"
+    ],
+    "note": "left lateral/subtotal"
+   },
+   {
+    "codes": [
+     "0NT50ZZ"
+    ],
+    "note": "right total"
+   },
+   {
+    "codes": [
+     "0NT60ZZ"
+    ],
+    "note": "left total"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C44222",
+    "condition": "ear canal carcinoma",
+    "role": "typical"
+   },
+   {
+    "code": "C07",
+    "condition": "parotid cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Lateral or subtotal temporal bone resection removes part of the bone = Excision, temporal bone, open; total removal = Resection.",
+  "confidence": "medium"
+ },
+ {
+  "code": "69554",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0GTC0ZZ"
+    ],
+    "note": "glomus jugulare tumor removed"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D447",
+    "condition": "glomus jugulare tumor",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Paraganglioma of the jugular foramen removed with its extratemporal extension = Resection, glomus jugulare, open; Excision if residual left.",
+  "confidence": "medium"
+ }
+]

@@ -1,0 +1,1028 @@
+[
+ {
+  "code": "47780",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F170ZB"
+    ],
+    "note": "common hepatic duct to jejunum"
+   },
+   {
+    "codes": [
+     "0F190ZB"
+    ],
+    "note": "common bile duct to jejunum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K831",
+    "condition": "bile duct stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Biliary-enteric anastomosis to a Roux limb = Bypass of the extrahepatic duct to small intestine, open; Roux jejunojejunostomy not coded separately.",
+  "confidence": "high"
+ },
+ {
+  "code": "47785",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F150ZB",
+     "0F160ZB"
+    ],
+    "note": "right and left hepatic ducts to jejunum"
+   },
+   {
+    "codes": [
+     "0F150ZB"
+    ],
+    "note": "right hepatic duct to jejunum"
+   },
+   {
+    "codes": [
+     "0F160ZB"
+    ],
+    "note": "left hepatic duct to jejunum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K831",
+    "condition": "bile duct stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Intrahepatic duct-to-Roux limb anastomosis = Bypass of right and/or left hepatic duct to small intestine, open; one code per duct body part.",
+  "confidence": "medium"
+ },
+ {
+  "code": "47800",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FB90ZZ"
+    ],
+    "note": "common bile duct segment excised"
+   },
+   {
+    "codes": [
+     "0FB70ZZ"
+    ],
+    "note": "common hepatic duct segment excised"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K831",
+    "condition": "bile duct stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Excision of the strictured or injured duct segment with primary end-to-end anastomosis = Excision of the duct, open; anastomosis is closure. Repair (0FQ90ZZ) if no tissue is removed.",
+  "confidence": "medium"
+ },
+ {
+  "code": "47801",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F790DZ"
+    ],
+    "note": "common bile duct stent"
+   },
+   {
+    "codes": [
+     "0F770DZ"
+    ],
+    "note": "common hepatic duct stent"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K831",
+    "condition": "bile duct obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open placement of a stent to hold the duct open = Dilation with intraluminal device, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "47900",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FQ90ZZ"
+    ],
+    "note": "common bile duct"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K9189",
+    "condition": "postop bile duct injury",
+    "role": "typical"
+   },
+   {
+    "code": "S3613XA",
+    "condition": "traumatic bile duct injury",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Suture closure of an earlier duct injury = Repair of common bile duct, open. Postprocedural complication PDx (MDC 6) with a biliary OR code groups 981-983 by design; traumatic injury groups in MDC 7.",
+  "confidence": "medium"
+ },
+ {
+  "code": "48000",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F9G00Z"
+    ],
+    "note": "peripancreatic drains"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K8590",
+    "condition": "acute pancreatitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open placement of drains around the pancreas = Drainage of pancreas with drainage device, open (peritoneal/retroperitoneal body part is the alternative coder choice).",
+  "confidence": "medium"
+ },
+ {
+  "code": "48001",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F9G00Z",
+     "0F9400Z",
+     "0D9600Z",
+     "0DHA0UZ"
+    ],
+    "note": "pancreas drains, cholecystostomy, decompressive gastrostomy, feeding jejunostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K8590",
+    "condition": "acute pancreatitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Distinct objectives on separate body parts (B3.2): pancreas drainage, gallbladder drainage, stomach drainage tube, jejunal feeding tube, all open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "48020",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FCD0ZZ"
+    ],
+    "note": "pancreatic duct"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K861",
+    "condition": "chronic pancreatitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open removal of ductal calculi = Extirpation of matter from pancreatic duct, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "48100",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FBG0ZX"
+    ],
+    "note": "diagnostic excision"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open biopsy of the pancreas = Excision of pancreas, open, diagnostic qualifier.",
+  "confidence": "high"
+ },
+ {
+  "code": "48105",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FBG0ZZ"
+    ],
+    "note": "pancreatic necrosectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K8592",
+    "condition": "infected necrotizing pancreatitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open cutting away of necrotic pancreas = Excision of pancreas, open; Extirpation (0FCG0ZZ) is the alternative reading if only loose debris is removed.",
+  "confidence": "medium"
+ },
+ {
+  "code": "48120",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FBG0ZZ"
+    ],
+    "note": "local excision of lesion"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D136",
+    "condition": "benign pancreas neoplasm",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Enucleation/local removal of a pancreatic lesion = Excision of pancreas, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "48140",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FBG0ZZ",
+     "07TP0ZZ"
+    ],
+    "note": "with splenectomy"
+   },
+   {
+    "codes": [
+     "0FBG0ZZ"
+    ],
+    "note": "spleen preserved"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C252",
+    "condition": "pancreatic tail cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Partial pancreatectomy = Excision of pancreas, open (single pancreas body part); splenectomy coded separately as Resection of spleen.",
+  "confidence": "high"
+ },
+ {
+  "code": "48145",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FBG0ZZ",
+     "07TP0ZZ"
+    ],
+    "note": "with splenectomy"
+   },
+   {
+    "codes": [
+     "0FBG0ZZ"
+    ],
+    "note": "spleen preserved"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C252",
+    "condition": "pancreatic tail cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Distal pancreatectomy = Excision of pancreas, open; the remnant-to-jejunum anastomosis is reconstruction within the resection, not separately coded.",
+  "confidence": "medium"
+ },
+ {
+  "code": "48146",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FBG0ZZ",
+     "07TP0ZZ"
+    ],
+    "note": "with splenectomy"
+   },
+   {
+    "codes": [
+     "0FBG0ZZ"
+    ],
+    "note": "spleen preserved"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K861",
+    "condition": "chronic pancreatitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Near-total pancreatectomy leaving a head rim and the duodenum = Excision of pancreas, open; splenectomy separate if done.",
+  "confidence": "medium"
+ },
+ {
+  "code": "48148",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FTC0ZZ"
+    ],
+    "note": "ampulla"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D135",
+    "condition": "ampullary adenoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Transduodenal removal of the whole ampulla = Resection of ampulla of Vater, open; duodenotomy is access.",
+  "confidence": "medium"
+ },
+ {
+  "code": "48150",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FBG0ZZ",
+     "0DT90ZZ",
+     "0DB60ZZ",
+     "0FT40ZZ",
+     "0FB90ZZ"
+    ],
+    "note": "classic Whipple"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   },
+   {
+    "code": "C170",
+    "condition": "duodenal cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Pancreaticoduodenectomy: Excision pancreas, Resection duodenum, Excision stomach (antrum), Resection gallbladder, Excision common bile duct; anastomoses not coded.",
+  "confidence": "high"
+ },
+ {
+  "code": "48152",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FBG0ZZ",
+     "0DT90ZZ",
+     "0DB60ZZ",
+     "0FT40ZZ",
+     "0FB90ZZ"
+    ],
+    "note": "classic Whipple"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   },
+   {
+    "code": "C170",
+    "condition": "duodenal cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Same coded components as standard Whipple; how the pancreatic remnant is managed does not change PCS.",
+  "confidence": "high"
+ },
+ {
+  "code": "48153",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FBG0ZZ",
+     "0DT90ZZ",
+     "0FT40ZZ",
+     "0FB90ZZ"
+    ],
+    "note": "pylorus-preserving"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   },
+   {
+    "code": "C170",
+    "condition": "duodenal cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Pylorus-preserving pancreaticoduodenectomy: Excision pancreas, Resection duodenum, Resection gallbladder, Excision common bile duct; no stomach code.",
+  "confidence": "high"
+ },
+ {
+  "code": "48154",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FBG0ZZ",
+     "0DT90ZZ",
+     "0FT40ZZ",
+     "0FB90ZZ"
+    ],
+    "note": "pylorus-preserving"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   },
+   {
+    "code": "C170",
+    "condition": "duodenal cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Same as pylorus-preserving Whipple; remnant management does not change PCS.",
+  "confidence": "high"
+ },
+ {
+  "code": "48155",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FTG0ZZ",
+     "0DT90ZZ",
+     "0FT40ZZ",
+     "0FB90ZZ",
+     "07TP0ZZ"
+    ],
+    "note": "with duodenum, gallbladder, distal bile duct, spleen"
+   },
+   {
+    "codes": [
+     "0FTG0ZZ"
+    ],
+    "note": "completion pancreatectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total pancreatectomy = Resection of pancreas, open, plus separate codes for other organs removed en bloc (duodenum, gallbladder, distal CBD, spleen).",
+  "confidence": "medium"
+ },
+ {
+  "code": "48500",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F9G0ZZ"
+    ],
+    "note": "cyst opened to surface"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K863",
+    "condition": "pancreatic pseudocyst",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Marsupialization opens and drains the cyst = Drainage of pancreas, open (index also allows Excision if wall removed).",
+  "confidence": "medium"
+ },
+ {
+  "code": "48510",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F9G00Z"
+    ],
+    "note": "external drain"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K863",
+    "condition": "pancreatic pseudocyst",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open external drainage of a pseudocyst with a drain left = Drainage of pancreas with drainage device, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "48520",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F9G0ZZ"
+    ],
+    "note": "cystgastrostomy"
+   },
+   {
+    "codes": [
+     "0F1G0Z3"
+    ],
+    "note": "cystduodenostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K863",
+    "condition": "pancreatic pseudocyst",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cyst-to-duodenum = Bypass pancreas to duodenum; PCS has no pancreas-to-stomach target, so cystgastrostomy codes as Drainage of pancreas, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "48540",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F1G0ZB"
+    ],
+    "note": "cyst to Roux jejunal limb"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K863",
+    "condition": "pancreatic pseudocyst",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Roux-en-Y cystjejunostomy = Bypass pancreas to small intestine, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "48545",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FQG0ZZ"
+    ],
+    "note": "pancreas"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S36230A",
+    "condition": "pancreatic laceration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Suture of pancreatic injury = Repair of pancreas, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "48547",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DL70ZZ",
+     "0D160ZA"
+    ],
+    "note": "pyloric exclusion with gastrojejunostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S36230A",
+    "condition": "pancreatic laceration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Duodenal exclusion = Occlusion of pylorus, open, plus Bypass stomach to jejunum, open (distinct objectives).",
+  "confidence": "medium"
+ },
+ {
+  "code": "48548",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0F1D0ZB"
+    ],
+    "note": "pancreatic duct to jejunum"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K861",
+    "condition": "chronic pancreatitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Longitudinal pancreaticojejunostomy = Bypass of pancreatic duct to small intestine, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "54125",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VTS0ZZ"
+    ],
+    "note": "penis"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C609",
+    "condition": "penile cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total penectomy = Resection of penis, open; perineal urethrostomy is part of the reconstruction (no urethral Bypass value).",
+  "confidence": "high"
+ },
+ {
+  "code": "54130",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VTS0ZZ",
+     "07TH0ZZ",
+     "07TJ0ZZ"
+    ],
+    "note": "bilateral inguinal dissection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C609",
+    "condition": "penile cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Resection of penis plus bilateral inguinofemoral lymphadenectomy as distinct objectives (B3.10c) = Resection right and left inguinal lymphatic.",
+  "confidence": "high"
+ },
+ {
+  "code": "54135",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VTS0ZZ",
+     "07TH0ZZ",
+     "07TJ0ZZ",
+     "07TC0ZZ"
+    ],
+    "note": "inguinal and pelvic dissection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C609",
+    "condition": "penile cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Resection of penis plus bilateral inguinal and pelvic lymphadenectomy coded separately (B3.10c).",
+  "confidence": "high"
+ },
+ {
+  "code": "54390",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQB0ZZ",
+     "0TQD0ZZ"
+    ],
+    "note": "bladder closure and urethral repair"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q6410",
+    "condition": "bladder exstrophy",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Exstrophy/epispadias reconstruction = Repair bladder and Repair urethra, open (separate body parts); pediatric, rare in Medicare.",
+  "confidence": "low"
+ },
+ {
+  "code": "54430",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0V9S0ZZ"
+    ],
+    "note": "corporal shunt"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N4833",
+    "condition": "drug-induced priapism",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Corporal shunt to drain trapped blood = Drainage of penis, open; PCS has no penile Bypass. Non-OR in MS-DRG terms likely; groups by diagnosis.",
+  "confidence": "medium"
+ },
+ {
+  "code": "55605",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0V930ZZ"
+    ],
+    "note": "bilateral"
+   },
+   {
+    "codes": [
+     "0V910ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0V920ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N490",
+    "condition": "seminal vesicle abscess",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open incision and drainage of seminal vesicle = Drainage of seminal vesicle, open; laterality per side.",
+  "confidence": "medium"
+ },
+ {
+  "code": "55650",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VT30ZZ"
+    ],
+    "note": "bilateral"
+   },
+   {
+    "codes": [
+     "0VT10ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0VT20ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C637",
+    "condition": "seminal vesicle cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Vesiculectomy = Resection of seminal vesicle, open; laterality per side.",
+  "confidence": "medium"
+ },
+ {
+  "code": "55801",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VB00ZZ"
+    ],
+    "note": "prostate"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N401",
+    "condition": "BPH with LUTS",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Subtotal (adenoma) prostatectomy = Excision of prostate, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "55810",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VT00ZZ",
+     "0VT30ZZ"
+    ],
+    "note": "prostate and seminal vesicles"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C61",
+    "condition": "prostate cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Radical perineal prostatectomy = Resection of prostate, open, plus Resection of bilateral seminal vesicles (separate body part).",
+  "confidence": "high"
+ },
+ {
+  "code": "55812",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VT00ZZ",
+     "0VT30ZZ",
+     "07BC0ZX"
+    ],
+    "note": "with pelvic node sampling"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C61",
+    "condition": "prostate cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Radical prostatectomy codes plus limited pelvic node sampling = Excision pelvis lymphatic, diagnostic.",
+  "confidence": "medium"
+ },
+ {
+  "code": "55815",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VT00ZZ",
+     "0VT30ZZ",
+     "07TC0ZZ"
+    ],
+    "note": "with pelvic lymphadenectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C61",
+    "condition": "prostate cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Radical prostatectomy codes plus full bilateral pelvic lymphadenectomy = Resection pelvis lymphatic (B3.10c).",
+  "confidence": "high"
+ },
+ {
+  "code": "55821",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VB00ZZ"
+    ],
+    "note": "prostate"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N401",
+    "condition": "BPH with LUTS",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Suprapubic simple prostatectomy = Excision of prostate, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "55831",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VB00ZZ"
+    ],
+    "note": "prostate"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N401",
+    "condition": "BPH with LUTS",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Retropubic simple prostatectomy = Excision of prostate, open.",
+  "confidence": "high"
+ }
+]

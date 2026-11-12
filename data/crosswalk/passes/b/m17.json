@@ -1,0 +1,1196 @@
+[
+ {
+  "code": "22808",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SG10A0"
+    ],
+    "note": "2 lumbar joints"
+   },
+   {
+    "codes": [
+     "0SG00A0"
+    ],
+    "note": "1 lumbar joint"
+   },
+   {
+    "codes": [
+     "0RGA0A0"
+    ],
+    "note": "thoracolumbar joint"
+   },
+   {
+    "codes": [
+     "0RG7070"
+    ],
+    "note": "2 thoracic joints, rib autograft"
+   },
+   {
+    "codes": [
+     "0RG6070"
+    ],
+    "note": "1 thoracic joint, rib autograft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M4186",
+    "condition": "adult lumbar scoliosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Anterior column fusion from an anterior approach for deformity; 2-3 vertebrae = 1-2 joints, body part by region and joint count; cage in lumbar, rib graft in thoracic.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22810",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RG7070",
+     "0RGA0A0",
+     "0SG10A0"
+    ],
+    "note": "thoracolumbar span"
+   },
+   {
+    "codes": [
+     "0SG10A0"
+    ],
+    "note": "lumbar only"
+   },
+   {
+    "codes": [
+     "0RG7070"
+    ],
+    "note": "thoracic only, rib autograft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M4185",
+    "condition": "thoracolumbar scoliosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Anterior deformity fusion over 3-6 joints; one Fusion code per region crossed (thoracic, thoracolumbar, lumbar).",
+  "confidence": "medium"
+ },
+ {
+  "code": "22812",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RG7070",
+     "0RGA0A0",
+     "0SG10A0"
+    ],
+    "note": "thoracolumbar span"
+   },
+   {
+    "codes": [
+     "0RG8070"
+    ],
+    "note": "8+ thoracic joints"
+   },
+   {
+    "codes": [
+     "0RG7070",
+     "0RGA0A0"
+    ],
+    "note": "thoracic to T12-L1"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M4185",
+    "condition": "thoracolumbar scoliosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Long anterior deformity fusion (7+ joints); Fusion per region crossed, anterior approach anterior column.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22818",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB40ZZ"
+    ],
+    "note": "thoracic apex"
+   },
+   {
+    "codes": [
+     "0QB00ZZ"
+    ],
+    "note": "lumbar apex"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q76415",
+    "condition": "congenital kyphosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Removal of 1-2 whole vertebral segments at the kyphus = Excision of vertebra (PCS has no Resection value for vertebrae); companion fusion is a separate CPT.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22819",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB40ZZ",
+     "0QB00ZZ"
+    ],
+    "note": "thoracolumbar apex"
+   },
+   {
+    "codes": [
+     "0PB40ZZ"
+    ],
+    "note": "thoracic only"
+   },
+   {
+    "codes": [
+     "0QB00ZZ"
+    ],
+    "note": "lumbar only"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q76415",
+    "condition": "congenital kyphosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Excision of 3+ vertebral segments; one code per vertebra body-part value crossed; fusion separately reported.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22830",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SJ00ZZ"
+    ],
+    "note": "lumbar"
+   },
+   {
+    "codes": [
+     "0RJ60ZZ"
+    ],
+    "note": "thoracic"
+   },
+   {
+    "codes": [
+     "0RJ10ZZ"
+    ],
+    "note": "cervical"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M960",
+    "condition": "pseudarthrosis after fusion",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open exploration of a prior fusion mass with nothing else done = Inspection of the vertebral joint.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22836",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PS443Z"
+    ],
+    "note": "thoracoscopic"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M41124",
+    "condition": "adolescent idiopathic scoliosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Vertebral body tether for curve correction = Reposition of thoracic vertebra with tether device value; thoracoscopic typical (0PS403Z if fully open).",
+  "confidence": "high"
+ },
+ {
+  "code": "22837",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PS443Z"
+    ],
+    "note": "thoracoscopic"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M41124",
+    "condition": "adolescent idiopathic scoliosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Same tether Reposition code regardless of level count.",
+  "confidence": "high"
+ },
+ {
+  "code": "22838",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PW444Z"
+    ],
+    "note": "revision"
+   },
+   {
+    "codes": [
+     "0PP444Z"
+    ],
+    "note": "removal"
+   },
+   {
+    "codes": [
+     "0PP444Z",
+     "0PS443Z"
+    ],
+    "note": "removal and new tether"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T84216A",
+    "condition": "tether breakage",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Tether is internal fixation device in Removal/Revision tables; replacement = Removal plus new tether Reposition.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22849",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SW004Z"
+    ],
+    "note": "lumbar, components exchanged"
+   },
+   {
+    "codes": [
+     "0SP004Z",
+     "0SH004Z"
+    ],
+    "note": "lumbar, construct removed and reinserted"
+   },
+   {
+    "codes": [
+     "0RW604Z"
+    ],
+    "note": "thoracic, components exchanged"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T84216A",
+    "condition": "broken spinal hardware",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Reinserting posterior instrumentation without new fusion: Revision when components are exchanged, Removal plus Insertion when the construct is replaced.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22850",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RP604Z"
+    ],
+    "note": "thoracic"
+   },
+   {
+    "codes": [
+     "0RP604Z",
+     "0RPA04Z",
+     "0SP004Z"
+    ],
+    "note": "thoracic to lumbar"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8484XA",
+    "condition": "painful spinal hardware",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Taking out nonsegmental rod instrumentation = Removal of internal fixation device from each vertebral-joint region it spans.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22852",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SP004Z"
+    ],
+    "note": "lumbar"
+   },
+   {
+    "codes": [
+     "0RP604Z"
+    ],
+    "note": "thoracic"
+   },
+   {
+    "codes": [
+     "0RP104Z"
+    ],
+    "note": "cervical"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8484XA",
+    "condition": "painful spinal hardware",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Removal of posterior segmental rods/screws = Removal of internal fixation device, vertebral joint by region.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22855",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RP104Z"
+    ],
+    "note": "cervical plate"
+   },
+   {
+    "codes": [
+     "0SP004Z"
+    ],
+    "note": "lumbar"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T84226A",
+    "condition": "displaced spinal hardware",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Removal of anterior plate/screws = Removal of internal fixation device from the vertebral joint.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22857",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SR40JZ"
+    ],
+    "note": "L5-S1"
+   },
+   {
+    "codes": [
+     "0SR20JZ"
+    ],
+    "note": "lumbar level above L5"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M51370",
+    "condition": "lumbosacral disc degeneration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total disc arthroplasty = Replacement of the disc with synthetic substitute, open anterior.",
+  "confidence": "high"
+ },
+ {
+  "code": "22861",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RW30JZ"
+    ],
+    "note": "revision in place"
+   },
+   {
+    "codes": [
+     "0RP30JZ",
+     "0RR30JZ"
+    ],
+    "note": "explant and new prosthesis"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T84098A",
+    "condition": "disc prosthesis failure",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Revision of the disc prosthesis in place, or Removal plus Replacement when a new prosthesis is put in.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22862",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SW40JZ"
+    ],
+    "note": "L5-S1 revision"
+   },
+   {
+    "codes": [
+     "0SW20JZ"
+    ],
+    "note": "lumbar revision"
+   },
+   {
+    "codes": [
+     "0SP40JZ",
+     "0SR40JZ"
+    ],
+    "note": "L5-S1 new prosthesis"
+   },
+   {
+    "codes": [
+     "0SP20JZ",
+     "0SR20JZ"
+    ],
+    "note": "lumbar new prosthesis"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T84098A",
+    "condition": "disc prosthesis failure",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Revision of the lumbar disc prosthesis, or Removal plus Replacement when exchanged.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22864",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RP30JZ"
+    ],
+    "note": "cervical disc"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T84098A",
+    "condition": "disc prosthesis failure",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Explant of cervical disc prosthesis = Removal of synthetic substitute from cervical disc; any conversion fusion is a separate CPT.",
+  "confidence": "medium"
+ },
+ {
+  "code": "22865",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SP40JZ"
+    ],
+    "note": "L5-S1"
+   },
+   {
+    "codes": [
+     "0SP20JZ"
+    ],
+    "note": "lumbar"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T84098A",
+    "condition": "disc prosthesis failure",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Explant of lumbar disc prosthesis = Removal of synthetic substitute from the disc.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32665",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D844ZZ"
+    ],
+    "note": "thoracoscopic myotomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K220",
+    "condition": "achalasia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cutting the distal esophageal/LES muscle = Division of esophagogastric junction, percutaneous endoscopic (thoracoscope).",
+  "confidence": "high"
+ },
+ {
+  "code": "41130",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CB7XZZ"
+    ],
+    "note": "transoral"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C021",
+    "condition": "oral tongue cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Partial glossectomy = Excision of tongue; transoral is External per PCS orifice guideline (0CB70ZZ if via mandibulotomy/neck).",
+  "confidence": "high"
+ },
+ {
+  "code": "41135",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CB70ZZ",
+     "07T10ZZ",
+     "0KB20ZZ",
+     "05BM0ZZ",
+     "00BR0ZZ"
+    ],
+    "note": "right neck"
+   },
+   {
+    "codes": [
+     "0CB70ZZ",
+     "07T20ZZ",
+     "0KB30ZZ",
+     "05BN0ZZ",
+     "00BR0ZZ"
+    ],
+    "note": "left neck"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C021",
+    "condition": "oral tongue cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Partial glossectomy plus radical neck: Resection of neck lymphatics and Excision of SCM, internal jugular and accessory nerve as distinct body parts.",
+  "confidence": "medium"
+ },
+ {
+  "code": "41140",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CT70ZZ"
+    ],
+    "note": "total glossectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C028",
+    "condition": "advanced tongue cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Removal of the whole tongue = Resection of tongue, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "41145",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CT70ZZ",
+     "07T10ZZ",
+     "0KB20ZZ",
+     "05BM0ZZ",
+     "00BR0ZZ"
+    ],
+    "note": "right neck"
+   },
+   {
+    "codes": [
+     "0CT70ZZ",
+     "07T20ZZ",
+     "0KB30ZZ",
+     "05BN0ZZ",
+     "00BR0ZZ"
+    ],
+    "note": "left neck"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C028",
+    "condition": "advanced tongue cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Resection of tongue plus radical neck (neck lymphatic Resection; SCM, IJV, accessory nerve Excision).",
+  "confidence": "medium"
+ },
+ {
+  "code": "41150",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CB70ZZ",
+     "0NBT0ZZ"
+    ],
+    "note": "right mandible"
+   },
+   {
+    "codes": [
+     "0CB70ZZ",
+     "0NBV0ZZ"
+    ],
+    "note": "left mandible"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C041",
+    "condition": "floor of mouth cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Composite resection: Excision of tongue and of mandible (partial); floor-of-mouth soft tissue has no separate PCS body part.",
+  "confidence": "medium"
+ },
+ {
+  "code": "41153",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CB70ZZ",
+     "07B10ZZ"
+    ],
+    "note": "right neck"
+   },
+   {
+    "codes": [
+     "0CB70ZZ",
+     "07B20ZZ"
+    ],
+    "note": "left neck"
+   },
+   {
+    "codes": [
+     "0CB70ZZ",
+     "07B10ZZ",
+     "07B20ZZ"
+    ],
+    "note": "bilateral suprahyoid"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C041",
+    "condition": "floor of mouth cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Excision of tongue/floor of mouth plus selective suprahyoid node dissection = Excision of neck lymphatic (distinct objective).",
+  "confidence": "medium"
+ },
+ {
+  "code": "41155",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CB70ZZ",
+     "0NBT0ZZ",
+     "07T10ZZ",
+     "0KB20ZZ",
+     "05BM0ZZ",
+     "00BR0ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0CB70ZZ",
+     "0NBV0ZZ",
+     "07T20ZZ",
+     "0KB30ZZ",
+     "05BN0ZZ",
+     "00BR0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C041",
+    "condition": "floor of mouth cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Composite resection (tongue and mandible Excision) plus radical neck codes, same side.",
+  "confidence": "medium"
+ },
+ {
+  "code": "42426",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CT80ZZ",
+     "07T10ZZ",
+     "0KB20ZZ",
+     "05BM0ZZ",
+     "00BR0ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0CT90ZZ",
+     "07T20ZZ",
+     "0KB30ZZ",
+     "05BN0ZZ",
+     "00BR0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C07",
+    "condition": "parotid cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total parotidectomy = Resection of parotid gland, plus radical neck codes on the same side.",
+  "confidence": "medium"
+ },
+ {
+  "code": "42845",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CTP0ZZ",
+     "0CBM0ZZ"
+    ],
+    "note": "tonsil and pillars"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C090",
+    "condition": "tonsil cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Radical tonsil-region resection = Resection of tonsils plus Excision of pharynx (pillars); flap is a separate CPT (a pectoralis Transfer 0KXH0Z2 would not change the family).",
+  "confidence": "medium"
+ },
+ {
+  "code": "42894",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CBM0ZZ"
+    ],
+    "note": "pharyngeal wall"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C132",
+    "condition": "hypopharyngeal wall cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Partial pharyngeal wall removal = Excision of pharynx, open; flap is a separate CPT (adding a pectoralis Transfer does not change the family).",
+  "confidence": "medium"
+ },
+ {
+  "code": "42953",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQ10ZZ"
+    ],
+    "note": "upper esophagus"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K222",
+    "condition": "pharyngoesophageal stricture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open repair at the pharyngoesophageal junction = Repair of upper esophagus; Repair of pharynx (0CQM0ZZ) would be unrelated-OR with an esophageal dx.",
+  "confidence": "low"
+ },
+ {
+  "code": "43045",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DC20ZZ"
+    ],
+    "note": "thoracic esophagus"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T18198A",
+    "condition": "esophageal foreign body",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Thoracotomy esophagotomy to take out a foreign object = Extirpation of matter, middle esophagus, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "43100",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DB10ZZ"
+    ],
+    "note": "cervical esophagus"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D130",
+    "condition": "benign esophageal tumor",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Local excision of lesion via neck = Excision of upper esophagus, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "43101",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DB20ZZ"
+    ],
+    "note": "thoracic"
+   },
+   {
+    "codes": [
+     "0DB30ZZ"
+    ],
+    "note": "distal/abdominal"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D130",
+    "condition": "benign esophageal tumor",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Local excision of lesion via chest or abdomen = Excision of middle or lower esophagus, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "43107",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT50ZZ",
+     "0DT40ZZ",
+     "0DX60Z5"
+    ],
+    "note": "gastric conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C155",
+    "condition": "distal esophageal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total esophagectomy with EGJ, stomach tubed up to the neck = Resection of esophagus and EGJ plus Transfer stomach to esophagus.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43108",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT50ZZ",
+     "0DT40ZZ",
+     "0DXE0Z5"
+    ],
+    "note": "colon conduit"
+   },
+   {
+    "codes": [
+     "0DT50ZZ",
+     "0DT40ZZ",
+     "0DX80Z5"
+    ],
+    "note": "small bowel conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C155",
+    "condition": "distal esophageal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total esophagectomy with pedicled colon or jejunal interposition = Resection plus Transfer of bowel to esophagus.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43112",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT50ZZ",
+     "0DT40ZZ",
+     "0DX60Z5"
+    ],
+    "note": "gastric conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C155",
+    "condition": "distal esophageal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total esophagectomy via thoracotomy with gastric pull-up = Resection of esophagus and EGJ plus Transfer stomach to esophagus.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43113",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT50ZZ",
+     "0DT40ZZ",
+     "0DXE0Z5"
+    ],
+    "note": "colon conduit"
+   },
+   {
+    "codes": [
+     "0DT50ZZ",
+     "0DT40ZZ",
+     "0DX80Z5"
+    ],
+    "note": "small bowel conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C155",
+    "condition": "distal esophageal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total esophagectomy via thoracotomy with bowel interposition = Resection plus Transfer of bowel to esophagus.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43116",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DR507Z",
+     "0DBA0ZZ"
+    ],
+    "note": "free jejunal graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C153",
+    "condition": "cervical esophageal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cervical esophagus replaced by free jejunal segment = Replacement of esophagus with autologous tissue (includes the removal) plus jejunum donor Excision per B3.9.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43117",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT20ZZ",
+     "0DT30ZZ",
+     "0DT40ZZ",
+     "0DX60Z5"
+    ],
+    "note": "Ivor Lewis"
+   },
+   {
+    "codes": [
+     "0DT20ZZ",
+     "0DT30ZZ",
+     "0DT40ZZ",
+     "0DB60ZZ",
+     "0DX60Z5"
+    ],
+    "note": "with proximal gastrectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C155",
+    "condition": "distal esophageal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Distal two-thirds esophagectomy = Resection of middle and lower esophagus and EGJ plus Transfer stomach to esophagus; partial gastrectomy adds Excision of stomach.",
+  "confidence": "medium"
+ },
+ {
+  "code": "43118",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DT20ZZ",
+     "0DT30ZZ",
+     "0DT40ZZ",
+     "0DXE0Z5"
+    ],
+    "note": "colon conduit"
+   },
+   {
+    "codes": [
+     "0DT20ZZ",
+     "0DT30ZZ",
+     "0DT40ZZ",
+     "0DX80Z5"
+    ],
+    "note": "small bowel conduit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C155",
+    "condition": "distal esophageal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Distal two-thirds esophagectomy with bowel interposition = Resection of middle/lower esophagus and EGJ plus Transfer of bowel to esophagus.",
+  "confidence": "medium"
+ }
+]
