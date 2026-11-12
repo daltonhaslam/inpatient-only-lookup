@@ -190,6 +190,25 @@ describe('revenue at stake', { skip }, () => {
     assert.doesNotMatch(text, /For each of the [\d,]+ procedures/);
   });
 
+  test('help-review is easy to find: callout, sub-nav on all three pages, card links, home link', () => {
+    const main = read('revenue-at-stake/index.html');
+    assert.match(main, /data-help-callout/);
+    assert.ok(textOf(main).includes('Help check these mappings'));
+    assert.match(main, /<p class="stake__actions"><a class="btn" href="\/revenue-at-stake\/help-review\/">Help review →<\/a>/);
+    const pages = { 'revenue-at-stake/index.html': 'Compare', 'revenue-at-stake/help-review/index.html': 'Help review', 'revenue-at-stake/methods/index.html': 'Methods' };
+    for (const [file, current] of Object.entries(pages)) {
+      const nav = read(file).match(/<nav class="subnav"[^>]*>([\s\S]*?)<\/nav>/);
+      assert.ok(nav, `${file}: no sub-nav`);
+      for (const href of ['/revenue-at-stake/', '/revenue-at-stake/help-review/', '/revenue-at-stake/methods/']) assert.ok(nav[1].includes(`href="${href}"`), `${file}: no ${href}`);
+      assert.equal([...nav[1].matchAll(/aria-current="page"/g)].length, 1);
+      assert.match(nav[1], new RegExp(`aria-current="page">${current}<`));
+    }
+    assert.ok(read('index.html').includes('href="/revenue-at-stake/help-review/">help review it</a>'));
+    const withCard = readdirSync(join(docs, 'code')).filter((code) => read(`code/${code}/index.html`).includes('scard__act'));
+    assert.ok(withCard.length > 0);
+    for (const code of withCard.slice(0, 20)) assert.ok(read(`code/${code}/index.html`).includes('Review a batch of 10 →'), code);
+  });
+
   test('methods page cites every source file, the guardrail and the years', () => {
     const html = read('revenue-at-stake/methods/index.html');
     const text = textOf(html);

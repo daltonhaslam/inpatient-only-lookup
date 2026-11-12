@@ -300,6 +300,16 @@ td a[target] { white-space: nowrap; }
 .meter__text strong { font: 650 1.3rem/1 var(--serif); }
 .meter__bar { margin-top: 0.5rem; height: 0.55rem; border: 1.5px solid var(--ink-2); border-radius: 2px; }
 .meter__bar span { display: block; height: 100%; min-width: 2px; background: var(--on); }
+.subnav { display: flex; flex-wrap: wrap; gap: 0.2rem 1.4rem; margin-bottom: 1.2rem; font-weight: 500; font-size: 0.95rem; }
+.subnav a { color: var(--ink-2); text-decoration: none; padding: 0.25rem 0; border-bottom: 2px solid transparent; }
+.subnav a:hover { color: var(--ink); }
+.subnav a[aria-current] { color: var(--ink); border-bottom-color: var(--on); }
+.callout { margin-top: 1.4rem; max-width: 40rem; padding: 1rem 1.2rem; background: var(--panel); border: 1.5px solid var(--ink); border-radius: 4px; }
+.callout h2 { margin: 0 0 0.4rem; font-size: 1.25rem; }
+.callout p { margin: 0 0 0.8rem; }
+.callout__act { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem; margin: 0; }
+.callout__count { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.scard__batch { align-self: center; font-size: 0.95rem; }
 .stake__actions { margin-top: 1.4rem; display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .btn {
   display: inline-block; font: 600 1rem/1.2 var(--sans); text-decoration: none; color: var(--paper); background: var(--ink);
@@ -415,7 +425,7 @@ td a[target] { white-space: nowrap; }
   body { font-size: 11pt; }
   .verdict--ipo .verdict__answer { background: none; color: #000; border-color: #000; }
   a { color: inherit; }
-  .stake__actions, .scard__act, .stab__jump, [data-stake-app] { display: none; }
+  .stake__actions, .callout, .subnav, .scard__act, .stab__jump, [data-stake-app] { display: none; }
   .scard { break-inside: avoid; border-color: #000; }
   .scard__work[open] { break-inside: auto; }
   .sbar__ip, .meter__bar span { print-color-adjust: exact; -webkit-print-color-adjust: exact; }

@@ -97,20 +97,37 @@ function progressBar(stake) {
 }
 
 function downloads(stake) {
-  const excel = stake.xlsx ? '<a class="btn" href="/data/revenue-at-stake.xlsx" download>Download Excel</a>' : '';
-  return `<p class="stake__actions">${excel}<a class="btn${stake.xlsx ? ' btn--quiet' : ''}" href="/data/revenue-at-stake.csv" download>Download CSV</a><a class="btn btn--quiet" href="${ROOT}help-review/">Help review</a></p>`;
+  const excel = stake.xlsx ? '<a class="btn btn--quiet" href="/data/revenue-at-stake.xlsx" download>Download Excel</a>' : '';
+  return `<p class="stake__actions"><a class="btn" href="${ROOT}help-review/">Help review →</a>${excel}<a class="btn btn--quiet" href="/data/revenue-at-stake.csv" download>Download CSV</a></p>`;
+}
+
+/** Compare · Help review · Methods, shown on all three section pages. */
+function subnav(current) {
+  const links = [['compare', ROOT, 'Compare'], ['help', `${ROOT}help-review/`, 'Help review'], ['methods', `${ROOT}methods/`, 'Methods']];
+  return `<nav class="subnav" aria-label="Revenue at stake">${links.map(([id, href, text]) => `<a href="${href}"${id === current ? ' aria-current="page"' : ''}>${text}</a>`).join('')}</nav>`;
+}
+
+function helpCallout(stake) {
+  const { compared, reviewed } = stake.progress;
+  return `<aside class="callout" aria-labelledby="callout-h" data-help-callout>
+<h2 id="callout-h">Help check these mappings</h2>
+<p>Coders, CDI specialists and physicians: pick a batch of 10 codes in your specialty, or use the Agree / Something’s wrong buttons on any card. Credit by name, or name linked to your profile.</p>
+<p class="callout__act"><a class="btn" href="${ROOT}help-review/">Help review →</a> <span class="callout__count">${num(reviewed)} of ${num(compared)} reviewed</span></p>
+</aside>`;
 }
 
 export function mainPage(ctx) {
   const stake = ctx.stake;
   const { meta } = stake.model;
-  const body = `<section class="stake-head" aria-labelledby="stake-h1">
+  const body = `${subnav('compare')}
+<section class="stake-head" aria-labelledby="stake-h1">
 <h1 id="stake-h1">Revenue at stake</h1>
 <p class="lede">${coverageSentence(stake)} For those ${num(stake.summary.compared)}: what outpatient pays next to the inpatient MS-DRG family the same operation would group to, national and unadjusted, from CMS’s ${esc(meta.years.outpatient)} and ${esc(meta.years.inpatient)} final rules.</p>
 ${draft()}
+${helpCallout(stake)}
+${downloads(stake)}
 ${years(meta)}
 ${progressBar(stake)}
-${downloads(stake)}
 </section>
 ${guardrail()}
 <div class="stake-app" data-stake-app></div>
@@ -170,7 +187,8 @@ export function creditList(stake) {
 export function helpPage(ctx) {
   const stake = ctx.stake;
   const { progress } = stake;
-  const body = `<nav class="crumbs" aria-label="Breadcrumb"><a href="${ROOT}">Revenue at stake</a> <span aria-hidden="true">/</span> <span>Help review</span></nav>
+  const body = `${subnav('help')}
+<nav class="crumbs" aria-label="Breadcrumb"><a href="${ROOT}">Revenue at stake</a> <span aria-hidden="true">/</span> <span>Help review</span></nav>
 <h1>Help review the crosswalk</h1>
 <p class="lede">Each code’s map from CPT to ICD-10-PCS and an expected principal diagnosis was made by two AI passes. Coders can tell us where they are wrong. ${num(progress.reviewed)} of ${num(progress.compared)} compared codes have a review so far.</p>
 ${draft()}
@@ -230,7 +248,8 @@ export function methodsPage(ctx) {
   const drg165 = stake.items.flatMap((item) => (item.ip ? item.ip.families : [])).flatMap((f) => f.drgs).find((d) => d.drg === '165');
   const formula = drg165 ? ` For example, DRG 165 (major chest procedures without CC/MCC) is its relative weight, ${drg165.weight.toFixed(4)}, × ${cents(r.combined)}.` : '';
   const files = meta.sources.map((s) => `<tr><td>${out(s.landing, esc(s.label))}</td><td>${esc(s.file).replace(/; /g, '<br>')}</td></tr>`).join('');
-  const body = `<nav class="crumbs" aria-label="Breadcrumb"><a href="${ROOT}">Revenue at stake</a> <span aria-hidden="true">/</span> <span>Methods</span></nav>
+  const body = `${subnav('methods')}
+<nav class="crumbs" aria-label="Breadcrumb"><a href="${ROOT}">Revenue at stake</a> <span aria-hidden="true">/</span> <span>Methods</span></nav>
 <h1>Revenue at stake: methods</h1>
 <p class="lede">How each card’s two payments are found, where every number comes from, and what the comparison cannot tell you.</p>
 ${draft()}
