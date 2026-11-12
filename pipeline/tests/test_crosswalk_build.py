@@ -61,6 +61,40 @@ class InpatientFamilies(unittest.TestCase):
                          [("lung cancer: lobectomy; middle lobe", "in-mdc"),
                           ("lung cancer: hernia repair", "unrelated-nonextensive")])
         self.assertEqual(result["low"], min(f["low"] for f in result["families"]))
+        unrelated = result["families"][1]["index_rows"]
+        self.assertEqual([(r["pcs"], r["mdc"], r["non_or"]) for r in unrelated], [("0YQ50ZZ", None, False)])
+        self.assertIn("unrelated to the principal diagnosis (Appendix F, non-extensive)", unrelated[0]["note"])
+
+    def test_hip_revision_as_removal_plus_replacement_carries_the_caveat(self):
+        rec = {"pcs_sets": [{"codes": ["0SP90JZ", "0SR904A"], "note": "right hip"}],
+               "principal_dx": [{"code": "T84030A", "condition": "loose hip prosthesis", "role": "typical"}]}
+        family = build.inpatient(rec, build.Ref.load())["families"][0]
+        self.assertEqual([row["drg"] for row in family["drgs"]], ["463", "464", "465"])
+        self.assertEqual(family["caveat"], build.REVISION_CAVEAT)
+        self.assertTrue(build.REVISION_CAVEAT.startswith("In MS-DRG v44 a hip or knee revision"))
+        lobectomy = {"pcs_sets": [{"codes": ["0BTC0ZZ"], "note": "x"}],
+                     "principal_dx": [{"code": "C3411", "condition": "lung cancer", "role": "typical"}]}
+        self.assertNotIn("caveat", build.inpatient(lobectomy, build.Ref.load())["families"][0])
+
+    def test_a_cluster_driven_family_shows_the_part_2_row(self):
+        # Extensive fusion 523-525 comes from an Appendix E Part 2 cluster, not a Part 1 row.
+        ref = build.Ref.load()
+        codes = ["0RG7071", "0RGA071", "0SG1071", "0SG3071"]
+        result = build.group(codes, "M4185", ref)
+        self.assertEqual(result["drgs"], ["523", "524", "525"])
+        rows = build.index_rows(codes, result, ref)
+        clustered = [row for row in rows if row.get("cluster")]
+        self.assertTrue(clustered)
+        self.assertTrue(all(row["drgs"] == ["523", "524", "525"] and row["pcs"] in row["cluster"].split("+")
+                            for row in clustered))
+        self.assertTrue(all(checks._is_index_row(row, ref) for row in rows))
+
+    def test_index_rows_note_non_or_and_medical(self):
+        ref = build.Ref.load()
+        medical = build.index_rows(["BW03ZZZ", "5A1955Z"], build.group(["BW03ZZZ", "5A1955Z"], "C3411", ref), ref)
+        self.assertEqual([(r["pcs"], r["mdc"], r["non_or"]) for r in medical], [("BW03ZZZ", None, True), ("5A1955Z", None, True)])
+        self.assertIn("not in Appendix E", medical[0]["note"])
+        self.assertIn("non-OR procedure", medical[1]["note"])
 
 
 @unittest.skipUnless(RAW_PRESENT, "raw CMS files not downloaded; run pipeline/fetch.py")
@@ -115,7 +149,10 @@ class FixtureBuild(unittest.TestCase):
         self.assertEqual(family["drgs"][2]["amount"], 14254.31)
         self.assertEqual((code["inpatient"]["low"], code["inpatient"]["high"]), (14254.31, family["high"]))
         self.assertEqual(code["difference"], {"low": round(3584.95 - family["high"], 2), "high": round(3584.95 - 14254.31, 2)})
+        self.assertEqual(family["index_rows"], [{"pcs": "0BTC0ZZ", "mdc": "04", "drgs": ["163", "164", "165"],
+                                                  "family": "Major Chest Procedures", "non_or": False}])
         mapping = code["mapping"]
+        self.assertEqual(mapping["rationale"], "Fixture: one lobe resected, open; one code per lobe.")
         self.assertEqual(len(mapping["pcs_sets"]), 5)
         self.assertEqual(mapping["pcs_sets"][0]["codes"][0],
                          {"code": "0BTC0ZZ", "title": "Resection of Right Upper Lung Lobe, Open Approach"})
@@ -140,6 +177,7 @@ class FixtureBuild(unittest.TestCase):
         self.assertEqual(code["inpatient"]["high"], max(f["high"] for f in families))
         self.assertFalse(code["mapping"]["passes_agree"])
         self.assertTrue(code["mapping"]["adjudication"].startswith("Fixture adjudication"))
+        self.assertTrue(code["mapping"]["rationale"].startswith("Fixture: five codes"))     # pass A's own words
         self.assertEqual(code["tier"]["tier"], 3)
 
     def test_packaged_code_has_no_comparison(self):
@@ -187,6 +225,19 @@ class FailClosed(unittest.TestCase):
             self.assertEqual(run_build(tmp), 1)
             text = (Path(tmp) / "checks.txt").read_text()
             self.assertIn("FAIL final mapping for every mappable code:", text)
+            self.assertFalse((Path(tmp) / "crosswalk.json").exists())
+
+    def test_allow_missing_fails_only_on_the_disagreements(self):
+        # Without the adjudication, 48150's passes disagree; the 849 codes in no pass are only waiting.
+        with tempfile.TemporaryDirectory() as tmp:
+            args = ["--passes", str(FIXTURE / "passes"), "--adjudications", str(Path(tmp) / "none.json"),
+                    "--out", tmp, "--checks", str(Path(tmp) / "checks.txt"), "--allow-missing"]
+            with mock.patch("sys.stdout"):
+                self.assertEqual(build.main(args), 1)
+            text = (Path(tmp) / "checks.txt").read_text()
+            self.assertIn("FAIL final mapping for every mappable code: 2 of 852 mappable codes; 1 disagree "
+                          "(not adjudicated), 0 invalid, 849 not yet in both passes; 1 problem(s)\n"
+                          "    - 48150: passes disagree", text)
             self.assertFalse((Path(tmp) / "crosswalk.json").exists())
 
     def test_a_corrupted_apc_rate_fails_and_leaves_the_previous_file(self):

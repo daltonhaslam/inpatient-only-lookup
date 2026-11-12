@@ -92,7 +92,7 @@ def _codes_present(report, codes, inputs):
 
 def _final_mappings(report, codes, inputs, allow_missing):
     """{code: final record} for the mappable codes that have a valid one."""
-    finals, waiting, blocking = {}, [], []
+    finals, waiting, disagree, invalid = {}, [], [], []
     for code in inputs.mappable:
         in_passes = [inputs.passes.get(name, {}).get(code) for name in mappings.PASS_NAMES]
         try:
@@ -101,21 +101,25 @@ def _final_mappings(report, codes, inputs, allow_missing):
             if code not in inputs.adjudications and None in in_passes:
                 waiting.append(code)
             else:
-                blocking.append(str(error))
+                disagree.append(str(error))
             continue
         errors = mappings.validate_record(rec, inputs.ref)
         if rec.get("code") != code:
             errors.append("record is for %r" % rec.get("code"))
         if errors:
-            blocking.append("%s: %s" % (code, "; ".join(errors)))
+            invalid.append("%s: %s" % (code, "; ".join(errors)))
             continue
         finals[code] = rec
     name = "final mapping for every mappable code"
-    detail = "%d of %d mappable codes" % (len(finals), len(inputs.mappable))
-    if waiting and allow_missing and not blocking:
-        report.skip(name, "--allow-missing given; %s; %d not yet in both passes" % (detail, len(waiting)))
+    detail = "%d of %d mappable codes; %d disagree (not adjudicated), %d invalid, %d not yet in both passes" % (
+        len(finals), len(inputs.mappable), len(disagree), len(invalid), len(waiting))
+    blocking = disagree + invalid
+    if allow_missing and waiting and not blocking:
+        report.skip(name, "--allow-missing given; " + detail)
+    elif allow_missing:
+        report.check(name, blocking, detail)
     else:
-        report.check(name, blocking + (["%s: not yet in both passes" % code for code in waiting]), detail)
+        report.check(name, blocking + ["%s: not yet in both passes" % code for code in waiting], detail)
     return finals
 
 
@@ -168,13 +172,15 @@ def _combinations(finals, ref):
 
 def _families(report, codes, finals, combos, ref):
     """Regrouping every PCS set x diagnosis gives exactly the families in the file, typical diagnosis first."""
-    expected = {}
+    expected, sets_of = {}, {}
     problems = []
     for code, dx, entry, result in combos:
         if isinstance(result, str):
             problems.append("%s: %s x %s does not group: %s" % (code, "+".join(entry["codes"]), dx["code"], result))
             continue
-        expected.setdefault(code, set()).add((dx["code"], tuple(result["drgs"]), result["mdc"], result["basis"]))
+        key = (dx["code"], tuple(result["drgs"]), result["mdc"], result["basis"])
+        expected.setdefault(code, set()).add(key)
+        sets_of.setdefault((code,) + key, []).append(entry["codes"])
     for code, rec in sorted(finals.items()):
         if not rec["mappable"]:
             continue
@@ -182,25 +188,50 @@ def _families(report, codes, finals, combos, ref):
         found = {(f["dx"]["code"], tuple(row["drg"] for row in f["drgs"]), f["mdc"], f["basis"]) for f in families}
         if found != expected.get(code, set()):
             problems.append("%s: families in the file differ from regrouping" % code)
+        for family in families:
+            rows = family.get("index_rows") or []
+            key = (code, family["dx"]["code"], tuple(row["drg"] for row in family["drgs"]), family["mdc"], family["basis"])
+            if [row["pcs"] for row in rows] not in sets_of.get(key, []) or not all(_is_index_row(row, ref) for row in rows):
+                problems.append("%s: index rows of family %s are not v44 Appendix E rows of a set that groups to it"
+                                % (code, "-".join(key[2])))
         typical = next(d["code"] for d in rec["principal_dx"] if d["role"] == "typical")
         if families and families[0]["dx"]["code"] != typical:
             problems.append("%s: first family is not for the typical diagnosis" % code)
     report.check("inpatient families regroup", problems, "%d PCS set x diagnosis combinations" % len(combos))
 
 
+def _is_index_row(row, ref):
+    """An index_rows entry is a real v44 row: the code's Appendix E Part 1 row, or the Part 2
+    row of the cluster it names (which must contain the code); a note-only entry has no row."""
+    if row["mdc"] is None:
+        return not row["drgs"] and bool(row.get("note"))
+    shown = (row["mdc"], tuple(row["drgs"]), row["family"])
+    if "cluster" in row:
+        members = row["cluster"].split("+")
+        return row["pcs"] in members and any(
+            shown == (r["mdc"], tuple(r["drgs"]), r["family"])
+            for r in grouper._clusters(members, ref).get(row["cluster"], ()))
+    return any(shown == (r["mdc"], tuple(r["drgs"]), r["family"]) for r in ref.proc_index.get(row["pcs"], ()))
+
+
 def _index_rows(report, combos, ref):
-    """Each family is backed by v44: an Appendix E row of one of the set's codes in the family's MDC
-    naming its DRGs (Pre-MDC rows for Pre-MDC), an OR code for the any-OR and unrelated families,
-    and no OR code for a medical family."""
+    """Each family is backed by v44: an Appendix E Part 1 row of one of the set's codes, or a
+    Part 2 row of a cluster the set completes, in the family's MDC naming its DRGs (Pre-MDC rows
+    for Pre-MDC); an OR code for the any-OR and unrelated families; and no OR code for a medical
+    family. OR codes are Appendix E codes without * that no completed Part 3 combination makes non-OR."""
     any_or = {drgs for entries in grouper._ANY_OR.values() for drgs, _ in entries}
     problems = []
     for code, dx, entry, result in combos:
         if isinstance(result, str):
             continue
         drgs, mdc, basis = set(result["drgs"]), result["mdc"], result["basis"]
-        or_codes = [pcs for pcs in entry["codes"] if pcs in ref.unrelated]
+        present = set(entry["codes"])
+        made_non_or = {pcs for combo in ref.non_or_combos if set(combo) <= present for pcs in combo}
+        or_codes = [pcs for pcs in entry["codes"] if pcs in ref.unrelated and pcs not in made_non_or]
         rows = [row for pcs in entry["codes"] for row in ref.proc_index.get(pcs, ())
                 if row["mdc"] == mdc and drgs & set(row["drgs"])]
+        rows += [row for found in grouper._clusters(entry["codes"], ref).values() for row in found
+                 if row["mdc"] == mdc and drgs & set(row["drgs"])]
         if basis == "medical":
             ok = not or_codes
         elif basis.startswith("unrelated") or (basis == "in-mdc" and tuple(result["drgs"]) in any_or):
