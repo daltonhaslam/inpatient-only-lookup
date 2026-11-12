@@ -516,6 +516,103 @@
    "url": "https://www.govinfo.gov/content/pkg/FR-2018-11-21/html/2018-24243.htm",
    "landing": "https://www.govinfo.gov/app/details/FR-2018-11-21/2018-24243",
    "sha256": "fe727620e27ccb2a12daa085c079d99b93853f15ebc4bc8bf19d797a583863d7"
+  },
+  {
+   "id": "ipps-2027-table5",
+   "kind": "ipps_table5",
+   "fy": 2027,
+   "rule": "CMS-1849-F",
+   "url": "https://www.cms.gov/files/zip/fy2027-ipps-fr-table-5.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/acute-inpatient-pps/fy-2027-ipps-final-rule-home-page",
+   "sha256": "3b43654767907b1c3fa64b5ea685c5669e4623ceb2c4a1fa488af640d1dc06d4",
+   "note": "Table 5 (MS-DRG weights, geometric/arithmetic mean LOS). Zip holds the original final-rule file (CMS-1849-FR Table 5.txt) and the correction-notice file (CMS-1849-CN Table 5.txt) plus a combined xlsx. The CN version supersedes the FR version (weights differ by ~0.02%)."
+  },
+  {
+   "id": "ipps-2027-table1",
+   "kind": "ipps_rates",
+   "fy": 2027,
+   "rule": "CMS-1849-F",
+   "url": "https://www.cms.gov/files/zip/fy2027-ipps-fr-table-1a-1e.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/acute-inpatient-pps/fy-2027-ipps-final-rule-home-page",
+   "sha256": "70a89efeeea4f8430ed8e8a1c50d40c4fab3a839e6a2358763835688c448d12c",
+   "note": "Tables 1A-1E (standardized amounts, capital federal rate, LTCH rate). Zip holds the original final-rule txt (CMS-1849-F) and the correction-notice txt (CMS-1849-CN) plus a combined xlsx. The CN values supersede the FR values."
+  },
+  {
+   "id": "msdrg-v44",
+   "kind": "msdrg_definitions",
+   "fy": 2027,
+   "version": "44.0",
+   "url": "https://www.cms.gov/files/zip/fy2027-fr-icd10-ms-drg-definitions-manual-files-v44.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/acute-inpatient-pps/ms-drg-classifications-and-software",
+   "sha256": "ae4f6c11727fe91f807ebebe43c80cd55d9629c267f2a974dbf541bec8339bbe",
+   "note": "ICD-10 MS-DRG v44.0 Definitions Manual, text version (appendix_A DRG list, appendix_B dx to MDC/DRG, appendix_C CC/MCC, appendix_D_E surgical hierarchy and procedure to MDC/DRG index, mdcs_* per-MDC logic). Effective 2026-10-01 through 2027-03-31; CMS will post v44.1 for April 2027. HTML copy: https://www.cms.gov/icd10m/FY2027-fr-v44-fullcode-cms/fullcode_cms/P0001.html"
+  },
+  {
+   "id": "msdrg-v44-mce",
+   "kind": "msdrg_mce",
+   "fy": 2027,
+   "version": "44.0",
+   "url": "https://www.cms.gov/files/zip/fy2027-fr-definition-mce-v44.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/acute-inpatient-pps/ms-drg-classifications-and-software",
+   "sha256": "53af50dcfefa450a1498e7bd7292d4d0ee061a370e4403c61bd5fb3b18fd1ece",
+   "note": "Definitions of Medicare Code Edits v44 (docx, pdf, txt). Optional companion to msdrg-v44."
+  },
+  {
+   "id": "pcs-2027",
+   "kind": "pcs_codes",
+   "fy": 2027,
+   "url": "https://www.cms.gov/files/zip/2027-icd-10-pcs-order-file-long-abbreviated-titles.zip",
+   "landing": "https://www.cms.gov/medicare/coding-billing/icd-10-codes",
+   "sha256": "c9064c5c66873ecc4cc9aab1b100be605f2db457fd458113076b5eb6ce246439",
+   "note": "ICD-10-PCS FY2027 order file (icd10pcs_order_2027.txt, fixed width: order, code, valid flag, short and long title) plus order_addenda_2027.txt."
+  },
+  {
+   "id": "cm-2027",
+   "kind": "cm_codes",
+   "fy": 2027,
+   "url": "https://www.cms.gov/files/zip/2027-code-descriptions-tabular-order.zip",
+   "landing": "https://www.cms.gov/medicare/coding-billing/icd-10-codes",
+   "sha256": "91c6c9d1117764ce72375a0f3a5493b1725dafbc1ab283b55799076c9e194965",
+   "note": "ICD-10-CM FY2027 code descriptions in tabular order (Code Descriptions/icd10cm_order_2027.txt, fixed width: order, code, header-or-valid flag, short and long title), plus codes file and addenda."
+  },
+  {
+   "id": "asc-2027-aa",
+   "kind": "asc_addendum_aa",
+   "cy": 2027,
+   "rule": "CMS-1850-FC",
+   "url": "https://www.cms.gov/files/zip/2027-fr-addendum-aa-bb-dd1-dd2-ee-ff-updated-11-10-2026.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/ambulatory-surgical-center-asc/asc-regulations-and-notices/cms-1850-fc",
+   "sha256": "76b8fe855fbaa0e678ca9f7ea3f8c9886b04f9b0c0b765f55ff6f69e69fa1bcb",
+   "note": "CY2027 ASC final Addenda AA (covered surgical procedures with payment indicator, weight, rate), BB, DD1, DD2, EE, FF; updated 2026-11-10. Carries CPT short descriptors, so keep in gitignored data/raw/."
+  },
+  {
+   "id": "addenda-2027-proposed",
+   "kind": "opps_addenda_proposed",
+   "cy": 2027,
+   "rule": "CMS-1850-P",
+   "url": "https://www.cms.gov/files/zip/2027-nprm-opps-addenda.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/regulations-notices/cms-1850-p",
+   "sha256": "12979c6aafdabac0a526b0fa783eaa4e197ac8b02da179cd1e1feb2a7f9e086e",
+   "note": "CY2027 OPPS proposed-rule addenda (A, B, C, D1, D2, E, J, L-R), dated 2026-06-30. Addendum B here is the proposed payment table, for proposed-to-final comparison."
+  },
+  {
+   "id": "removed-2027-proposed",
+   "kind": "opps_removal_proposed",
+   "cy": 2027,
+   "rule": "CMS-1850-P",
+   "url": "https://www.cms.gov/files/zip/2027-nprm-procedures-removal-IPO-list.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient/regulations-notices/cms-1850-p",
+   "sha256": "ad42b5c6303d904e7fafe3980f10dfdb4cb6333aa7e88de5d41d537e902f4031",
+   "note": "Procedures CMS proposed to remove from the inpatient-only list in CMS-1850-P. Not kind removal_file on purpose: build.py reconciles that kind against the computed final removals."
+  },
+  {
+   "id": "team-2027",
+   "kind": "team_spec",
+   "cy": 2027,
+   "url": "https://www.cms.gov/priorities/innovation/files/team-drg-mapping-specs.xlsx",
+   "landing": "https://www.cms.gov/priorities/innovation/innovation-models/team-model",
+   "sha256": "3cf6d049d8937feb644d891a73929149e47fdba04b7bd300b5a4a2d24f06ab4d",
+   "note": "TEAM MS-DRG mapping specifications workbook, FY2020-FY2027 (13 sheets; Table_10-12 are the FY2027 IPPS changes). Defines the TEAM episode categories by MS-DRG/procedure. Landing page also lists exclusion lists (PY2 = 2027) and target-price files, not downloaded."
   }
  ]
 }
