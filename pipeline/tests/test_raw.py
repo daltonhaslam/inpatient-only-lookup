@@ -1,16 +1,12 @@
 """Checks that need the raw CMS downloads. Skipped when data/raw/ is absent (a fresh clone)."""
-import re
 import unittest
 
 import citations
 import fetch
 import history
 import parse
+from crosswalk.checks import words
 RAW_PRESENT = fetch.RAW.is_dir() and any(fetch.RAW.iterdir())
-
-
-def words(text):
-    return re.findall(r"[a-z0-9]+", text.lower())
 
 
 def shares_run(a, b, length):

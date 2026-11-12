@@ -16,7 +16,6 @@ in chunks of 40, ids m01, m02, ...
 batch prints CMS's short descriptor for the mapper's eyes only; nothing here writes it to a file.
 """
 import argparse
-import json
 import re
 import sys
 from pathlib import Path
@@ -46,16 +45,23 @@ Alternatives = variants that matter (cap 6). One typical dx; an alternative only
 the family. Never copy descriptor text into your output."""
 
 
-def _load_json(path):
-    return json.loads(path.read_text())
+def removal_dates(spans):
+    """{code: its latest removal date among REMOVAL_DATES} for a loaded ipo-history.json."""
+    return {code: max(e["date"] for e in removals)
+            for code, info in spans.items()
+            if (removals := [e for e in info["events"] if e["type"] == "removed" and e["date"] in REMOVAL_DATES])}
+
+
+def chunked(items, size):
+    """Consecutive slices of at most size items."""
+    return [items[start:start + size] for start in range(0, len(items), size)]
 
 
 def mapping_batches():
     """({batch id: [codes]}, {code: reason} for the removed codes that are not mapped)."""
-    spans = _load_json(HISTORY)
-    labels = _load_json(LABELS)
-    candidates = sorted(code for code, info in spans.items()
-                        if any(e["type"] == "removed" and e["date"] in REMOVAL_DATES for e in info["events"]))
+    spans = fetch.read_json(HISTORY)
+    labels = fetch.read_json(LABELS)
+    candidates = sorted(removal_dates(spans))
     mappable, unmappable = [], {}
     for code in candidates:
         if "00100" <= code <= "01999":
@@ -65,14 +71,12 @@ def mapping_batches():
         else:
             mappable.append(code)
     mappable.sort(key=lambda code: (labels[code]["group"], code))
-    batches = {"m%02d" % (n + 1): mappable[start:start + BATCH_SIZE]
-               for n, start in enumerate(range(0, len(mappable), BATCH_SIZE))}
+    batches = {"m%02d" % (n + 1): chunk for n, chunk in enumerate(chunked(mappable, BATCH_SIZE))}
     return batches, unmappable
 
 
 def _removal_year(code):
-    events = _load_json(HISTORY)[code]["events"]
-    return max(e["date"] for e in events if e["type"] == "removed" and e["date"] in REMOVAL_DATES)[:4]
+    return removal_dates(fetch.read_json(HISTORY))[code][:4]
 
 
 def cmd_batches(_args):
@@ -87,7 +91,7 @@ def cmd_batch(args):
     batches, _ = mapping_batches()
     if args.batch_id not in batches:
         sys.exit("unknown batch %r (see: mapper.py batches)" % args.batch_id)
-    labels = _load_json(LABELS)
+    labels = fetch.read_json(LABELS)
     opps = sources.load_opps()
     apcs = sources.load_apc_titles()
     path = sources._path("addenda-2027")
@@ -107,8 +111,7 @@ def cmd_unmappable(_args):
     _, unmappable = mapping_batches()
     records = [{"code": code, "mappable": False, "unmapped_reason": reason}
                for code, reason in sorted(unmappable.items())]
-    mappings.UNMAPPABLE.parent.mkdir(parents=True, exist_ok=True)
-    mappings.UNMAPPABLE.write_text(json.dumps(records, indent=1) + "\n")
+    fetch.write_json(mappings.UNMAPPABLE, records, indent=1)
     print("wrote %d records to %s" % (len(records), mappings.UNMAPPABLE))
 
 
@@ -137,7 +140,7 @@ def cmd_cm_search(args):
 def cmd_check(args):
     path = Path(args.file)
     try:
-        records = _load_json(path)
+        records = fetch.read_json(path)
     except (OSError, ValueError) as error:
         sys.exit("cannot read %s: %s" % (path, error))
     if not isinstance(records, list):

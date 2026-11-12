@@ -19,6 +19,7 @@ disagreement nobody adjudicated still fails. Exits 1 on any failed check.
 """
 import argparse
 import datetime
+import functools
 import sys
 import types
 from pathlib import Path
@@ -31,18 +32,16 @@ import fetch      # noqa: E402
 import history    # noqa: E402
 import parse      # noqa: E402
 from crosswalk import checks, mapper, mappings, reviews, sources, status, workbook   # noqa: E402
-from crosswalk.group import _ANY_OR, Ref, _clusters, group     # noqa: E402
+from crosswalk.group import ANY_OR_FAMILIES, Ref, group     # noqa: E402
 from crosswalk.price import family_range   # noqa: E402
 
-DERIVED = fetch.PIPELINE / "derived"
+DERIVED = fetch.DERIVED
 CHECKS = fetch.PIPELINE / "out" / "crosswalk-checks.txt"
-RESOLUTIONS = mappings.CROSSWALK_DIR / "resolutions.json"
 REVIEW_BATCH_SIZE = 10
 
 # A hip or knee revision coded as Removal (0SP, these joint body parts) plus Replacement lands in
 # 463-465, because the 0SP rows rank above 469-470 in v44; the family carries this caveat.
 REVISION_DRGS = ("463", "464", "465")
-REVISION_JOINTS = frozenset("CD9BAERSTUVW")
 REVISION_CAVEAT = ("In MS-DRG v44 a hip or knee revision coded as removal plus replacement groups to DRGs 463–465. "
                    "CMS's title for those DRGs still reads wound debridement or skin graft. DRG 449 (revision of hip or "
                    "knee prosthesis) covers only the PCS Revision root operation.")
@@ -74,16 +73,14 @@ def load_inputs(passes_dir=None, adjudications_path=None):
     adjudications_path = Path(adjudications_path) if adjudications_path else mappings.ADJUDICATIONS
     return types.SimpleNamespace(
         ref=Ref.load(),
-        removed={code: max(e["date"] for e in info["events"] if e["type"] == "removed" and e["date"] in mapper.REMOVAL_DATES)
-                 for code, info in spans.items()
-                 if any(e["type"] == "removed" and e["date"] in mapper.REMOVAL_DATES for e in info["events"])},
+        removed=mapper.removal_dates(spans),
         labels=fetch.read_json(mapper.LABELS),
         mappable=[code for codes in batches.values() for code in codes],
         packaged=packaged,
         passes=mappings.load_passes(passes_dir),
         adjudications=mappings.load_adjudications(adjudications_path),
-        reviews=fetch.read_json(reviews.REVIEWS) if reviews.REVIEWS.is_file() else [],
-        resolutions=fetch.read_json(RESOLUTIONS) if RESOLUTIONS.is_file() else {},
+        reviews=fetch.read_json_or(reviews.REVIEWS, []),
+        resolutions=fetch.read_json_or(mappings.RESOLUTIONS, {}),
         passes_dir=passes_dir,
         adjudications_path=adjudications_path,
     )
@@ -103,9 +100,9 @@ def review_batches(codes, labels):
     by_group = {}
     for code in sorted(codes):
         by_group.setdefault(labels[code]["group"], []).append(code)
-    return [{"id": "%s-%d" % (name, n + 1), "group": name, "codes": members[start:start + REVIEW_BATCH_SIZE]}
+    return [{"id": "%s-%d" % (name, n + 1), "group": name, "codes": chunk}
             for name, members in sorted(by_group.items())
-            for n, start in enumerate(range(0, len(members), REVIEW_BATCH_SIZE))]
+            for n, chunk in enumerate(mapper.chunked(members, REVIEW_BATCH_SIZE))]
 
 
 def outpatient(code, packaged, ref):
@@ -117,6 +114,14 @@ def outpatient(code, packaged, ref):
             "packaged": packaged}
 
 
+@functools.lru_cache(maxsize=None)
+def revision_joints(ref):
+    """The 0SP body part characters of the joints DRGs 461-462 count (hips, knees, ankles), from
+    the joint sites the grouper reads."""
+    return frozenset(code[3] for entries in ref.joint_sites.values() for entry in entries for code in entry
+                     if code[:3] == "0SP")
+
+
 def inpatient(rec, ref):
     """{"families", "low", "high"} over every pcs_set x principal_dx, typical diagnosis first.
 
@@ -126,6 +131,7 @@ def inpatient(rec, ref):
     the set notes (else its PCS codes) when they differ by PCS set under this diagnosis}, None
     where that does not split them. Raises ValueError when a combination does not group."""
     by_dx = status.split_drivers(rec, ref)[0]
+    joints = revision_joints(ref)
     families = []
     for dx in sorted(rec["principal_dx"], key=lambda d: d["role"] != "typical"):
         found = {}
@@ -144,7 +150,7 @@ def inpatient(rec, ref):
                 "index_rows": index_rows(codes, result, ref),
                 "when": {"dx": condition if by_dx else None,
                          "variant": ("; ".join(notes) or "+".join(codes)) if len(found) > 1 else None}})
-            if drgs == REVISION_DRGS and any(pcs[:3] == "0SP" and pcs[3] in REVISION_JOINTS for pcs in codes):
+            if drgs == REVISION_DRGS and any(pcs[:3] == "0SP" and pcs[3] in joints for pcs in codes):
                 families[-1]["caveat"] = REVISION_CAVEAT
     return {"families": families, "low": min(f["low"] for f in families), "high": max(f["high"] for f in families)}
 
@@ -159,8 +165,8 @@ def index_rows(codes, result, ref):
     family). non_or is True for a code the grouper treats as non-OR (an Appendix E * code, one
     not in Appendix E, or one of a Part 3 non-OR combination)."""
     drgs, mdc, basis = set(result["drgs"]), result["mdc"], result["basis"]
-    any_or = basis == "in-mdc" and tuple(result["drgs"]) in {f for entries in _ANY_OR.values() for f, _ in entries}
-    clusters = [(key, row) for key, found in _clusters(codes, ref).items() for row in found
+    any_or = basis == "in-mdc" and tuple(result["drgs"]) in ANY_OR_FAMILIES
+    clusters = [(key, row) for key, found in ref.clusters_for(codes).items() for row in found
                 if row["mdc"] == mdc and drgs & set(row["drgs"])]
     rows = []
     for pcs in codes:

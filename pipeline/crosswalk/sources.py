@@ -87,7 +87,7 @@ def _table(source_id, pattern, columns, prefer_spreadsheet=True):
     member = parse.pick_member(path, pattern, prefer_spreadsheet)
     for _, rows in parse.read_member(path, member):
         for number, row in enumerate(rows[:40]):
-            labels = [re.sub(r"\s+", " ", cell or "").strip() for cell in row]
+            labels = [fetch.squash(cell or "") for cell in row]
             found = {}
             for key, regex in columns.items():
                 hits = [index for index, label in enumerate(labels) if re.search(regex, label, re.I)]

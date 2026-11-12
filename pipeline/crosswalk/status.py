@@ -20,10 +20,6 @@ TIER3_ADJUDICATED_WHY = "Two AI mapping passes disagreed; an adjudicating pass c
 TIER3_UNGROUPABLE_WHY = "The grouper could not place every mapped combination. Reviewers wanted."
 
 
-def _any_or_families():
-    return {drgs for entries in grouper._ANY_OR.values() for drgs, _ in entries}
-
-
 def _bases(rec, ref):
     """Set of (basis, drgs) the grouper gives each pcs_set x principal_dx of a mappable record."""
     found = set()
@@ -65,13 +61,12 @@ def _tier2_reasons(passes_for_code, final, ref):
     sets = {frozenset(frozenset(entry["codes"]) for entry in rec["pcs_sets"]) for rec in passes_for_code}
     if len(sets) > 1:
         reasons.append("the passes chose different PCS codes but the same DRG family")
-    any_or = _any_or_families()
     for basis, drgs in sorted(_bases(final, ref)):
         if basis == "medical":
             reasons.append("it groups by diagnosis (basis medical: no operating-room procedure in MS-DRG terms)")
         elif basis.startswith("unrelated"):
             reasons.append("the operating-room procedure is unrelated to the principal diagnosis's MDC")
-        elif drgs in any_or:
+        elif drgs in grouper.ANY_OR_FAMILIES:
             reasons.append("the family is the MDC's any-operating-room-procedure family")
     return list(dict.fromkeys(reasons))
 

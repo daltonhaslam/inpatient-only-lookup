@@ -17,15 +17,14 @@ if __name__ == "__main__":
     sys.path[0] = str(Path(__file__).resolve().parent.parent)
 
 import fetch      # noqa: E402
+from crosswalk.reviews import REVIEWS      # noqa: E402
 from openpyxl import Workbook      # noqa: E402
 from openpyxl.styles import Alignment, Font, PatternFill      # noqa: E402
 from openpyxl.utils import get_column_letter as col      # noqa: E402
 from openpyxl.workbook.defined_name import DefinedName      # noqa: E402
 
-DERIVED = fetch.PIPELINE / "derived"
-JSON_PATH = DERIVED / "crosswalk.json"
-XLSX_PATH = DERIVED / "crosswalk.xlsx"
-REVIEWS = Path(__file__).resolve().parent.parent.parent / "data" / "crosswalk" / "reviews.json"
+JSON_PATH = fetch.DERIVED / "crosswalk.json"
+XLSX_PATH = fetch.DERIVED / "crosswalk.xlsx"
 
 BADGE = "Draft · built with Claude Code · under coder review"
 HELP_URL = "https://inpatient-only-lookup.vercel.app/revenue-at-stake/help-review/"
@@ -311,7 +310,7 @@ def _readme_sheet(wb, doc):
 def write(doc, out_path, reviews=None):
     """Build the workbook for a crosswalk document and save it to out_path. Returns the path."""
     if reviews is None:
-        reviews = fetch.read_json(REVIEWS) if REVIEWS.is_file() else []
+        reviews = fetch.read_json_or(REVIEWS, [])
     wb = Workbook()
     wb.remove(wb.active)
     _crosswalk_sheet(wb, doc)

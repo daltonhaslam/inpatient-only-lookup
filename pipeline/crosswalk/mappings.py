@@ -16,6 +16,7 @@ from crosswalk.group import group
 CROSSWALK_DIR = fetch.ROOT / "data" / "crosswalk"
 PASSES_DIR = CROSSWALK_DIR / "passes"
 ADJUDICATIONS = CROSSWALK_DIR / "adjudications.json"
+RESOLUTIONS = CROSSWALK_DIR / "resolutions.json"
 UNMAPPABLE = PASSES_DIR / "unmappable.json"
 PASS_NAMES = ("a", "b")
 CONFIDENCE = ("high", "medium", "low")
@@ -126,14 +127,13 @@ def load_passes(directory=None):
     """{"a": {code: record}, "b": {code: record}} from every <batch-id>.json in each pass folder.
     The auto-written unmappable.json records (codes no mapper sees) count in both passes."""
     root = directory or PASSES_DIR
-    fixed = root / "unmappable.json"
-    unmappable = {rec["code"]: rec for rec in json.loads(fixed.read_text())} if fixed.is_file() else {}
+    unmappable = {rec["code"]: rec for rec in fetch.read_json_or(root / "unmappable.json", [])}
     passes = {}
     for name in PASS_NAMES:
         records = dict(unmappable)
         folder = root / name
         for path in sorted(folder.glob("*.json")) if folder.is_dir() else []:
-            for rec in json.loads(path.read_text()):
+            for rec in fetch.read_json(path):
                 records[rec["code"]] = rec
         passes[name] = records
     return passes
@@ -141,8 +141,7 @@ def load_passes(directory=None):
 
 def load_adjudications(path=None):
     """{code: record} of settled disagreements, or {} when there are none yet."""
-    target = path or ADJUDICATIONS
-    return json.loads(target.read_text()) if target.is_file() else {}
+    return fetch.read_json_or(path or ADJUDICATIONS, {})
 
 
 def families(rec, ref):

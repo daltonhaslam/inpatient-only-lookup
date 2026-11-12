@@ -22,7 +22,7 @@ What this cannot see, and so does not model:
 - Appendix E Part 4 (MDC 14 obstetric logic) is not parsed. Part 2 procedure clusters
   ("grouped differently than their constituent codes", e.g. uterus, cervix and supporting
   structures to radical hysterectomy 734-735) replace their codes' own rows in an MDC where a
-  cluster row's condition holds, else the codes keep theirs (_clusters). So a bilateral hip or
+  cluster row's condition holds, else the codes keep theirs (Ref.clusters_for). So a bilateral hip or
   knee revision is 461-462 even with a periprosthetic infection diagnosis (each removal's
   403-404 row gives way to its cluster's 461-462); v44 does not say which wins, so this is an
   open ambiguity. Part 3 combinations (bile duct stent exchanges) are made non-OR.
@@ -62,6 +62,7 @@ class Ref:
         if unknown:
             raise TypeError("no loader for %s" % ", ".join(unknown))
         self.__dict__.update(tables)
+        self._group_cache = {}
 
     def __getattr__(self, name):
         descriptor = type(self).__dict__.get(name)
@@ -90,6 +91,35 @@ class Ref:
                 for mdc, families in self.hierarchy.items()}
 
     @functools.cached_property
+    def _clusters_by_code(self):
+        """{PCS code: positions in ref.clusters of the clusters that list it}."""
+        index = {}
+        for position, cluster in enumerate(self.clusters):
+            for members in cluster["groups"]:
+                for code in members:
+                    index.setdefault(code, set()).add(position)
+        return index
+
+    def clusters_for(self, codes):
+        """{"A+B": rows} the Appendix E Part 2 clusters the codes complete, keyed by their codes.
+
+        Appendix E: clusters "are grouped differently than their constituent codes". In an MDC
+        (or Pre-MDC) where one of a cluster's rows has its condition met, the cluster is read as
+        one code with the cluster's rows and its codes' own rows are set aside (set_aside);
+        otherwise the codes keep their rows. A one-joint knee removal plus replacement
+        (0SPC0JZ+0SRC0J9) has only a 461-462 row, which needs two sites, so it groups by the
+        removal's 463-465 row.
+        """
+        present, found = set(codes), {}
+        touched = sorted(set().union(*(self._clusters_by_code.get(code, ()) for code in present)))
+        for position in touched:
+            cluster = self.clusters[position]
+            if all(members & present for members in cluster["groups"]):
+                key = "+".join(sorted(code for members in cluster["groups"] for code in members & present))
+                found.setdefault(key, []).extend(cluster["rows"])
+        return found
+
+    @functools.cached_property
     def dx_specific(self):
         """Surgical DRGs whose logic names principal diagnoses: those Appendix B lists for some
         diagnosis (e.g. 521-522 hip replacement for hip fracture, 731-733 for malignancy)."""
@@ -105,7 +135,17 @@ def group(pcs_codes, principal_dx, ref, sex=None):
     or_codes are the OR procedures among pcs_codes. sex ("F", "M" or None) settles diagnoses CMS
     assigns by sex; without it the MDC one of the codes belongs to is used, else the first, and
     mdc_ambiguous is True. Raises ValueError for an invalid code or a diagnosis with no MS-DRG.
+
+    Results are cached on ref per (codes in the order given, diagnosis, sex); every call gets its own copy.
     """
+    key = (tuple(pcs_codes), principal_dx, sex)
+    cached = ref._group_cache.get(key)
+    if cached is None:
+        cached = ref._group_cache[key] = _group(pcs_codes, principal_dx, ref, sex)
+    return {**cached, "drgs": list(cached["drgs"]), "or_codes": list(cached["or_codes"])}
+
+
+def _group(pcs_codes, principal_dx, ref, sex):
     codes = list(dict.fromkeys(pcs_codes))
     bad = [code for code in codes if code not in ref.pcs]
     if bad:
@@ -153,6 +193,7 @@ _ANY_OR = {
     "23": [(("939", "940", "941"), "any")],
     "25": [(("969", "970"), "extensive")],
 }
+ANY_OR_FAMILIES = frozenset(drgs for entries in _ANY_OR.values() for drgs, _ in entries)
 
 
 def _any_or(mdc, dx, extensive, ref):
@@ -168,8 +209,8 @@ def _any_or(mdc, dx, extensive, ref):
 # catheterization, rehabilitation therapy), and ones that need a discharge status (expired,
 # left against medical advice). Appendix B lists them for every diagnosis they can take, which
 # would put their amounts into ranges for cases that show neither.
-_NEEDS_PROCEDURE = frozenset(("061", "062", "063", "207", "208", "286", "287", "870", "895"))
-_NEEDS_DISCHARGE_STATUS = frozenset(("283", "284", "285", "894"))
+NEEDS_PROCEDURE = frozenset(("061", "062", "063", "207", "208", "286", "287", "870", "895"))
+NEEDS_DISCHARGE_STATUS = frozenset(("283", "284", "285", "894"))
 
 
 def _medical(codes, mdc, dx, ref):
@@ -177,7 +218,7 @@ def _medical(codes, mdc, dx, ref):
     named = {drg for code in codes for row in ref.proc_index.get(code, ()) for drg in row["drgs"]}
     return [drg for drg in ref.dx_drgs[dx]
             if ref.drg_titles[drg]["type"] == "MED" and ref.drg_titles[drg]["mdc"] == mdc
-            and drg not in _NEEDS_DISCHARGE_STATUS and (drg not in _NEEDS_PROCEDURE or drg in named)]
+            and drg not in NEEDS_DISCHARGE_STATUS and (drg not in NEEDS_PROCEDURE or drg in named)]
 
 
 def _title(drgs, ref):
@@ -206,25 +247,8 @@ def _principal_mdc(dx, codes, sex, ref):
     return mdcs[0], True
 
 
-def _clusters(codes, ref):
-    """{"A+B": rows} the Appendix E Part 2 clusters the codes complete, keyed by their codes.
-
-    Appendix E: clusters "are grouped differently than their constituent codes". In an MDC (or
-    Pre-MDC) where one of a cluster's rows has its condition met, the cluster is read as one
-    code with the cluster's rows and its codes' own rows are set aside (_set_aside); otherwise
-    the codes keep their rows. A one-joint knee removal plus replacement (0SPC0JZ+0SRC0J9) has
-    only a 461-462 row, which needs two sites, so it groups by the removal's 463-465 row.
-    """
-    present, found = set(codes), {}
-    for cluster in ref.clusters:
-        if all(group & present for group in cluster["groups"]):
-            key = "+".join(sorted(code for group in cluster["groups"] for code in group & present))
-            found.setdefault(key, []).extend(cluster["rows"])
-    return found
-
-
-def _set_aside(clusters):
-    """The codes of these clusters (keys of _clusters), whose own rows give way to them."""
+def set_aside(clusters):
+    """The codes of these clusters (keys of Ref.clusters_for), whose own rows give way to them."""
     return {code for key in clusters for code in key.split("+")}
 
 
@@ -263,12 +287,13 @@ def _pre_mdc(codes, or_codes, dx, ref):
     pancreas transplant without a kidney is 010 (Appendix D ranks 010 above 008 and 019, which
     would otherwise make them unreachable).
     """
-    clusters = {key: [row for row in rows if row["mdc"] == PRE] for key, rows in _clusters(codes, ref).items()}
+    clusters = {key: [row for row in rows if row["mdc"] == PRE] for key, rows in ref.clusters_for(codes).items()}
     clusters = {key: rows for key, rows in clusters.items() if rows}
+    aside = set_aside(clusters)
     roles, candidates = {}, []
     for code in codes:
         rows = [row for row in ref.proc_index.get(code, ()) if row["mdc"] == PRE]
-        if rows and code not in _set_aside(clusters):
+        if rows and code not in aside:
             roles[code] = _pre_role(code, rows)
             candidates.extend((code, row) for row in rows)
     for key, rows in clusters.items():
@@ -325,7 +350,7 @@ def _in_mdc(codes, or_codes, mdc, dx, ref):
     hip fracture, 731-733 malignancy). A code listed under a lower family as well can only land
     there when a higher one's condition fails, so for each OR code, and each Appendix E Part 2
     cluster the codes complete with a row here whose condition holds (as one code with the
-    cluster's rows, in place of its codes; see _clusters):
+    cluster's rows, in place of its codes; see Ref.clusters_for):
     - rows whose stated v44 condition the codes do not show are dropped (_condition_met);
     - a diagnosis-specific row (DRGs Appendix B lists for some diagnosis) keeps the DRGs listed
       for this diagnosis, else its other DRGs, else is dropped (unless it is the code's only
@@ -339,9 +364,10 @@ def _in_mdc(codes, or_codes, mdc, dx, ref):
       valve plus catheterization is 216-218 and bypass plus catheterization 233-234.
     """
     listed = set(ref.dx_drgs.get(dx, ()))
-    clusters = {key: rows for key, rows in _clusters(codes, ref).items()
+    clusters = {key: rows for key, rows in ref.clusters_for(codes).items()
                 if any(row["mdc"] == mdc and _condition_met(mdc, row["drgs"], codes, ref) for row in rows)}
-    entries = {code: ref.proc_index[code] for code in or_codes if code not in _set_aside(clusters)}
+    aside = set_aside(clusters)
+    entries = {code: ref.proc_index[code] for code in or_codes if code not in aside}
     entries.update(clusters)
     families = {code: frozenset(_row_rank(mdc, row["drgs"], ref) for row in ref.proc_index.get(code, ())
                                 if row["mdc"] == mdc)

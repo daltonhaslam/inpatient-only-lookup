@@ -16,6 +16,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 PIPELINE = ROOT / "pipeline"
+DERIVED = PIPELINE / "derived"
 MANIFEST = PIPELINE / "sources.json"
 RULES = PIPELINE / "rules.json"
 RAW = ROOT / "data" / "raw"
@@ -27,6 +28,11 @@ MAX_BYTES = 60 * 1024 * 1024
 
 def read_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def read_json_or(path, default):
+    """read_json, or default when the file does not exist."""
+    return read_json(path) if Path(path).is_file() else default
 
 
 def write_json(path, value, **dumps_options):

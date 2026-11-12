@@ -13,7 +13,6 @@ with the code, never the text. Surviving dispute reasons and abuse flags are pri
 """
 import argparse
 import csv
-import json
 import re
 import sys
 from collections import defaultdict
@@ -23,6 +22,7 @@ from pathlib import Path
 if __name__ == "__main__":
     sys.path[0] = str(Path(__file__).resolve().parent.parent)
 
+import fetch      # noqa: E402
 from crosswalk.mappings import CROSSWALK_DIR   # noqa: E402
 from crosswalk.status import INPATIENT_CREDS   # noqa: E402
 
@@ -52,7 +52,7 @@ def has_phi(text):
 
 
 def normalize_credential(value):
-    value = " ".join((value or "").split())
+    value = fetch.squash(value or "")
     for known in CREDENTIALS:
         if value.lower() == known.lower():
             return known
@@ -86,7 +86,7 @@ def _read(path):
 
 
 def _clean_name(value, log, code):
-    value = " ".join((value or "").split())[:NAME_LIMIT]
+    value = fetch.squash(value or "")[:NAME_LIMIT]
     if not value:
         return None
     if "@" in value or has_phi(value):
@@ -96,7 +96,7 @@ def _clean_name(value, log, code):
 
 
 def _clean_reason(parts, log, code):
-    text = "; ".join(" ".join(part.split()) for part in parts if part and part.strip())
+    text = "; ".join(fetch.squash(part) for part in parts if part and part.strip())
     if not text:
         return None
     if has_phi(text):    # scan everything before cutting, so a pattern past character 280 still counts
@@ -175,7 +175,7 @@ def ingest(agree_path, wrong_path, claims_path=None, reviews_path=None, claims_o
     if drop_reasons:
         for row in rows:
             row["reason"] = None
-    existing = json.loads(reviews_path.read_text()) if reviews_path.is_file() else []
+    existing = fetch.read_json_or(reviews_path, [])
     seen = {_key(row) for row in existing}
     new = [row for row in rows if _key(row) not in seen]
     claims = count_claims(claims_path) if claims_path else None
@@ -194,9 +194,9 @@ def ingest(agree_path, wrong_path, claims_path=None, reviews_path=None, claims_o
         print("Nothing written.", file=out)
         return None
     merged = sorted(existing + new, key=lambda row: row.get("ts", row["date"]))
-    reviews_path.write_text(json.dumps(merged, indent=1, ensure_ascii=False) + "\n")
+    fetch.write_json(reviews_path, merged, indent=1)
     if claims is not None:
-        (claims_out or CLAIMS).write_text(json.dumps(claims, indent=1) + "\n")
+        fetch.write_json(claims_out or CLAIMS, claims, indent=1)
     return len(new)
 
 

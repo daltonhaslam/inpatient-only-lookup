@@ -12,6 +12,8 @@ from unittest import mock
 
 import fetch
 from crosswalk import build, checks
+from crosswalk import group as grouper
+from crosswalk.group import Ref
 
 RAW_PRESENT = fetch.RAW.is_dir() and any(fetch.RAW.iterdir())
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "crosswalk"
@@ -22,6 +24,22 @@ def run_build(out, *extra):
             "--out", str(out), "--checks", str(Path(out) / "checks.txt")] + list(extra)
     with mock.patch("sys.stdout"):
         return build.main(args)
+
+
+@unittest.skipUnless(RAW_PRESENT, "raw CMS files not downloaded; run pipeline/fetch.py")
+class RevisionJoints(unittest.TestCase):
+    def test_derived_from_the_joint_sites(self):
+        self.assertEqual(build.revision_joints(Ref.load()), frozenset("CD9BAERSTUVW"))
+
+
+class MedicalExclusions(unittest.TestCase):
+    def test_every_excluded_drg_is_medical(self):
+        report = checks.Report()
+        checks._medical_exclusions(report, Ref(drg_titles={d: {"type": "MED"} for d in
+                                                           grouper.NEEDS_PROCEDURE | grouper.NEEDS_DISCHARGE_STATUS}))
+        self.assertEqual(report.failures, 0)
+        checks._medical_exclusions(report, Ref(drg_titles={"061": {"type": "SURG"}}))
+        self.assertEqual(report.failures, 1)
 
 
 class DescriptorRule(unittest.TestCase):

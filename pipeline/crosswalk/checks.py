@@ -8,7 +8,6 @@ FAIL stops build.py from writing crosswalk.json.
 Never print descriptor text: the checks file is committed. Standard library + openpyxl.
 """
 import functools
-import json
 import re
 
 import fetch
@@ -62,6 +61,7 @@ def run(doc, inputs, allow_missing=False):
     _families(report, codes, finals, combos, inputs.ref)
     _index_rows(report, combos, inputs.ref)
     _drgs(report, codes, inputs.ref)
+    _medical_exclusions(report, inputs.ref)
     _outpatient(report, codes, inputs)
     _differences(report, codes)
     _batches(report, doc, inputs)
@@ -73,7 +73,7 @@ def run(doc, inputs, allow_missing=False):
 
 
 def _families_of(entry):
-    return [family for family in (entry["inpatient"] or {}).get("families", [])]
+    return (entry["inpatient"] or {}).get("families", [])
 
 
 # ---------------------------------------------------------------- codes and mappings
@@ -210,7 +210,7 @@ def _is_index_row(row, ref):
         members = row["cluster"].split("+")
         return row["pcs"] in members and any(
             shown == (r["mdc"], tuple(r["drgs"]), r["family"])
-            for r in grouper._clusters(members, ref).get(row["cluster"], ()))
+            for r in ref.clusters_for(members).get(row["cluster"], ()))
     return any(shown == (r["mdc"], tuple(r["drgs"]), r["family"]) for r in ref.proc_index.get(row["pcs"], ()))
 
 
@@ -219,7 +219,6 @@ def _index_rows(report, combos, ref):
     Part 2 row of a cluster the set completes, in the family's MDC naming its DRGs (Pre-MDC rows
     for Pre-MDC); an OR code for the any-OR and unrelated families; and no OR code for a medical
     family. OR codes are Appendix E codes without * that no completed Part 3 combination makes non-OR."""
-    any_or = {drgs for entries in grouper._ANY_OR.values() for drgs, _ in entries}
     problems = []
     for code, dx, entry, result in combos:
         if isinstance(result, str):
@@ -230,11 +229,11 @@ def _index_rows(report, combos, ref):
         or_codes = [pcs for pcs in entry["codes"] if pcs in ref.unrelated and pcs not in made_non_or]
         rows = [row for pcs in entry["codes"] for row in ref.proc_index.get(pcs, ())
                 if row["mdc"] == mdc and drgs & set(row["drgs"])]
-        rows += [row for found in grouper._clusters(entry["codes"], ref).values() for row in found
+        rows += [row for found in ref.clusters_for(entry["codes"]).values() for row in found
                  if row["mdc"] == mdc and drgs & set(row["drgs"])]
         if basis == "medical":
             ok = not or_codes
-        elif basis.startswith("unrelated") or (basis == "in-mdc" and tuple(result["drgs"]) in any_or):
+        elif basis.startswith("unrelated") or (basis == "in-mdc" and tuple(result["drgs"]) in grouper.ANY_OR_FAMILIES):
             ok = bool(or_codes)
         else:
             ok = bool(rows)
@@ -276,6 +275,16 @@ def _drgs(report, codes, ref):
     report.check("DRG titles and MDCs match v44", titles, "titles from Appendix A; each DRG in its family's MDC")
     report.check("DRG amounts recompute", amounts, "weight x ($%s operating + $%s capital), to the cent" % (
         format(rates["operating_wi_gt1"], ",.2f"), format(rates["capital"], ",.2f")))
+
+
+def _medical_exclusions(report, ref):
+    """Every DRG the grouper holds back as needing a procedure or a discharge status is a medical
+    DRG in Appendix A, so a typo there cannot silently stop the exclusion from applying."""
+    named = (("procedure-defined", grouper.NEEDS_PROCEDURE), ("discharge-status", grouper.NEEDS_DISCHARGE_STATUS))
+    problems = ["%s DRG %s is not a medical DRG in Appendix A" % (what, drg)
+                for what, drgs in named for drg in sorted(drgs) if ref.drg_titles.get(drg, {}).get("type") != "MED"]
+    report.check("grouper's medical exclusions are medical DRGs", problems,
+                 "%d procedure-defined and %d discharge-status DRGs" % tuple(len(drgs) for _, drgs in named))
 
 
 def _outpatient(report, codes, inputs):
@@ -434,7 +443,7 @@ def free_text(passes_dir, adjudications_path):
     if adjudications_path.is_file():
         paths.append(adjudications_path)
     for path in paths:
-        yield from _strings(json.loads(path.read_text()), path.name if path.parent == passes_dir else "%s/%s" % (path.parent.name, path.name))
+        yield from _strings(fetch.read_json(path), path.name if path.parent == passes_dir else "%s/%s" % (path.parent.name, path.name))
     notes = passes_dir.parent / "notes"
     for path in sorted(notes.glob("*.md")) if notes.is_dir() else []:
         for number, line in enumerate(path.read_text().splitlines(), 1):
