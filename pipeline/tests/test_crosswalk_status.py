@@ -310,3 +310,58 @@ class Ingest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ProfileLinks(unittest.TestCase):
+    def test_accepted_and_normalized(self):
+        self.assertEqual(reviews.clean_profile("  https://www.linkedin.com/in/jane-doe?utm=x#top "), "https://www.linkedin.com/in/jane-doe")
+        self.assertEqual(reviews.clean_profile("https://orcid.org/0000-0000-0000-0000?a=b"), "https://orcid.org/0000-0000-0000-0000?a=b")
+
+    def test_rejected(self):
+        for bad in ("http://linkedin.com/in/x", "javascript:alert(1)", "https://linkedin.com/in/ jane", "https://jane@linkedin.com/in/x",
+                    "https://u:p@example.org/", "https://", "https:///path", "https://example.org/" + "a" * 200, "", None, "linkedin.com/in/x"):
+            self.assertIsNone(reviews.clean_profile(bad), bad)
+
+    def _csv(self, tmp, name, profile):
+        path = Path(tmp) / "a.csv"
+        path.write_text("Timestamp,Code,Mapping reviewed,Your credential,Name to show in the credit list,"
+                        "Link to your LinkedIn or other professional profile\n"
+                        '11/12/2026 09:00:00,32480,aaaa1111 x,CCS,%s,%s\n' % (name, profile))
+        return path
+
+    def _run(self, name, profile):
+        with tempfile.TemporaryDirectory() as tmp:
+            out, path = io.StringIO(), Path(tmp) / "reviews.json"
+            path.write_text("[]")
+            reviews.ingest(self._csv(tmp, name, profile), FIXTURES / "review_wrong.csv", reviews_path=path, out=out, yes=True, codes=CODES)
+            rows = [r for r in json.loads(path.read_text()) if r["ts"] == "2026-11-12 09:00:00"]
+            return rows[0], out.getvalue()
+
+    def test_ingest_keeps_profile_and_prints_it(self):
+        row, printed = self._run("Jane Doe", "https://www.linkedin.com/in/jane?trk=1")
+        self.assertEqual(row["profile"], "https://www.linkedin.com/in/jane")
+        self.assertIn("name Jane Doe, profile https://www.linkedin.com/in/jane", printed)
+        self.assertNotIn("PROFILE (", printed)
+
+    def test_ingest_rejects_bad_and_drops_without_name(self):
+        self.assertIsNone(self._run("Jane Doe", "http://example.org/x")[0]["profile"])
+        row, printed = self._run("", "https://www.linkedin.com/in/jane")
+        self.assertIsNone(row["profile"])
+        self.assertIn("no name to link", printed)
+
+    def test_missing_column_is_null(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "reviews.json"
+            path.write_text("[]")
+            reviews.ingest(FIXTURES / "review_agree.csv", FIXTURES / "review_wrong.csv", reviews_path=path, out=io.StringIO(), yes=True, codes=CODES)
+            self.assertTrue(all(r["profile"] is None for r in json.loads(path.read_text())))
+
+    def test_unknown_host_is_flagged(self):
+        _, printed = self._run("Jane Doe", "https://janedoe.example/about")
+        self.assertIn("PROFILE (32480): janedoe.example — check before approving", printed)
+
+    def test_resolution_problems(self):
+        good = {"X:aaaa1111": {"decision": "kept", "by": "Jane Doe", "by_profile": "https://orcid.org/0000-0000-0000-0000"}}
+        self.assertEqual(reviews.resolution_problems(good), [])
+        bad = {"X:aaaa1111": {"by": "Jane Doe", "by_profile": "http://x.org"}, "Y:bbbb2222": {"by_profile": "https://x.org"}}
+        self.assertEqual(len(reviews.resolution_problems(bad)), 2)

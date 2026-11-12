@@ -129,14 +129,16 @@ class FormulaInjection(unittest.TestCase):
         bad["codes"]["32480"]["label"] = "=1+1"
         bad["codes"]["32480"]["inpatient"]["families"][0]["condition"] = "@SUM(A1)"
         reviews = [{"code": "32480", "fp": "3fa9c1d2", "verdict": "wrong", "credential": "CCS", "date": "2026-11-12",
-                    "name": self.NAME, "reason": "+cmd|' /C calc'!A0"},
+                    "name": self.NAME, "profile": "=HYPERLINK(1)", "reason": "+cmd|' /C calc'!A0"},
                    {"code": "32480", "fp": "3fa9c1d2", "verdict": "agree", "credential": "CIC", "date": "2026-11-12",
                     "name": "-2+3", "reason": "\tx"}]
         with tempfile.TemporaryDirectory() as tmp:
             wb = openpyxl.load_workbook(workbook.write(bad, Path(tmp) / "x.xlsx", reviews=reviews))
         log = wb["Review log"]
         self.assertEqual((log["F2"].value, log["F2"].data_type), (self.NAME, "s"))
-        self.assertEqual((log["G2"].value, log["G2"].data_type), ("+cmd|' /C calc'!A0", "s"))
+        self.assertEqual((log["G2"].value, log["G2"].data_type), ("=HYPERLINK(1)", "s"))
+        self.assertEqual(log["G1"].value, "Profile")
+        self.assertEqual((log["H2"].value, log["H2"].data_type), ("+cmd|' /C calc'!A0", "s"))
         self.assertEqual((log["F3"].value, log["F3"].data_type), ("-2+3", "s"))
         ws = wb["Crosswalk"]
         header = {c.value: c.column_letter for c in ws[1]}

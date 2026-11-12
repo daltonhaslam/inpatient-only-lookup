@@ -16,9 +16,13 @@ mapper's own words only, never CPT descriptor text.
 - `adjudications.json`: one merged file, an object keyed by code; each value is a full record that settles a
   code the passes disagree on. An adjudication always wins.
 - `notes/<pass>-<batch-id>.md`: each mapper's working notes for a batch (`a-m01.md`, `b-m01.md`, ...).
-- `reviews.json`: de-identified coder reviews (credential, verdict, date, optional display name), written by
+- `reviews.json`: de-identified coder reviews (credential, verdict, date, optional display name and profile link), written by
   `python3 pipeline/crosswalk/reviews.py ingest`.
-- `resolutions.json`: how each disputed code was resolved, keyed by code.
+- `resolutions.json`: how each disputed code was resolved, keyed `"code:fp"` to `{decision, by, date}`.
+  A tiebreaker may add `by_profile`, an optional https link their name points to on the help-review
+  page. It must already be in the normalized form `reviews.clean_profile()` returns (https, at most
+  200 characters, no spaces, no `user@host`; linkedin.com without query or fragment) and needs a `by`.
+  `crosswalk/build.py` stops on a bad one; `reviews.resolution_problems(resolutions)` lists them.
 - `claims.json`: counts of claimed review batches, written by `reviews.py ingest --claims`.
 
 `mappings.final_mapping(code, passes, adjudications, ref)` picks the record to use: the

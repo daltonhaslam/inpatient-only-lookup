@@ -71,6 +71,10 @@ def load_inputs(passes_dir=None, adjudications_path=None):
     batches, packaged = mapper.mapping_batches()
     passes_dir = Path(passes_dir) if passes_dir else mappings.PASSES_DIR
     adjudications_path = Path(adjudications_path) if adjudications_path else mappings.ADJUDICATIONS
+    resolutions = fetch.read_json_or(mappings.RESOLUTIONS, {})
+    problems = reviews.resolution_problems(resolutions)
+    if problems:
+        raise SystemExit("resolutions.json: " + "; ".join(problems))
     return types.SimpleNamespace(
         ref=Ref.load(),
         removed=mapper.removal_dates(spans),
@@ -80,7 +84,7 @@ def load_inputs(passes_dir=None, adjudications_path=None):
         passes=mappings.load_passes(passes_dir),
         adjudications=mappings.load_adjudications(adjudications_path),
         reviews=fetch.read_json_or(reviews.REVIEWS, []),
-        resolutions=fetch.read_json_or(mappings.RESOLUTIONS, {}),
+        resolutions=resolutions,
         passes_dir=passes_dir,
         adjudications_path=adjudications_path,
     )

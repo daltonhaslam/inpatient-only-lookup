@@ -4,6 +4,7 @@ import { SITE, CFR, claimHref } from './site.mjs';
 import { formatDate, num, plural, csv as toCsv } from './engine.mjs';
 import { esc, out, cfr } from './views.mjs';
 import { layout } from './pages.mjs';
+import { safeProfile } from './stake-data.mjs';
 import { BADGE, card, money, moneyRange, cents, drgList, dxCode, statusText, noCompareText, yearLines, alternativeLabel } from './stake-card.mjs';
 
 export const ROOT = '/revenue-at-stake/';
@@ -138,21 +139,22 @@ function batchTable(stake) {
   }).join('\n');
 }
 
-function creditList(stake) {
+export function creditList(stake) {
   const confirmed = stake.items.filter((item) => item.kind === 'compare' && item.review.status === 'confirmed')
     .sort((a, b) => String(b.review.last || '').localeCompare(String(a.review.last || '')) || a.code.localeCompare(b.code));
   const names = new Map();
   for (const rows of Object.values(stake.credits)) {
-    for (const row of rows) names.set(row.name, row.credential);
+    for (const row of rows) names.set(row.name, { profile: (names.get(row.name) || {}).profile || safeProfile(row.profile) });
   }
+  const credit = (name, profile) => (safeProfile(profile) ? out(safeProfile(profile), esc(name), undefined, 'nofollow ugc') : esc(name));
   if (!confirmed.length && !names.size) {
     return '<p>No code is confirmed yet. Reviewers who give a name are thanked here after each update.</p>';
   }
   const codes = confirmed.slice(0, 40).map((item) => {
-    const who = (stake.credits[item.code] || []).map((row) => esc(row.name)).join(', ');
+    const who = (stake.credits[item.code] || []).map((row) => credit(row.name, (names.get(row.name) || {}).profile)).join(', ');
     return `<li><a href="/code/${esc(item.code)}/#stake-h">${esc(item.code)}</a> ${esc(item.label)}${item.review.last ? `, ${formatDate(item.review.last)}` : ''}${who ? `. Thanks to ${who}.` : ''}</li>`;
   }).join('');
-  const people = [...names.keys()].sort((a, b) => a.localeCompare(b)).map((name) => `<li>${esc(name)}</li>`).join('');
+  const people = [...names.keys()].sort((a, b) => a.localeCompare(b)).map((name) => `<li>${credit(name, names.get(name).profile)}</li>`).join('');
   return `${codes ? `<h3>Recently confirmed</h3><ul class="plain">${codes}</ul>` : ''}${people ? `<h3>Reviewers</h3><ul class="credits">${people}</ul>` : ''}`;
 }
 
@@ -169,7 +171,7 @@ ${draft()}
 <ol class="plain steps">
 <li>Open a code’s page and its “Show the work”: the ICD-10-PCS codes, the expected principal diagnosis, the MS-DRG family and the arithmetic.</li>
 <li>If you would code it the same way, press <strong>Agree</strong>. If not, press <strong>Something’s wrong</strong> and say what you would code instead. Each opens a short Google Form in a new tab with the code and the mapping filled in. Leave those as they are.</li>
-<li>Pick your credential. Add a name if you want credit; leave it blank to stay anonymous.</li>
+<li>Pick your credential. Credit is optional: give a name to be listed, and leave it blank to stay anonymous. To have your name link to a LinkedIn or other professional profile, add the link too (it needs a name).</li>
 <li>Reviews are added at the next update, and the card’s status changes then.</li>
 </ol>
 </section>
@@ -189,6 +191,7 @@ ${draft()}
 <section class="block" aria-labelledby="phi-h">
 <h2 id="phi-h">No patient information</h2>
 <p>Don’t put any patient information in a form: no names, dates of birth, record numbers or details about anyone’s care. If you checked a mapping against your own claims, share only totals, for example “of our 40 cases, 70% grouped to DRG 165”. Answers go to a private sheet. Contributions are published under the site’s MIT license, and your name appears only if you give one.</p>
+<p>Profile links are shown as you provide them and are not verified. They open in a new tab and only https links are used. A tiebreaker coder’s rulings are credited the same way.</p>
 </section>
 
 <section class="block" aria-labelledby="batch-h">

@@ -264,14 +264,14 @@ def _inputs_sheet(wb, doc):
 
 def _review_log_sheet(wb, reviews):
     ws = wb.create_sheet("Review log")
-    _header(ws, 1, ["Code", "Mapping fingerprint", "Verdict", "Credential", "Date", "Name (if given)", "Reason"],
-            [10, 18, 10, 14, 12, 28, 80])
+    _header(ws, 1, ["Code", "Mapping fingerprint", "Verdict", "Credential", "Date", "Name (if given)", "Profile", "Reason"],
+            [10, 18, 10, 14, 12, 28, 40, 80])
     for r in reviews:
-        _append(ws, [r.get("code"), r.get("fp"), r.get("verdict"), r.get("credential"), r.get("date"), r.get("name"), r.get("reason")])
+        _append(ws, [r.get("code"), r.get("fp"), r.get("verdict"), r.get("credential"), r.get("date"), r.get("name"), r.get("profile"), r.get("reason")])
     if not reviews:
         ws.append(["No reviews yet"])
     ws.freeze_panes = "A2"
-    ws.auto_filter.ref = "A1:G%d" % ws.max_row
+    ws.auto_filter.ref = "A1:H%d" % ws.max_row
     return ws
 
 

@@ -5,9 +5,10 @@ import { formatDate, monthYear, addDays, dayNumber, lookup, eventsOf, stateOf, s
 
 export const esc = (value) => String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-/** A link that leaves the site: new tab, no referrer, and a spoken hint. cls: an optional class (a button, say). */
-export const out = (href, text, cls) =>
-  `<a${cls ? ` class="${esc(cls)}"` : ''} href="${esc(href)}" target="_blank" rel="noopener noreferrer">${text}<span class="sr"> (opens in a new tab)</span></a>`;
+/** A link that leaves the site: new tab, no referrer, and a spoken hint. cls: an optional class (a button, say);
+ *  rel: extra rel words ahead of noopener noreferrer (e.g. "nofollow ugc" for links people supplied). */
+export const out = (href, text, cls, rel) =>
+  `<a${cls ? ` class="${esc(cls)}"` : ''} href="${esc(href)}" target="_blank" rel="${rel ? `${esc(rel)} ` : ''}noopener noreferrer">${text}<span class="sr"> (opens in a new tab)</span></a>`;
 
 /** "85 FR 86093" as a link to that page of the Federal Register on govinfo.gov. */
 export function fr(cite) {

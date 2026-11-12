@@ -129,13 +129,34 @@ export function removalMismatches(model, data) {
   return found;
 }
 
-/** Credit lines from reviews.json: named agreements on each code's current mapping. */
-export function credits(reviews, model) {
+/** A profile link only if it is a plain https URL with a host and no credentials, whitespace or fragment tricks; else null. */
+export function safeProfile(value) {
+  if (typeof value !== 'string' || value.length > 200 || /\s/.test(value) || !/^https:\/\//i.test(value)) return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && url.hostname && !url.username && !url.password ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Credit lines from reviews.json (named agreements on each code's current mapping) and from
+ * resolutions.json (a tiebreaker's ruling on the current mapping, credited under `by`).
+ * profile: the https link the name points to, or null.
+ */
+export function credits(reviews, model, resolutions = {}) {
   const byCode = {};
   for (const row of list(reviews)) {
     const item = model.codes[row.code];
     if (!item || !item.map || row.fp !== item.map.fp || row.verdict !== 'agree' || !row.name) continue;
-    (byCode[row.code] ||= []).push({ name: row.name, credential: row.credential || '', date: row.date || '' });
+    (byCode[row.code] ||= []).push({ name: row.name, credential: row.credential || '', date: row.date || '', profile: safeProfile(row.profile) });
+  }
+  for (const [key, ruling] of Object.entries(resolutions || {})) {
+    const [code, fp] = key.split(':');
+    const item = model.codes[code];
+    if (!item || !item.map || fp !== item.map.fp || !ruling || !ruling.by) continue;
+    (byCode[code] ||= []).push({ name: ruling.by, credential: '', date: ruling.date || '', profile: safeProfile(ruling.by_profile) });
   }
   return byCode;
 }

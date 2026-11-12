@@ -265,9 +265,11 @@ function stakeData(ctx) {
   if (badFp.length) throw new Error(`crosswalk.json has mapping fingerprints that are not 8 hex digits: ${badFp.slice(0, 10).join(', ')}`);
   const reviewsPath = join(root, 'data/crosswalk/reviews.json');
   const reviews = existsSync(reviewsPath) ? JSON.parse(readFileSync(reviewsPath, 'utf8')) : [];
+  const resolutionsPath = join(root, 'data/crosswalk/resolutions.json');
+  const resolutions = existsSync(resolutionsPath) ? JSON.parse(readFileSync(resolutionsPath, 'utf8')) : {};
   const xlsx = join(dirname(path), 'crosswalk.xlsx');
   if (!existsSync(xlsx)) console.warn('No crosswalk.xlsx next to crosswalk.json: the Excel download is left out.');
-  return { ...stake.stakeContext(model, credits(reviews, model), ctx.data.groups, { xlsx: existsSync(xlsx) }), xlsxPath: xlsx };
+  return { ...stake.stakeContext(model, credits(reviews, model, resolutions), ctx.data.groups, { xlsx: existsSync(xlsx) }), xlsxPath: xlsx };
 }
 
 const FONTS = [

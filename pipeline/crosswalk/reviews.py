@@ -18,6 +18,7 @@ import argparse
 import csv
 import re
 import sys
+from urllib.parse import urlsplit, urlunsplit
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
@@ -37,10 +38,13 @@ _CRED_ALIASES = {"MD/DO": "MD or DO", "MD": "MD or DO", "DO": "MD or DO"}
 REASON_LIMIT = 280
 NAME_LIMIT = 80
 BURST_COUNT, BURST_SECONDS = 3, 120
+PROFILE_LIMIT = 200
+KNOWN_PROFILE_HOSTS = ("linkedin.com", "www.linkedin.com", "doximity.com", "orcid.org", "github.com")
 
 # Question titles (case-insensitive prefixes) -> field.
 TITLES = {"timestamp": "Timestamp", "code": "Code", "mapping": "Mapping reviewed", "credential": "Your credential",
-          "name": "Name to show in the credit list", "pcs_which": "If not, which PCS codes",
+          "name": "Name to show in the credit list", "profile": "Link to your LinkedIn or other professional profile",
+          "pcs_which": "If not, which PCS codes",
           "dx_what": "If not, what would you expect", "reasoning": "Your reasoning", "batch": "Batch"}
 _PHI = (re.compile(r"\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b"), re.compile(r"\b\d{4}-\d{2}-\d{2}\b"),
         re.compile(r"\b\d{6,}\b"), re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),
@@ -100,6 +104,44 @@ def _clean_name(value, log, code):
     return value[:NAME_LIMIT]
 
 
+def clean_profile(value):
+    """The normalized https profile URL, or None when it is not acceptable: https only, at most
+    PROFILE_LIMIT characters, no whitespace inside, no user@host credentials, a hostname present.
+    Leading/trailing whitespace is stripped; linkedin.com URLs lose their query string and fragment."""
+    value = (value or "").strip()
+    if not value or len(value) > PROFILE_LIMIT or re.search(r"\s", value) or not value.lower().startswith("https://"):
+        return None
+    try:
+        parts = urlsplit(value)
+        host = parts.hostname
+        port = parts.port
+    except ValueError:
+        return None
+    if parts.scheme != "https" or not host or "@" in parts.netloc or port not in (None, 443):
+        return None
+    if host == "linkedin.com" or host.endswith(".linkedin.com"):
+        parts = parts._replace(query="", fragment="")
+    return urlunsplit(parts)
+
+
+def profile_host(url):
+    return urlsplit(url).hostname or ""
+
+
+def resolution_problems(resolutions):
+    """Lines describing every resolutions.json `by_profile` that clean_profile would reject, or that has no `by`."""
+    problems = []
+    for key, entry in sorted(resolutions.items()):
+        if not isinstance(entry, dict) or "by_profile" not in entry:
+            continue
+        value = entry["by_profile"]
+        if not entry.get("by"):
+            problems.append("%s: by_profile without by" % key)
+        elif clean_profile(value) != value:
+            problems.append("%s: by_profile is not an acceptable normalized https URL" % key)
+    return problems
+
+
 def _clean_reason(parts, log, code):
     text = "; ".join(fetch.squash(part) for part in parts if part and part.strip())
     if not text:
@@ -138,9 +180,16 @@ def parse_rows(agree_path, wrong_path, log, codes):
             reason = None
             if verdict == "wrong":
                 reason = _clean_reason([get("reasoning"), get("pcs_which"), get("dx_what")], log, code)
+            name = _clean_name(get("name"), log, code)
+            profile = clean_profile(get("profile"))
+            if get("profile") and not profile:
+                log.append("%s: a profile link was dropped (not an acceptable https URL)" % code)
+            if profile and not name:
+                log.append("%s: a profile link was dropped (no name to link)" % code)
+                profile = None
             rows.append({"code": code, "fp": fp.group(0), "credential": normalize_credential(get("credential")),
                          "verdict": verdict, "date": when.strftime("%Y-%m-%d"), "ts": when.strftime("%Y-%m-%d %H:%M:%S"),
-                         "name": _clean_name(get("name"), log, code), "reason": reason})
+                         "name": name, "profile": profile, "reason": reason})
     rows.sort(key=lambda row: row["ts"])
     return rows
 
@@ -162,6 +211,8 @@ def abuse_flags(rows):
             if row["name"]:
                 names[row["name"].lower()] += 1
         flags += ["%s: display name %r appears %d times" % (code, name, n) for name, n in sorted(names.items()) if n > 1]
+        flags += ["PROFILE (%s): %s — check before approving" % (code, profile_host(row["profile"])) for row in group
+                  if row.get("profile") and profile_host(row["profile"]) not in KNOWN_PROFILE_HOSTS]
         agrees = [row for row in group if row["verdict"] == "agree"]
         if agrees and not any(row["credential"] in INPATIENT_CREDS for row in agrees):
             flags.append("%s: %d agreement(s), none from an inpatient credential" % (code, len(agrees)))
@@ -203,8 +254,8 @@ def ingest(agree_path, wrong_path, claims_path=None, reviews_path=None, claims_o
     for line in flags:
         print("FLAG: " + line, file=out)
     for row in new:     # everything that will be written and published, for a human to read first
-        print("NEW (%s, %s): %s, credential %s, name %s" % (row["code"], row["ts"], row["verdict"], row["credential"],
-                                                            row["name"] or "(none)"), file=out)
+        print("NEW (%s, %s): %s, credential %s, name %s, profile %s" % (
+            row["code"], row["ts"], row["verdict"], row["credential"], row["name"] or "(none)", row["profile"] or "(none)"), file=out)
         if row["reason"]:
             print("REASON (%s, %s): %s" % (row["code"], row["ts"], row["reason"]), file=out)
     print("%d new review row(s), %d already present, %d flag(s)." % (len(new), len(rows) - len(new), len(flags)), file=out)
