@@ -113,6 +113,8 @@ function familyLine(f, many) {
     + `${f.caveat ? `<span class="scard__caveat">${esc(f.caveat)}</span>` : ''}</div>`;
 }
 
+// Not views.pct: that one gives 3 decimals (timeline ticks), and these bars are drawn to 2; reusing it
+// would change every card's markup for no visible gain.
 const pct = (n) => `${(n * 100).toFixed(2)}%`;
 
 /** Bars on one dollar scale: hollow for outpatient, filled for each inpatient range. Decorative; the text says it all. */
@@ -172,8 +174,6 @@ ${stale}
 </details>`;
 }
 
-const formLink = (href, text, cls) => `<a class="${cls}" href="${esc(href)}" target="_blank" rel="noopener noreferrer">${text}<span class="sr"> (opens in a new tab)</span></a>`;
-
 /** The full card. title: render the code and label (off on the code's own page, where the h1 says it). detail: include Show the work (off in the browser, which links to the code page instead). */
 export function card(item, meta, { title = true, detail = true } = {}) {
   const head = title ? `<p class="scard__title"><span class="scard__code">${esc(item.code)}</span> <span class="scard__label">${esc(item.label)}</span></p>` : '';
@@ -196,6 +196,6 @@ ${scaleBar(item)}
 ${tier}
 <p class="scard__fine">National, unadjusted: no wage index, IME or DSH. <span class="scard__draft">${esc(BADGE)}</span></p>
 ${detail ? work(item, meta) : `<p class="scard__more"><a href="/code/${esc(item.code)}/#stake-h">Show the work for ${esc(item.code)}</a></p>`}
-<p class="scard__act">${formLink(agreeHref(item.code, item.map.fp, mappingSummary(item)), 'Agree', 'btn')}${formLink(wrongHref(item.code, item.map.fp, mappingSummary(item)), 'Something’s wrong', 'btn btn--quiet')}</p>
+<p class="scard__act">${out(agreeHref(item.code, item.map.fp, mappingSummary(item)), 'Agree', 'btn')}${out(wrongHref(item.code, item.map.fp, mappingSummary(item)), 'Something’s wrong', 'btn btn--quiet')}</p>
 </article>`;
 }

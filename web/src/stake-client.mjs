@@ -4,12 +4,12 @@
 import { num } from './engine.mjs';
 import { esc } from './views.mjs';
 import { card, STATUS } from './stake-card.mjs';
-import { prepare, filterCodes, outsideCrosswalk, stateFromParams, paramsFromState, isFiltered, countText, PAGE_SIZE, TIERS, DEFAULTS } from './stake-engine.mjs';
+import { prepare, filterCodes, outsideCrosswalk, stateFromParams, paramsFromState, countText, PAGE_SIZE, TIERS, DEFAULTS } from './stake-engine.mjs';
 
 const $ = (selector, root = document) => root.querySelector(selector);
 
 const option = (value, text, current) => `<option value="${esc(value)}"${value === current ? ' selected' : ''}>${esc(text)}</option>`;
-const select = (id, label, options, current) => `<label class="sfilter__field" for="${id}"><span>${label}</span><select id="${id}" data-f="${id.replace('sf-', '')}">${options.map(([v, t]) => option(v, t, current)).join('')}</select></label>`;
+const select = (id, label, options, current, hint) => `<label class="sfilter__field" for="${id}"><span>${label}</span><select id="${id}" data-f="${id.replace('sf-', '')}"${hint ? ` aria-describedby="${hint}"` : ''}>${options.map(([v, t]) => option(v, t, current)).join('')}</select></label>`;
 
 function form(data, state) {
   return `<form class="sfilter" role="search" aria-label="Find a code" novalidate>
@@ -17,11 +17,12 @@ function form(data, state) {
 <input id="sf-q" data-f="q" type="search" value="${esc(state.q)}" placeholder="32480, or lobectomy" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"></label>
 <div class="sfilter__row">
 ${select('sf-group', 'Body system', [['', 'All'], ...data.groups], state.group)}
-${select('sf-status', 'Review status', [['', 'Any'], ...Object.entries(STATUS)], state.status)}
-${select('sf-tier', 'Tier', [['', 'Any'], ...TIERS.map((t) => [t, `Tier ${t}`])], state.tier)}
+${select('sf-status', 'Review status', [['', 'Any'], ...Object.entries(STATUS)], state.status, 'sf-hint')}
+${select('sf-tier', 'Tier', [['', 'Any'], ...TIERS.map((t) => [t, `Tier ${t}`])], state.tier, 'sf-hint')}
 ${select('sf-year', 'Year removed', [['', 'Any'], ...data.years.map((y) => [y, y])], state.year)}
 ${select('sf-sort', 'Sort by', [['code', 'Code'], ['gap', 'Biggest gap']], state.sort)}
 </div>
+<p class="sfilter__hint" id="sf-hint">Status and tier apply only to codes with a comparison.</p>
 <div class="sfilter__foot">
 <label class="sfilter__check"><input type="checkbox" id="sf-compared" data-f="compared"${state.compared ? ' checked' : ''}> Has a comparison</label>
 <button type="button" class="btn btn--quiet" data-reset>Clear filters</button>
@@ -40,6 +41,10 @@ function missing(miss) {
 <p class="scard__none">Not in this crosswalk. It covers only the procedures removed from the inpatient-only list in 2026 and 2027.</p>
 <p class="scard__more">${where}</p></div>`;
 }
+
+/** Filters that match nothing, when the search is not a code outside the crosswalk. */
+const empty = () => `<div class="scard scard--none" data-empty><p class="scard__none">No codes match these filters.</p>
+<p class="scard__more"><button type="button" class="btn btn--quiet" data-reset>Clear filters</button></p></div>`;
 
 /** The cards replace the long table; keep it one click away. Without JS it is never touched. */
 function collapseTable(total) {
@@ -80,7 +85,7 @@ export function start(model) {
     const html = slice.map((item) => card(item, model.meta, { detail: false })).join('');
     if (from === 0) {
       const miss = matches.length ? null : outsideCrosswalk(data, state.q);
-      results.innerHTML = miss ? missing(miss) : html;
+      results.innerHTML = matches.length ? html : (miss ? missing(miss) : empty());
     } else {
       results.insertAdjacentHTML('beforeend', html);
     }

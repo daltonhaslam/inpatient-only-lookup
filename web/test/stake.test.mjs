@@ -11,6 +11,7 @@ import { agreeHref, wrongHref, claimHref, REVIEW_ENTRY } from '../src/site.mjs';
 import { normalize, clientModel, hydrate, removalMismatches } from '../src/stake-data.mjs';
 import { card, alternativeLabel } from '../src/stake-card.mjs';
 import { CSV_HEADER, csvRows } from '../src/stake.mjs';
+import { out } from '../src/views.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '..', '..');
@@ -289,6 +290,22 @@ describe('crosswalk removal dates against the site history', () => {
       { code: 'A', crosswalk: '2026-01-01', history: '2027-01-01' },
       { code: 'C', crosswalk: '2027-01-01', history: null },
     ]);
+  });
+});
+
+describe('outbound links', () => {
+  test('out() takes an optional class and is unchanged without one', () => {
+    assert.equal(out('https://x.test/?a=1&b=2', 'Agree', 'btn btn--quiet'),
+      '<a class="btn btn--quiet" href="https://x.test/?a=1&amp;b=2" target="_blank" rel="noopener noreferrer">Agree<span class="sr"> (opens in a new tab)</span></a>');
+    assert.equal(out('https://x.test/', 'X'), '<a href="https://x.test/" target="_blank" rel="noopener noreferrer">X<span class="sr"> (opens in a new tab)</span></a>');
+  });
+
+  test('every name stake-client.mjs imports is exported by its module', async () => {
+    const text = readFileSync(join(here, '..', 'src', 'stake-client.mjs'), 'utf8');
+    for (const [, names, from] of text.matchAll(/import \{([^}]+)\} from '([^']+)';/g)) {
+      const mod = await import(join(here, '..', 'src', from));
+      for (const name of names.split(',').map((n) => n.trim()).filter(Boolean)) assert.ok(name in mod, `${from} does not export ${name}`);
+    }
   });
 });
 

@@ -443,6 +443,21 @@ if (!hasStake) {
     eq(await page.locator('[data-outside] a').getAttribute('href'), '/code/27447/', 'code page link');
   });
 
+  await check('stake: filters that match nothing show an empty-state card whose Clear filters resets them', async (page) => {
+    await openStake(page);
+    has(await page.locator('#sf-hint').textContent(), 'Status and tier apply only to codes with a comparison.', 'filter hint');
+    eq(await page.locator('#sf-tier').getAttribute('aria-describedby'), 'sf-hint', 'tier select is described by the hint');
+    await page.locator('#sf-q').fill('qqqzzzx');
+    await page.waitForSelector('[data-results] [data-empty]');
+    has(await page.locator('[data-empty]').textContent(), 'No codes match these filters.', 'empty state');
+    eq(await cardsOf(page).count(), 0, 'cards');
+    await page.locator('[data-empty] [data-reset]').click();
+    await page.waitForSelector('[data-results] [data-stake-card]');
+    eq(await page.locator('#sf-q').inputValue(), '', 'search after clear');
+    eq(await page.locator('[data-empty]').count(), 0, 'empty state gone');
+    eq(await page.evaluate(() => document.activeElement.id), 'sf-q', 'focus returns to the search box');
+  });
+
   await check('stake: keyboard only, from search to filters to clear', async (page) => {
     await openStake(page);
     for (let i = 0; i < 40 && (await page.evaluate(() => document.activeElement.id)) !== 'sf-q'; i += 1) await page.keyboard.press('Tab');
@@ -510,13 +525,13 @@ function axeSource() {
   if (!existsSync(AXE)) throw new Error('axe-core is not installed. Run: cd web && npm install');
   return readFileSync(AXE, 'utf8');
 }
-const axePaths = ['/?q=27447', ...(hasStake ? ['/revenue-at-stake/?tier=3', '/revenue-at-stake/?q=99213'] : []), '/code/27132/', '/history/', '/phase-out/', '/exemption/', '/methods/', '/group/spine/'];
+const axePaths = ['/?q=27447', ...(hasStake ? ['/revenue-at-stake/?tier=3', '/revenue-at-stake/?q=99213', '/revenue-at-stake/?q=qqqzzzx'] : []), '/code/27132/', '/history/', '/phase-out/', '/exemption/', '/methods/', '/group/spine/'];
 for (const scheme of ['light', 'dark']) {
   await check(`axe (${scheme}): no serious or critical violations`, async (page) => {
     const report = [];
     for (const path of axePaths) {
       await open(page, path);
-      if (path.startsWith('/revenue-at-stake/')) await page.waitForSelector('[data-results] [data-stake-card], [data-results] [data-outside]');
+      if (path.startsWith('/revenue-at-stake/')) await page.waitForSelector('[data-results] [data-stake-card], [data-results] [data-outside], [data-results] [data-empty]');
       else if (path.includes('q=')) await page.waitForSelector('[data-results] .verdict');
       await page.evaluate(axeSource());   // evaluate, not addScriptTag: the live CSP forbids inline scripts
       const results = await page.evaluate(() => window.axe.run(document));
