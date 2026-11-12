@@ -142,19 +142,27 @@ function batchTable(stake) {
 export function creditList(stake) {
   const confirmed = stake.items.filter((item) => item.kind === 'compare' && item.review.status === 'confirmed')
     .sort((a, b) => String(b.review.last || '').localeCompare(String(a.review.last || '')) || a.code.localeCompare(b.code));
-  const names = new Map();
+  const names = new Map();   // name -> {profile, credential, date}: the first profile seen, the most recent credential
   for (const rows of Object.values(stake.credits)) {
-    for (const row of rows) names.set(row.name, { profile: (names.get(row.name) || {}).profile || safeProfile(row.profile) });
+    for (const row of rows) {
+      const seen = names.get(row.name) || { profile: null, credential: '', date: '' };
+      const newer = row.credential && (!seen.credential || String(row.date || '') >= seen.date);
+      names.set(row.name, { profile: seen.profile || safeProfile(row.profile), credential: newer ? row.credential : seen.credential, date: newer ? String(row.date || '') : seen.date });
+    }
   }
-  const credit = (name, profile) => (safeProfile(profile) ? out(safeProfile(profile), esc(name), undefined, 'nofollow ugc') : esc(name));
+  const credit = (name, withCredential = true) => {
+    const { profile, credential } = names.get(name);
+    const link = safeProfile(profile) ? out(safeProfile(profile), esc(name), undefined, 'nofollow ugc') : esc(name);
+    return withCredential && credential ? `${link}, ${esc(credential)}` : link;
+  };
   if (!confirmed.length && !names.size) {
     return '<p>No code is confirmed yet. Reviewers who give a name are thanked here after each update.</p>';
   }
   const codes = confirmed.slice(0, 40).map((item) => {
-    const who = (stake.credits[item.code] || []).map((row) => credit(row.name, (names.get(row.name) || {}).profile)).join(', ');
+    const who = (stake.credits[item.code] || []).map((row) => credit(row.name)).join(', ');
     return `<li><a href="/code/${esc(item.code)}/#stake-h">${esc(item.code)}</a> ${esc(item.label)}${item.review.last ? `, ${formatDate(item.review.last)}` : ''}${who ? `. Thanks to ${who}.` : ''}</li>`;
   }).join('');
-  const people = [...names.keys()].sort((a, b) => a.localeCompare(b)).map((name) => `<li>${credit(name, names.get(name).profile)}</li>`).join('');
+  const people = [...names.keys()].sort((a, b) => a.localeCompare(b)).map((name) => `<li>${credit(name)}</li>`).join('');
   return `${codes ? `<h3>Recently confirmed</h3><ul class="plain">${codes}</ul>` : ''}${people ? `<h3>Reviewers</h3><ul class="credits">${people}</ul>` : ''}`;
 }
 

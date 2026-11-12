@@ -11,13 +11,13 @@ const render = (reviews, resolutions = {}) => creditList({ items: [], credits: c
 describe('credit links', () => {
   test('a https profile makes the name a new-tab link with nofollow ugc', () => {
     const html = render([agree('Jane Doe', 'https://www.linkedin.com/in/jane-doe')]);
-    assert.match(html, /<li><a href="https:\/\/www\.linkedin\.com\/in\/jane-doe" target="_blank" rel="nofollow ugc noopener noreferrer">Jane Doe<span class="sr"> \(opens in a new tab\)<\/span><\/a><\/li>/);
+    assert.match(html, /<li><a href="https:\/\/www\.linkedin\.com\/in\/jane-doe" target="_blank" rel="nofollow ugc noopener noreferrer">Jane Doe<span class="sr"> \(opens in a new tab\)<\/span><\/a>, CCS<\/li>/);
   });
 
   test('no profile, or an unusable one, leaves the plain name', () => {
     for (const bad of [null, undefined, '', 'http://example.org/x', 'javascript:alert(1)', 'https://u:p@example.org/', 'https://ex ample.org/', 'https://' + 'a'.repeat(200) + '.org']) {
       const html = render([agree('Jane Doe', bad)]);
-      assert.ok(html.includes('<li>Jane Doe</li>'), String(bad));
+      assert.ok(html.includes('<li>Jane Doe, CCS</li>'), String(bad));
       assert.ok(!html.includes('<a href="http') && !html.includes('javascript'), String(bad));
     }
   });
@@ -35,6 +35,13 @@ describe('credit links', () => {
     const html = render([], resolutions);
     assert.ok(html.includes('href="https://orcid.org/0000-0000-0000-0000"') && html.includes('Sam Lee'));
     assert.ok(!html.includes('Stale Person'));
+  });
+
+  test('shows the most recent credential; tiebreaker shown as written', () => {
+    const later = { ...agree('Jane Doe', null), credential: 'CIC', date: '2026-12-01' };
+    const html = render([later, agree('Jane Doe', null)], { '11111:aaaa1111': { by: 'Sam Lee, MD', date: '2026-11-20' } });
+    assert.ok(html.includes('<li>Jane Doe, CIC</li>') && !html.includes('Jane Doe, CCS'));
+    assert.ok(html.includes('<li>Sam Lee, MD</li>'));
   });
 
   test('safeProfile', () => {
