@@ -7,9 +7,12 @@ The three forms write to separate tabs of one sheet (see Paid-And-Penalized-Plan
 export each tab as CSV. Columns are found by question title. Written rows:
 {"code", "fp", "credential", "verdict": "agree"|"wrong", "date", "ts", "name"|null, "reason"|null}.
 Never written: email addresses, the "where do you code" answer, free text from agree rows, claim
-names. A dispute's reasoning is cut to 280 characters and dropped when it looks like PHI (a
-date of birth, a record number, "Mr./Mrs./Ms." plus a name); the drop is reported on the screen
-with the code, never the text. Surviving dispute reasons and abuse flags are printed (--drop-reasons nulls all reasons) and the run waits for a yes before writing.
+names. A row whose Code is not a CPT/HCPCS code in the crosswalk is dropped and reported. A
+dispute's reasoning is cut to 280 characters and dropped when it looks like PHI (a date of
+birth, a record number, "Mr./Mrs./Ms." plus a name); a display name gets the same scan. A drop is
+reported on the screen with the code, never the text. Every new row (code, verdict, credential,
+name, and a dispute's reason) and the abuse flags are printed (--drop-reasons nulls all reasons)
+and the run waits for a yes before writing.
 """
 import argparse
 import csv
@@ -27,6 +30,7 @@ from crosswalk.mappings import CROSSWALK_DIR   # noqa: E402
 from crosswalk.status import INPATIENT_CREDS   # noqa: E402
 
 REVIEWS = CROSSWALK_DIR / "reviews.json"
+CROSSWALK_JSON = fetch.DERIVED / "crosswalk.json"
 CLAIMS = CROSSWALK_DIR / "claims.json"
 CREDENTIALS = ("CCS", "CCS-P", "CIC", "CPC", "COC", "CDIP", "CCDS", "RHIA", "RHIT", "MD or DO", "RN", "Other")
 _CRED_ALIASES = {"MD/DO": "MD or DO", "MD": "MD or DO", "DO": "MD or DO"}
@@ -44,6 +48,7 @@ _PHI = (re.compile(r"\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b"), re.compile(r"\b\d{4}-\
         re.compile(r"\b\d{1,2}(?:st|nd|rd|th)?\s+(?i:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\b"),
         re.compile(r"\b(?i:dr|mr|mrs|ms|patient|pt)\.?\s+[A-Z][a-z]+"))
 _FP = re.compile(r"\b[0-9a-f]{8}\b")
+_CODE = re.compile(r"^[0-9A-Z]\d{3}[0-9A-Z]$")
 _TS_FORMATS = ("%m/%d/%Y %H:%M:%S", "%Y-%m-%d %H:%M:%S", "%Y/%m/%d %H:%M:%S", "%m/%d/%Y %H:%M")
 
 
@@ -86,13 +91,13 @@ def _read(path):
 
 
 def _clean_name(value, log, code):
-    value = fetch.squash(value or "")[:NAME_LIMIT]
+    value = fetch.squash(value or "")
     if not value:
         return None
-    if "@" in value or has_phi(value):
+    if "@" in value or has_phi(value):    # scan the whole name before cutting it, as for a reason
         log.append("%s: a display name was dropped (email or PHI-like)" % code)
         return None
-    return value
+    return value[:NAME_LIMIT]
 
 
 def _clean_reason(parts, log, code):
@@ -105,8 +110,14 @@ def _clean_reason(parts, log, code):
     return text[:REASON_LIMIT]
 
 
-def parse_rows(agree_path, wrong_path, log):
-    """Review rows from the two CSV exports, in timestamp order."""
+def crosswalk_codes(path=None):
+    """The codes in crosswalk.json: the only codes a review can be about."""
+    return set(fetch.read_json(path or CROSSWALK_JSON)["codes"])
+
+
+def parse_rows(agree_path, wrong_path, log, codes):
+    """Review rows from the two CSV exports, in timestamp order. codes: the crosswalk's codes; a row
+    whose Code is not a CPT/HCPCS code among them is dropped (and logged)."""
     rows = []
     for path, verdict in ((agree_path, "agree"), (wrong_path, "wrong")):
         cols, records = _read(path)
@@ -117,6 +128,12 @@ def parse_rows(agree_path, wrong_path, log):
             when = _parse_ts(get("timestamp"))
             if not code or not fp or not when:
                 log.append("%s row %d skipped (missing code, fingerprint or timestamp)" % (Path(path).name, number))
+                continue
+            if not _CODE.match(code):     # the value is not echoed: a free-typed Code field could hold anything
+                log.append("%s row %d skipped (Code is not a CPT/HCPCS code)" % (Path(path).name, number))
+                continue
+            if code not in codes:
+                log.append("%s row %d skipped (%s is not in the crosswalk)" % (Path(path).name, number, code))
                 continue
             reason = None
             if verdict == "wrong":
@@ -166,12 +183,13 @@ def _key(row):
 
 
 def ingest(agree_path, wrong_path, claims_path=None, reviews_path=None, claims_out=None, yes=False,
-           confirm=input, out=sys.stdout, drop_reasons=False):
+           confirm=input, out=sys.stdout, drop_reasons=False, codes=None):
     """Merge the exports into reviews.json (rows already there are kept; a repeated export adds
-    nothing). Returns the number of new rows, or None when the human said no."""
+    nothing). codes: the crosswalk's codes (default: crosswalk.json's). Returns the number of new
+    rows, or None when the human said no."""
     reviews_path = reviews_path or REVIEWS
     log = []
-    rows = parse_rows(agree_path, wrong_path, log)
+    rows = parse_rows(agree_path, wrong_path, log, crosswalk_codes() if codes is None else codes)
     if drop_reasons:
         for row in rows:
             row["reason"] = None
@@ -184,7 +202,9 @@ def ingest(agree_path, wrong_path, claims_path=None, reviews_path=None, claims_o
     flags = abuse_flags(rows)
     for line in flags:
         print("FLAG: " + line, file=out)
-    for row in new:
+    for row in new:     # everything that will be written and published, for a human to read first
+        print("NEW (%s, %s): %s, credential %s, name %s" % (row["code"], row["ts"], row["verdict"], row["credential"],
+                                                            row["name"] or "(none)"), file=out)
         if row["reason"]:
             print("REASON (%s, %s): %s" % (row["code"], row["ts"], row["reason"]), file=out)
     print("%d new review row(s), %d already present, %d flag(s)." % (len(new), len(rows) - len(new), len(flags)), file=out)

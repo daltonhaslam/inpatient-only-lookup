@@ -98,16 +98,27 @@ def tier(code, passes, final, ref):
     return {"tier": 1, "why": TIER1_WHY}
 
 
+def reviewer_key(row):
+    """Who gave a review, as far as the form can tell: the display name (case and spacing folded)
+    when one was given, else "anon:" + credential + ":" + the timestamp to the hour. Two rows with one
+    key count as one reviewer."""
+    name = " ".join((row.get("name") or "").split()).casefold()
+    if name:
+        return "name:" + name
+    return "anon:%s:%s" % (row.get("credential"), (row.get("ts") or row.get("date") or "")[:13])
+
+
 def review_status(code, fp, reviews, resolutions, tier=None):
     """tier is the number or the dict tier() returns.
 
     {"status", "agrees", "disputes", "stale", "last"} for one code at its current fingerprint.
 
-    agrees/disputes count reviews of the current fingerprint; stale counts reviews of an older
+    agrees/disputes count review rows of the current fingerprint; stale counts rows of an older
     one, which never count. Any current dispute makes the status "disputed" until the mapping
-    changes or a resolution settles it. Confirmed: two agrees including an inpatient credential;
-    a Tier 3 code needs a resolution instead (two agrees show "agree-needs-tiebreak"). Two agrees
-    with no inpatient credential stay "one-agrees" and carry needs_inpatient_credential.
+    changes or a resolution settles it. Agreements count by reviewer (reviewer_key), not by row:
+    confirmed needs two distinct reviewers who agree, at least one with an inpatient credential;
+    a Tier 3 code needs a resolution instead (two reviewers show "agree-needs-tiebreak"). Two
+    reviewers with no inpatient credential stay "one-agrees" and carry needs_inpatient_credential.
     """
     tier_number = tier.get("tier") if isinstance(tier, dict) else tier
     mine = [row for row in reviews if row["code"] == code]
@@ -120,7 +131,7 @@ def review_status(code, fp, reviews, resolutions, tier=None):
         result["status"] = "confirmed"
     elif disputes:
         result["status"] = "disputed"
-    elif len(agrees) >= 2:
+    elif len({reviewer_key(row) for row in agrees}) >= 2:
         if not any(row["credential"] in INPATIENT_CREDS for row in agrees):
             result["status"] = "one-agrees"
             result["needs_inpatient_credential"] = True

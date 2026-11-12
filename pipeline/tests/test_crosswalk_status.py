@@ -98,9 +98,9 @@ class Tiering(unittest.TestCase):
         self.assertEqual(status.review_status("X", "00000000", [], {}, result["tier"])["status"], "unreviewed")
 
 
-def review(verdict="agree", credential="CCS", fp="aaaa1111", date="2026-11-12", code="X"):
+def review(verdict="agree", credential="CCS", fp="aaaa1111", date="2026-11-12", code="X", name=None, ts=None):
     return {"code": code, "fp": fp, "credential": credential, "verdict": verdict, "date": date,
-            "name": None, "reason": None}
+            "ts": ts or date + " 09:00:00", "name": name, "reason": None}
 
 
 class ReviewStatus(unittest.TestCase):
@@ -118,13 +118,32 @@ class ReviewStatus(unittest.TestCase):
         self.assertEqual((result["status"], result["agrees"], result["last"]), ("confirmed", 2, "2026-11-13"))
 
     def test_two_cpc_agrees_do_not_confirm(self):
-        result = self.status([review(credential="CPC"), review(credential="CPC")])
+        result = self.status([review(credential="CPC"), review(credential="CPC", date="2026-11-13")])
         self.assertEqual(result["status"], "one-agrees")
         self.assertTrue(result["needs_inpatient_credential"])
 
     def test_tier_3_two_agrees_need_tiebreak(self):
-        self.assertEqual(self.status([review(), review()], tier=3)["status"], "agree-needs-tiebreak")
-        self.assertEqual(self.status([review(), review()], tier={"tier": 3, "why": ""})["status"], "agree-needs-tiebreak")
+        two = [review(), review(date="2026-11-13")]
+        self.assertEqual(self.status(two, tier=3)["status"], "agree-needs-tiebreak")
+        self.assertEqual(self.status(two, tier={"tier": 3, "why": ""})["status"], "agree-needs-tiebreak")
+
+    def test_one_named_reviewer_agreeing_twice_does_not_confirm(self):
+        rows = [review(name="Jane Doe", credential="CCS"), review(name="  jane   DOE ", credential="CIC", date="2026-11-13")]
+        result = self.status(rows)
+        self.assertEqual((result["status"], result["agrees"]), ("one-agrees", 2))
+        self.assertNotIn("needs_inpatient_credential", result)
+        self.assertEqual(self.status(rows + [review(name="Sam Lee", credential="CPC")])["status"], "confirmed")
+
+    def test_anonymous_reviewers_count_by_credential_and_hour(self):
+        same_hour = [review(ts="2026-11-12 09:05:00"), review(ts="2026-11-12 09:55:00")]
+        self.assertEqual(self.status(same_hour)["status"], "one-agrees")
+        self.assertEqual(self.status([review(ts="2026-11-12 09:05:00"), review(ts="2026-11-12 10:05:00")])["status"], "confirmed")
+        self.assertEqual(self.status([review(ts="2026-11-12 09:05:00"), review(credential="CPC", ts="2026-11-12 09:06:00")])["status"],
+                         "confirmed")
+
+    def test_reviewer_key(self):
+        self.assertEqual(status.reviewer_key(review(name=" Jane  Doe ")), "name:jane doe")
+        self.assertEqual(status.reviewer_key(review(credential="CIC", ts="2026-11-12 14:59:59")), "anon:CIC:2026-11-12 14")
 
     def test_old_fingerprint_is_stale(self):
         result = self.status([review(fp="oldoldol")])
@@ -143,11 +162,15 @@ class ReviewStatus(unittest.TestCase):
         self.assertEqual(self.status([review(code="Y")])["status"], "unreviewed")
 
 
+CODES = {"32480", "44150", "48150"}
+
+
 class Ingest(unittest.TestCase):
     def run_ingest(self, directory, **kwargs):
         out = io.StringIO()
         path = Path(directory) / "reviews.json"
         path.write_text("[]")
+        kwargs.setdefault("codes", CODES)
         count = reviews.ingest(FIXTURES / "review_agree.csv", FIXTURES / "review_wrong.csv", reviews_path=path, out=out, **kwargs)
         return count, json.loads(path.read_text()), out.getvalue()
 
@@ -234,6 +257,51 @@ class Ingest(unittest.TestCase):
             reviews.ingest(FIXTURES / "review_agree.csv", ok, reviews_path=path, out=io.StringIO(),
                            yes=True, drop_reasons=True)
             self.assertTrue(all(r["reason"] is None for r in json.loads(path.read_text())))
+
+    def test_rows_whose_code_is_not_a_crosswalk_code_are_dropped_and_reported(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            agree = Path(tmp) / "a.csv"
+            agree.write_text("Timestamp,Code,Mapping reviewed,Your credential,Name to show in the credit list\n"
+                             "11/12/2026 09:00:00,32480,aaaa1111 x,CCS,\n"
+                             "11/12/2026 09:01:00,<b>hi</b>,aaaa1111 x,CCS,\n"
+                             '11/12/2026 09:02:00,"=HYPERLINK(""https://evil.test"")",aaaa1111 x,CCS,\n'
+                             "11/12/2026 09:03:00,99213,aaaa1111 x,CCS,\n"
+                             "11/12/2026 09:04:00,3248,aaaa1111 x,CCS,\n")
+            path = Path(tmp) / "reviews.json"
+            out = io.StringIO()
+            count = reviews.ingest(agree, self._wrong_csv(tmp, "ok"), reviews_path=path, out=out, yes=True, codes=CODES)
+            self.assertEqual(count, 2)
+            self.assertEqual(sorted(r["code"] for r in json.loads(path.read_text())), ["32480", "48150"])
+            printed = out.getvalue()
+            self.assertIn("a.csv row 3 skipped (Code is not a CPT/HCPCS code)", printed)
+            self.assertIn("a.csv row 4 skipped (Code is not a CPT/HCPCS code)", printed)
+            self.assertIn("a.csv row 5 skipped (99213 is not in the crosswalk)", printed)
+            self.assertIn("a.csv row 6 skipped (Code is not a CPT/HCPCS code)", printed)
+            self.assertNotIn("HYPERLINK", printed)
+            self.assertNotIn("<b>", printed)
+
+    def test_default_code_set_is_the_crosswalk(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            doc = Path(tmp) / "crosswalk.json"
+            doc.write_text(json.dumps({"meta": {}, "codes": {"32480": {}, "0095T": {}}}))
+            self.assertEqual(reviews.crosswalk_codes(doc), {"32480", "0095T"})
+
+    def test_display_name_gets_the_phi_scan_before_it_is_cut(self):
+        log = []
+        self.assertIsNone(reviews._clean_name("Mrs Garcia", log, "X"))
+        self.assertIsNone(reviews._clean_name("x" * 85 + " 123-45-6789", log, "X"))
+        self.assertEqual(len(log), 2)
+        self.assertTrue(all("123-45-6789" not in line and "Garcia" not in line for line in log))
+        self.assertEqual(reviews._clean_name("  Jane   Doe, CCS ", log, "X"), "Jane Doe, CCS")
+        self.assertEqual(len(reviews._clean_name("y" * 100, log, "X")), reviews.NAME_LIMIT)
+
+    def test_preview_shows_code_credential_and_name_of_every_new_row(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _, rows, printed = self.run_ingest(tmp, yes=True)
+            self.assertEqual(printed.count("NEW ("), len(rows))
+            self.assertIn("NEW (32480, 2026-11-12 09:00:00): agree, credential CCS, name Jane Doe, CCS", printed)
+            self.assertIn("NEW (32480, 2026-11-12 09:30:00): agree, credential MD or DO, name (none)", printed)
+            self.assertIn("NEW (48150, 2026-11-12 11:00:00): wrong, credential CIC, name (none)", printed)
 
     def test_credential_normalization(self):
         self.assertEqual([reviews.normalize_credential(v) for v in ("ccs-p", "MD/DO", "md or do", "Nurse", "")],

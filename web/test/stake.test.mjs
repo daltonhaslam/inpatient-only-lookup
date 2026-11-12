@@ -147,6 +147,7 @@ describe('revenue at stake', { skip }, () => {
       assert.ok(decode(html).includes(claimHref(batch.id)), `no claim link for ${batch.id}`);
     }
     assert.match(textOf(html), /\d+ of \d+/);
+    assert.ok(textOf(html).includes('Agreements under the same name count as one reviewer.'), 'help page does not say how reviewers are counted');
   });
 
   test('main page: badge, guardrail, years, progress, downloads, a row per code', () => {
