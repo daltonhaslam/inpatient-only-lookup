@@ -1,0 +1,97 @@
+[
+ {
+  "code": "32480",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BTC0ZZ"
+    ],
+    "note": "right upper lobe"
+   },
+   {
+    "codes": [
+     "0BTD0ZZ"
+    ],
+    "note": "right middle lobe"
+   },
+   {
+    "codes": [
+     "0BTF0ZZ"
+    ],
+    "note": "right lower lobe"
+   },
+   {
+    "codes": [
+     "0BTG0ZZ"
+    ],
+    "note": "left upper lobe"
+   },
+   {
+    "codes": [
+     "0BTJ0ZZ"
+    ],
+    "note": "left lower lobe"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C3411",
+    "condition": "lung cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fixture pass B: Resection, lung lobe, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "44150",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DTE0ZZ",
+     "0D1B0Z4"
+    ],
+    "note": "end ileostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K5190",
+    "condition": "ulcerative colitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fixture pass B: Resection of large intestine with ileostomy bypass.",
+  "confidence": "high"
+ },
+ {
+  "code": "48150",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FBG0ZZ",
+     "0DT90ZZ",
+     "0DB60ZZ",
+     "0F190ZB",
+     "0D160ZA"
+    ],
+    "note": "standard Whipple"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fixture pass B: pancreatic head cancer only.",
+  "confidence": "medium"
+ }
+]

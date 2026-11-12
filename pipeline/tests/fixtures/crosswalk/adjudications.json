@@ -1,0 +1,33 @@
+{
+ "48150": {
+  "code": "48150",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FBG0ZZ",
+     "0DT90ZZ",
+     "0DB60ZZ",
+     "0F190ZB",
+     "0D160ZA"
+    ],
+    "note": "standard Whipple"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   },
+   {
+    "code": "C170",
+    "condition": "duodenal cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Fixture adjudication: keep both families; duodenal cancer moves the case to MDC 06.",
+  "confidence": "medium"
+ }
+}
