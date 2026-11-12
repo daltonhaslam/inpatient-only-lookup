@@ -1,0 +1,1357 @@
+[
+ {
+  "code": "31382",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CBS0ZZ"
+    ],
+    "note": "partial larynx via open thyrotomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C320",
+    "condition": "glottic cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Vertical hemilaryngectomy takes out part of the larynx (one cord plus thyroid ala) through an open neck approach = Excision, larynx, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "31390",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CTS0ZZ",
+     "0CBM0ZZ",
+     "07T10ZZ"
+    ],
+    "note": "right radical neck dissection"
+   },
+   {
+    "codes": [
+     "0CTS0ZZ",
+     "0CBM0ZZ",
+     "07T20ZZ"
+    ],
+    "note": "left radical neck dissection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C139",
+    "condition": "hypopharyngeal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Whole larynx removed (Resection) with the involved part of the pharynx (Excision, closed primarily) plus radical neck dissection (Resection, neck lymphatic); three distinct objectives.",
+  "confidence": "medium"
+ },
+ {
+  "code": "31395",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0CTS0ZZ",
+     "0CRM07Z",
+     "0DBA0ZZ",
+     "07T10ZZ"
+    ],
+    "note": "total pharynx replaced by free jejunal flap; right neck"
+   },
+   {
+    "codes": [
+     "0CTS0ZZ",
+     "0CRM07Z",
+     "0DBA0ZZ",
+     "07T20ZZ"
+    ],
+    "note": "total pharynx replaced by free jejunal flap; left neck"
+   },
+   {
+    "codes": [
+     "0CTS0ZZ",
+     "0CBM0ZZ",
+     "0KXH0Z2",
+     "07T10ZZ"
+    ],
+    "note": "partial pharynx, pedicled right pectoralis myocutaneous flap; right neck"
+   },
+   {
+    "codes": [
+     "0CTS0ZZ",
+     "0CBM0ZZ",
+     "0KXJ0Z2",
+     "07T20ZZ"
+    ],
+    "note": "partial pharynx, pedicled left pectoralis myocutaneous flap; left neck"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C139",
+    "condition": "hypopharyngeal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laryngectomy (Resection) plus neck dissection, with the pharyngeal defect rebuilt either by free autologous tissue (Replacement of pharynx, removal included, plus separate donor-site Excision) or by a pedicled chest flap (Transfer).",
+  "confidence": "medium"
+ },
+ {
+  "code": "31725",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BC38ZZ"
+    ],
+    "note": "right main bronchus"
+   },
+   {
+    "codes": [
+     "0BC78ZZ"
+    ],
+    "note": "left main bronchus"
+   },
+   {
+    "codes": [
+     "0BC18ZZ"
+    ],
+    "note": "trachea"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J9601",
+    "condition": "acute hypoxic respiratory failure",
+    "role": "typical"
+   },
+   {
+    "code": "J189",
+    "condition": "pneumonia",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Scope passed through the airway to suction out mucus plugs/secretions = Extirpation of matter, airway, via natural opening endoscopic; non-OR, so the stay groups medically.",
+  "confidence": "medium"
+ },
+ {
+  "code": "31760",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BU10JZ"
+    ],
+    "note": "posterior mesh splinting of trachea (malacia)"
+   },
+   {
+    "codes": [
+     "0BQ10ZZ"
+    ],
+    "note": "repair without device"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J398",
+    "condition": "tracheal stenosis/malacia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open intrathoracic reconstruction of the trachea; reinforcing with a mesh splint = Supplement with synthetic substitute; plain plasty without device = Repair.",
+  "confidence": "medium"
+ },
+ {
+  "code": "31766",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BT20ZZ"
+    ],
+    "note": "full carinal resection"
+   },
+   {
+    "codes": [
+     "0BB20ZZ"
+    ],
+    "note": "partial carinal resection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C33",
+    "condition": "tracheal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Carina taken out and the trachea re-joined to the main bronchi; Resection of carina when the whole carina goes, Excision when part; anastomosis not coded.",
+  "confidence": "medium"
+ },
+ {
+  "code": "31770",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BU307Z"
+    ],
+    "note": "right main bronchus, autologous graft"
+   },
+   {
+    "codes": [
+     "0BU707Z"
+    ],
+    "note": "left main bronchus, autologous graft"
+   },
+   {
+    "codes": [
+     "0BU30JZ"
+    ],
+    "note": "right main bronchus, synthetic graft"
+   },
+   {
+    "codes": [
+     "0BU70JZ"
+    ],
+    "note": "left main bronchus, synthetic graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J9809",
+    "condition": "bronchial stenosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Bronchus widened/reinforced with a graft patch = Supplement of bronchus, open; device value by graft type.",
+  "confidence": "medium"
+ },
+ {
+  "code": "31775",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BB30ZZ"
+    ],
+    "note": "right main bronchus"
+   },
+   {
+    "codes": [
+     "0BB70ZZ"
+    ],
+    "note": "left main bronchus"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J9809",
+    "condition": "bronchial stenosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Narrowed segment of bronchus cut out and ends rejoined = Excision of bronchus, open; anastomosis not coded.",
+  "confidence": "medium"
+ },
+ {
+  "code": "31780",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BB10ZZ"
+    ],
+    "note": "cervical trachea segment"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J398",
+    "condition": "tracheal stenosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Stenotic tracheal segment cut out through the neck and ends rejoined = Excision, trachea, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "31781",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BB10ZZ"
+    ],
+    "note": "cervicothoracic trachea segment"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J398",
+    "condition": "tracheal stenosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Same objective as the cervical version over a longer segment = Excision, trachea, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "31786",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BB10ZZ"
+    ],
+    "note": "thoracic trachea tumor"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C33",
+    "condition": "tracheal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Tumor and part of the intrathoracic trachea cut out = Excision, trachea, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "31800",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BQ10ZZ"
+    ],
+    "note": "cervical trachea"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S11021A",
+    "condition": "tracheal laceration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Suturing a traumatic tear of the neck trachea = Repair, trachea, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "31805",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BQ10ZZ"
+    ],
+    "note": "thoracic trachea"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S2753XA",
+    "condition": "thoracic tracheal laceration",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Suturing a traumatic tear of the intrathoracic trachea = Repair, trachea, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "32035",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W9900Z"
+    ],
+    "note": "right pleural cavity"
+   },
+   {
+    "codes": [
+     "0W9B00Z"
+    ],
+    "note": "left pleural cavity"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J869",
+    "condition": "empyema",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Objective is draining the empyema cavity through an open window with a tube left in = Drainage, pleural cavity, with drainage device; rib removal is access only.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32036",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W990ZZ"
+    ],
+    "note": "right pleural cavity"
+   },
+   {
+    "codes": [
+     "0W9B0ZZ"
+    ],
+    "note": "left pleural cavity"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J869",
+    "condition": "empyema",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open window drainage kept patent by a skin flap = Drainage, pleural cavity, open, no device; the flap is the means of drainage, not a separate objective.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32096",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BBC0ZX"
+    ],
+    "note": "right upper lobe"
+   },
+   {
+    "codes": [
+     "0BBD0ZX"
+    ],
+    "note": "right middle lobe"
+   },
+   {
+    "codes": [
+     "0BBF0ZX"
+    ],
+    "note": "right lower lobe"
+   },
+   {
+    "codes": [
+     "0BBG0ZX"
+    ],
+    "note": "left upper lobe"
+   },
+   {
+    "codes": [
+     "0BBH0ZX"
+    ],
+    "note": "lingula"
+   },
+   {
+    "codes": [
+     "0BBJ0ZX"
+    ],
+    "note": "left lower lobe"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J849",
+    "condition": "interstitial lung disease",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open wedge of lung tissue for diagnosis = Excision, lung lobe, open, diagnostic qualifier; one set per lobe sampled.",
+  "confidence": "high"
+ },
+ {
+  "code": "32097",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BBC0ZX"
+    ],
+    "note": "right upper lobe"
+   },
+   {
+    "codes": [
+     "0BBD0ZX"
+    ],
+    "note": "right middle lobe"
+   },
+   {
+    "codes": [
+     "0BBF0ZX"
+    ],
+    "note": "right lower lobe"
+   },
+   {
+    "codes": [
+     "0BBG0ZX"
+    ],
+    "note": "left upper lobe"
+   },
+   {
+    "codes": [
+     "0BBH0ZX"
+    ],
+    "note": "lingula"
+   },
+   {
+    "codes": [
+     "0BBJ0ZX"
+    ],
+    "note": "left lower lobe"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "R911",
+    "condition": "lung nodule",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open wedge of a nodule for diagnosis = Excision, lung lobe, open, diagnostic; final pathology may replace the nodule dx with cancer (same family).",
+  "confidence": "medium"
+ },
+ {
+  "code": "32098",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BBN0ZX"
+    ],
+    "note": "right pleura"
+   },
+   {
+    "codes": [
+     "0BBP0ZX"
+    ],
+    "note": "left pleura"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J90",
+    "condition": "pleural effusion",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open sample of pleura for diagnosis = Excision, pleura, open, diagnostic.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32100",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WJ90ZZ"
+    ],
+    "note": "right chest"
+   },
+   {
+    "codes": [
+     "0WJB0ZZ"
+    ],
+    "note": "left chest"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C3490",
+    "condition": "lung cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Chest opened and looked through with no other definitive procedure = Inspection, pleural cavity, open; typical scenario is unresectable tumor found at thoracotomy.",
+  "confidence": "low"
+ },
+ {
+  "code": "32110",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W390ZZ"
+    ],
+    "note": "bleeding, right chest"
+   },
+   {
+    "codes": [
+     "0W3B0ZZ"
+    ],
+    "note": "bleeding, left chest"
+   },
+   {
+    "codes": [
+     "0BQK0ZZ"
+    ],
+    "note": "suture of right lung tear"
+   },
+   {
+    "codes": [
+     "0BQL0ZZ"
+    ],
+    "note": "suture of left lung tear"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S271XXA",
+    "condition": "traumatic hemothorax",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Thoracotomy to stop acute bleeding = Control bleeding, pleural cavity; when the work is suturing a torn lung = Repair, lung.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32120",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W390ZZ"
+    ],
+    "note": "right chest"
+   },
+   {
+    "codes": [
+     "0W3B0ZZ"
+    ],
+    "note": "left chest"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J95830",
+    "condition": "postoperative chest bleeding",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Return to the chest is most often for postoperative bleeding = Control bleeding, pleural cavity (clot evacuation included).",
+  "confidence": "low"
+ },
+ {
+  "code": "32124",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BNK0ZZ"
+    ],
+    "note": "right lung"
+   },
+   {
+    "codes": [
+     "0BNL0ZZ"
+    ],
+    "note": "left lung"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J948",
+    "condition": "pleural adhesions",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cutting adhesions to free the lung, nothing removed = Release, lung, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32140",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BBC0ZZ"
+    ],
+    "note": "right upper lobe"
+   },
+   {
+    "codes": [
+     "0BBD0ZZ"
+    ],
+    "note": "right middle lobe"
+   },
+   {
+    "codes": [
+     "0BBF0ZZ"
+    ],
+    "note": "right lower lobe"
+   },
+   {
+    "codes": [
+     "0BBG0ZZ"
+    ],
+    "note": "left upper lobe"
+   },
+   {
+    "codes": [
+     "0BBH0ZZ"
+    ],
+    "note": "lingula"
+   },
+   {
+    "codes": [
+     "0BBJ0ZZ"
+    ],
+    "note": "left lower lobe"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J984",
+    "condition": "lung cyst",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cysts cut out of lung tissue, lobe left in place = Excision, lung lobe, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32141",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BBC0ZZ"
+    ],
+    "note": "right upper lobe"
+   },
+   {
+    "codes": [
+     "0BBD0ZZ"
+    ],
+    "note": "right middle lobe"
+   },
+   {
+    "codes": [
+     "0BBF0ZZ"
+    ],
+    "note": "right lower lobe"
+   },
+   {
+    "codes": [
+     "0BBG0ZZ"
+    ],
+    "note": "left upper lobe"
+   },
+   {
+    "codes": [
+     "0BBH0ZZ"
+    ],
+    "note": "lingula"
+   },
+   {
+    "codes": [
+     "0BBJ0ZZ"
+    ],
+    "note": "left lower lobe"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J439",
+    "condition": "bullous emphysema",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Bullae cut out of lung tissue (bullectomy) = Excision, lung lobe, open; plication variant has no better PCS fit.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32150",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WC90ZZ"
+    ],
+    "note": "right pleural space"
+   },
+   {
+    "codes": [
+     "0WCB0ZZ"
+    ],
+    "note": "left pleural space"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J942",
+    "condition": "clotted hemothorax",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Taking solid matter (clot/fibrin or a foreign object) out of the pleural space = Extirpation, pleural cavity, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32151",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BCC0ZZ"
+    ],
+    "note": "right upper lobe"
+   },
+   {
+    "codes": [
+     "0BCD0ZZ"
+    ],
+    "note": "right middle lobe"
+   },
+   {
+    "codes": [
+     "0BCF0ZZ"
+    ],
+    "note": "right lower lobe"
+   },
+   {
+    "codes": [
+     "0BCG0ZZ"
+    ],
+    "note": "left upper lobe"
+   },
+   {
+    "codes": [
+     "0BCH0ZZ"
+    ],
+    "note": "lingula"
+   },
+   {
+    "codes": [
+     "0BCJ0ZZ"
+    ],
+    "note": "left lower lobe"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T17898A",
+    "condition": "lung foreign body",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Foreign object taken out of lung tissue = Extirpation of matter, lung lobe, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32160",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "02QA0ZZ"
+    ],
+    "note": "open chest cardiac massage"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I469",
+    "condition": "cardiac arrest",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Direct manual compression of the heart through an open chest; PCS indexes open cardiac massage to Repair, heart, open.",
+  "confidence": "low"
+ },
+ {
+  "code": "32200",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0B9C00Z"
+    ],
+    "note": "right upper lobe"
+   },
+   {
+    "codes": [
+     "0B9D00Z"
+    ],
+    "note": "right middle lobe"
+   },
+   {
+    "codes": [
+     "0B9F00Z"
+    ],
+    "note": "right lower lobe"
+   },
+   {
+    "codes": [
+     "0B9G00Z"
+    ],
+    "note": "left upper lobe"
+   },
+   {
+    "codes": [
+     "0B9H00Z"
+    ],
+    "note": "lingula"
+   },
+   {
+    "codes": [
+     "0B9J00Z"
+    ],
+    "note": "left lower lobe"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J852",
+    "condition": "lung abscess",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open drainage of an abscess cavity in the lung with a tube left in = Drainage, lung lobe, with drainage device.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32215",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0B5N0ZZ"
+    ],
+    "note": "right pleura"
+   },
+   {
+    "codes": [
+     "0B5P0ZZ"
+    ],
+    "note": "left pleura"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J9312",
+    "condition": "secondary pneumothorax",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Mechanical abrasion of the pleura to make it scar and fuse = Destruction, pleura, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32220",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BCN0ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0BCP0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J869",
+    "condition": "empyema",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Stripping the fibrous peel off the lung surface = Extirpation of matter from pleura, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32225",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BCN0ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0BCP0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J869",
+    "condition": "empyema",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Partial peel removal, same objective as total = Extirpation of matter from pleura, open.",
+  "confidence": "medium"
+ },
+ {
+  "code": "32310",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BBN0ZZ"
+    ],
+    "note": "right parietal pleura"
+   },
+   {
+    "codes": [
+     "0BBP0ZZ"
+    ],
+    "note": "left parietal pleura"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J9312",
+    "condition": "recurrent pneumothorax",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Parietal layer removed, visceral left = Excision, pleura, open (no Resection value for pleura).",
+  "confidence": "medium"
+ },
+ {
+  "code": "32320",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BCN0ZZ",
+     "0BBN0ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0BCP0ZZ",
+     "0BBP0ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J869",
+    "condition": "empyema",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Two root operations on the pleura: peel removal (Extirpation) plus parietal pleurectomy (Excision).",
+  "confidence": "medium"
+ },
+ {
+  "code": "32440",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BTK0ZZ"
+    ],
+    "note": "right lung"
+   },
+   {
+    "codes": [
+     "0BTL0ZZ"
+    ],
+    "note": "left lung"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C3411",
+    "condition": "lung cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Entire lung removed = Resection, lung, open.",
+  "confidence": "high"
+ },
+ {
+  "code": "32442",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BTK0ZZ",
+     "0BB20ZZ"
+    ],
+    "note": "right sleeve"
+   },
+   {
+    "codes": [
+     "0BTL0ZZ",
+     "0BB20ZZ"
+    ],
+    "note": "left sleeve"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C3401",
+    "condition": "main bronchus cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Whole lung removed (Resection) plus the carina cut out and trachea joined to the other main bronchus (Excision, carina).",
+  "confidence": "medium"
+ },
+ {
+  "code": "32445",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BTK0ZZ",
+     "0BBN0ZZ",
+     "0BRT0JZ",
+     "02RN0JZ"
+    ],
+    "note": "right, diaphragm and pericardium patched"
+   },
+   {
+    "codes": [
+     "0BTL0ZZ",
+     "0BBP0ZZ",
+     "0BRT0JZ",
+     "02RN0JZ"
+    ],
+    "note": "left, diaphragm and pericardium patched"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C450",
+    "condition": "pleural mesothelioma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Lung resected en bloc with parietal pleura (Excision), hemidiaphragm and pericardium removed and replaced by synthetic patches (Replacement, removal included).",
+  "confidence": "medium"
+ },
+ {
+  "code": "32480",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BTC0ZZ"
+    ],
+    "note": "right upper lobe"
+   },
+   {
+    "codes": [
+     "0BTD0ZZ"
+    ],
+    "note": "right middle lobe"
+   },
+   {
+    "codes": [
+     "0BTF0ZZ"
+    ],
+    "note": "right lower lobe"
+   },
+   {
+    "codes": [
+     "0BTG0ZZ"
+    ],
+    "note": "left upper lobe"
+   },
+   {
+    "codes": [
+     "0BTJ0ZZ"
+    ],
+    "note": "left lower lobe"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C3411",
+    "condition": "lung cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "One whole lobe removed = Resection, lung lobe, open; one set per lobe.",
+  "confidence": "high"
+ },
+ {
+  "code": "32482",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BTC0ZZ",
+     "0BTD0ZZ"
+    ],
+    "note": "upper + middle"
+   },
+   {
+    "codes": [
+     "0BTD0ZZ",
+     "0BTF0ZZ"
+    ],
+    "note": "middle + lower"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C3411",
+    "condition": "lung cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Two whole right lobes removed = two Resection codes, one per lobe.",
+  "confidence": "high"
+ },
+ {
+  "code": "32484",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BBC0ZZ"
+    ],
+    "note": "right upper lobe segment"
+   },
+   {
+    "codes": [
+     "0BBF0ZZ"
+    ],
+    "note": "right lower lobe segment"
+   },
+   {
+    "codes": [
+     "0BBG0ZZ"
+    ],
+    "note": "left upper lobe segment"
+   },
+   {
+    "codes": [
+     "0BBJ0ZZ"
+    ],
+    "note": "left lower lobe segment"
+   },
+   {
+    "codes": [
+     "0BTH0ZZ"
+    ],
+    "note": "lingulectomy"
+   },
+   {
+    "codes": [
+     "0BBD0ZZ"
+    ],
+    "note": "right middle lobe segment"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C3411",
+    "condition": "lung cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "A segment is part of a lobe = Excision, lung lobe; lingula is its own PCS body part, so removing it whole = Resection.",
+  "confidence": "high"
+ },
+ {
+  "code": "32486",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BTC0ZZ",
+     "0BB30ZZ"
+    ],
+    "note": "right upper sleeve"
+   },
+   {
+    "codes": [
+     "0BTG0ZZ",
+     "0BB70ZZ"
+    ],
+    "note": "left upper sleeve"
+   },
+   {
+    "codes": [
+     "0BTF0ZZ",
+     "0BB30ZZ"
+    ],
+    "note": "right lower sleeve"
+   },
+   {
+    "codes": [
+     "0BTJ0ZZ",
+     "0BB70ZZ"
+    ],
+    "note": "left lower sleeve"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C3411",
+    "condition": "lung cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Lobe removed (Resection) plus a cuff of the main bronchus (bronchus intermedius indexes to right main) cut out and rejoined (Excision, main bronchus).",
+  "confidence": "high"
+ }
+]

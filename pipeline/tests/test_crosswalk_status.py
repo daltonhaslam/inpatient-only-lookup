@@ -175,6 +175,45 @@ class Ingest(unittest.TestCase):
             self.assertEqual(json.loads(claims.read_text()), {"m01": 2, "m02": 1})
             self.assertNotIn("Pat", claims.read_text())
 
+    def test_phi_patterns(self):
+        for text in ("john smith 123-45-6789 born March 3 1960", "born 3 Mar 1960", "Dr. Jones said",
+                     "Patient Lee had it", "pt Garcia", "Mrs Ng", "x" * 300 + " 123-45-6789"):
+            self.assertTrue(reviews.has_phi(text), text)
+        self.assertFalse(reviews.has_phi("Approach differs; use 0FT00ZZ for the open case."))
+
+    def test_phi_scan_runs_before_truncation(self):
+        log = []
+        self.assertIsNone(reviews._clean_reason(["x" * 290 + " 123-45-6789"], log, "X"))
+        self.assertEqual(len(reviews._clean_reason(["y" * 400], log, "X")), 280)
+
+    def _wrong_csv(self, tmp, reason):
+        path = Path(tmp) / "w.csv"
+        path.write_text("Timestamp,Code,Mapping reviewed,Your credential,Your reasoning\n"
+                        '11/12/2026 11:00:00,48150,cccc3333 x,CIC,"%s"\n' % reason)
+        return path
+
+    def test_reviewer_example_dropped_and_survivors_printed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = io.StringIO()
+            path = Path(tmp) / "reviews.json"
+            bad = self._wrong_csv(tmp, "john smith 123-45-6789 born March 3 1960")
+            reviews.ingest(FIXTURES / "review_agree.csv", bad, reviews_path=path, out=out, yes=True)
+            self.assertNotIn("123-45-6789", path.read_text())
+            self.assertNotIn("123-45-6789", out.getvalue())
+            ok = self._wrong_csv(tmp, "PCS approach is off")
+            path.write_text("[]")
+            out = io.StringIO()
+            reviews.ingest(FIXTURES / "review_agree.csv", ok, reviews_path=path, out=out, yes=True)
+            self.assertIn("REASON (48150, 2026-11-12 11:00:00): PCS approach is off", out.getvalue())
+
+    def test_drop_reasons_flag(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "reviews.json"
+            ok = self._wrong_csv(tmp, "PCS approach is off")
+            reviews.ingest(FIXTURES / "review_agree.csv", ok, reviews_path=path, out=io.StringIO(),
+                           yes=True, drop_reasons=True)
+            self.assertTrue(all(r["reason"] is None for r in json.loads(path.read_text())))
+
     def test_credential_normalization(self):
         self.assertEqual([reviews.normalize_credential(v) for v in ("ccs-p", "MD/DO", "md or do", "Nurse", "")],
                          ["CCS-P", "MD or DO", "MD or DO", "Other", "Other"])

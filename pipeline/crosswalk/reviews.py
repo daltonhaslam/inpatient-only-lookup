@@ -9,7 +9,7 @@ export each tab as CSV. Columns are found by question title. Written rows:
 Never written: email addresses, the "where do you code" answer, free text from agree rows, claim
 names. A dispute's reasoning is cut to 280 characters and dropped when it looks like PHI (a
 date of birth, a record number, "Mr./Mrs./Ms." plus a name); the drop is reported on the screen
-with the code, never the text. Abuse flags are printed and the run waits for a yes before writing.
+with the code, never the text. Surviving dispute reasons and abuse flags are printed (--drop-reasons nulls all reasons) and the run waits for a yes before writing.
 """
 import argparse
 import csv
@@ -39,7 +39,10 @@ TITLES = {"timestamp": "Timestamp", "code": "Code", "mapping": "Mapping reviewed
           "name": "Name to show in the credit list", "pcs_which": "If not, which PCS codes",
           "dx_what": "If not, what would you expect", "reasoning": "Your reasoning", "batch": "Batch"}
 _PHI = (re.compile(r"\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b"), re.compile(r"\b\d{4}-\d{2}-\d{2}\b"),
-        re.compile(r"\b\d{6,}\b"), re.compile(r"\b(?:Mr|Mrs|Ms)\.?\s+[A-Z][a-z]+"))
+        re.compile(r"\b\d{6,}\b"), re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),
+        re.compile(r"\b(?i:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s+\d{1,2}\b"),
+        re.compile(r"\b\d{1,2}(?:st|nd|rd|th)?\s+(?i:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\b"),
+        re.compile(r"\b(?i:dr|mr|mrs|ms|patient|pt)\.?\s+[A-Z][a-z]+"))
 _FP = re.compile(r"\b[0-9a-f]{8}\b")
 _TS_FORMATS = ("%m/%d/%Y %H:%M:%S", "%Y-%m-%d %H:%M:%S", "%Y/%m/%d %H:%M:%S", "%m/%d/%Y %H:%M")
 
@@ -93,13 +96,13 @@ def _clean_name(value, log, code):
 
 
 def _clean_reason(parts, log, code):
-    text = "; ".join(" ".join(part.split()) for part in parts if part and part.strip())[:REASON_LIMIT]
+    text = "; ".join(" ".join(part.split()) for part in parts if part and part.strip())
     if not text:
         return None
-    if has_phi(text):
+    if has_phi(text):    # scan everything before cutting, so a pattern past character 280 still counts
         log.append("%s: dispute text dropped (PHI-like pattern); %d characters" % (code, len(text)))
         return None
-    return text
+    return text[:REASON_LIMIT]
 
 
 def parse_rows(agree_path, wrong_path, log):
@@ -163,12 +166,15 @@ def _key(row):
 
 
 def ingest(agree_path, wrong_path, claims_path=None, reviews_path=None, claims_out=None, yes=False,
-           confirm=input, out=sys.stdout):
+           confirm=input, out=sys.stdout, drop_reasons=False):
     """Merge the exports into reviews.json (rows already there are kept; a repeated export adds
     nothing). Returns the number of new rows, or None when the human said no."""
     reviews_path = reviews_path or REVIEWS
     log = []
     rows = parse_rows(agree_path, wrong_path, log)
+    if drop_reasons:
+        for row in rows:
+            row["reason"] = None
     existing = json.loads(reviews_path.read_text()) if reviews_path.is_file() else []
     seen = {_key(row) for row in existing}
     new = [row for row in rows if _key(row) not in seen]
@@ -178,6 +184,9 @@ def ingest(agree_path, wrong_path, claims_path=None, reviews_path=None, claims_o
     flags = abuse_flags(rows)
     for line in flags:
         print("FLAG: " + line, file=out)
+    for row in new:
+        if row["reason"]:
+            print("REASON (%s, %s): %s" % (row["code"], row["ts"], row["reason"]), file=out)
     print("%d new review row(s), %d already present, %d flag(s)." % (len(new), len(rows) - len(new), len(flags)), file=out)
     if claims is not None:
         print("Claims per batch: %s" % (claims or "none"), file=out)
@@ -198,9 +207,10 @@ def main(argv=None):
     cmd.add_argument("agree")
     cmd.add_argument("wrong")
     cmd.add_argument("--claims")
+    cmd.add_argument("--drop-reasons", action="store_true", help="write every dispute reason as null (safest)")
     cmd.add_argument("--yes", action="store_true", help="skip the confirmation (tests)")
     args = parser.parse_args(argv)
-    result = ingest(args.agree, args.wrong, args.claims, yes=args.yes)
+    result = ingest(args.agree, args.wrong, args.claims, yes=args.yes, drop_reasons=args.drop_reasons)
     sys.exit(1 if result is None else 0)
 
 
