@@ -57,6 +57,11 @@ def chunked(items, size):
     return [items[start:start + size] for start in range(0, len(items), size)]
 
 
+def is_anesthesia(code):
+    """An anesthesia CPT code, 00100-01999. All digits: 0095T sorts inside that range as text."""
+    return code.isdigit() and "00100" <= code <= "01999"
+
+
 def mapping_batches():
     """({batch id: [codes]}, {code: reason} for the removed codes that are not mapped)."""
     spans = fetch.read_json(HISTORY)
@@ -64,7 +69,7 @@ def mapping_batches():
     candidates = sorted(removal_dates(spans))
     mappable, unmappable = [], {}
     for code in candidates:
-        if "00100" <= code <= "01999":
+        if is_anesthesia(code):
             unmappable[code] = "anesthesia code"
         elif spans[code]["spans"][-1]["si"] == "N":
             unmappable[code] = "packaged: no separate outpatient payment"
@@ -73,10 +78,6 @@ def mapping_batches():
     mappable.sort(key=lambda code: (labels[code]["group"], code))
     batches = {"m%02d" % (n + 1): chunk for n, chunk in enumerate(chunked(mappable, BATCH_SIZE))}
     return batches, unmappable
-
-
-def _removal_year(code):
-    return removal_dates(fetch.read_json(HISTORY))[code][:4]
 
 
 def cmd_batches(_args):
@@ -96,13 +97,14 @@ def cmd_batch(args):
     apcs = sources.load_apc_titles()
     path = sources._path("addenda-2027")
     descriptors = parse.descriptor_table(path, parse.pick_member(path, history.ADDENDUM_B))
+    removed = removal_dates(fetch.read_json(HISTORY))
     print(REMINDER + "\n")
     for code in batches[args.batch_id]:
         info = labels[code]
         row = opps.get(code, {})
         apc = row.get("apc")
         print("%s  [%s] removed %s  SI %s  APC %s %s" % (
-            code, info["group"], _removal_year(code), row.get("si", "-"), apc or "-", apcs.get(apc, "")))
+            code, info["group"], removed[code][:4], row.get("si", "-"), apc or "-", apcs.get(apc, "")))
         print("    label: %s" % info["label"])
         print("    CMS short descriptor (do not copy): %s" % "; ".join(descriptors.get(code, ["-"])))
 

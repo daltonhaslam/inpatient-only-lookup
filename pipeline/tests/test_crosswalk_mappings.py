@@ -134,6 +134,12 @@ class MapperBatches(unittest.TestCase):
         self.assertTrue(all(len(chunk) <= 40 for chunk in batches.values()))
         self.assertFalse(any("00100" <= c <= "01999" for c in codes))
         self.assertEqual(set(unmappable.values()), {"anesthesia code", "packaged: no separate outpatient payment"})
+        for code in ("0095T", "0098T", "0164T", "0165T"):      # Category III codes, not anesthesia
+            self.assertEqual(unmappable[code], "packaged: no separate outpatient payment", code)
+
+    def test_anesthesia_range_is_numeric_codes_only(self):
+        self.assertTrue(all(mapper.is_anesthesia(c) for c in ("00100", "01402", "01999")))
+        self.assertFalse(any(mapper.is_anesthesia(c) for c in ("0095T", "0164T", "00099", "02000", "0010T")))
 
     def check(self, records, name="smoke.json"):
         with tempfile.TemporaryDirectory() as tmp:

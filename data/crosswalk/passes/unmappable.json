@@ -102,12 +102,12 @@
  {
   "code": "0095T",
   "mappable": false,
-  "unmapped_reason": "anesthesia code"
+  "unmapped_reason": "packaged: no separate outpatient payment"
  },
  {
   "code": "0098T",
   "mappable": false,
-  "unmapped_reason": "anesthesia code"
+  "unmapped_reason": "packaged: no separate outpatient payment"
  },
  {
   "code": "01140",
@@ -157,12 +157,12 @@
  {
   "code": "0164T",
   "mappable": false,
-  "unmapped_reason": "anesthesia code"
+  "unmapped_reason": "packaged: no separate outpatient payment"
  },
  {
   "code": "0165T",
   "mappable": false,
-  "unmapped_reason": "anesthesia code"
+  "unmapped_reason": "packaged: no separate outpatient payment"
  },
  {
   "code": "01756",
