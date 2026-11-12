@@ -9,11 +9,6 @@ from crosswalk.checks import words
 RAW_PRESENT = fetch.RAW.is_dir() and any(fetch.RAW.iterdir())
 
 
-def shares_run(a, b, length):
-    grams = {tuple(a[i:i + length]) for i in range(len(a) - length + 1)}
-    return any(tuple(b[i:i + length]) in grams for i in range(len(b) - length + 1))
-
-
 @unittest.skipUnless(RAW_PRESENT, "raw CMS files not downloaded; run pipeline/fetch.py")
 class Raw(unittest.TestCase):
     @classmethod
@@ -28,7 +23,8 @@ class Raw(unittest.TestCase):
         self.assertEqual(citations.verify(self.sources), [])
 
     def test_no_label_copies_a_cms_descriptor(self):
-        """A label may not equal a CMS/AMA descriptor or share five consecutive words with one."""
+        """A label may not equal its own code's CMS/AMA descriptor, or share five consecutive words
+        with ANY code's descriptor (a label can echo a sibling code's wording)."""
         labels = fetch.read_json(fetch.ROOT / "data" / "labels.json")
         descriptors = {}
         for source in self.sources:
@@ -37,17 +33,16 @@ class Raw(unittest.TestCase):
                     continue    # Addendum E repeats the descriptors of the same rule's Addendum B
                 path = fetch.raw_path(source)
                 for code, texts in parse.descriptor_table(path, parse.pick_member(path, pattern)).items():
-                    if code in labels:
-                        descriptors.setdefault(code, set()).update(texts)
-        self.assertEqual(set(descriptors), set(labels))
+                    descriptors.setdefault(code, set()).update(texts)
+        self.assertEqual(set(labels) - set(descriptors), set())
+        runs = {tuple(found[i:i + 5]) for texts in descriptors.values() for text in texts
+                for found in [words(text)] for i in range(len(found) - 4)}
         copied = []
         for code, item in labels.items():
             label = words(item["label"])
-            for text in descriptors[code]:
-                theirs = words(text)
-                if label == theirs or shares_run(label, theirs, 5):
-                    copied.append(code)
-                    break
+            if any(label == words(text) for text in descriptors[code]) or any(
+                    tuple(label[i:i + 5]) in runs for i in range(len(label) - 4)):
+                copied.append(code)
         self.assertEqual(copied, [])
 
 
