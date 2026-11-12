@@ -201,14 +201,19 @@ def mapping_block(code, rec, inputs):
     a, b = (inputs.passes.get(name, {}).get(code) for name in mappings.PASS_NAMES)
     ref = inputs.ref
     adjudicated = inputs.adjudications.get(code)
+    fp = mappings.fingerprint(rec)
+    if adjudicated:
+        # Pass A's reasoning shows only beside the mapping pass A made; the adjudicator's is under "adjudication".
+        rationale = a.get("rationale") if a and mappings.fingerprint(a) == fp else None
+    else:
+        rationale = rec["rationale"]
     return {
         "pcs_sets": [{"codes": [{"code": pcs, "title": ref.pcs[pcs]} for pcs in entry["codes"]], "note": entry.get("note")}
                      for entry in rec["pcs_sets"]],
         "principal_dx": [{"code": dx["code"], "title": ref.cm[dx["code"]], "condition": dx.get("condition"), "role": dx["role"]}
                          for dx in rec["principal_dx"]],
-        "fp": mappings.fingerprint(rec),
-        # An adjudicated code shows pass A's reasoning here and the adjudicator's under "adjudication".
-        "rationale": (a or {}).get("rationale") if adjudicated else rec["rationale"],
+        "fp": fp,
+        "rationale": rationale,
         "passes_agree": bool(a and b) and mappings.families(a, ref) == mappings.families(b, ref),
         "adjudication": adjudicated["rationale"] if adjudicated else None,
     }

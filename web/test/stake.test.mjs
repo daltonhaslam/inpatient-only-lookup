@@ -110,6 +110,16 @@ describe('revenue at stake', { skip }, () => {
     assert.ok(seen.dx > 0 && seen.variant > 0, `labels seen: ${JSON.stringify(seen)}`);
   });
 
+  test('an adjudicated card shows pass A\'s note only beside pass A\'s own mapping, and always the adjudicator\'s note', () => {
+    const adjudicated = items.filter((item) => item.kind === 'compare' && item.map.adjudication);
+    assert.ok(adjudicated.some((item) => !item.map.rationale), 'no adjudicated code with its mapper\'s note withheld');
+    for (const item of adjudicated) {
+      const text = textOf(block(item.code));
+      assert.ok(text.includes('Adjudicator’s note:'), `${item.code}: no adjudicator's note`);
+      assert.equal(text.includes('Mapper’s note:'), Boolean(item.map.rationale), `${item.code}: mapper's note shown ${!item.map.rationale ? 'without' : 'with'} a rationale`);
+    }
+  });
+
   test('CSV alternative rows say what selects the family: diagnosis, operation variant, or both', () => {
     const rows = csvRows(stake);
     const order = CSV_HEADER.indexOf('family_order');

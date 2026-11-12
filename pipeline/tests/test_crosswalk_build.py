@@ -137,6 +137,21 @@ class InpatientFamilies(unittest.TestCase):
 
 
 @unittest.skipUnless(RAW_PRESENT, "raw CMS files not downloaded; run pipeline/fetch.py")
+class AdjudicatedRationale(unittest.TestCase):
+    def test_pass_a_reasoning_only_beside_the_mapping_pass_a_made(self):
+        inputs = build.load_inputs(FIXTURE / "passes", FIXTURE / "adjudications.json")
+        same = inputs.adjudications["48150"]
+        block = build.mapping_block("48150", same, inputs)
+        self.assertTrue(block["rationale"].startswith("Fixture: five codes"))     # adjudicator kept pass A's mapping
+        changed = json.loads(json.dumps(same))
+        changed["pcs_sets"][0]["codes"] = changed["pcs_sets"][0]["codes"][1:]
+        inputs.adjudications["48150"] = changed
+        block = build.mapping_block("48150", changed, inputs)
+        self.assertIsNone(block["rationale"])
+        self.assertTrue(block["adjudication"].startswith("Fixture adjudication"))
+
+
+@unittest.skipUnless(RAW_PRESENT, "raw CMS files not downloaded; run pipeline/fetch.py")
 class FixtureBuild(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

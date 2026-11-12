@@ -10,6 +10,7 @@ ok PCS codes in the v44 index for the family's MDC: every family traced to Appen
 ok DRGs in Table 5: every family DRG has an FY2027 CN Table 5 weight
 ok DRG titles and MDCs match v44: titles from Appendix A; each DRG in its family's MDC
 ok DRG amounts recompute: weight x ($6,848.00 operating + $539.95 capital), to the cent
+ok grouper's medical exclusions are medical DRGs: 9 procedure-defined and 4 discharge-status DRGs
 ok APC rates equal Addendum B: SI, APC, title and national rate from CY 2027 final Addenda A and B
 ok ASC rates equal Addendum AA: 849 codes with an ASC rate
 ok proposed rates equal proposed Addendum B: CY 2027 proposed rule
@@ -19,7 +20,7 @@ ok review batches: 95 batches of at most 10 codes
 ok known cases 32480, 44150, 48150: lobectomy 163-165 vs APC 5183 $3,584.95; colectomy 329-331; Whipple 405-407 for pancreatic cancer
 ok DRG 165 sanity band: national $14,254.31 within $10,000-$25,000 (catches unit errors only)
 info DRG 165 vs the published example: national unadjusted $14,254.31; a published hand-worked lobectomy example is about $20,000; gap $5,745.69 (28.7% lower). Published examples usually include a hospital's wage index, IME and DSH.
-ok no CPT descriptor text: 66182 strings in crosswalk.json and the mapping files, against the CMS descriptors of 922 codes (equal, or 5 consecutive words)
+ok no CPT descriptor text: 66116 strings in crosswalk.json and the mapping files, against the CMS descriptors of 922 codes (equal, or 5 consecutive words)
 info TEAM pairing: 66 combinations overlap TEAM's tables, 33 differ (conditional reassignments; for a reviewer)
     - 0219T: 0RG13J1 x M4722 -> 471-472-473; TEAM lists 429,430
     - 0219T: 0RG13K1 x M4722 -> 471-472-473; TEAM lists 429,430
