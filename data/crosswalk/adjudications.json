@@ -1,0 +1,3179 @@
+{
+ "15756": {
+  "code": "15756",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0JRN07Z",
+     "0KBF0ZZ"
+    ],
+    "note": "latissimus to right lower leg"
+   },
+   {
+    "codes": [
+     "0JRN07Z",
+     "0KBQ0ZZ"
+    ],
+    "note": "gracilis to right lower leg"
+   },
+   {
+    "codes": [
+     "0JRP07Z",
+     "0KBG0ZZ"
+    ],
+    "note": "latissimus to left lower leg"
+   },
+   {
+    "codes": [
+     "0JRP07Z",
+     "0KBR0ZZ"
+    ],
+    "note": "gracilis to left lower leg"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M86661",
+    "condition": "chronic tibial osteomyelitis",
+    "role": "typical"
+   },
+   {
+    "code": "L97814",
+    "condition": "chronic leg ulcer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Free (detached, re-anastomosed) muscle flap is not Transfer: Replacement of recipient soft tissue with autologous tissue plus Excision of donor muscle (B3.9).",
+  "confidence": "medium",
+  "note": "Merged B's donor/recipient sets with A's ulcer alternative, given a specified site (L97.81-). A chronic ulcer moves the case from 500-502 to MDC 9 579-581; a diabetic ulcer (E11.62x) would be principal and group elsewhere."
+ },
+ "15757": {
+  "code": "15757",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0JRN07Z",
+     "0JBL0ZZ"
+    ],
+    "note": "thigh skin flap to right lower leg"
+   },
+   {
+    "codes": [
+     "0JRP07Z",
+     "0JBM0ZZ"
+    ],
+    "note": "thigh skin flap to left lower leg"
+   },
+   {
+    "codes": [
+     "0JRN07Z",
+     "0JBG0ZZ"
+    ],
+    "note": "forearm skin flap to right lower leg"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M86661",
+    "condition": "chronic tibial osteomyelitis",
+    "role": "typical"
+   },
+   {
+    "code": "L97814",
+    "condition": "chronic leg ulcer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Free fasciocutaneous flap = Replacement of recipient subcutaneous tissue with autologous tissue plus Excision of donor subcutaneous tissue (B3.9).",
+  "confidence": "low",
+  "note": "Merged B's sets with A's ulcer alternative, given a specified site (L97.81-). The ulcer moves the case from 463-465 to 570-572 because the donor subcutaneous Excision is a debridement code in MDC 9."
+ },
+ "15758": {
+  "code": "15758",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0JRQ07Z",
+     "0JB00ZZ"
+    ],
+    "note": "temporoparietal fascia to right foot"
+   },
+   {
+    "codes": [
+     "0JRR07Z",
+     "0JB00ZZ"
+    ],
+    "note": "temporoparietal fascia to left foot"
+   },
+   {
+    "codes": [
+     "0JRJ07Z",
+     "0JB00ZZ"
+    ],
+    "note": "temporoparietal fascia to right hand"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M86671",
+    "condition": "chronic foot osteomyelitis",
+    "role": "typical"
+   },
+   {
+    "code": "L97514",
+    "condition": "chronic foot ulcer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Free fascial flap = Replacement of recipient subcutaneous tissue/fascia with autologous tissue plus Excision of donor fascia (B3.9).",
+  "confidence": "low",
+  "note": "Merged B's foot/hand recipients and foot osteomyelitis with A's ulcer alternative, here a foot ulcer (L97.51-). It moves the case from 463-465 to 570-572."
+ },
+ "20957": {
+  "code": "20957",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PRP07Z",
+     "0QBN0ZZ"
+    ],
+    "note": "right metacarpal from right metatarsal"
+   },
+   {
+    "codes": [
+     "0PRQ07Z",
+     "0QBP0ZZ"
+    ],
+    "note": "left metacarpal from left metatarsal"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M89741",
+    "condition": "hand bone defect",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Free vascularized metatarsal to replace lost hand bone = Replacement of metacarpal with autologous tissue plus Excision of metatarsal donor (B3.9).",
+  "confidence": "low",
+  "note": "Took B: free metatarsal transfer is a hand/metacarpal reconstruction far more often than a jaw one; A's mandible recipient was the outlier. Rare in Medicare either way."
+ },
+ "20962": {
+  "code": "20962",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NRT07Z",
+     "0PB50ZZ"
+    ],
+    "note": "right mandible defect, right scapula donor"
+   },
+   {
+    "codes": [
+     "0NRV07Z",
+     "0PB60ZZ"
+    ],
+    "note": "left mandible defect, left scapula donor"
+   },
+   {
+    "codes": [
+     "0NRR07Z",
+     "0PB50ZZ"
+    ],
+    "note": "maxilla defect, scapula donor"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C031",
+    "condition": "oral cavity cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Vascularized bone takes the place of a resected jaw segment = Replacement with autologous tissue, open; bone harvest from a separate site coded as Excision per B3.9; scapula used as the representative non-fibula, non-iliac donor.",
+  "confidence": "medium",
+  "note": "Took B: same mandible sets as A plus a maxilla recipient (scapula is a common maxillary donor, groups 143-145); dropped A's radius set since a radial osteocutaneous flap belongs to the osteocutaneous code."
+ },
+ "20969": {
+  "code": "20969",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NRT07Z",
+     "0QBJ0ZZ"
+    ],
+    "note": "right mandible defect, fibula osteocutaneous donor"
+   },
+   {
+    "codes": [
+     "0NRV07Z",
+     "0QBK0ZZ"
+    ],
+    "note": "left mandible defect, fibula osteocutaneous donor"
+   },
+   {
+    "codes": [
+     "0NRR07Z",
+     "0QBJ0ZZ"
+    ],
+    "note": "maxilla defect, fibula osteocutaneous donor"
+   },
+   {
+    "codes": [
+     "0NRT07Z",
+     "0PB50ZZ"
+    ],
+    "note": "mandible, scapula osteocutaneous donor"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C031",
+    "condition": "oral cavity cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Osteocutaneous free flap rebuilding a jaw segment = Replacement of mandible/maxilla with autologous tissue, open, plus Excision of the donor bone (B3.9); fibula is the usual donor in this code's range; skin paddle not coded separately.",
+  "confidence": "medium",
+  "note": "Merged: B's fibula sets including the maxilla recipient (143-145) plus A's scapula osteocutaneous donor set."
+ },
+ "20970": {
+  "code": "20970",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NRT07Z",
+     "0QB20ZZ"
+    ],
+    "note": "right mandible defect, right iliac crest donor"
+   },
+   {
+    "codes": [
+     "0NRV07Z",
+     "0QB30ZZ"
+    ],
+    "note": "left mandible defect, left iliac crest donor"
+   },
+   {
+    "codes": [
+     "0NRR07Z",
+     "0QB20ZZ"
+    ],
+    "note": "maxilla defect, iliac crest donor"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C031",
+    "condition": "oral cavity cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Iliac crest osteocutaneous free flap to a jaw defect = Replacement of mandible/maxilla with autologous tissue, open, plus Excision of pelvic bone at the donor site (B3.9).",
+  "confidence": "medium",
+  "note": "Took B: same mandible sets as A plus an iliac-crest-to-maxilla recipient set, which groups 143-145."
+ },
+ "21268": {
+  "code": "21268",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0NSP04Z",
+     "0NUP07Z",
+     "0NB30ZZ"
+    ],
+    "note": "right orbit"
+   },
+   {
+    "codes": [
+     "0NSQ04Z",
+     "0NUQ07Z",
+     "0NB30ZZ"
+    ],
+    "note": "left orbit"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q107",
+    "condition": "congenital orbital deformity",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Orbital box osteotomy with repositioning = Reposition orbit with internal fixation, bone graft Supplement, calvarial donor Excision; the craniotomy is access.",
+  "confidence": "medium",
+  "note": "Same PCS in both passes; took B's dx: the index sends congenital orbital deformity to Q10.7 (A's Q75.8 is a nonspecific skull/face code that shifts to MDC 8). Acquired causes (H05.32-/H05.33-) also group 113-114, so no alternative."
+ },
+ "21602": {
+  "code": "21602",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB10ZZ",
+     "0WU80JZ"
+    ],
+    "note": "1 to 2 ribs, mesh reconstruction"
+   },
+   {
+    "codes": [
+     "0PB20ZZ",
+     "0WU80JZ"
+    ],
+    "note": "3 or more ribs, mesh reconstruction"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C413",
+    "condition": "rib/sternum bone cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Chest wall tumor removal with rib segments = Excision of ribs; reconstruction coded separately as Supplement chest wall with synthetic substitute.",
+  "confidence": "medium",
+  "note": "Took A: mesh reconstruction is the reconstruction within this code; B's latissimus flap set dropped because a muscle flap is a separately reported operation."
+ },
+ "21603": {
+  "code": "21603",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB10ZZ",
+     "0WU80JZ",
+     "07B70ZZ"
+    ],
+    "note": "1 to 2 ribs, mesh, mediastinal nodes"
+   },
+   {
+    "codes": [
+     "0PB20ZZ",
+     "0WU80JZ",
+     "07B70ZZ"
+    ],
+    "note": "3 or more ribs, mesh, mediastinal nodes"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C413",
+    "condition": "rib/sternum bone cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "As the version without nodes, plus mediastinal node dissection coded separately (B3.10c) as Excision of thorax lymphatic.",
+  "confidence": "medium",
+  "note": "Took A: as 21602, B's separately reported flap set dropped; node dissection kept as Excision of thorax lymphatic (station dissection, not a whole chain); same family either way."
+ },
+ "21615": {
+  "code": "21615",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "01N30ZZ"
+    ],
+    "note": "brachial plexus release via first or cervical rib removal"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "G540",
+    "condition": "thoracic outlet syndrome",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Rib removal frees the brachial plexus, so Release of brachial plexus, open (B3.13); the rib is the restraining tissue, not coded separately.",
+  "confidence": "medium",
+  "note": "Took B's plexus Release (Coding Clinic 2Q 2016 treats rib removal in TOS decompression as the means of releasing the plexus); dropped B's venous-TOS sets and I82B11, rare in Medicare and paired with G540 they mis-group."
+ },
+ "21616": {
+  "code": "21616",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "01N30ZZ",
+     "01BL0ZZ"
+    ],
+    "note": "plexus release plus sympathectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "G540",
+    "condition": "thoracic outlet syndrome",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Rib removal frees the brachial plexus (Release, B3.13) and a segment of the upper thoracic sympathetic chain is cut out as a separate objective (Excision).",
+  "confidence": "medium",
+  "note": "Took B: plexus Release per the TOS Coding Clinic, plus sympathectomy coded separately as Excision of thoracic sympathetic nerve (separate objective, Coding Clinic 2Q 2017)."
+ },
+ "21620": {
+  "code": "21620",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB00ZZ"
+    ],
+    "note": "partial sternectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8143XA",
+    "condition": "post-sternotomy osteomyelitis",
+    "role": "typical"
+   },
+   {
+    "code": "C7951",
+    "condition": "sternal metastasis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Part of the sternum is cut out = Excision, sternum, open; usual Medicare indication is post-cardiac-surgery sternal infection.",
+  "confidence": "medium",
+  "note": "Took B: post-sternotomy infection sequences first as the complication code (T81.4-), osteomyelitis as additional; sternal metastasis kept as the family-changing alternative."
+ },
+ "21705": {
+  "code": "21705",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "01N30ZZ"
+    ],
+    "note": "scalene division with cervical rib removal"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "G540",
+    "condition": "thoracic outlet syndrome",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cutting the scalene and removing the cervical rib both free the brachial plexus = Release, brachial plexus (B3.13); alternative view is Division of neck muscle plus Excision of rib.",
+  "confidence": "medium",
+  "note": "Took B: scalene division and cervical rib removal both serve to free the plexus, so one Release code (B3.13) rather than A's Division of muscle plus rib Excision."
+ },
+ "22318": {
+  "code": "22318",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PS304Z"
+    ],
+    "note": "displaced, reduced and screwed"
+   },
+   {
+    "codes": [
+     "0PH304Z"
+    ],
+    "note": "nondisplaced, screw only"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S12111A",
+    "condition": "type II dens fracture",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Anterior odontoid screw = Reposition of cervical vertebra with internal fixation (Insertion if nondisplaced, per B3.15).",
+  "confidence": "medium",
+  "note": "Took A: B3.15 makes screw fixation of a nondisplaced dens fracture Insertion (515-517) and reduction of a displaced one Reposition (518-520); B dropped the nondisplaced variant."
+ },
+ "22610": {
+  "code": "22610",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RG6071"
+    ],
+    "note": "one thoracic level"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S22082A",
+    "condition": "thoracic burst fracture",
+    "role": "typical"
+   },
+   {
+    "code": "C7951",
+    "condition": "spinal metastasis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Single-level posterolateral thoracic fusion = Fusion of thoracic vertebral joint, posterior approach posterior column, autologous graft, open.",
+  "confidence": "high",
+  "note": "Took B: same fusion code as A; kept B's spinal-metastasis alternative because metastatic disease is a common reason for thoracic posterior fusion in Medicare and moves the case to 456-458."
+ },
+ "22812": {
+  "code": "22812",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0RG70A0",
+     "0RGA0A0",
+     "0SG10A0"
+    ],
+    "note": "thoracolumbar to lumbar span, interbody devices (typical adult)"
+   },
+   {
+    "codes": [
+     "0RG8070"
+    ],
+    "note": "8+ thoracic joints, rib autograft"
+   },
+   {
+    "codes": [
+     "0RG7070",
+     "0RGA0A0"
+    ],
+    "note": "thoracic span ending at T12-L1 (less common in Medicare)"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M4185",
+    "condition": "thoracolumbar scoliosis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Anterior deformity fusion over 8+ vertebrae: one Fusion code per joint region spanned, anterior approach anterior column; adult degenerative curves usually cross into the lumbar spine.",
+  "confidence": "medium",
+  "note": "Merged: B's dx (adult deformity coded M41.8-) and B's thoracic-only sets, with A's all-interbody thoracolumbar-lumbar span as typical; family follows the span coded (523-525 vs 456-458)."
+ },
+ "26551": {
+  "code": "26551",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0XRL07N",
+     "0QB20ZZ"
+    ],
+    "note": "right thumb from right great toe, iliac bone graft"
+   },
+   {
+    "codes": [
+     "0XRM07P",
+     "0QB30ZZ"
+    ],
+    "note": "left thumb from left great toe, iliac bone graft"
+   },
+   {
+    "codes": [
+     "0XRL07P",
+     "0QB30ZZ"
+    ],
+    "note": "right thumb from left great toe, iliac bone graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z89011",
+    "condition": "thumb amputee",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Microvascular toe tissue to rebuild thumb = Replacement of thumb with toe (qualifier names donor toe); separately harvested iliac bone graft = Excision of pelvic bone per B3.9.",
+  "confidence": "medium",
+  "note": "Took B: delayed reconstruction for an acquired thumb loss is the norm. A's acute traumatic-amputation alternative (906) is uncommon for toe-to-hand transfer, so it is dropped."
+ },
+ "26553": {
+  "code": "26553",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0XRL07N"
+    ],
+    "note": "second toe to right thumb"
+   },
+   {
+    "codes": [
+     "0XRM07P"
+    ],
+    "note": "second toe to left thumb"
+   },
+   {
+    "codes": [
+     "0PRT07Z",
+     "0Y6R0Z0"
+    ],
+    "note": "second toe to right finger"
+   },
+   {
+    "codes": [
+     "0PRV07Z",
+     "0Y6S0Z0"
+    ],
+    "note": "second toe to left finger"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z89011",
+    "condition": "thumb amputee",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Single lesser toe free transfer: to thumb = Replacement of thumb with toe; to finger there is no toe-qualified finger code, so Replacement of finger phalanx with autologous tissue plus Detachment of donor toe (B3.9).",
+  "confidence": "low",
+  "note": "Took B: thumb recipients (toe qualifier) plus finger recipients (Replacement of the finger phalanx plus toe Detachment, B3.9); all sets group 939-941. A's acute-amputation alternative is dropped as uncommon."
+ },
+ "27132": {
+  "code": "27132",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SR904A",
+     "0QP604Z"
+    ],
+    "note": "right, with prior hardware removed"
+   },
+   {
+    "codes": [
+     "0SRB04A",
+     "0QP704Z"
+    ],
+    "note": "left, with prior hardware removed"
+   },
+   {
+    "codes": [
+     "0SR904A"
+    ],
+    "note": "right, no hardware"
+   },
+   {
+    "codes": [
+     "0SRB04A"
+    ],
+    "note": "left, no hardware"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M1651",
+    "condition": "post-traumatic hip arthritis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Total hip = Replacement of hip joint (ceramic-on-poly uncemented as the common construct); removal of prior femoral fixation is a distinct body part, Removal from upper femur.",
+  "confidence": "medium",
+  "note": "Took B: hardware removal from the upper femur is a separate body part (B3.2) and groups 498-499 (v44 App. D ranks it above 469-470). The no-hardware variant (retained or previously removed hardware) is kept because it groups 469-470."
+ },
+ "27185": {
+  "code": "27185",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QQ60ZZ"
+    ],
+    "note": "right, drilling/curettage arrest"
+   },
+   {
+    "codes": [
+     "0QQ70ZZ"
+    ],
+    "note": "left, drilling/curettage arrest"
+   },
+   {
+    "codes": [
+     "0QH604Z"
+    ],
+    "note": "right, screw or staple arrest"
+   },
+   {
+    "codes": [
+     "0QH704Z"
+    ],
+    "note": "left, screw or staple arrest"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M9111",
+    "condition": "Perthes disease",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Growth-plate arrest of the trochanteric apophysis indexes to Repair (no device) or Insertion of internal fixation (screws/staples), upper femur, open.",
+  "confidence": "medium",
+  "note": "Took A: the PCS index sends epiphysiodesis to Repair (drilling/curettage) or Insertion (screws/staples), not Destruction. Every set groups 480-482."
+ },
+ "27280": {
+  "code": "27280",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SG707Z"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0SG807Z"
+    ],
+    "note": "left"
+   },
+   {
+    "codes": [
+     "0SG707Z",
+     "0SG807Z"
+    ],
+    "note": "bilateral (CPT reported with modifier 50)"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "M533",
+    "condition": "sacroiliac joint dysfunction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open SI joint fusion with graft and hardware = Fusion sacroiliac joint, autologous tissue device (B3.10c applied by analogy; 0SG704Z is the alternative and groups the same); bilateral = two codes.",
+  "confidence": "medium",
+  "note": "Merged B's device value with A's bilateral set. Not a grouper error: v44 lists both SI fusion codes in the single-level posterior list of DRGs 447-448 ('two or more codes'), so bilateral SI fusion really is 447-448. Unilateral is 450-451."
+ },
+ "27295": {
+  "code": "27295",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0Y670ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0Y680ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I70261",
+    "condition": "limb gangrene",
+    "role": "typical"
+   },
+   {
+    "code": "M86651",
+    "condition": "femur osteomyelitis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Hip disarticulation = Detachment at femoral region (the lower-limb analog of shoulder-region disarticulation); 0Y6C0Z1 (upper leg, high) is the competing choice.",
+  "confidence": "medium",
+  "note": "Took A: Detachment at the femoral region as both passes coded it. A keeps the osteomyelitis alternative because infection is a common reason for hip disarticulation and moves the case from 239-241 to 474-476."
+ },
+ "27365": {
+  "code": "27365",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0QTB0ZZ"
+    ],
+    "note": "right distal femur segment removed"
+   },
+   {
+    "codes": [
+     "0QTC0ZZ"
+    ],
+    "note": "left distal femur segment removed"
+   },
+   {
+    "codes": [
+     "0QBB0ZZ"
+    ],
+    "note": "right distal femur, partial"
+   },
+   {
+    "codes": [
+     "0QBC0ZZ"
+    ],
+    "note": "left distal femur, partial"
+   },
+   {
+    "codes": [
+     "0QB80ZZ"
+    ],
+    "note": "right femoral shaft, partial"
+   },
+   {
+    "codes": [
+     "0QB90ZZ"
+    ],
+    "note": "left femoral shaft, partial"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C7951",
+    "condition": "bone metastasis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Radical bone tumor removal: Resection when the whole distal femur body part goes, else Excision; reconstruction reported separately.",
+  "confidence": "medium",
+  "note": "Took A: a wide resection that takes the whole distal femur is Resection of lower femur (480-482); a partial or intercalary one is Excision (498-499). B dropped the Resection reading, so both are kept here."
+ },
+ "27580": {
+  "code": "27580",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0SGC04Z"
+    ],
+    "note": "right knee, nail or plate"
+   },
+   {
+    "codes": [
+     "0SGD04Z"
+    ],
+    "note": "left knee, nail or plate"
+   },
+   {
+    "codes": [
+     "0SPC08Z",
+     "0SGC04Z"
+    ],
+    "note": "right knee, after spacer removal"
+   },
+   {
+    "codes": [
+     "0SPD08Z",
+     "0SGD04Z"
+    ],
+    "note": "left knee, after spacer removal"
+   },
+   {
+    "codes": [
+     "0SGC05Z"
+    ],
+    "note": "right knee, external fixator"
+   },
+   {
+    "codes": [
+     "0SGD05Z"
+    ],
+    "note": "left knee, external fixator"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T8453XA",
+    "condition": "infected knee prosthesis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Knee arthrodesis = Fusion knee joint with fixation device, open; typical Medicare case is salvage of failed infected arthroplasty.",
+  "confidence": "medium",
+  "note": "Took A: fusion with an internal or external device, plus restoring the spacer-removal variant (separate Removal objective, B3.2), which is common in staged salvage after infected TKA. In v44, spacer removal leads to 463-465."
+ },
+ "31805": {
+  "code": "31805",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BQ10ZZ"
+    ],
+    "note": "thoracic trachea"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "S2753XA",
+    "condition": "thoracic tracheal laceration",
+    "role": "typical"
+   },
+   {
+    "code": "J9572",
+    "condition": "iatrogenic airway tear",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Suture of an intrathoracic tracheal tear = Repair trachea, open; iatrogenic intubation tears carry a complication dx.",
+  "confidence": "medium",
+  "note": "Took B: intrathoracic tracheal tears in Medicare patients are often iatrogenic (intubation, esophagectomy), so the J95.7x alternative is common and moves the case to 907-909."
+ },
+ "32160": {
+  "code": "32160",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "02QA0ZZ"
+    ],
+    "note": "open cardiac massage"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I469",
+    "condition": "cardiac arrest",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open-chest cardiac massage is indexed in PCS to Repair heart, open; principal dx in practice is the cause of the arrest.",
+  "confidence": "low",
+  "note": "Took B: the PCS Index sends open-chest cardiac massage to Repair heart, open (02QA0ZZ); A's 5A12012 is the external-massage entry."
+ },
+ "32653": {
+  "code": "32653",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WC94ZZ"
+    ],
+    "note": "right pleural cavity"
+   },
+   {
+    "codes": [
+     "0WCB4ZZ"
+    ],
+    "note": "left pleural cavity"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J869",
+    "condition": "empyema",
+    "role": "typical"
+   },
+   {
+    "code": "S271XXA",
+    "condition": "traumatic hemothorax",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Clearing fibrin, clot or foreign body from the pleural space = Extirpation of matter from pleural cavity, thoracoscopic; non-OR in MS-DRG terms, groups by diagnosis (empyema vs retained hemothorax).",
+  "confidence": "medium",
+  "note": "Merged: same PCS in both; A's empyema as typical (more common in Medicare) plus B's retained traumatic hemothorax as the family-changing alternative."
+ },
+ "32664": {
+  "code": "32664",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "01BL4ZZ"
+    ],
+    "note": "segment cut out"
+   },
+   {
+    "codes": [
+     "015L4ZZ"
+    ],
+    "note": "ablated or clipped"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I4720",
+    "condition": "ventricular tachycardia",
+    "role": "typical"
+   },
+   {
+    "code": "L74512",
+    "condition": "palmar hyperhidrosis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Thoracoscopic interruption of the thoracic sympathetic chain: excised segment = Excision, cautery ablation = Destruction, percutaneous endoscopic; Medicare inpatients are mostly cardiac denervation for refractory VT.",
+  "confidence": "low",
+  "note": "Took B: Medicare inpatients having this are mostly cardiac sympathetic denervation for refractory VT; hyperhidrosis (A's typical) kept as alternative; Destruction set kept for ablation technique."
+ },
+ "32673": {
+  "code": "32673",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "07TM4ZZ"
+    ],
+    "note": "thymus"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D150",
+    "condition": "thymoma",
+    "role": "typical"
+   },
+   {
+    "code": "C37",
+    "condition": "invasive thymoma/carcinoma",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Thoracoscopic thymectomy = Resection of thymus, percutaneous endoscopic; thymoma NOS indexes to D15.0, malignant/invasive thymoma or thymic carcinoma to C37.",
+  "confidence": "medium",
+  "note": "Merged: PCS agreed; ICD-10-CM Index defaults thymoma to D15.0 (B), and C37 (A) applies when documented malignant; that split replaces myasthenia gravis, an uncommon thymectomy indication over 65."
+ },
+ "32905": {
+  "code": "32905",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0PB20ZZ"
+    ],
+    "note": "extrapleural thoracoplasty"
+   },
+   {
+    "codes": [
+     "0PB20ZZ",
+     "0BBN0ZZ"
+    ],
+    "note": "Schede type, right"
+   },
+   {
+    "codes": [
+     "0PB20ZZ",
+     "0BBP0ZZ"
+    ],
+    "note": "Schede type, left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J869",
+    "condition": "chronic empyema",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Multiple ribs taken out so the chest wall collapses into the cavity = Excision, 3+ ribs; Schede variant also excises parietal pleura.",
+  "confidence": "medium",
+  "note": "Took B: the code spans extrapleural and Schede thoracoplasty; Schede also excises parietal pleura (distinct body part, B3.2), which A omitted and which moves the family."
+ },
+ "38380": {
+  "code": "38380",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "07LK0ZZ"
+    ],
+    "note": "ligation/oversew of thoracic duct"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I9789",
+    "condition": "postoperative chyle leak",
+    "role": "typical"
+   },
+   {
+    "code": "J940",
+    "condition": "chylothorax",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Tying or oversewing the duct closes its lumen = Occlusion of thoracic duct, open; the neck approach is mainly for chyle leak after neck dissection (I97.89), which groups as an unrelated OR procedure.",
+  "confidence": "medium",
+  "note": "Merged: B's dx (cervical approach is mainly for post-neck-dissection chyle leak, chylothorax as alternative); dropped B's Repair set since suturing a leaking duct closes the lumen = Occlusion."
+ },
+ "38564": {
+  "code": "38564",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "07BD0ZX"
+    ],
+    "note": "staging sampling, diagnostic"
+   },
+   {
+    "codes": [
+     "07BD0ZZ"
+    ],
+    "note": "coded non-diagnostic"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C541",
+    "condition": "endometrial cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Limited retroperitoneal staging sampling = Excision of aortic lymphatic, open, diagnostic qualifier; without X it groups 987-989.",
+  "confidence": "low",
+  "note": "Took A: para-aortic staging sampling is mainly a gynecologic-oncology (endometrial) operation; kidney cancer is not a common principal dx for it. Both passes kept X and Z sets."
+ },
+ "38765": {
+  "code": "38765",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "07TH0ZZ",
+     "07TC0ZZ"
+    ],
+    "note": "right groin + pelvic"
+   },
+   {
+    "codes": [
+     "07TJ0ZZ",
+     "07TC0ZZ"
+    ],
+    "note": "left groin + pelvic"
+   },
+   {
+    "codes": [
+     "07TH0ZZ",
+     "07TJ0ZZ",
+     "07TC0ZZ"
+    ],
+    "note": "bilateral groin + pelvic"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C774",
+    "condition": "groin node metastasis",
+    "role": "typical"
+   },
+   {
+    "code": "C519",
+    "condition": "vulvar cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Groin dissection in continuity with iliac/obturator nodes = Resection of inguinal and pelvis lymphatics, open (B3.10b); Excision of inguinal if only part of the chain is taken.",
+  "confidence": "medium",
+  "note": "Took A: this CPT is groin dissection in continuity with external iliac/hypogastric/obturator nodes, so pelvis lymphatic Resection must be reported with inguinal; B coded inguinal only."
+ },
+ "39000": {
+  "code": "39000",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W9C0ZZ"
+    ],
+    "note": "drainage"
+   },
+   {
+    "codes": [
+     "0WJC0ZZ"
+    ],
+    "note": "exploration only"
+   },
+   {
+    "codes": [
+     "0WBC0ZX"
+    ],
+    "note": "biopsy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J9851",
+    "condition": "mediastinitis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Cervical mediastinotomy: code the objective achieved, usually Drainage of mediastinum, open; Inspection if exploration only; diagnostic Excision if biopsy.",
+  "confidence": "medium",
+  "note": "Took A: the CPT spans drainage, exploration and biopsy; B dropped the Inspection set, which groups to a different family (163-165) and is a real variant."
+ },
+ "39010": {
+  "code": "39010",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W9C0ZZ"
+    ],
+    "note": "drainage"
+   },
+   {
+    "codes": [
+     "0WJC0ZZ"
+    ],
+    "note": "exploration only"
+   },
+   {
+    "codes": [
+     "0WBC0ZX"
+    ],
+    "note": "biopsy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "J9851",
+    "condition": "mediastinitis",
+    "role": "typical"
+   },
+   {
+    "code": "T8143XA",
+    "condition": "post-sternotomy infection",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Transthoracic/sternotomy mediastinotomy: Drainage of mediastinum, open, for the usual infected case; Inspection or diagnostic Excision for other objectives.",
+  "confidence": "medium",
+  "note": "Took A: adds the biopsy set and the post-sternotomy organ/space SSI alternative (T81.43XA, 856-858), common for sternotomy-approach mediastinal drainage in Medicare."
+ },
+ "39560": {
+  "code": "39560",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0BBT0ZZ"
+    ],
+    "note": "partial diaphragm excision, primary closure"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C450",
+    "condition": "pleural mesothelioma",
+    "role": "typical"
+   },
+   {
+    "code": "C7989",
+    "condition": "secondary diaphragm cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Removing part of the diaphragm = Excision, diaphragm, open; primary closure not coded.",
+  "confidence": "medium",
+  "note": "Took A: same PCS in both; mesothelioma is a likelier Medicare indication for diaphragm excision than primary diaphragm sarcoma (B), and secondary diaphragm cancer kept as the family-changing alternative."
+ },
+ "43400": {
+  "code": "43400",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "06L30ZZ"
+    ],
+    "note": "direct variceal ligation"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K7030",
+    "condition": "alcoholic cirrhosis",
+    "role": "typical"
+   },
+   {
+    "code": "I8501",
+    "condition": "bleeding varices",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Open suture ligation of varices = Occlusion of esophageal vein, open; I85.1- carries a code-first note so cirrhosis is sequenced first.",
+  "confidence": "medium",
+  "note": "Took B: I85.1- carries a code-first note, so cirrhosis is principal (423-425); A sequenced the secondary varices first. Kept I85.01 alternative for undocumented cause (326-328)."
+ },
+ "43460": {
+  "code": "43460",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W3P7ZZ"
+    ],
+    "note": "balloon tamponade"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K7030",
+    "condition": "alcoholic cirrhosis",
+    "role": "typical"
+   },
+   {
+    "code": "I8501",
+    "condition": "bleeding varices",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Blind-placed balloon tube to stop variceal bleeding = Control bleeding in GI tract via natural opening; pressure hemostasis fits Control (B3.7); grouper treats this code as OR, so with cirrhosis principal it lands in 981-983.",
+  "confidence": "medium",
+  "note": "Took B: both chose Control of GI tract bleeding (B3.7, correct); B sequences cirrhosis first per the I85.1- code-first note (981-983), with I85.01 alternative (347-349). Insertion of an esophageal intraluminal device is the weaker reading and was not added."
+ },
+ "43771": {
+  "code": "43771",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DW64CZ"
+    ],
+    "note": "band component revised"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K9509",
+    "condition": "gastric band complication",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Repositioning/adjusting the existing band = Revision, extraluminal device, stomach, percutaneous endoscopic.",
+  "confidence": "high",
+  "note": "Took A: band revision is done for a band complication (slip, erosion), so K95.09 typical; revision for poor weight loss is usually a band replacement or conversion, so B's obesity alternative isn't common for this code."
+ },
+ "43832": {
+  "code": "43832",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D160Z4"
+    ],
+    "note": "gastric tube to skin"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I69391",
+    "condition": "post-stroke dysphagia",
+    "role": "typical"
+   },
+   {
+    "code": "R1310",
+    "condition": "dysphagia",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Constructing a gastric-wall tube brought to the skin = Bypass stomach to cutaneous, open.",
+  "confidence": "medium",
+  "note": "Took B: open gastrostomy is non-OR in v44 so dx decides; a permanent gastric tube is usually for neurologic dysphagia, and when the cause is a prior stroke I69.391 is sequenced over the symptom code. Kept R13.10 as the alternative."
+ },
+ "43848": {
+  "code": "43848",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D160ZA"
+    ],
+    "note": "redo gastrojejunal bypass"
+   },
+   {
+    "codes": [
+     "0DB60ZZ"
+    ],
+    "note": "pouch resizing"
+   },
+   {
+    "codes": [
+     "0DP60CZ"
+    ],
+    "note": "removal of gastroplasty ring"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K9589",
+    "condition": "bariatric complication",
+    "role": "typical"
+   },
+   {
+    "code": "E6601",
+    "condition": "morbid obesity",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "No device-free Revision root op; code what is done: redo of the bypass, excision to resize the pouch, (band/ring removal alone would be Removal of extraluminal device).",
+  "confidence": "low",
+  "note": "Merged: B's record (keeps the common weight-regain alternative E66.01, 619-621) plus A's ring-removal set, which B dropped because of how it grouped (981-983 with obesity dx)."
+ },
+ "43881": {
+  "code": "43881",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DH60MZ"
+    ],
+    "note": "antral stimulator lead"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "E1143",
+    "condition": "diabetic gastroparesis",
+    "role": "typical"
+   },
+   {
+    "code": "K3184",
+    "condition": "gastroparesis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Placing gastric stimulator electrodes in the antral wall = Insertion of stimulator lead into stomach, open.",
+  "confidence": "medium",
+  "note": "Took B: K31.84 has a code-first note, so diabetic gastroparesis puts E11.43 first (040-042); idiopathic K31.84 kept as alternative (981-983, since v44 lists 0DH60MZ in no MDC 6 DRG)."
+ },
+ "43882": {
+  "code": "43882",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DW60MZ"
+    ],
+    "note": "lead revision"
+   },
+   {
+    "codes": [
+     "0DP60MZ"
+    ],
+    "note": "lead removal"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T85528A",
+    "condition": "displaced stimulator lead",
+    "role": "typical"
+   },
+   {
+    "code": "K3184",
+    "condition": "gastroparesis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Repositioning/repairing the lead = Revision of stimulator lead in stomach; taking it out = Removal; open.",
+  "confidence": "medium",
+  "note": "Merged: B's sets and device-complication dx (907-909) plus A's K31.84 alternative for removal or revision when therapy fails (981-983 removal, 326-328 revision)."
+ },
+ "44025": {
+  "code": "44025",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DCN0ZZ"
+    ],
+    "note": "object removed from sigmoid"
+   },
+   {
+    "codes": [
+     "0DCL0ZZ"
+    ],
+    "note": "object removed from transverse colon"
+   },
+   {
+    "codes": [
+     "0DBN0ZX"
+    ],
+    "note": "sigmoid biopsy"
+   },
+   {
+    "codes": [
+     "0DJD0ZZ"
+    ],
+    "note": "exploration only"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "T184XXA",
+    "condition": "colon foreign body",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open colotomy: Extirpation of the colon segment for an object, diagnostic Excision for biopsy, Inspection of lower tract when only explored.",
+  "confidence": "low",
+  "note": "Took B: specific colon segments instead of A's nonspecific large-intestine body part, and keeps the exploration-only variant, which is correctly Inspection and groups 356-358 rather than 344-346."
+ },
+ "44050": {
+  "code": "44050",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DS80ZZ"
+    ],
+    "note": "small bowel volvulus/internal hernia"
+   },
+   {
+    "codes": [
+     "0DSH0ZZ"
+    ],
+    "note": "cecal volvulus"
+   },
+   {
+    "codes": [
+     "0DSN0ZZ"
+    ],
+    "note": "sigmoid volvulus"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K562",
+    "condition": "volvulus",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open detorsion/reduction returns bowel to its normal position = Reposition of the affected intestine.",
+  "confidence": "medium",
+  "note": "Took B: same root operation as A but the specific segment rather than A's whole large intestine; the sigmoid variant groups 344-346, so it stays as its own set."
+ },
+ "44055": {
+  "code": "44055",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DN90ZZ",
+     "0DNV0ZZ",
+     "0DTJ0ZZ"
+    ],
+    "note": "band division, mesenteric widening, appendectomy"
+   },
+   {
+    "codes": [
+     "0DS80ZZ",
+     "0DN90ZZ",
+     "0DNV0ZZ",
+     "0DTJ0ZZ"
+    ],
+    "note": "with midgut volvulus detorsion"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q433",
+    "condition": "intestinal malrotation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Ladd procedure = Release duodenum + Release mesentery + Resection appendix (distinct body parts); add Reposition of small intestine when a volvulus is untwisted.",
+  "confidence": "medium",
+  "note": "Took B: adds the mesenteric Release and the volvulus-reduction variant the CPT explicitly covers (329-331); A had only the band-division reading."
+ },
+ "44187": {
+  "code": "44187",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D1B4Z4"
+    ],
+    "note": "loop/end ileostomy"
+   },
+   {
+    "codes": [
+     "0D1A4Z4"
+    ],
+    "note": "jejunostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C20",
+    "condition": "rectal cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparoscopic stoma creation = Bypass ileum (or jejunum) to cutaneous, percutaneous endoscopic.",
+  "confidence": "high",
+  "note": "Took B: same PCS; dropped A's pressure-ulcer alternative because fecal diversion for sacral wounds is done by colostomy (kept on 44320), not ileostomy, so it is not a common dx here."
+ },
+ "44227": {
+  "code": "44227",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBM4ZZ"
+    ],
+    "note": "Hartmann reversal, stomal descending colon excised"
+   },
+   {
+    "codes": [
+     "0DBB4ZZ"
+    ],
+    "note": "ileostomy takedown with segment resection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z433",
+    "condition": "colostomy takedown",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparoscopic stoma takedown with resection: the stoma-bearing bowel is removed and rejoined = Excision of that segment; anastomosis and mobilization are integral.",
+  "confidence": "medium",
+  "note": "New for the colostomy set: Excision per Coding Clinic convention (takedown with any bowel removed = Excision, anastomosis inherent); rejected A's Reposition (bowel is removed, not just moved) and B's Bypass (reversal restores the native route, it does not reroute). Kept both passes' ileum Excision; Z43.3 typical as lap Hartmann reversal dominates this code (same family as Z43.2)."
+ },
+ "44320": {
+  "code": "44320",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0D1N0Z4"
+    ],
+    "note": "sigmoid end/loop colostomy"
+   },
+   {
+    "codes": [
+     "0D1L0Z4"
+    ],
+    "note": "transverse loop colostomy"
+   },
+   {
+    "codes": [
+     "0D1H0Z4"
+    ],
+    "note": "skin-level cecostomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C20",
+    "condition": "obstructing rectal cancer",
+    "role": "typical"
+   },
+   {
+    "code": "L89154",
+    "condition": "sacral pressure ulcer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Open colostomy/cecostomy = Bypass of the colon segment to cutaneous; diversion for a stage 4 sacral ulcer is a common Medicare indication that groups to 981-983.",
+  "confidence": "high",
+  "note": "Took B: same PCS as A plus the pressure-ulcer diversion alternative, which is common for this code and changes the family (981-983)."
+ },
+ "44345": {
+  "code": "44345",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBN0ZZ"
+    ],
+    "note": "stomal sigmoid excised and re-matured"
+   },
+   {
+    "codes": [
+     "0DBM0ZZ"
+    ],
+    "note": "stomal descending colon excised"
+   },
+   {
+    "codes": [
+     "0DQN0ZZ"
+    ],
+    "note": "stoma refashioned, no bowel removed"
+   },
+   {
+    "codes": [
+     "0DSN0ZZ"
+    ],
+    "note": "stoma relocated to a new site"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K9403",
+    "condition": "colostomy malfunction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "In-depth colostomy revision: Excision when stenotic/prolapsed stomal colon is cut out (usual), Repair when only refashioned, Reposition when the stoma is moved to a new site.",
+  "confidence": "medium",
+  "note": "Merged: A's Excision and Reposition (relocation groups 344-346, so kept as its own set) with B's Repair reading; Excision listed first as the usual in-depth revision, consistent with the takedown convention."
+ },
+ "44346": {
+  "code": "44346",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WUF0JZ",
+     "0DQN0ZZ"
+    ],
+    "note": "mesh hernia repair + stoma refashioned"
+   },
+   {
+    "codes": [
+     "0WQF0ZZ",
+     "0DQN0ZZ"
+    ],
+    "note": "suture hernia repair + stoma refashioned"
+   },
+   {
+    "codes": [
+     "0WUF0JZ",
+     "0DBN0ZZ"
+    ],
+    "note": "mesh repair + stomal colon excised"
+   },
+   {
+    "codes": [
+     "0WQF0ZZ",
+     "0DSN0ZZ"
+    ],
+    "note": "fascia closed + stoma relocated"
+   },
+   {
+    "codes": [
+     "0WUF0JZ"
+    ],
+    "note": "reading: colon revision integral, abdominal wall only"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K435",
+    "condition": "parastomal hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Parastomal hernia repair (Supplement with mesh or Repair of abdominal wall) plus the colostomy revision on a distinct body part per B3.2a (Repair, Excision, or Reposition if relocated).",
+  "confidence": "medium",
+  "note": "Merged: B's structure (the CPT includes colostomy revision, a separate body part, so the colon is coded; 329-331) plus A's mesh-with-Excision set; kept A's abdominal-wall-only reading last because some coders treat the stoma refashioning as integral (353-355)."
+ },
+ "44620": {
+  "code": "44620",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQB0ZZ"
+    ],
+    "note": "loop ileostomy closure"
+   },
+   {
+    "codes": [
+     "0DQL0ZZ"
+    ],
+    "note": "loop transverse colostomy closure"
+   },
+   {
+    "codes": [
+     "0DSL0ZZ"
+    ],
+    "note": "reading: Reposition of transverse colon"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z432",
+    "condition": "ileostomy takedown",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Stoma closure without bowel removed: the objective is closing the opening in the stoma-bearing bowel = Repair; Reposition is the competing reading.",
+  "confidence": "medium",
+  "note": "Took B (Repair): no segment removed so Excision does not apply, there is no rerouting, and freeing the loop from the wall is a step to the closure; kept A's Reposition as a transverse-colon set because it groups 344-346 (for ileum both readings give 329-331)."
+ },
+ "44626": {
+  "code": "44626",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBM0ZZ"
+    ],
+    "note": "stomal descending colon excised, joined to rectal stump"
+   },
+   {
+    "codes": [
+     "0DBN0ZZ"
+    ],
+    "note": "stomal sigmoid excised, joined to rectal stump"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Z433",
+    "condition": "colostomy takedown",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Hartmann reversal: the stoma-bearing colon end is resected and anastomosed to the rectal stump = Excision of that colon; anastomosis and mobilization integral.",
+  "confidence": "medium",
+  "note": "New: this CPT includes resection, and Coding Clinic convention codes a takedown with bowel removed as Excision with the anastomosis inherent; rejected A's Reposition (minor bowel 344-346; bowel is removed, not just moved) and B's Bypass (reversal restores, not reroutes). Lands 329-331."
+ },
+ "45130": {
+  "code": "45130",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBP0ZZ"
+    ],
+    "note": "prolapsed rectal segment"
+   },
+   {
+    "codes": [
+     "0DBP0ZZ",
+     "0DBN0ZZ"
+    ],
+    "note": "prolapsed rectum and distal sigmoid"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "K623",
+    "condition": "rectal prolapse",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Perineal rectosigmoidectomy: full-thickness bowel cut and peritoneum entered through the perineum = open approach; a distal rectal cuff stays, so Excision rectum (plus sigmoid when taken).",
+  "confidence": "medium",
+  "note": "Took B: A's Resection is wrong since a distal cuff remains (B3.8), and approach 7 is for transanal local excision (0DBP7ZZ would fall to 347-349); sigmoid-inclusive set kept since it moves 332-334 to 329-331."
+ },
+ "48153": {
+  "code": "48153",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FBG0ZZ",
+     "0DB90ZZ",
+     "0FT40ZZ",
+     "0FB90ZZ"
+    ],
+    "note": "pylorus-preserving Whipple"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   },
+   {
+    "code": "C170",
+    "condition": "duodenal cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Pancreatic head Excision, duodenum Excision (proximal cuff kept), gallbladder Resection, distal CBD Excision, all open; no gastric code since the stomach/pylorus is kept.",
+  "confidence": "high",
+  "note": "Took B: pylorus-preserving resection leaves a proximal duodenal cuff, so it is Excision of the duodenum, not Resection. The duodenal-cancer alternative therefore groups to 326-328, not 329-331."
+ },
+ "48154": {
+  "code": "48154",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0FBG0ZZ",
+     "0DB90ZZ",
+     "0FT40ZZ",
+     "0FB90ZZ"
+    ],
+    "note": "pylorus-preserving Whipple, no pancreatic-enteric anastomosis"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C250",
+    "condition": "pancreatic head cancer",
+    "role": "typical"
+   },
+   {
+    "code": "C170",
+    "condition": "duodenal cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Pancreatic head Excision, duodenum Excision (proximal cuff kept), gallbladder Resection, distal CBD Excision, all open.",
+  "confidence": "high",
+  "note": "Took B: pylorus-preserving resection leaves a proximal duodenal cuff, so it is Excision of the duodenum, not Resection. The duodenal-cancer alternative therefore groups to 326-328, not 329-331."
+ },
+ "49062": {
+  "code": "49062",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0W9J0ZZ"
+    ],
+    "note": "pelvic lymphocele fenestrated into peritoneum"
+   },
+   {
+    "codes": [
+     "0W9H0ZZ"
+    ],
+    "note": "extraperitoneal iliac-fossa lymphocele"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "I9789",
+    "condition": "postoperative lymphocele",
+    "role": "typical"
+   },
+   {
+    "code": "T8619",
+    "condition": "kidney transplant complication",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Internal drainage of a lymphocele into the peritoneum = Drainage of the cavity holding it (pelvic cavity or retroperitoneum), open.",
+  "confidence": "low",
+  "note": "Took B: a lymphocele is a collection in a body cavity, not a lymphatic vessel, so Drainage of pelvic cavity/retroperitoneum beats A's pelvic-lymphatic Drainage; B's postprocedural vs transplant-complication dx split is real."
+ },
+ "49188": {
+  "code": "49188",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBW0ZZ"
+    ],
+    "note": "peritoneal tumor"
+   },
+   {
+    "codes": [
+     "0DBV0ZZ"
+    ],
+    "note": "mesenteric tumor"
+   },
+   {
+    "codes": [
+     "0WBH0ZZ"
+    ],
+    "note": "retroperitoneal tumor"
+   },
+   {
+    "codes": [
+     "0DBU0ZZ"
+    ],
+    "note": "omental tumor"
+   },
+   {
+    "codes": [
+     "0D5W0ZZ"
+    ],
+    "note": "destruction of peritoneal implants"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C786",
+    "condition": "peritoneal metastasis",
+    "role": "typical"
+   },
+   {
+    "code": "C480",
+    "condition": "retroperitoneal sarcoma",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Same as smaller size bands: Excision of the containing body part or Destruction; size does not change PCS.",
+  "confidence": "medium",
+  "note": "Took A: at 10-20 cm summed diameter both peritoneal-metastasis debulking and retroperitoneal sarcoma are common, so keep C78.6 typical with C48.0 as the family-changing alternative B dropped."
+ },
+ "49189": {
+  "code": "49189",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WBH0ZZ"
+    ],
+    "note": "retroperitoneal tumor"
+   },
+   {
+    "codes": [
+     "0DBV0ZZ"
+    ],
+    "note": "mesenteric tumor"
+   },
+   {
+    "codes": [
+     "0DBW0ZZ"
+    ],
+    "note": "peritoneal tumor"
+   },
+   {
+    "codes": [
+     "0DBU0ZZ"
+    ],
+    "note": "omental tumor"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C480",
+    "condition": "retroperitoneal sarcoma",
+    "role": "typical"
+   },
+   {
+    "code": "C786",
+    "condition": "peritoneal metastasis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Large non-organ tumor, most often retroperitoneal sarcoma: Excision, retroperitoneum (or mesentery/peritoneum/omentum), open.",
+  "confidence": "medium",
+  "note": "Took A: retroperitoneal sarcoma typical, but extensive carcinomatosis debulking also reaches this size band, so keep A's C78.6 alternative (different family)."
+ },
+ "49190": {
+  "code": "49190",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WBH0ZZ"
+    ],
+    "note": "retroperitoneal tumor"
+   },
+   {
+    "codes": [
+     "0DBV0ZZ"
+    ],
+    "note": "mesenteric tumor"
+   },
+   {
+    "codes": [
+     "0DBW0ZZ"
+    ],
+    "note": "peritoneal tumor"
+   },
+   {
+    "codes": [
+     "0DBU0ZZ"
+    ],
+    "note": "omental tumor"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C480",
+    "condition": "retroperitoneal sarcoma",
+    "role": "typical"
+   },
+   {
+    "code": "C786",
+    "condition": "peritoneal metastasis",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Very large non-organ tumor, most often retroperitoneal liposarcoma: Excision, retroperitoneum (or mesentery/peritoneum/omentum), open.",
+  "confidence": "medium",
+  "note": "Took A: same reasoning as 49189; C78.6 alternative restored because large-volume peritoneal debulking is a common use."
+ },
+ "49215": {
+  "code": "49215",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0WBH0ZZ"
+    ],
+    "note": "presacral mass excised"
+   },
+   {
+    "codes": [
+     "0WBH0ZZ",
+     "0QTS0ZZ"
+    ],
+    "note": "with coccygectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D367",
+    "condition": "benign presacral tumor",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Presacral space is extraperitoneal: Excision, retroperitoneum, open; add Resection of coccyx when the coccyx is taken en bloc.",
+  "confidence": "low",
+  "note": "Took B: the Neoplasm Table sends presacral-region benign tumors to D36.7, not D20.0 (retroperitoneum); PCS sets identical in both passes."
+ },
+ "49255": {
+  "code": "49255",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBU0ZZ"
+    ],
+    "note": "partial (infracolic) omentectomy"
+   },
+   {
+    "codes": [
+     "0DTU0ZZ"
+    ],
+    "note": "total omentectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C786",
+    "condition": "peritoneal metastasis",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Omentectomy = Excision of omentum when partial (usual infracolic), Resection when the whole omentum is removed.",
+  "confidence": "medium",
+  "note": "Took A: standalone omentectomy for omental disease takes C78.6 even with an ovarian primary (treatment directed at the metastasis), so B's C56.9 alternative is not a common principal dx here."
+ },
+ "50100": {
+  "code": "50100",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TN30ZZ"
+    ],
+    "note": "right, Release of kidney pelvis (B3.13 reading)"
+   },
+   {
+    "codes": [
+     "0TN40ZZ"
+    ],
+    "note": "left, Release of kidney pelvis (B3.13 reading)"
+   },
+   {
+    "codes": [
+     "04S90ZZ"
+    ],
+    "note": "right, vessel moved off UPJ coded as Reposition of renal artery"
+   },
+   {
+    "codes": [
+     "04SA0ZZ"
+    ],
+    "note": "left, vessel moved off UPJ coded as Reposition of renal artery"
+   },
+   {
+    "codes": [
+     "04L90ZZ"
+    ],
+    "note": "right, vessel divided coded as Occlusion of renal artery"
+   },
+   {
+    "codes": [
+     "04LA0ZZ"
+    ],
+    "note": "left, vessel divided coded as Occlusion of renal artery"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N130",
+    "condition": "UPJ obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Freeing the UPJ from a crossing vessel = Release of kidney pelvis (B3.13 codes the body part freed); coders may instead code the vessel work as Reposition or Occlusion of renal artery; open.",
+  "confidence": "low",
+  "note": "Merged: B's Release reading as typical plus A's Reposition and Occlusion readings; Occlusion moves the family to 673-675, so the real ambiguity is kept visible."
+ },
+ "50205": {
+  "code": "50205",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TB00ZX"
+    ],
+    "note": "right kidney"
+   },
+   {
+    "codes": [
+     "0TB10ZX"
+    ],
+    "note": "left kidney"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N179",
+    "condition": "acute kidney injury",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open kidney biopsy = Excision, kidney, open, diagnostic qualifier; done for medical renal disease when a needle biopsy is unsafe.",
+  "confidence": "medium",
+  "note": "Took B: a renal mass is rarely biopsied open (needle biopsy or partial nephrectomy instead), so A's mass alternative is not common enough to keep."
+ },
+ "50548": {
+  "code": "50548",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TT04ZZ",
+     "0TT64ZZ",
+     "0TBB4ZZ"
+    ],
+    "note": "right, with bladder cuff"
+   },
+   {
+    "codes": [
+     "0TT14ZZ",
+     "0TT74ZZ",
+     "0TBB4ZZ"
+    ],
+    "note": "left, with bladder cuff"
+   },
+   {
+    "codes": [
+     "0TT04ZZ",
+     "0TT64ZZ"
+    ],
+    "note": "right, no cuff or cuff taken transurethrally"
+   },
+   {
+    "codes": [
+     "0TT14ZZ",
+     "0TT74ZZ"
+    ],
+    "note": "left, no cuff or cuff taken transurethrally"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C651",
+    "condition": "renal pelvis cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Laparoscopic nephroureterectomy = Resection kidney + Resection ureter, perc endoscopic; a bladder cuff is a distinct body part coded as Excision of bladder.",
+  "confidence": "medium",
+  "note": "Took B, cuff sets first: the cuff is standard for upper-tract cancer and moves the case to 653-655, but a transurethral cuff (0TBB8ZZ) or none stays 656-658, so both families are real."
+ },
+ "50600": {
+  "code": "50600",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T960ZZ"
+    ],
+    "note": "right ureter drained"
+   },
+   {
+    "codes": [
+     "0T970ZZ"
+    ],
+    "note": "left ureter drained"
+   },
+   {
+    "codes": [
+     "0T9600Z"
+    ],
+    "note": "right, tube left in ureter"
+   },
+   {
+    "codes": [
+     "0T9700Z"
+    ],
+    "note": "left, tube left in ureter"
+   },
+   {
+    "codes": [
+     "0TJ90ZZ"
+    ],
+    "note": "exploration only"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N131",
+    "condition": "ureteral obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Open ureterotomy = Drainage of ureter (device value when a tube stays in the ureter, which is non-OR and groups medical); exploration alone = Inspection of ureter.",
+  "confidence": "low",
+  "note": "Merged: A's no-device Drainage sets (659-661) plus B's device and Inspection variants; kept A's specific N131 over B's unspecified N139."
+ },
+ "50605": {
+  "code": "50605",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T760DZ"
+    ],
+    "note": "right ureter"
+   },
+   {
+    "codes": [
+     "0T770DZ"
+    ],
+    "note": "left ureter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N131",
+    "condition": "ureteral obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Stent placed through an open ureterotomy to hold an obstructed ureter open = Dilation, ureter, intraluminal device, open; non-OR in MS-DRG terms, groups by diagnosis.",
+  "confidence": "medium",
+  "note": "Took A: stented strictures usually have hydronephrosis (N131, 693-694); N135 is the no-hydronephrosis code and CMS's own v44 Appendix B lists it under 689-690, so that family is CMS's, not a grouper error."
+ },
+ "50728": {
+  "code": "50728",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DQB0ZZ",
+     "0WQF0ZZ"
+    ],
+    "note": "ileal conduit stoma, fascial repair"
+   },
+   {
+    "codes": [
+     "0DQB0ZZ",
+     "0WUF0JZ"
+    ],
+    "note": "ileal conduit stoma, mesh hernia repair"
+   },
+   {
+    "codes": [
+     "0TQ60ZZ",
+     "0WQF0ZZ"
+    ],
+    "note": "right cutaneous ureterostomy stoma"
+   },
+   {
+    "codes": [
+     "0TQ70ZZ",
+     "0WQF0ZZ"
+    ],
+    "note": "left cutaneous ureterostomy stoma"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N99523",
+    "condition": "urostomy hernia",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Stoma revision = Repair of the conduit body part (ileum or ureter) plus the abdominal wall: Repair for a fascial closure, Supplement when mesh is placed.",
+  "confidence": "low",
+  "note": "Merged A and B: A's mesh variant (groups 981-983, since mesh Supplement has no MDC 11 row) is a common real case and kept; B's ureterostomy stomas added."
+ },
+ "50815": {
+  "code": "50815",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T180Z9",
+     "0DBN0ZZ"
+    ],
+    "note": "bilateral, sigmoid conduit"
+   },
+   {
+    "codes": [
+     "0T180Z9",
+     "0DBL0ZZ"
+    ],
+    "note": "bilateral, transverse colon conduit"
+   },
+   {
+    "codes": [
+     "0T160Z9",
+     "0DBN0ZZ"
+    ],
+    "note": "solitary right ureter, sigmoid"
+   },
+   {
+    "codes": [
+     "0T170Z9",
+     "0DBN0ZZ"
+    ],
+    "note": "solitary left ureter, sigmoid"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N319",
+    "condition": "neurogenic bladder",
+    "role": "typical"
+   },
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Colon conduit = Bypass ureter(s) to colocutaneous plus Excision of the colon segment taken for it (B3.9).",
+  "confidence": "medium",
+  "note": "Merged: A's laterality sets + B's transverse colon set; benign dx typical (conduit without cystectomy), bladder cancer kept as alternative for palliative diversion (656-658)."
+ },
+ "50820": {
+  "code": "50820",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T180ZC",
+     "0DBB0ZZ"
+    ],
+    "note": "bilateral ureters"
+   },
+   {
+    "codes": [
+     "0T160ZC",
+     "0DBB0ZZ"
+    ],
+    "note": "solitary right ureter"
+   },
+   {
+    "codes": [
+     "0T170ZC",
+     "0DBB0ZZ"
+    ],
+    "note": "solitary left ureter"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N319",
+    "condition": "neurogenic bladder",
+    "role": "typical"
+   },
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Ileal conduit = Bypass ureter(s) to ileocutaneous plus Excision of the harvested ileal segment (B3.9).",
+  "confidence": "medium",
+  "note": "Merged: identical PCS sets; A's benign dx as typical since with cancer the conduit is usually billed with the cystectomy code, B's bladder cancer kept as alternative (656-658)."
+ },
+ "50825": {
+  "code": "50825",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T180Z9",
+     "0DBF0ZZ",
+     "0DBB0ZZ"
+    ],
+    "note": "right colon pouch with ileal limb"
+   },
+   {
+    "codes": [
+     "0T180ZC",
+     "0DBB0ZZ"
+    ],
+    "note": "all-ileal pouch"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N319",
+    "condition": "neurogenic bladder",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Continent cutaneous reservoir = Bypass ureters to colocutaneous or ileocutaneous plus Excision of each bowel segment harvested to build it.",
+  "confidence": "medium",
+  "note": "Took A: a continent pouch without cystectomy is built for benign disease; cancer patients get it with cystectomy (a different code), so the cancer alternative is not common here."
+ },
+ "50860": {
+  "code": "50860",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0T160ZD"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0T170ZD"
+    ],
+    "note": "left"
+   },
+   {
+    "codes": [
+     "0T180ZD"
+    ],
+    "note": "bilateral"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C679",
+    "condition": "bladder cancer",
+    "role": "typical"
+   },
+   {
+    "code": "N131",
+    "condition": "ureteral stricture",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Ureter brought to the skin = Bypass ureter to cutaneous, open.",
+  "confidence": "medium",
+  "note": "Took B: standalone cutaneous ureterostomy in older adults is mostly palliative diversion for pelvic cancer; benign obstruction kept as the alternative (659-661)."
+ },
+ "50930": {
+  "code": "50930",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQ60ZZ",
+     "0DQN0ZZ"
+    ],
+    "note": "right ureter-sigmoid fistula"
+   },
+   {
+    "codes": [
+     "0TQ70ZZ",
+     "0DQN0ZZ"
+    ],
+    "note": "left ureter-sigmoid fistula"
+   },
+   {
+    "codes": [
+     "0TQ60ZZ",
+     "0DQB0ZZ"
+    ],
+    "note": "right ureter-ileum fistula"
+   },
+   {
+    "codes": [
+     "0TQ70ZZ",
+     "0DQB0ZZ"
+    ],
+    "note": "left ureter-ileum fistula"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N2889",
+    "condition": "ureteral fistula",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Fistula closed on both sides: Repair ureter plus Repair of the involved bowel segment (separate body systems).",
+  "confidence": "low",
+  "note": "Took B, restoring the bowel variant A dropped for grouping: this code is for ureter-bowel fistulas; ureterovaginal fistulas are usually fixed by reimplantation, which is a different code."
+ },
+ "51800": {
+  "code": "51800",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQC0ZZ"
+    ],
+    "note": "bladder neck plasty, Repair reading"
+   },
+   {
+    "codes": [
+     "0T7C0ZZ"
+    ],
+    "note": "bladder neck widening, Dilation reading"
+   },
+   {
+    "codes": [
+     "0TBB0ZZ"
+    ],
+    "note": "fundus resection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N320",
+    "condition": "bladder neck obstruction",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Bladder neck plasty = Repair (PCS index: cystoplasty to Repair); widening by incision and flap can also read as Dilation, which is non-OR; fundus reduction = Excision of bladder.",
+  "confidence": "low",
+  "note": "Merged: A's Repair (653-655) as the index-supported reading, B's Dilation (medical 698-700) kept as the defensible other reading, and B's fundus Excision; dropped wedge resection alone, an add-on."
+ },
+ "54390": {
+  "code": "54390",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0TQD0ZZ",
+     "0VQS0ZZ"
+    ],
+    "note": "urethroplasty + penile reconstruction"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "Q640",
+    "condition": "epispadias",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Epispadias correction in an exstrophy patient: reconstruct the dorsal urethra (Repair urethra) and correct the penile deformity (Repair penis), open; Supplement if graft/flap tissue is used.",
+  "confidence": "low",
+  "note": "Took B: the CPT is the epispadias (urethral/penile) repair in an exstrophy patient; bladder closure is a separate CPT, so A's bladder Repair over-codes it. Penis procedures 709-710 with epispadias as principal."
+ },
+ "55650": {
+  "code": "55650",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0VT30ZZ"
+    ],
+    "note": "bilateral"
+   },
+   {
+    "codes": [
+     "0VT10ZZ"
+    ],
+    "note": "right"
+   },
+   {
+    "codes": [
+     "0VT20ZZ"
+    ],
+    "note": "left"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C637",
+    "condition": "seminal vesicle cancer",
+    "role": "typical"
+   },
+   {
+    "code": "Q554",
+    "condition": "seminal vesicle cyst",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Removal of the whole seminal vesicle = Resection of seminal vesicle, open, by laterality.",
+  "confidence": "medium",
+  "note": "Took B: the same Resection codes. It keeps a benign cyst alternative because primary seminal vesicle cancer is rare, benign cystic disease is at least as common, and the cyst moves the case to 717-718."
+ },
+ "58240": {
+  "code": "58240",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0UTG0ZZ",
+     "0TTB0ZZ",
+     "0TTD0ZZ",
+     "0DTP0ZZ",
+     "0T180ZC",
+     "0DBB0ZZ",
+     "0D1N0Z4"
+    ],
+    "note": "total exenteration, conduit and colostomy"
+   },
+   {
+    "codes": [
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0UTG0ZZ",
+     "0TTB0ZZ",
+     "0TTD0ZZ",
+     "0T180ZC",
+     "0DBB0ZZ"
+    ],
+    "note": "anterior exenteration"
+   },
+   {
+    "codes": [
+     "0UT90ZZ",
+     "0UTC0ZZ",
+     "0UTG0ZZ",
+     "0DTP0ZZ",
+     "0D1N0Z4"
+    ],
+    "note": "posterior exenteration"
+   },
+   {
+    "codes": [
+     "0UTG0ZZ",
+     "0TTB0ZZ",
+     "0TTD0ZZ",
+     "0DTP0ZZ",
+     "0T180ZC",
+     "0DBB0ZZ",
+     "0D1N0Z4"
+    ],
+    "note": "total exenteration after prior hysterectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C539",
+    "condition": "cervical cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Each organ removed = Resection; ileal conduit = Bypass ureters to ileocutaneous plus ileum Excision; end colostomy = Bypass sigmoid to cutaneous.",
+  "confidence": "medium",
+  "note": "Took B: adds urethra resection (removed with the bladder in female anterior exenteration) and the post-hysterectomy total exenteration variant (recurrent endometrial cancer), which groups to 748 under v44."
+ },
+ "58520": {
+  "code": "58520",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UQ90ZZ"
+    ],
+    "note": "hysterorrhaphy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N9971",
+    "condition": "iatrogenic uterine perforation",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Suture repair of nonobstetric uterine rupture = Repair, uterus, open.",
+  "confidence": "low",
+  "note": "Took A: iatrogenic perforation (N9971) is the plausible Medicare cause of nonobstetric uterine rupture needing repair; traumatic laceration (B) is rare at this age; confidence lowered to low."
+ },
+ "58700": {
+  "code": "58700",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT50ZZ"
+    ],
+    "note": "right tube"
+   },
+   {
+    "codes": [
+     "0UT60ZZ"
+    ],
+    "note": "left tube"
+   },
+   {
+    "codes": [
+     "0UT70ZZ"
+    ],
+    "note": "both tubes"
+   },
+   {
+    "codes": [
+     "0UB50ZZ"
+    ],
+    "note": "partial right tube"
+   },
+   {
+    "codes": [
+     "0UB60ZZ"
+    ],
+    "note": "partial left tube"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N7011",
+    "condition": "hydrosalpinx",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Whole tube removed = Resection of fallopian tube, open; part of one tube = Excision; Medicare indication is chronic tubal disease.",
+  "confidence": "medium",
+  "note": "Merged: B's sets plus a left partial set; dropped B's ectopic alternative (not a Medicare population) and A's bilateral partial set (that is sterilization, not a Medicare indication)."
+ },
+ "58822": {
+  "code": "58822",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0U9000Z"
+    ],
+    "note": "right ovary, drain left in"
+   },
+   {
+    "codes": [
+     "0U9100Z"
+    ],
+    "note": "left ovary, drain left in"
+   },
+   {
+    "codes": [
+     "0U900ZZ"
+    ],
+    "note": "right ovary, no drain"
+   },
+   {
+    "codes": [
+     "0U910ZZ"
+    ],
+    "note": "left ovary, no drain"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "N7003",
+    "condition": "tubo-ovarian abscess",
+    "role": "typical"
+   }
+  ],
+  "rationale": "This code is the abdominal (open) approach, despite CMS's short descriptor; Drainage of ovary, open, drain device if left in; surgical, not bedside.",
+  "confidence": "medium",
+  "note": "Merged: B's open-approach sets (the code is the abdominal approach; A followed CMS's percutaneous short descriptor) with A's tubo-ovarian abscess diagnosis."
+ },
+ "58940": {
+  "code": "58940",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0UT00ZZ"
+    ],
+    "note": "right total"
+   },
+   {
+    "codes": [
+     "0UT10ZZ"
+    ],
+    "note": "left total"
+   },
+   {
+    "codes": [
+     "0UT20ZZ"
+    ],
+    "note": "bilateral total"
+   },
+   {
+    "codes": [
+     "0UB00ZZ"
+    ],
+    "note": "right partial"
+   },
+   {
+    "codes": [
+     "0UB10ZZ"
+    ],
+    "note": "left partial"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D279",
+    "condition": "benign ovarian tumor",
+    "role": "typical"
+   },
+   {
+    "code": "C569",
+    "condition": "ovarian cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Open oophorectomy = Resection of ovary (total) or Excision (partial), by side; malignant pathology moves the case to the malignancy family.",
+  "confidence": "high",
+  "note": "Merged: B's sets and cancer alternative (common for a postmenopausal adnexal mass; 731-733 vs 742-743), with A's side-neutral D279 since the sets span both sides."
+ },
+ "58958": {
+  "code": "58958",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0DBW0ZZ",
+     "0DBU0ZZ",
+     "07TC0ZZ",
+     "07BD0ZZ"
+    ],
+    "note": "complete pelvic node dissection (Resection), limited aortic (Excision)"
+   },
+   {
+    "codes": [
+     "0DBW0ZZ",
+     "0DBU0ZZ",
+     "07BC0ZZ",
+     "07BD0ZZ"
+    ],
+    "note": "pelvic nodes partially removed (Excision)"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C786",
+    "condition": "peritoneal metastasis",
+    "role": "typical"
+   },
+   {
+    "code": "C569",
+    "condition": "ovarian cancer",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Excision of recurrent peritoneal tumor with omentectomy and node dissection; surgery aimed at the recurrence, not the excised primary, puts the secondary site first; Resection vs Excision of pelvic nodes moves the family only under the ovarian dx.",
+  "confidence": "low",
+  "note": "Merged: A's dx (guideline I.C.2.b: treatment directed at the secondary site makes C78.6 principal) with C56.9 kept as alternative; A's Resection-of-pelvic-nodes set plus an Excision set (B's reading), since the full-chain call depends on the op note and splits 734-735 from 749-750."
+ },
+ "58960": {
+  "code": "58960",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "07BC0ZX",
+     "07BD0ZX",
+     "0DBW0ZX",
+     "0DBU0ZZ"
+    ],
+    "note": "node sampling, peritoneal biopsies, omentectomy"
+   },
+   {
+    "codes": [
+     "07BC0ZX",
+     "07BD0ZX",
+     "0DBW0ZX"
+    ],
+    "note": "without omentectomy"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C569",
+    "condition": "ovarian cancer",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Staging/second-look laparotomy: exploration not coded; retroperitoneal node sampling and peritoneal biopsies are diagnostic Excisions; omentectomy as Excision when done.",
+  "confidence": "medium",
+  "note": "Took B: the CPT describes node sampling, so Excision (not A's Resection of pelvic nodes, which wrongly pushed 734-735); changed node qualifier to diagnostic X since staging samples are biopsies; side-neutral C56.9. Family 749-750 either way."
+ },
+ "60522": {
+  "code": "60522",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "07TM0ZZ",
+     "07T70ZZ"
+    ],
+    "note": "thymectomy with mediastinal node dissection"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C37",
+    "condition": "thymoma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Thymus resection plus radical mediastinal dissection coded separately as Resection of thorax lymphatic (B3.10c).",
+  "confidence": "medium",
+  "note": "Took A: same PCS in both; dropped B's myasthenia alternative because a radical mediastinal dissection implies tumor, and extended thymectomy for myasthenia without thymoma is uncommon in Medicare."
+ },
+ "60545": {
+  "code": "60545",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0GT30ZZ",
+     "0WBH0ZZ"
+    ],
+    "note": "right adrenal with retroperitoneal mass"
+   },
+   {
+    "codes": [
+     "0GT20ZZ",
+     "0WBH0ZZ"
+    ],
+    "note": "left adrenal with retroperitoneal mass"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "C7400",
+    "condition": "adrenal cortex cancer",
+    "role": "typical"
+   },
+   {
+    "code": "C480",
+    "condition": "retroperitoneal sarcoma",
+    "role": "alternative"
+   }
+  ],
+  "rationale": "Adrenal resection plus separate Excision of retroperitoneum for the adjacent tumor.",
+  "confidence": "medium",
+  "note": "Took A: same PCS in both; adrenal cortex cancer typical (unspecified side, since sets are lateralized) and retroperitoneal sarcoma with adrenal en bloc kept as the common family-changing alternative."
+ },
+ "60605": {
+  "code": "60605",
+  "mappable": true,
+  "unmapped_reason": null,
+  "pcs_sets": [
+   {
+    "codes": [
+     "0GT70ZZ",
+     "03BM0ZZ"
+    ],
+    "note": "right, external carotid segment excised"
+   },
+   {
+    "codes": [
+     "0GT60ZZ",
+     "03BN0ZZ"
+    ],
+    "note": "left, external carotid segment excised"
+   },
+   {
+    "codes": [
+     "0GT70ZZ",
+     "03RK0JZ"
+    ],
+    "note": "right, internal carotid replaced by graft"
+   },
+   {
+    "codes": [
+     "0GT60ZZ",
+     "03RL0JZ"
+    ],
+    "note": "left, internal carotid replaced by graft"
+   }
+  ],
+  "principal_dx": [
+   {
+    "code": "D446",
+    "condition": "carotid body paraganglioma",
+    "role": "typical"
+   }
+  ],
+  "rationale": "Carotid body Resection plus the arterial objective: Excision of the sacrificed external carotid, or Replacement when the internal carotid is resected and grafted.",
+  "confidence": "medium",
+  "note": "Took B: the external carotid is the artery usually sacrificed (037-039); internal carotid resection needs a graft (Replacement, 040-042); D446 is where the index sends carotid body tumors."
+ }
+}
