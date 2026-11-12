@@ -42,7 +42,7 @@ export function layout(ctx, { path, title, description, page, body }) {
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 ${ctx.assets.preload}${LIVE.has(page) ? `\n<link rel="preload" href="${ctx.assets.data}" as="fetch" crossorigin>` : ''}
 <link rel="stylesheet" href="${ctx.assets.css}">
-<script defer src="${ctx.assets.js}"></script>
+<script defer src="${ctx.assets.js}"></script>${page === 'stake' && ctx.assets.stakeJs ? `\n<script defer src="${ctx.assets.stakeJs}"></script>` : ''}
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body data-page="${page}"${LIVE.has(page) ? ` data-ipo="${ctx.assets.data}" data-other="${ctx.assets.other}"` : ''}${page === 'stake' ? ` data-stake="${ctx.assets.stake}"` : ''}>

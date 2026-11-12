@@ -88,6 +88,15 @@ class InpatientFamilies(unittest.TestCase):
         self.assertIn({"dx": "lung cancer", "variant": "0YQ50ZZ"}, whens)
         self.assertTrue(all(w["dx"] in ("lung cancer", "heart disease") for w in whens))
 
+    def test_families_split_by_diagnosis_only_carry_a_dx_only_when(self):
+        rec = {"pcs_sets": [{"codes": ["0BTC0ZZ"], "note": "lobectomy"}],
+               "principal_dx": [{"code": "C3411", "condition": "lung cancer", "role": "typical"},
+                                {"code": "I2510", "condition": "heart disease", "role": "alternative"}]}
+        families = build.inpatient(rec, build.Ref.load())["families"]
+        self.assertEqual([f["when"] for f in families],
+                         [{"dx": "lung cancer", "variant": None}, {"dx": "heart disease", "variant": None}])
+        self.assertNotEqual(families[0]["drgs"], families[1]["drgs"])
+
     def test_a_cluster_driven_family_shows_the_part_2_row(self):
         # Extensive fusion 523-525 comes from an Appendix E Part 2 cluster, not a Part 1 row.
         ref = build.Ref.load()

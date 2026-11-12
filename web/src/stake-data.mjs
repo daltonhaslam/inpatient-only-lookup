@@ -118,3 +118,45 @@ export function credits(reviews, model) {
   }
   return byCode;
 }
+
+/**
+ * What the browser needs to search, filter and draw cards, and nothing else: the card without
+ * "Show the work" and without the review buttons (both stay on each code page, where the mapping is
+ * visible). Repeated strings (tier wording, DRG family names) go in tables. `siteCodes` are codes
+ * that have a page on the site but are not in the crosswalk. hydrate() reverses this in the browser.
+ */
+export function clientModel(model, groups, siteCodes = []) {
+  const strings = [];
+  const ref = (text) => {
+    let at = strings.indexOf(text);
+    if (at < 0) at = strings.push(text) - 1;
+    return at;
+  };
+  const codes = {};
+  for (const [code, item] of Object.entries(model.codes)) {
+    const { op } = item;
+    const slim = { label: item.label, group: item.group, year: item.year, kind: item.kind, op: { si: op.si, apc: op.apc, apcTitle: op.apcTitle, rate: op.rate, asc: op.asc }, review: { status: item.review.status, needsInpatient: item.review.needsInpatient }, tier: item.tier && { n: item.tier.n, why: ref(item.tier.why) }, diff: item.diff };
+    if (item.ip) {
+      slim.ip = {
+        low: item.ip.low, high: item.ip.high,
+        families: item.ip.families.map((f) => ({ condition: f.condition, dx: f.dx ? { code: f.dx.code } : undefined, name: ref(f.name), basis: f.basis, drgs: f.drgs.map((d) => ({ drg: d.drg })), low: f.low, high: f.high, caveat: f.caveat || undefined, when: f.when && (f.when.dx || f.when.variant) ? f.when : undefined })),
+      };
+    }
+    codes[code] = slim;
+  }
+  const { years } = model.meta;
+  return { meta: { years, groups }, strings, codes, siteCodes: [...siteCodes].filter((code) => !model.codes[code]).sort() };
+}
+
+/** The items card() draws, from a clientModel() document. */
+export function hydrate(doc) {
+  const codes = {};
+  for (const [code, slim] of Object.entries(doc.codes)) {
+    codes[code] = {
+      ...slim, code,
+      tier: slim.tier && { n: slim.tier.n, why: doc.strings[slim.tier.why] },
+      ip: slim.ip && { ...slim.ip, families: slim.ip.families.map((f) => ({ ...f, name: doc.strings[f.name] })) },
+    };
+  }
+  return { ...doc, codes };
+}

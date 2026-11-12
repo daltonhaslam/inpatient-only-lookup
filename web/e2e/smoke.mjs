@@ -353,6 +353,142 @@ await check('phone 390x844: no horizontal overflow', async (page) => {
   assert(wide.length === 0, wide.join('\n'));
 }, { viewport: { width: 390, height: 844 } });
 
+// ---- Revenue at stake: search, filters and cards -----------------------------------------
+
+const hasStake = LIVE ? (await fetch(`${base}/revenue-at-stake/`)).ok : existsSync(join(here, '..', '..', 'docs', 'revenue-at-stake', 'index.html'));
+const cardsOf = (page) => page.locator('[data-results] [data-stake-card]');
+async function openStake(page, query = '') {
+  await open(page, `/revenue-at-stake/${query}`);
+  await page.waitForSelector('[data-results] [data-stake-card], [data-results] [data-outside]');
+}
+/** Wait for the live count line to say something that satisfies the test. */
+const countLine = (page, test, what) => waitText(page.locator('#sf-count'), test, what);
+
+if (!hasStake) {
+  console.log('– skipped: no Revenue at stake pages in this build');
+  skipped += 1;
+} else {
+  await check('stake: the page starts with cards, 50 at a time, and Show more adds more', async (page) => {
+    await openStake(page);
+    eq(await cardsOf(page).count(), 50, 'first slice');
+    await countLine(page, (t) => /^Showing 50 of [\d,]+ codes\.$/.test(t), 'count line');
+    await page.locator('[data-more]').click();
+    eq(await cardsOf(page).count(), 100, 'after Show more');
+    const focused = await page.evaluate(() => document.activeElement.getAttribute('data-stake-card'));
+    assert(focused, 'focus did not move to the first new card');
+    assert(await page.locator('.sresults__more [data-more]').isVisible(), 'Show more should stay while codes remain');
+  });
+
+  await check('stake: searching 32480 shows its card, with a range, a status and a link to the code page', async (page) => {
+    await openStake(page);
+    await page.locator('#sf-q').fill('32480');
+    await countLine(page, (t) => t === '1 code.', 'count line');
+    eq(await cardsOf(page).count(), 1, 'cards');
+    const card = page.locator('[data-stake-card="32480"]');
+    has(await card.textContent(), '$', 'card has dollars');
+    assert(await card.locator('.badge').count() === 1, 'card has a review status');
+    assert(await card.locator('a[href="/code/32480/#stake-h"]').count() === 1, 'card links to its code page');
+    assert(await card.locator('.scard__work').count() === 0, 'client cards leave the work to the code page');
+    has(page.url(), 'q=32480', 'URL remembers the search');
+  });
+
+  await check('stake: searching by words finds procedures', async (page) => {
+    await openStake(page);
+    await page.locator('#sf-q').fill('lobectomy');
+    await page.waitForFunction(() => document.querySelectorAll('[data-results] [data-stake-card]').length > 0 && document.querySelectorAll('[data-results] [data-stake-card]').length < 40);
+    assert(await page.locator('[data-stake-card="32480"]').count() === 1 || await cardsOf(page).count() > 0, 'no results for lobectomy');
+  });
+
+  await check('stake: the Tier 3 filter shows only Tier 3 cards and survives a reload', async (page) => {
+    await openStake(page);
+    await page.locator('#sf-tier').selectOption('3');
+    await countLine(page, (t) => /codes?\.$/.test(t) && !/^No /.test(t), 'count line');
+    const tiers = await page.locator('[data-results] [data-stake-card]').evaluateAll((nodes) => nodes.map((n) => n.className));
+    assert(tiers.length > 0, 'no Tier 3 cards');
+    assert(tiers.every((c) => c.includes('scard--t3')), `non-Tier-3 card shown: ${tiers.find((c) => !c.includes('scard--t3'))}`);
+    has(page.url(), 'tier=3', 'URL remembers the filter');
+    await page.reload();
+    await page.waitForSelector('[data-results] [data-stake-card]');
+    eq(await page.locator('#sf-tier').inputValue(), '3', 'tier select after reload');
+    const again = await page.locator('[data-results] [data-stake-card]').evaluateAll((nodes) => nodes.every((n) => n.className.includes('scard--t3')));
+    assert(again, 'reload lost the Tier 3 filter');
+  });
+
+  await check('stake: filters combine, sort by biggest gap, clear resets', async (page) => {
+    await openStake(page);
+    await page.locator('#sf-year').selectOption('2027');
+    await page.locator('#sf-compared').check();
+    await page.locator('#sf-sort').selectOption('gap');
+    await page.waitForFunction(() => new URLSearchParams(location.search).get('sort') === 'gap');
+    const gaps = await page.locator('[data-results] [data-stake-card] .scard__gap').allTextContents();
+    assert(gaps.length > 5 && gaps.every((g) => g.includes('$')), 'cards in the gap sort should all carry a gap');
+    await page.locator('[data-reset]').click();
+    eq(await page.locator('#sf-year').inputValue(), '', 'year after clear');
+    eq(await page.evaluate(() => location.search), '', 'URL after clear');
+    eq(await page.evaluate(() => document.activeElement.id), 'sf-q', 'focus returns to the search box');
+  });
+
+  await check('stake: a code outside the crosswalk says so and points to the lookup or its code page', async (page) => {
+    await openStake(page);
+    await page.locator('#sf-q').fill('99213');
+    await page.waitForSelector('[data-outside="99213"]');
+    has(await page.locator('[data-outside]').textContent(), 'Not in this crosswalk', 'message');
+    eq(await page.locator('[data-outside] a').getAttribute('href'), '/?q=99213', 'lookup link');
+    await countLine(page, (t) => t === '99213 is not in this crosswalk.', 'live region');
+    await page.locator('#sf-q').fill('27447');
+    await page.waitForSelector('[data-outside="27447"]');
+    eq(await page.locator('[data-outside] a').getAttribute('href'), '/code/27447/', 'code page link');
+  });
+
+  await check('stake: keyboard only, from search to filters to clear', async (page) => {
+    await openStake(page);
+    for (let i = 0; i < 40 && (await page.evaluate(() => document.activeElement.id)) !== 'sf-q'; i += 1) await page.keyboard.press('Tab');
+    eq(await page.evaluate(() => document.activeElement.id), 'sf-q', 'Tab reaches the search box');
+    await page.keyboard.type('32480');
+    await countLine(page, (t) => t === '1 code.', 'count after typing');
+    await page.keyboard.press('ControlOrMeta+a');
+    await page.keyboard.press('Backspace');
+    await countLine(page, (t) => /^Showing 50/.test(t), 'count after clearing');
+    for (const id of ['sf-group', 'sf-status', 'sf-tier']) {
+      await page.keyboard.press('Tab');
+      eq(await page.evaluate(() => document.activeElement.id), id, `Tab order reaches ${id}`);
+    }
+    await page.keyboard.type('Tier 3');   // type-ahead picks the option without opening the list
+    await page.waitForFunction(() => document.querySelector('#sf-tier').value === '3');
+    await page.waitForFunction(() => [...document.querySelectorAll('[data-results] [data-stake-card]')].every((n) => n.className.includes('scard--t3')));
+    for (let i = 0; i < 20 && (await page.evaluate(() => document.activeElement.hasAttribute('data-reset'))) === false; i += 1) await page.keyboard.press('Tab');
+    await page.keyboard.press('Enter');
+    eq(await page.evaluate(() => document.activeElement.id), 'sf-q', 'Clear returns focus to search');
+    eq(await page.locator('#sf-tier').inputValue(), '', 'tier cleared');
+  });
+
+  await check('stake: dark mode draws the filters on the dark page', async (page) => {
+    await openStake(page, '?tier=3');
+    const colors = await page.evaluate(() => ({ body: getComputedStyle(document.body).backgroundColor, select: getComputedStyle(document.querySelector('#sf-tier')).backgroundColor, card: getComputedStyle(document.querySelector('[data-stake-card]')).backgroundColor }));
+    eq(colors.select, colors.body, 'select background');
+    eq(colors.card, colors.body, 'card background');
+    const lum = (rgb) => rgb.match(/\d+/g).slice(0, 3).reduce((a, b) => a + Number(b), 0) / 3;
+    assert(lum(colors.body) < 60, `page is not dark: ${colors.body}`);
+  }, { colorScheme: 'dark' });
+
+  await check('stake 375px: no horizontal overflow with a search and with the Tier 3 filter', async (page) => {
+    const wide = [];
+    for (const query of ['', '?q=32480', '?tier=3', '?q=99213']) {
+      await openStake(page, query);
+      await page.locator('[data-more]').click().catch(() => {});
+      const m = await page.evaluate(() => ({ s: document.documentElement.scrollWidth, c: document.documentElement.clientWidth }));
+      if (m.s > m.c + 1) wide.push(`${query || '/'}: ${m.s} > ${m.c}`);
+    }
+    assert(wide.length === 0, wide.join('\n'));
+  }, { viewport: { width: 375, height: 800 } });
+
+  await check('stake: with JavaScript off the table is still there', async (page) => {
+    await page.goto(`${base}/revenue-at-stake/`);
+    assert(await page.locator('tr[data-code="32480"]').count() === 1, 'table row for 32480');
+    eq(await page.locator('[data-stake-app] *').count(), 0, 'app is empty without JS');
+  }, { javaScriptEnabled: false });
+}
+
 // ---- accessibility ------------------------------------------------------------------------
 
 // Read lazily so a missing node_modules gives this message, not a raw ENOENT at import time.
@@ -360,13 +496,14 @@ function axeSource() {
   if (!existsSync(AXE)) throw new Error('axe-core is not installed. Run: cd web && npm install');
   return readFileSync(AXE, 'utf8');
 }
-const axePaths = ['/?q=27447', '/code/27132/', '/history/', '/phase-out/', '/exemption/', '/methods/', '/group/spine/'];
+const axePaths = ['/?q=27447', ...(hasStake ? ['/revenue-at-stake/?tier=3', '/revenue-at-stake/?q=99213'] : []), '/code/27132/', '/history/', '/phase-out/', '/exemption/', '/methods/', '/group/spine/'];
 for (const scheme of ['light', 'dark']) {
   await check(`axe (${scheme}): no serious or critical violations`, async (page) => {
     const report = [];
     for (const path of axePaths) {
       await open(page, path);
-      if (path.includes('q=')) await page.waitForSelector('[data-results] .verdict');
+      if (path.startsWith('/revenue-at-stake/')) await page.waitForSelector('[data-results] [data-stake-card], [data-results] [data-outside]');
+      else if (path.includes('q=')) await page.waitForSelector('[data-results] .verdict');
       await page.evaluate(axeSource());   // evaluate, not addScriptTag: the live CSP forbids inline scripts
       const results = await page.evaluate(() => window.axe.run(document));
       for (const v of results.violations.filter((x) => x.impact === 'serious' || x.impact === 'critical')) {

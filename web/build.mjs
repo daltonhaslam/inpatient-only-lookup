@@ -12,7 +12,7 @@ import { SITE } from './src/site.mjs';
 import { todayISO, isDate, monthYear, formatDate, clampDate, periodIndex, siAt, countsAt, exemptCodes, lookup, eventsOf, csv } from './src/engine.mjs';
 import * as pages from './src/pages.mjs';
 import * as stake from './src/stake.mjs';
-import { normalize, credits } from './src/stake-data.mjs';
+import { normalize, credits, clientModel } from './src/stake-data.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -292,12 +292,16 @@ async function main() {
   const script = await bundle({
     entryPoints: [join(here, 'src/client.mjs')], bundle: true, minify: true, format: 'iife', target: 'es2020', write: false, legalComments: 'none',
   });
+  const stakeScript = ctx.stake ? await bundle({
+    entryPoints: [join(here, 'src/stake-client.mjs')], bundle: true, minify: true, format: 'iife', target: 'es2020', write: false, legalComments: 'none',
+  }) : null;
   ctx.assets = {
     css,
     js: hashed('assets', 'app', 'js', script.outputFiles[0].contents),
+    stakeJs: stakeScript ? hashed('assets', 'stake', 'js', stakeScript.outputFiles[0].contents) : null,
     data: hashed('data', 'ipo', 'json', JSON.stringify(ctx.data)),
     other: hashed('data', 'other', 'json', JSON.stringify(packOther())),
-    stake: ctx.stake ? hashed('data', 'stake', 'json', JSON.stringify(ctx.stake.model)) : null,
+    stake: ctx.stake ? hashed('data', 'stake', 'json', JSON.stringify(clientModel(ctx.stake.model, ctx.stake.groups, ctx.codes))) : null,
     preload: faces.map((f) => `<link rel="preload" href="${f.url}" as="font" type="font/woff2" crossorigin>`).join('\n'),
   };
 

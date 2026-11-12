@@ -8,7 +8,8 @@ import { execFileSync } from 'node:child_process';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { agreeHref, wrongHref, claimHref, REVIEW_ENTRY } from '../src/site.mjs';
-import { normalize } from '../src/stake-data.mjs';
+import { normalize, clientModel, hydrate } from '../src/stake-data.mjs';
+import { card } from '../src/stake-card.mjs';
 import { CSV_HEADER } from '../src/stake.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -40,6 +41,22 @@ describe('revenue at stake', { skip }, () => {
   const model = doc ? normalize(doc) : null;
   const codes = model ? Object.keys(model.codes) : [];
   const items = model ? Object.values(model.codes) : [];
+
+  test('the trimmed browser model draws the same cards as the full one, and stays under 600 KB', () => {
+    const slim = clientModel(model, [], ['27447']);
+    const text = JSON.stringify(slim);
+    assert.ok(text.length < 600000, `client JSON is ${text.length} bytes`);
+    assert.ok(!('27447' in slim.codes) && slim.siteCodes.includes('27447'));
+    const back = hydrate(JSON.parse(text));
+    for (const code of codes) assert.equal(card(back.codes[code], model.meta, { detail: false }), card(model.codes[code], model.meta, { detail: false }), code);
+  });
+
+  test('browser cards never carry the review buttons or the work; code-page cards do', () => {
+    const compared = items.find((item) => item.kind === 'compare');
+    assert.ok(!card(compared, model.meta, { detail: false }).includes('forms/d/e'));
+    assert.ok(!card(compared, model.meta, { detail: false }).includes('Show the work</summary>'));
+    assert.ok(card(compared, model.meta).includes('Show the work</summary>'));
+  });
 
   test('every removed code page has one block, and no other code page has one', () => {
     assert.equal(codes.length, doc.meta.counts.codes);

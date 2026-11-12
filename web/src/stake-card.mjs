@@ -169,8 +169,8 @@ ${stale}
 
 const formLink = (href, text, cls) => `<a class="${cls}" href="${esc(href)}" target="_blank" rel="noopener noreferrer">${text}<span class="sr"> (opens in a new tab)</span></a>`;
 
-/** The full card. title: render the code and label (off on the code's own page, where the h1 says it). */
-export function card(item, meta, { title = true } = {}) {
+/** The full card. title: render the code and label (off on the code's own page, where the h1 says it). detail: include Show the work and the review buttons (off in the browser, which links to the code page instead). */
+export function card(item, meta, { title = true, detail = true } = {}) {
   const head = title ? `<p class="scard__title"><span class="scard__code">${esc(item.code)}</span> <span class="scard__label">${esc(item.label)}</span></p>` : '';
   if (item.kind !== 'compare') {
     return `<article class="scard scard--none" data-stake-card="${esc(item.code)}" data-kind="${esc(item.kind)}">
@@ -180,7 +180,6 @@ ${item.kind === 'pending' || item.kind === 'unmapped' ? `<dl class="scard__pay">
   }
   const many = item.ip.families.length > 1;
   const tier = item.tier ? `<p class="scard__tier"><strong>Tier ${item.tier.n}.</strong> ${esc(item.tier.why)}</p>` : '';
-  const summary = mappingSummary(item);
   return `<article class="scard scard--t${item.tier ? item.tier.n : 0}" data-stake-card="${esc(item.code)}" data-kind="compare">
 ${head}<p class="scard__status">${statusBadge(item.review)}</p>
 <p class="scard__gap">${esc(gapText(item)).replace(/\$[\d,]+–\$[\d,]+/g, (range) => `<span class="nw">${range}</span>`)}</p>
@@ -191,7 +190,7 @@ ${head}<p class="scard__status">${statusBadge(item.review)}</p>
 ${scaleBar(item)}
 ${tier}
 <p class="scard__fine">National, unadjusted: no wage index, IME or DSH. <span class="scard__draft">${esc(BADGE)}</span></p>
-${work(item, meta)}
-<p class="scard__act">${formLink(agreeHref(item.code, item.map.fp, summary), 'Agree', 'btn')}${formLink(wrongHref(item.code, item.map.fp, summary), 'Something’s wrong', 'btn btn--quiet')}</p>
+${detail ? `${work(item, meta)}
+<p class="scard__act">${formLink(agreeHref(item.code, item.map.fp, mappingSummary(item)), 'Agree', 'btn')}${formLink(wrongHref(item.code, item.map.fp, mappingSummary(item)), 'Something’s wrong', 'btn btn--quiet')}</p>` : `<p class="scard__more"><a href="/code/${esc(item.code)}/#stake-h">Show the work, or review this mapping, for ${esc(item.code)}</a></p>`}
 </article>`;
 }
