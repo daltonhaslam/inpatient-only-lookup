@@ -315,11 +315,14 @@ if __name__ == "__main__":
 class ProfileLinks(unittest.TestCase):
     def test_accepted_and_normalized(self):
         self.assertEqual(reviews.clean_profile("  https://www.linkedin.com/in/jane-doe?utm=x#top "), "https://www.linkedin.com/in/jane-doe")
-        self.assertEqual(reviews.clean_profile("https://orcid.org/0000-0000-0000-0000?a=b"), "https://orcid.org/0000-0000-0000-0000?a=b")
+        self.assertEqual(reviews.clean_profile("https://orcid.org/0000-0000-0000-0000?a=b#c"), "https://orcid.org/0000-0000-0000-0000")
 
     def test_rejected(self):
         for bad in ("http://linkedin.com/in/x", "javascript:alert(1)", "https://linkedin.com/in/ jane", "https://jane@linkedin.com/in/x",
-                    "https://u:p@example.org/", "https://", "https:///path", "https://example.org/" + "a" * 200, "", None, "linkedin.com/in/x"):
+                    "https://u:p@example.org/", "https://", "https:///path", "https://example.org/" + "a" * 200, "", None, "linkedin.com/in/x",
+                    "https://example.org/a@b", "https://example.org/?next=a@b", "https://example.org/a\x07b", "https://example.org/a\x7fb",
+                    "https://127.0.0.1/x", "https://[::1]/x", "https://localhost/x", "https://a.localhost/x", "https://2130706433/x",
+                    "https://intranet/x"):
             self.assertIsNone(reviews.clean_profile(bad), bad)
 
     def _csv(self, tmp, name, profile):
@@ -365,3 +368,13 @@ class ProfileLinks(unittest.TestCase):
         self.assertEqual(reviews.resolution_problems(good), [])
         bad = {"X:aaaa1111": {"by": "Jane Doe", "by_profile": "http://x.org"}, "Y:bbbb2222": {"by_profile": "https://x.org"}}
         self.assertEqual(len(reviews.resolution_problems(bad)), 2)
+
+    def test_name_with_different_profiles_is_flagged_and_non_ascii_host(self):
+        base = {"code": "32480", "verdict": "agree", "credential": "CCS", "ts": "2026-11-12 09:00:00"}
+        rows = [dict(base, name="Jane Doe", profile="https://github.com/a"),
+                dict(base, code="44150", ts="2026-11-12 10:00:00", name="jane doe", profile="https://github.com/b"),
+                dict(base, code="48150", ts="2026-11-12 11:00:00", name="Sam Lee", profile="https://b\u00fccher.example/x")]
+        flags = reviews.abuse_flags(rows)
+        self.assertTrue(any(f.startswith("NAME: 'jane doe' appears with different profile links") for f in flags))
+        self.assertFalse(any("sam lee" in f for f in flags))
+        self.assertTrue(any("non-ASCII host" in f and f.startswith("PROFILE (48150)") for f in flags))

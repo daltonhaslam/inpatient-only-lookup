@@ -15,7 +15,7 @@ describe('credit links', () => {
   });
 
   test('no profile, or an unusable one, leaves the plain name', () => {
-    for (const bad of [null, undefined, '', 'http://example.org/x', 'javascript:alert(1)', 'https://u:p@example.org/', 'https://ex ample.org/', 'https://' + 'a'.repeat(200) + '.org']) {
+    for (const bad of [null, undefined, '', 'http://example.org/x', 'javascript:alert(1)', 'https://u:p@example.org/', 'https://ex ample.org/', 'https://example.org/a@b', 'https://example.org/?n=a@b', 'https://example.org/a\x07b', 'https://127.0.0.1/', 'https://[::1]/', 'https://localhost/', 'https://a.localhost/', 'https://2130706433/', 'https://intranet/', 'https://' + 'a'.repeat(200) + '.org']) {
       const html = render([agree('Jane Doe', bad)]);
       assert.ok(html.includes('<li>Jane Doe, CCS</li>'), String(bad));
       assert.ok(!html.includes('<a href="http') && !html.includes('javascript'), String(bad));
@@ -42,6 +42,20 @@ describe('credit links', () => {
     const html = render([later, agree('Jane Doe', null)], { '11111:aaaa1111': { by: 'Sam Lee, MD', date: '2026-11-20' } });
     assert.ok(html.includes('<li>Jane Doe, CIC</li>') && !html.includes('Jane Doe, CCS'));
     assert.ok(html.includes('<li>Sam Lee, MD</li>'));
+  });
+
+  test('query and fragment are dropped for every host', () => {
+    assert.equal(safeProfile('https://orcid.org/0000?a=b#c'), 'https://orcid.org/0000');
+  });
+
+  test('the same name with different profiles is listed twice', () => {
+    const html = render([agree('Jane Doe', 'https://github.com/a'), agree('Jane Doe', 'https://github.com/b')]);
+    assert.equal((html.match(/<li>/g) || []).length, 2);
+  });
+
+  test('credential Other is not shown', () => {
+    const html = render([{ ...agree('Jane Doe', null), credential: 'Other' }]);
+    assert.ok(html.includes('<li>Jane Doe</li>') && !html.includes('Other'));
   });
 
   test('safeProfile', () => {

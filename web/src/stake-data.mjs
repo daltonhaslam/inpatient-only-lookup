@@ -129,12 +129,18 @@ export function removalMismatches(model, data) {
   return found;
 }
 
-/** A profile link only if it is a plain https URL with a host and no credentials, whitespace or fragment tricks; else null. */
+/** A profile link only if it is a plain https URL: no whitespace, control characters or "@", a real hostname (no IP literal, localhost or dotless name). Query and fragment are dropped. Else null. */
 export function safeProfile(value) {
-  if (typeof value !== 'string' || value.length > 200 || /\s/.test(value) || !/^https:\/\//i.test(value)) return null;
+  if (typeof value !== 'string' || value.length > 200 || /[\s\x00-\x1f\x7f@]/.test(value) || !/^https:\/\//i.test(value)) return null;
   try {
     const url = new URL(value);
-    return url.protocol === 'https:' && url.hostname && !url.username && !url.password ? url.href : null;
+    const host = url.hostname;
+    const labels = host.split('.');
+    if (url.protocol !== 'https:' || !host || url.port || host.startsWith('[') || labels.length < 2 || labels.includes('') ||
+      /^\d+$/.test(labels[labels.length - 1]) || labels[labels.length - 1] === 'localhost') return null;
+    url.search = '';
+    url.hash = '';
+    return url.href;
   } catch {
     return null;
   }
@@ -150,7 +156,7 @@ export function credits(reviews, model, resolutions = {}) {
   for (const row of list(reviews)) {
     const item = model.codes[row.code];
     if (!item || !item.map || row.fp !== item.map.fp || row.verdict !== 'agree' || !row.name) continue;
-    (byCode[row.code] ||= []).push({ name: row.name, credential: row.credential || '', date: row.date || '', profile: safeProfile(row.profile) });
+    (byCode[row.code] ||= []).push({ name: row.name, credential: row.credential === 'Other' ? '' : row.credential || '', date: row.date || '', profile: safeProfile(row.profile) });
   }
   for (const [key, ruling] of Object.entries(resolutions || {})) {
     const [code, fp] = key.split(':');

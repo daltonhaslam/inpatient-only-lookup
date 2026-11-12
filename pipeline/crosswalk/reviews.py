@@ -16,6 +16,7 @@ and the run waits for a yes before writing.
 """
 import argparse
 import csv
+import ipaddress
 import re
 import sys
 from urllib.parse import urlsplit, urlunsplit
@@ -106,10 +107,12 @@ def _clean_name(value, log, code):
 
 def clean_profile(value):
     """The normalized https profile URL, or None when it is not acceptable: https only, at most
-    PROFILE_LIMIT characters, no whitespace inside, no user@host credentials, a hostname present.
-    Leading/trailing whitespace is stripped; linkedin.com URLs lose their query string and fragment."""
+    PROFILE_LIMIT characters, no whitespace or control characters, no "@" anywhere, a real hostname
+    (not an IP literal, localhost or a dotless name). Surrounding whitespace is stripped and the
+    query string and fragment are dropped for every host."""
     value = (value or "").strip()
-    if not value or len(value) > PROFILE_LIMIT or re.search(r"\s", value) or not value.lower().startswith("https://"):
+    if (not value or len(value) > PROFILE_LIMIT or re.search(r"[\s\x00-\x1f\x7f@]", value)
+            or not value.lower().startswith("https://")):
         return None
     try:
         parts = urlsplit(value)
@@ -117,11 +120,20 @@ def clean_profile(value):
         port = parts.port
     except ValueError:
         return None
-    if parts.scheme != "https" or not host or "@" in parts.netloc or port not in (None, 443):
+    if parts.scheme != "https" or not host or port not in (None, 443) or not _public_host(host):
         return None
-    if host == "linkedin.com" or host.endswith(".linkedin.com"):
-        parts = parts._replace(query="", fragment="")
-    return urlunsplit(parts)
+    return urlunsplit(parts._replace(query="", fragment=""))
+
+
+def _public_host(host):
+    try:
+        ipaddress.ip_address(host)
+        return False
+    except ValueError:
+        pass
+    labels = host.split(".")
+    return (len(labels) > 1 and host != "localhost" and labels[-1] != "localhost" and not labels[-1].isdigit()
+            and all(labels))
 
 
 def profile_host(url):
@@ -211,11 +223,21 @@ def abuse_flags(rows):
             if row["name"]:
                 names[row["name"].lower()] += 1
         flags += ["%s: display name %r appears %d times" % (code, name, n) for name, n in sorted(names.items()) if n > 1]
-        flags += ["PROFILE (%s): %s — check before approving" % (code, profile_host(row["profile"])) for row in group
-                  if row.get("profile") and profile_host(row["profile"]) not in KNOWN_PROFILE_HOSTS]
+        for row in group:
+            host = profile_host(row["profile"]) if row.get("profile") else ""
+            if host and not host.isascii():
+                flags.append("PROFILE (%s): %s — non-ASCII host, check before approving" % (code, host))
+            elif host and host not in KNOWN_PROFILE_HOSTS:
+                flags.append("PROFILE (%s): %s — check before approving" % (code, host))
         agrees = [row for row in group if row["verdict"] == "agree"]
         if agrees and not any(row["credential"] in INPATIENT_CREDS for row in agrees):
             flags.append("%s: %d agreement(s), none from an inpatient credential" % (code, len(agrees)))
+    profiles = defaultdict(set)
+    for row in rows:
+        if row.get("name"):
+            profiles[row["name"].lower()].add(row.get("profile"))
+    flags += ["NAME: %r appears with different profile links (%s)" % (name, ", ".join(sorted(p or "none" for p in found)))
+              for name, found in sorted(profiles.items()) if len(found) > 1]
     return flags
 
 

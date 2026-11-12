@@ -21,7 +21,7 @@ mapper's own words only, never CPT descriptor text.
 - `resolutions.json`: how each disputed code was resolved, keyed `"code:fp"` to `{decision, by, date}`.
   A tiebreaker may add `by_profile`, an optional https link their name points to on the help-review
   page. It must already be in the normalized form `reviews.clean_profile()` returns (https, at most
-  200 characters, no spaces, no `user@host`; linkedin.com without query or fragment) and needs a `by`.
+  200 characters, no spaces or control characters, no `@`, a real hostname; query and fragment dropped) and needs a `by`.
   `crosswalk/build.py` stops on a bad one; `reviews.resolution_problems(resolutions)` lists them.
 - `claims.json`: counts of claimed review batches, written by `reviews.py ingest --claims`.
 
