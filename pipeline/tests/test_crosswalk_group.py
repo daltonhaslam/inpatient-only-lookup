@@ -147,7 +147,8 @@ class Group(unittest.TestCase):
         self.assertEqual(self.group(["0SG00AJ", "0SG0071"], "M4316")["drgs"], ["402"])
         self.assertEqual(self.group(["0SG00AJ", "0SG30AJ"], "M4316")["drgs"], ["447", "448"])
         self.assertEqual(self.group(["0SG10AJ"], "M4316")["drgs"], ["447", "448"])
-        # Bilateral hip replacement: two codes of the same kind do pair outside MDC 05.
+        # Bilateral hip replacement: two codes of the same kind do pair outside MDC 05, from
+        # two different sites (test_bilateral_joints_need_two_sites).
         self.assertEqual(self.group(["0SR9019", "0SRB019"], "M1611")["drgs"], ["461", "462"])
         # Bile duct exploration: 411-413 only with a cholecystectomy, else 408-410.
         self.assertEqual(self.group(["0FC90ZZ"], "K8050")["drgs"], ["408", "409", "410"])
@@ -163,6 +164,70 @@ class Group(unittest.TestCase):
         # Hip replacement: hip fracture family only with a hip-fracture principal diagnosis.
         self.assertEqual(self.group(["0SR9019"], "S72001A")["drgs"], ["521", "522"])
         self.assertEqual(self.group(["0SR9019"], "M1611")["drgs"], ["469", "470"])
+
+    def test_hip_and_knee_revisions(self):
+        # v44 has no 466-468. Revision root (0SW) is 449. A removal (0SP) is listed under
+        # 403-404 (with a periprosthetic joint infection principal diagnosis) and 463-465, both
+        # above 469-470, and no class lists removal "and" replacement except 461-462 (as one
+        # site): so a removal plus replacement of one joint goes where the removal does.
+        def drgs(codes, dx):
+            for code in codes:
+                self.assertIn(code, self.ref.pcs)
+            self.assertIn(dx, self.ref.cm)
+            return self.group(codes, dx)["drgs"]
+        wound = ["463", "464", "465"]
+        # Knee revision for mechanical loosening: removal + replacement, right knee.
+        self.assertEqual(drgs(["0SPC0JZ", "0SRC0J9"], "T84032A"), wound)
+        # Hip revision for dislocation of the prosthesis: removal + replacement, left hip.
+        self.assertEqual(drgs(["0SPB0JZ", "0SRB0J9"], "T84021A"), wound)
+        # Infected knee prosthesis: removal with spacer insertion, or removal + replacement.
+        self.assertEqual(drgs(["0SPC0JZ", "0SHC08Z"], "T8453XA"), ["403", "404"])
+        self.assertEqual(drgs(["0SPC0JZ", "0SRC0J9"], "T8453XA"), ["403", "404"])
+        # Removal alone; revision root; replacement alone of a previously replaced joint.
+        self.assertEqual(drgs(["0SPC0JZ"], "T84032A"), wound)
+        self.assertEqual(drgs(["0SWC0JZ"], "T84032A"), ["449"])
+        self.assertEqual(drgs(["0SRC0J9"], "T84032A"), ["469", "470"])
+        # Primary total knee stays 469-470.
+        result = self.group(["0SRD0J9"], "M1711")
+        self.assertIn("M1711", self.ref.cm)
+        self.assertEqual((result["mdc"], result["drgs"], result["basis"]), ("08", ["469", "470"], "in-mdc"))
+        # Conversion to total hip with removal of femoral hardware: 498-499 ranks above 469-470.
+        self.assertEqual(drgs(["0SR90J9", "0QP604Z"], "M1611"), ["498", "499"])
+
+    def test_bilateral_joints_need_two_sites(self):
+        # 461-462 needs codes from two of its sites (right hip, left knee ...); acetabular and
+        # femoral surfaces of one hip, or femoral and tibial of one knee, are one site.
+        self.assertEqual(self.group(["0SRA0J9", "0SRR0J9"], "M1611")["drgs"], ["469", "470"])
+        self.assertEqual(self.group(["0SRT0J9", "0SRV0J9"], "M1711")["drgs"], ["469", "470"])
+        self.assertEqual(self.group(["0SRC0J9", "0SRD0J9"], "M1711")["drgs"], ["461", "462"])
+        # A revision on one side still goes where its removal does (463-465 ranks above).
+        self.assertEqual(self.group(["0SPC0JZ", "0SRC0J9", "0SRD0J9"], "M1711")["drgs"], ["463", "464", "465"])
+
+    def test_joint_site_pairs_are_the_bilateral_clusters(self):
+        pairs = {frozenset(entry) for entries in self.ref.joint_sites.values() for entry in entries
+                 if len(entry) > 1}
+        clusters = {frozenset(code for group in cluster["groups"] for code in group)
+                    for cluster in self.ref.clusters if any(row["drgs"][0] == "461" for row in cluster["rows"])}
+        self.assertEqual(pairs, clusters)
+        self.assertEqual(len(pairs), 1528)
+
+    def test_procedure_clusters(self):
+        # Resection of uterus, cervix and supporting structures: radical hysterectomy 734-735.
+        self.assertEqual(self.group(["0UT40ZZ", "0UT90ZZ", "0UTC0ZZ"], "D259")["drgs"], ["734", "735"])
+        self.assertEqual(self.group(["0UT90ZZ", "0UTC0ZZ"], "D259")["drgs"], ["742", "743"])
+        # Pre-MDC: insertion of a short-term heart assist system with removal of one is 001-002.
+        self.assertEqual(self.group(["02HA0RS"], "I5022")["drgs"], ["215"])
+        result = self.group(["02HA0RS", "02PA0RZ"], "I5022")
+        self.assertEqual((result["drgs"], result["basis"]), (["001", "002"], "pre-mdc"))
+        # MDC 10 lists knee liner removal and replacement under 628-630; neither code alone.
+        self.assertEqual(self.group(["0SRC0J9"], "E6601")["basis"], "unrelated-extensive")
+        self.assertEqual(self.group(["0SPC09Z", "0SRC0J9"], "E6601")["drgs"], ["628", "629", "630"])
+
+    def test_non_or_combinations(self):
+        # Appendix E Part 3: a bile duct stent exchange is non-OR, though the insertion is OR.
+        self.assertEqual(self.group(["0FHB7DZ"], "K8050")["drgs"], ["408", "409", "410"])
+        result = self.group(["0FHB7DZ", "0FPB7DZ"], "K8050")
+        self.assertEqual((result["basis"], result["or_codes"]), ("medical", []))
 
     def test_any_or_procedure_families(self):
         # v44 DRGs defined as a principal diagnosis plus ANY O.R. procedure (no Appendix E rows).

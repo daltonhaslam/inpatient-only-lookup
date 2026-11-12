@@ -19,14 +19,17 @@ What this cannot see, and so does not model:
 - CC/MCC: a family is returned as the whole severity set; pricing gives its range.
 - Secondary diagnoses, except where noted. Pancreas transplant DRGs need diabetes (and 008/019
   renal failure); they are assumed present.
-- Appendix E Part 2-4: procedure clusters (codes CMS only accepts in pairs, e.g. heart assist
-  revisions with removals), Part 3 non-OR combinations and Part 4 MDC 14 obstetric logic are
-  not parsed. Cluster-only codes have no Appendix E row, so they group as non-OR.
+- Appendix E Part 4 (MDC 14 obstetric logic) is not parsed. Part 2 procedure clusters
+  (combinations CMS lists under a class, e.g. uterus, cervix and supporting structures under
+  radical hysterectomy 734-735) add their rows to their codes' own (_clusters); Part 3
+  combinations (bile duct stent exchanges) are made non-OR.
 - Conditions other than the principal diagnosis and the other codes present (number of
   spinal levels beyond the codes, device types); see _in_mdc.
 - Non-OR procedures that CMS lets lead to a surgical or a procedure-driven medical DRG
   (debridement to 579-581, cardiac catheterization to 286-287, MV > 96 hours to 207): per the
-  spec, a case with no OR procedure groups by diagnosis.
+  spec, a case with no OR procedure groups by diagnosis. Nor do they outrank an OR code: a
+  percutaneous hip or knee spacer removal (0SPC38Z*, listed for 463-465) with a replacement
+  groups to 469-470 here, 463-465 in v44.
 - MDC 25 with only non-extensive OR procedures goes to 987-989 (v44 not checked for this).
 
 Shared tables come from Ref and are never mutated.
@@ -108,7 +111,8 @@ def group(pcs_codes, principal_dx, ref, sex=None):
         raise ValueError("%r is not a billable FY2027 ICD-10-CM principal diagnosis" % principal_dx)
     if sex not in (None, "F", "M"):
         raise ValueError("sex must be 'F', 'M' or None, not %r" % sex)
-    or_codes = [code for code in codes if code in ref.unrelated]
+    non_or = {code for combo in ref.non_or_combos if set(combo) <= set(codes) for code in combo}
+    or_codes = [code for code in codes if code in ref.unrelated and code not in non_or]
     mdc, ambiguous = _principal_mdc(principal_dx, codes, sex, ref)
 
     def result(family_mdc, drgs, family, basis):
@@ -199,6 +203,21 @@ def _principal_mdc(dx, codes, sex, ref):
     return mdcs[0], True
 
 
+def _clusters(codes, ref):
+    """{"A+B": rows} the Appendix E Part 2 clusters the codes complete, keyed by their codes.
+
+    A cluster's rows are read like one more code's: CMS lists it under each class whose logic
+    names the combination, and its codes keep their own rows (v44 groups a knee removal plus
+    replacement, cluster 0SPC0JZ+0SRC0J9, by the removal's 463-465 row).
+    """
+    present, found = set(codes), {}
+    for cluster in ref.clusters:
+        if all(group & present for group in cluster["groups"]):
+            key = "+".join(sorted(code for group in cluster["groups"] for code in group & present))
+            found.setdefault(key, []).extend(cluster["rows"])
+    return found
+
+
 # ---------------------------------------------------------------- Pre-MDC
 
 # Pre-MDC codes that qualify only with something else, by the set of Pre-MDC rows Appendix E
@@ -240,6 +259,11 @@ def _pre_mdc(codes, dx, ref):
         if rows:
             roles[code] = _pre_role(code, rows)
             candidates.extend((code, row) for row in rows)
+    for key, rows in _clusters(codes, ref).items():
+        rows = [row for row in rows if row["mdc"] == PRE]
+        if rows:
+            roles[key] = None
+            candidates.extend((key, row) for row in rows)
     if not candidates:
         return None
     has = set(roles.values())
@@ -289,33 +313,37 @@ def _in_mdc(codes, or_codes, mdc, dx, ref):
     concomitant aortic and mitral valves, 216-218 valve with catheterization, 650-651 kidney
     transplant with hemodialysis, combined spinal fusions) or a principal diagnosis (521-522
     hip fracture, 731-733 malignancy). A code listed under a lower family as well can only land
-    there when a higher one's condition fails, so for each OR code:
+    there when a higher one's condition fails, so for each OR code, and each Appendix E Part 2
+    cluster the codes complete (as one more code with the cluster's rows):
     - rows whose stated v44 condition the codes do not show are dropped (_condition_met);
     - a diagnosis-specific row (DRGs Appendix B lists for some diagnosis) keeps the DRGs listed
       for this diagnosis, else its other DRGs, else is dropped (unless it is the code's only
       row in the MDC: then the listing is for other logic and the row stands);
     - its lowest-ranked remaining row (its base) always qualifies;
-    - a higher row qualifies when the diagnosis is listed for it, or (212) its procedure
-      condition was checked in full;
+    - a higher row qualifies when the diagnosis is listed for it, or (212, 461-462) its
+      procedure condition was checked in full;
     - of the higher rows in a family where another of the codes is an acceptable partner
       (_partner_ok), the lowest-ranked qualifies. Lowest, because a partner code is often
       listed under several of them: a catheterization has rows in 212, 216-218 and 233-234, so
       valve plus catheterization is 216-218 and bypass plus catheterization 233-234.
     """
     listed = set(ref.dx_drgs.get(dx, ()))
+    entries = {code: ref.proc_index[code] for code in or_codes}
+    entries.update(_clusters(codes, ref))
     families = {code: frozenset(_row_rank(mdc, row["drgs"], ref) for row in ref.proc_index.get(code, ())
                                 if row["mdc"] == mdc)
                 for code in codes}
+    families.update({code: frozenset(_row_rank(mdc, row["drgs"], ref) for row in rows if row["mdc"] == mdc)
+                     for code, rows in entries.items() if code not in families})
     hierarchy = ref.hierarchy.get(mdc, ())
     best = None
-    for code in or_codes:
-        rows = [row for row in ref.proc_index[code]
-                if row["mdc"] == mdc and _condition_met(mdc, row["drgs"], codes, ref)]
+    for code, all_rows in entries.items():
+        rows = [row for row in all_rows if row["mdc"] == mdc and _condition_met(mdc, row["drgs"], codes, ref)]
         kept = []
         for row in rows:
             # A row qualifies outright when its whole condition is shown: the diagnosis is
-            # listed for it, or (212) _condition_met checked all three procedure groups.
-            drgs, shown = row["drgs"], mdc == "05" and row["drgs"][0] == "212"
+            # listed for it, or (212, 461-462) _condition_met checked it in full.
+            drgs, shown = row["drgs"], (mdc, row["drgs"][0]) in _CHECKED_IN_FULL
             specific = [drg for drg in drgs if drg in ref.dx_specific]
             if specific:
                 matched = [drg for drg in specific if drg in listed]
@@ -352,6 +380,7 @@ _DELIVERY_FAMILIES = ("783", "786", "768", "796")   # cesarean, vaginal delivery
 _DELIVERY = frozenset(("786", "805"))               # rows of cesarean and vaginal delivery codes
 _CHOLECYSTECTOMY = frozenset(("414", "417"))        # rows 411-416 (open) and 417-419 (laparoscopic)
 _COMBINED_FUSION = ("402", "426", "429")            # combined anterior and posterior fusion families
+_CHECKED_IN_FULL = frozenset((("05", "212"), ("08", "461")))   # rows _condition_met settles
 
 
 def _condition_met(mdc, drgs, codes, ref):
@@ -362,7 +391,9 @@ def _condition_met(mdc, drgs, codes, ref):
     - MDC 07 411-413 (cholecystectomy with C.D.E.) needs a cholecystectomy; a bile duct
       exploration alone is 408-410 ("biliary tract procedures except only cholecystectomy");
     - 212 needs an aortic valve (02xF) and a mitral valve (02xG) procedure plus at least one
-      concomitant procedure (a third code listed for 212).
+      concomitant procedure (a third code listed for 212);
+    - 461-462 needs codes from two different lower extremity sites of its list (right hip,
+      left knee ...): two codes on one joint (acetabular and femoral surfaces) are not bilateral.
     """
     first = drgs[0]
     if mdc == "14" and first in _DELIVERY_FAMILIES:
@@ -373,6 +404,11 @@ def _condition_met(mdc, drgs, codes, ref):
         listed = [code for code in codes if _has_row(code, "05", {"212"}, ref)]
         valves = {code[3] for code in listed if code[1] == "2"}
         return {"F", "G"} <= valves and len(listed) >= 3
+    if mdc == "08" and first == "461":
+        present = set(codes)
+        sites = [site for site, entries in ref.joint_sites.items()
+                 if any(set(entry) <= present for entry in entries)]
+        return len(sites) >= 2
     return True
 
 
@@ -391,7 +427,8 @@ def _partner_ok(mdc, family, code, other, families):
       same set of families (two grafts, two valves) are the same kind and do not pair;
     - combined fusions (402, 426-428, 429-430) need an anterior and a posterior column code;
     - 447-448 by two single-level codes needs two from the same column list.
-    Elsewhere (bilateral joints 461-462, kidney with hemodialysis) any listed code pairs.
+    Elsewhere (kidney with hemodialysis) any listed code pairs; 461-462 is settled by
+    _condition_met.
     """
     if mdc == "05":
         return families[other] != families[code]

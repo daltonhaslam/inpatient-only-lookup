@@ -25,6 +25,9 @@ SOURCE_OF = {
     "load_table5": "ipps-2027-table5",     # CMS-1849-CN Table 5
     "load_rates": "ipps-2027-table1",      # CMS-1849-CN Tables 1A, 1B, 1D
     "load_proc_index": "msdrg-v44",        # Appendix E, Part 1 (with Appendix D titles)
+    "load_clusters": "msdrg-v44",          # Appendix E, Part 2
+    "load_non_or_combos": "msdrg-v44",     # Appendix E, Part 3
+    "load_joint_sites": "msdrg-v44",       # DRG 461-462 site lists in mdcs_08_11.txt
     "load_hierarchy": "msdrg-v44",         # Appendix D
     "load_unrelated": "msdrg-v44",         # Appendix F (and Appendix E for the OR designation)
     "load_dx_mdc": "msdrg-v44",            # "MDC nn Assignment of Diagnosis Codes" in mdcs_*.txt
@@ -311,6 +314,119 @@ def load_proc_index():
             raise parse.ParseError("Appendix E: %s MDC %s %s has no category" % (current, mdc, drgs))
         index[current].append({"mdc": mdc, "drgs": _expand(drgs), "family": family, "non_or": non_or})
     return _at_least(index, 10000, "Appendix E")
+
+
+_CLUSTER_LINE = re.compile(r"^  (?:(and |One of|with one of)\s*)?(%s)?\s*(?:(Pre|\d\d)\s+(%s)\s+(\S.*?))?\s*$"
+                           % (PCS, DRGS))
+_CLUSTER_MEMBER = re.compile(r"^    (%s)\s*$" % PCS)
+
+
+@cached
+def load_clusters():
+    """[{"groups": (frozenset of PCS codes, ...), "rows": [{"mdc", "drgs", "family"}]}] from v44
+    Appendix E, Part 2 (the Procedure Cluster/MS-DRG Index), in CMS's order.
+
+    A cluster is reported when every group has a code on the claim: most are a code "and"
+    another (single-code groups); the extensive spinal fusion ones are "One of" a list "with one
+    of" another. rows are the surgical classes CMS assigns the combination to, as in Part 1.
+    """
+    lines = _appendix_d_e()
+    start = _find(lines, r"^Procedure Cluster/MS-DRG Index\s*$", what="Appendix E Part 2")
+    end = _find(lines, r"^Appendix E Part 3:", start, "Appendix E Part 3")
+    if not re.match(r"^\s+CODE COMBINATION\s+MDC\s+MS-DRG\s+SURGICAL CATEGORY", lines[start + 1]):
+        raise parse.ParseError("Appendix E Part 2 header changed")
+    titles = {(mdc, drgs): title for mdc, drgs, title in _surgical_classes()}
+    clusters, current = [], None
+
+    def close():
+        if current is not None:
+            if len(current["groups"]) < 2 or not current["rows"] or not all(current["groups"]):
+                raise parse.ParseError("Appendix E Part 2: incomplete cluster %r" % current)
+            clusters.append({"groups": tuple(frozenset(group) for group in current["groups"]),
+                             "rows": current["rows"]})
+
+    for line in lines[start + 2:end]:
+        if not line.strip():
+            close()
+            current = None
+            continue
+        member = _CLUSTER_MEMBER.match(line)
+        match = None if member else _CLUSTER_LINE.match(line)
+        if member:
+            if current is None or not current["groups"]:
+                raise parse.ParseError("Appendix E Part 2: member with no list: %r" % line[:60])
+            current["groups"][-1].add(member.group(1))
+            continue
+        if not match:
+            raise parse.ParseError("Appendix E Part 2: unexpected line %r" % line[:60])
+        joiner, code, mdc, drgs, category = match.groups()
+        if joiner in (None, "One of") and current is None:
+            current = {"groups": [], "rows": []}
+        elif joiner in (None, "One of") or current is None:
+            raise parse.ParseError("Appendix E Part 2: cluster boundary not where expected: %r" % line[:60])
+        if code or joiner in ("One of", "with one of"):
+            current["groups"].append({code} if code else set())
+        if mdc:
+            mdc = PRE_MDC if mdc == "Pre" else mdc
+            current["rows"].append({"mdc": mdc, "drgs": _expand(drgs),
+                                    "family": titles.get((mdc, drgs)) or category})
+    close()
+    return _at_least(clusters, 1000, "Appendix E Part 2")
+
+
+@cached
+def load_non_or_combos():
+    """[(PCS code, ...)] the combinations v44 Appendix E, Part 3 makes non-OR although one or
+    more of their codes is an OR procedure (e.g. a bile duct stent exchange)."""
+    lines = _appendix_d_e()
+    start = _find(lines, r"^Appendix E Part 3:", what="Appendix E Part 3")
+    end = _find(lines, r"^Appendix E Part 4:", start, "Appendix E Part 4")
+    combos, current = [], []
+    for line in lines[start + 1:end] + [""]:
+        match = re.match(r"^ {2,3}(and )?(%s) +\S" % PCS, line)
+        if match and (match.group(1) is None) == (not current):
+            current.append(match.group(2))
+        elif not line.strip():
+            if len(current) == 1:
+                raise parse.ParseError("Appendix E Part 3: a combination of one code")
+            if current:
+                combos.append(tuple(current))
+            current = []
+        else:
+            raise parse.ParseError("Appendix E Part 3: unexpected line %r" % line[:60])
+    return _at_least(combos, 1, "Appendix E Part 3")
+
+
+_JOINT_SITES = ("RIGHT HIP", "LEFT HIP", "RIGHT KNEE", "LEFT KNEE", "RIGHT ANKLE", "LEFT ANKLE")
+
+
+@cached
+def load_joint_sites():
+    """{site: [(PCS code, ...), ...]} the lower extremity sites of DRGs 461-462 (Bilateral or
+    Multiple Major Joint Procedures), from the MDC 08 logic in mdcs_08_11.txt. A case qualifies
+    with entries from two different sites; an entry is one code, or a removal "and" a
+    replacement of the joint (both must be on the claim)."""
+    lines = _lines(SOURCE_OF["load_joint_sites"], r"^mdcs_08_11\.txt$")
+    start = _find(lines, r"^DRG 462 Bilateral or Multiple Major Joint Procedures of Lower Extremity")
+    if not lines[_find(lines, r"\S", start + 1)].startswith("To qualify as  bilateral or multiple joint"):
+        raise parse.ParseError("DRG 461-462: the two-site rule changed")
+    end = _find(lines, r"^\+-", start, "end of DRG 461-462")
+    sites, site = {}, None
+    for line in lines[start + 1:end]:
+        entry = re.match(r"^  (%s) +\S" % PCS, line)
+        partner = re.match(r"^   and (%s) +\S" % PCS, line)
+        if line.strip() in _JOINT_SITES:
+            site = line.strip()
+            sites[site] = []
+        elif entry and site:
+            sites[site].append((entry.group(1),))
+        elif partner and site and sites[site]:
+            sites[site][-1] += (partner.group(1),)
+        elif line.strip() and site:
+            raise parse.ParseError("DRG 461-462: unexpected line %r" % line[:60])
+    if sorted(sites) != sorted(_JOINT_SITES) or not all(sites.values()):
+        raise parse.ParseError("DRG 461-462: sites %s, expected %s" % (sorted(sites), sorted(_JOINT_SITES)))
+    return sites
 
 
 @cached
