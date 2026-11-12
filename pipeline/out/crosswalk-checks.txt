@@ -1,0 +1,59 @@
+Revenue at stake: crosswalk checks
+
+ok all removed codes present once: 922 codes (285 removed 2026-01-01, 637 removed 2027-01-01)
+ok final mapping for every mappable code: 852 of 852 mappable codes; 0 disagree (not adjudicated), 0 invalid, 0 not yet in both passes
+ok mappings match the passes: 852 codes mapped
+ok PCS codes valid FY2027: every PCS code is in the FY2027 order file with its title
+ok principal diagnoses valid FY2027: every diagnosis is a billable FY2027 ICD-10-CM code with a v44 MDC, with its title
+ok inpatient families regroup: 1974 PCS set x diagnosis combinations
+ok PCS codes in the v44 index for the family's MDC: every family traced to Appendix E rows or the OR designation
+ok DRGs in Table 5: every family DRG has an FY2027 CN Table 5 weight
+ok DRG titles and MDCs match v44: titles from Appendix A; each DRG in its family's MDC
+ok DRG amounts recompute: weight x ($6,848.00 operating + $539.95 capital), to the cent
+ok APC rates equal Addendum B: SI, APC, title and national rate from CY 2027 final Addenda A and B
+ok ASC rates equal Addendum AA: 849 codes with an ASC rate
+ok proposed rates equal proposed Addendum B: CY 2027 proposed rule
+ok packaged codes have no comparison: 70 packaged (SI N or anesthesia)
+ok differences recompute: outpatient rate minus inpatient high and low
+ok review batches: 95 batches of at most 10 codes
+ok known cases 32480, 44150, 48150: lobectomy 163-165 vs APC 5183 $3,584.95; colectomy 329-331; Whipple 405-407 for pancreatic cancer
+ok DRG 165 sanity band: national $14,254.31 within $10,000-$25,000 (catches unit errors only)
+info DRG 165 vs the published example: national unadjusted $14,254.31; a published hand-worked lobectomy example is about $20,000; gap $5,745.69 (28.7% lower). Published examples usually include a hospital's wage index, IME and DSH.
+ok no CPT descriptor text: 66182 strings in crosswalk.json and the mapping files, against the CMS descriptors of 922 codes (equal, or 5 consecutive words)
+info TEAM pairing: 66 combinations overlap TEAM's tables, 33 differ (conditional reassignments; for a reviewer)
+    - 0219T: 0RG13J1 x M4722 -> 471-472-473; TEAM lists 429,430
+    - 0219T: 0RG13K1 x M4722 -> 471-472-473; TEAM lists 429,430
+    - 22532: 0RG60AJ x C7951 -> 456-457-458; TEAM lists 402,426,427,428,447,448,450,451
+    - 22532: 0RG607J x C7951 -> 456-457-458; TEAM lists 402,426,427,428,447,448,450,451
+    - 22533: 0SG00AJ x C7951 -> 456-457-458; TEAM lists 402,426,427,428,447,448,450,451
+    - 22533: 0SG007J x C7951 -> 456-457-458; TEAM lists 402,426,427,428,447,448,450,451
+    - 22548: 0RG1070 x M532X1 -> 471-472-473; TEAM lists 429,430
+    - 22595: 0RG1071 x S12111A -> 471-472-473; TEAM lists 429,430
+    - 22595: 0RG10K1 x S12111A -> 471-472-473; TEAM lists 429,430
+    - 22600: 0RG1071 x M4712 -> 471-472-473; TEAM lists 429,430
+    - 22600: 0RG10K1 x M4712 -> 471-472-473; TEAM lists 429,430
+    - 22610: 0RG6071 x C7951 -> 456-457-458; TEAM lists 402,426,427,428,447,448,450,451
+    - 22800: 0SG1071+0SG3071 x M4186 -> 456-457-458; TEAM lists 402,426,427,428,447,448,450,451,523,524,525
+    - 22800: 0RGA071+0SG1071 x M4186 -> 456-457-458; TEAM lists 402,426,427,428,447,448,450,451,523,524,525
+    - 22808: 0SG10A0 x M4186 -> 456-457-458; TEAM lists 426,427,428,447,448,523,524,525
+    - 22808: 0SG00A0 x M4186 -> 456-457-458; TEAM lists 402,426,427,428,447,448,450,451
+    - 22808: 0RG70A0 x M4186 -> 456-457-458; TEAM lists 426,427,428,447,448,523,524,525
+    - 22808: 0RGA0A0 x M4186 -> 456-457-458; TEAM lists 402,426,427,428,447,448,450,451
+    - 22810: 0SG10A0 x M4186 -> 456-457-458; TEAM lists 426,427,428,447,448,523,524,525
+    - 22810: 0RG70A0 x M4186 -> 456-457-458; TEAM lists 426,427,428,447,448,523,524,525
+    - 22812: 0RG7070+0RGA0A0 x M4185 -> 456-457-458; TEAM lists 402,426,427,428,447,448,450,451,523,524,525
+    - 27132: 0SR904A+0QP604Z x M1651 -> 498-499; TEAM lists 521,522
+    - 27132: 0SRB04A+0QP704Z x M1651 -> 498-499; TEAM lists 521,522
+    - 27132: 0SR904A x M1651 -> 469-470; TEAM lists 521,522
+    - 27132: 0SRB04A x M1651 -> 469-470; TEAM lists 521,522
+    - 27134: 0SP90JZ+0SR904A x T84030A -> 463-464-465; TEAM lists 521,522
+    - 27134: 0SPB0JZ+0SRB04A x T84030A -> 463-464-465; TEAM lists 521,522
+    - 27134: 0SP90JZ+0SR9029 x T84030A -> 463-464-465; TEAM lists 521,522
+    - 27134: 0SPB0JZ+0SRB029 x T84030A -> 463-464-465; TEAM lists 521,522
+    - 27137: 0SPA0JZ+0SRA00A x T84030A -> 463-464-465; TEAM lists 521,522
+    - 27137: 0SPE0JZ+0SRE00A x T84030A -> 463-464-465; TEAM lists 521,522
+    - 27138: 0SPR0JZ+0SRR01A x T84030A -> 463-464-465; TEAM lists 521,522
+    - 27138: 0SPS0JZ+0SRS01A x T84030A -> 463-464-465; TEAM lists 521,522
+
+All checks passed. Wrote crosswalk.json (922 codes).
+Wrote crosswalk.xlsx.
