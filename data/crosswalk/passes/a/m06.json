@@ -1156,7 +1156,7 @@
     "role": "typical"
    }
   ],
-  "rationale": "Open reduction of depressed frontal sinus fracture = Reposition frontal bone, usually with plates.",
+  "rationale": "Open repair of a sunken frontal sinus fracture: ICD-10-PCS Reposition of the frontal bone, usually plated.",
   "confidence": "high"
  },
  {
@@ -1178,7 +1178,7 @@
     "role": "typical"
    }
   ],
-  "rationale": "Complex frontal sinus fracture via coronal approach = Reposition frontal bone with internal fixation.",
+  "rationale": "Complicated frontal sinus fracture repaired through a coronal incision: Reposition of the frontal bone with internal fixation.",
   "confidence": "medium"
  },
  {
