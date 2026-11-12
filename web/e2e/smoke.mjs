@@ -422,8 +422,11 @@ if (!hasStake) {
     await openStake(page);
     await page.locator('#sf-year').selectOption('2027');
     await page.locator('#sf-compared').check();
+    eq(await page.locator('#sf-sort').inputValue(), 'gap', 'biggest gap is the default sort');
+    await page.locator('#sf-sort').selectOption('code');
+    await page.waitForFunction(() => new URLSearchParams(location.search).get('sort') === 'code');
     await page.locator('#sf-sort').selectOption('gap');
-    await page.waitForFunction(() => new URLSearchParams(location.search).get('sort') === 'gap');
+    await page.waitForFunction(() => !new URLSearchParams(location.search).has('sort'));
     const gaps = await page.locator('[data-results] [data-stake-card] .scard__gap').allTextContents();
     assert(gaps.length > 5 && gaps.every((g) => g.includes('$')), 'cards in the gap sort should all carry a gap');
     await page.locator('[data-reset]').click();

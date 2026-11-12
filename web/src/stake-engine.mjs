@@ -38,7 +38,7 @@ export function sortCodes(items, sort) {
  * comparison.
  */
 export function filterCodes(data, filters = {}) {
-  const { q = '', group = '', status = '', tier = '', year = '', compared = false, sort = 'code' } = filters;
+  const { q = '', group = '', status = '', tier = '', year = '', compared = false, sort = 'gap' } = filters;
   let items = data.items;
   if (q.trim()) {
     const hits = new Set(search(data.index, q, data.items.length).codes);
@@ -62,7 +62,7 @@ export function outsideCrosswalk(data, q) {
   return { code, page: data.siteCodes.has(code) };
 }
 
-export const DEFAULTS = { q: '', group: '', status: '', tier: '', year: '', compared: false, sort: 'code' };
+export const DEFAULTS = { q: '', group: '', status: '', tier: '', year: '', compared: false, sort: 'gap' };
 
 /** Filter state from a query string. Anything not a known value is dropped, so a URL cannot inject one. */
 export function stateFromParams(search, data) {
@@ -75,7 +75,7 @@ export function stateFromParams(search, data) {
     tier: pick('tier', TIERS),
     year: pick('year', data.years),
     compared: p.get('compared') === '1',
-    sort: pick('sort', SORTS) || 'code',
+    sort: pick('sort', SORTS) || 'gap',
   };
 }
 

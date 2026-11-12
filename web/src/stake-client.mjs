@@ -20,7 +20,7 @@ ${select('sf-group', 'Body system', [['', 'All'], ...data.groups], state.group)}
 ${select('sf-status', 'Review status', [['', 'Any'], ...Object.entries(STATUS)], state.status, 'sf-hint')}
 ${select('sf-tier', 'Tier', [['', 'Any'], ...TIERS.map((t) => [t, `Tier ${t}`])], state.tier, 'sf-hint')}
 ${select('sf-year', 'Year removed', [['', 'Any'], ...data.years.map((y) => [y, y])], state.year)}
-${select('sf-sort', 'Sort by', [['code', 'Code'], ['gap', 'Biggest gap']], state.sort)}
+${select('sf-sort', 'Sort by', [['gap', 'Biggest gap'], ['code', 'Code']], state.sort)}
 </div>
 <p class="sfilter__hint" id="sf-hint">Status and tier apply only to codes with a comparison.</p>
 <div class="sfilter__foot">

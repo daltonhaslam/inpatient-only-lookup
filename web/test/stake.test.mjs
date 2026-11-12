@@ -194,7 +194,8 @@ describe('revenue at stake', { skip }, () => {
     const main = read('revenue-at-stake/index.html');
     assert.match(main, /data-help-callout/);
     assert.ok(textOf(main).includes('Help check these mappings'));
-    assert.match(main, /<p class="stake__actions"><a class="btn" href="\/revenue-at-stake\/help-review\/">Help review →<\/a>/);
+    assert.match(main, /class="callout__act"><a class="btn" href="\/revenue-at-stake\/help-review\/">Help review →<\/a>/);
+    assert.equal((main.match(/>Help review →</g) || []).length, 1, 'one Help review button on the main page');
     const pages = { 'revenue-at-stake/index.html': 'Compare', 'revenue-at-stake/help-review/index.html': 'Help review', 'revenue-at-stake/methods/index.html': 'Methods' };
     for (const [file, current] of Object.entries(pages)) {
       const nav = read(file).match(/<nav class="subnav"[^>]*>([\s\S]*?)<\/nav>/);

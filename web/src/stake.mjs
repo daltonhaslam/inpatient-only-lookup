@@ -98,7 +98,7 @@ function progressBar(stake) {
 
 function downloads(stake) {
   const excel = stake.xlsx ? '<a class="btn btn--quiet" href="/data/revenue-at-stake.xlsx" download>Download Excel</a>' : '';
-  return `<p class="stake__actions"><a class="btn" href="${ROOT}help-review/">Help review →</a>${excel}<a class="btn btn--quiet" href="/data/revenue-at-stake.csv" download>Download CSV</a></p>`;
+  return `<p class="stake__actions">${excel}<a class="btn btn--quiet" href="/data/revenue-at-stake.csv" download>Download CSV</a></p>`;
 }
 
 /** Compare · Help review · Methods, shown on all three section pages. */
@@ -112,7 +112,7 @@ function helpCallout(stake) {
   return `<aside class="callout" aria-labelledby="callout-h" data-help-callout>
 <h2 id="callout-h">Help check these mappings</h2>
 <p>Coders, CDI specialists and physicians: pick a batch of 10 codes in your specialty, or use the Agree / Something’s wrong buttons on any card. Credit by name, or name linked to your profile.</p>
-<p class="callout__act"><a class="btn" href="${ROOT}help-review/">Help review →</a> <span class="callout__count">${num(reviewed)} of ${num(compared)} reviewed</span></p>
+<p class="callout__act"><a class="btn" href="${ROOT}help-review/">Help review →</a></p>
 </aside>`;
 }
 

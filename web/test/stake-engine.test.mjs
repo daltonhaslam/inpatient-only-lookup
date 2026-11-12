@@ -18,7 +18,7 @@ const model = {
   siteCodes: ['27447'],
 };
 const data = prepare(model);
-const codes = (filters) => filterCodes(data, filters).map((i) => i.code);
+const codes = (filters) => filterCodes(data, { sort: 'code', ...filters }).map((i) => i.code);
 
 describe('filterCodes', () => {
   test('no filters: everything, in code order', () => assert.deepEqual(codes({}), ['00176', '0790T', '22800', '32480']));
@@ -52,6 +52,10 @@ describe('sort', () => {
     assert.equal(gapSize({ diff: { low: -2000, high: 500 } }), 2000);
     assert.equal(gapSize({ diff: null }), -1);
   });
+  test('biggest gap is the default sort', () => {
+    assert.deepEqual(filterCodes(data, {}).map((i) => i.code), ['32480', '22800', '0790T', '00176']);
+    assert.equal(DEFAULTS.sort, 'gap');
+  });
   test('does not reorder its input', () => {
     const input = [{ code: 'B', diff: null }, { code: 'A', diff: null }];
     sortCodes(input, 'code');
@@ -73,9 +77,9 @@ describe('outsideCrosswalk', () => {
 
 describe('URL state', () => {
   test('round-trips and leaves defaults out', () => {
-    const state = { ...DEFAULTS, q: 'lung', tier: '3', compared: true, sort: 'gap' };
+    const state = { ...DEFAULTS, q: 'lung', tier: '3', compared: true, sort: 'code' };
     const text = paramsFromState(state);
-    assert.equal(text, 'q=lung&tier=3&compared=1&sort=gap');
+    assert.equal(text, 'q=lung&tier=3&compared=1&sort=code');
     assert.deepEqual(stateFromParams(`?${text}`, data), state);
     assert.equal(paramsFromState(DEFAULTS), '');
   });
