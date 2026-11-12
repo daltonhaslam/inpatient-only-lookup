@@ -173,5 +173,13 @@ class Replaced(unittest.TestCase):
         self.assertIn("00160", line)
 
 
+class FollowUps(unittest.TestCase):
+    def test_a_history_change_asks_for_a_crosswalk_rebuild(self):
+        sources = fetch.load_sources()
+        self.assertNotIn(refresh.CROSSWALK_NOTE, refresh.follow_ups(sources))
+        self.assertIn(refresh.CROSSWALK_NOTE, refresh.follow_ups(sources, history_changed=True))
+        self.assertIn("python3 pipeline/crosswalk/build.py", refresh.CROSSWALK_NOTE)
+
+
 if __name__ == "__main__":
     unittest.main()

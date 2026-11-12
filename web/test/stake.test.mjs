@@ -8,7 +8,7 @@ import { execFileSync } from 'node:child_process';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { agreeHref, wrongHref, claimHref, REVIEW_ENTRY } from '../src/site.mjs';
-import { normalize, clientModel, hydrate } from '../src/stake-data.mjs';
+import { normalize, clientModel, hydrate, removalMismatches } from '../src/stake-data.mjs';
 import { card, alternativeLabel } from '../src/stake-card.mjs';
 import { CSV_HEADER, csvRows } from '../src/stake.mjs';
 
@@ -272,6 +272,23 @@ print(json.dumps(workbook.ALT_FLAG))`, join(repo, 'pipeline')], { encoding: 'utf
     for (const [kind, when] of [['dx', { dx: 'x', variant: null }], ['variant', { dx: null, variant: 'y' }], ['both', { dx: 'x', variant: 'y' }]]) {
       assert.equal(flags[kind].toLowerCase(), alternativeLabel(f(when)), kind);
     }
+  });
+});
+
+describe('crosswalk removal dates against the site history', () => {
+  const data = {
+    periods: [{ d: '2021-01-01' }, { d: '2022-01-01' }, { d: '2026-01-01' }, { d: '2027-01-01' }],
+    codes: { A: { events: [[0, 'r', 'C'], [1, 't', 'C'], [3, 'r', 'J1']] }, B: { events: [[2, 'r', 'J1']] }, C: { events: [[0, 'l', 'C']] } },
+  };
+  const model = (removed) => ({ codes: Object.fromEntries(Object.entries(removed).map(([code, date]) => [code, { removed: date }])) });
+  test('a crosswalk that matches the history passes', () => {
+    assert.deepEqual(removalMismatches(model({ A: '2027-01-01', B: '2026-01-01' }), data), []);
+  });
+  test('a moved or missing removal is reported with both dates', () => {
+    assert.deepEqual(removalMismatches(model({ A: '2026-01-01', B: '2026-01-01', C: '2027-01-01' }), data), [
+      { code: 'A', crosswalk: '2026-01-01', history: '2027-01-01' },
+      { code: 'C', crosswalk: '2027-01-01', history: null },
+    ]);
   });
 });
 

@@ -3,6 +3,7 @@
 // renamed key in the pipeline is a one-line change here.
 
 import { mappingSummary } from './stake-card.mjs';
+import { eventsOf } from './engine.mjs';
 
 const list = (value) => (Array.isArray(value) ? value : []);
 const numberOr = (value) => (typeof value === 'number' && Number.isFinite(value) ? value : null);
@@ -108,6 +109,24 @@ export function normalize(doc) {
     batches: list(raw.batches).map((b) => ({ id: b.id, group: b.group, codes: list(b.codes) })),
   };
   return { meta, codes };
+}
+
+/**
+ * Codes whose crosswalk removal date is not the one the site's own list history gives: [{code, crosswalk,
+ * history}]. The history date is the code's latest removal on one of the crosswalk's removal dates (null
+ * when it has none). crosswalk.json is built from pipeline/derived/ipo-history.json, so a mismatch means
+ * the history changed since; rebuild the crosswalk.
+ */
+export function removalMismatches(model, data) {
+  const dates = new Set(Object.values(model.codes).map((item) => item.removed));
+  const found = [];
+  for (const [code, item] of Object.entries(model.codes)) {
+    const record = data.codes[code];
+    const removals = record ? eventsOf(data, record).filter((e) => e.type === 'removed' && dates.has(e.date)).map((e) => e.date) : [];
+    const history = removals.length ? removals.sort()[removals.length - 1] : null;
+    if (history !== item.removed) found.push({ code, crosswalk: item.removed, history });
+  }
+  return found;
 }
 
 /** Credit lines from reviews.json: named agreements on each code's current mapping. */

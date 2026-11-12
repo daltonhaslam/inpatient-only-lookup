@@ -12,7 +12,7 @@ import { SITE } from './src/site.mjs';
 import { todayISO, isDate, monthYear, formatDate, clampDate, periodIndex, siAt, countsAt, exemptCodes, lookup, eventsOf, csv } from './src/engine.mjs';
 import * as pages from './src/pages.mjs';
 import * as stake from './src/stake.mjs';
-import { normalize, credits, clientModel } from './src/stake-data.mjs';
+import { normalize, credits, clientModel, removalMismatches } from './src/stake-data.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -255,6 +255,11 @@ function stakeData(ctx) {
   const model = normalize(JSON.parse(readFileSync(path, 'utf8')));
   const missing = Object.keys(model.codes).filter((code) => !ctx.data.codes[code]);
   if (missing.length) throw new Error(`crosswalk.json has codes with no page on this site: ${missing.slice(0, 10).join(', ')}`);
+  const moved = removalMismatches(model, ctx.data);
+  if (moved.length) {
+    const list = moved.slice(0, 10).map((m) => `${m.code} (crosswalk ${m.crosswalk}, history ${m.history || 'none'})`).join(', ');
+    throw new Error(`crosswalk.json removal dates disagree with the site's list history for ${moved.length} code(s): ${list}. The history changed after the crosswalk was built: run python3 pipeline/crosswalk/build.py, then build again.`);
+  }
   // The review ingest reads the first 8-hex word of the prefilled mapping; anything else would lose reviews.
   const badFp = Object.values(model.codes).filter((item) => item.map && !/^[0-9a-f]{8}$/.test(item.map.fp)).map((item) => item.code);
   if (badFp.length) throw new Error(`crosswalk.json has mapping fingerprints that are not 8 hex digits: ${badFp.slice(0, 10).join(', ')}`);

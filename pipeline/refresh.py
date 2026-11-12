@@ -13,7 +13,7 @@ One run does four things:
   3. Runs build.py, which reconciles the whole history and leaves the published tables alone if
      any check fails.
   4. Runs the tests, then lists what still needs a person: a new rule's Federal Register facts in
-     rules.json, and plain-language labels for new codes.
+     rules.json, plain-language labels for new codes, and a crosswalk rebuild when the history changed.
 Every new download is checked to be the table it claims to be before sources.json is touched.
 
 To add a file CMS posted somewhere discovery does not look:
@@ -263,8 +263,14 @@ def run(script):
     return subprocess.run([sys.executable, str(fetch.PIPELINE / script)], cwd=str(fetch.ROOT)).returncode
 
 
-def follow_ups(sources):
-    """What a person still has to do by hand after an automatic refresh."""
+CROSSWALK_NOTE = ("The list history changed: rebuild the Revenue at stake crosswalk (python3 pipeline/crosswalk/build.py) "
+                  "so its removal dates and packaged codes follow it. The site build stops while a crosswalk removal "
+                  "date disagrees with the history.")
+
+
+def follow_ups(sources, history_changed=False):
+    """What a person still has to do by hand after an automatic refresh. history_changed: the run
+    adopted a new or replaced file, so ipo-history.json may have changed."""
     notes = []
     have_rules = {rule["cy"] for rule in fetch.load_rules()["rules"]}
     first_quarterly = min(int(source["effective"][:4]) for source in sources if source["kind"] == "addendum_b")
@@ -282,6 +288,8 @@ def follow_ups(sources):
                 len(listed - labels), ", ".join(sorted(listed - labels))))
         if labels - listed:
             notes.append("data/labels.json has labels for codes with no list history: %s" % ", ".join(sorted(labels - listed)))
+    if history_changed:
+        notes.append(CROSSWALK_NOTE)
     return notes
 
 
@@ -377,7 +385,7 @@ def main(argv=None):
         print("\nREFRESH FAILED. The site's tables were not updated. Fix what is reported above and run it again.")
         print("To undo: git checkout pipeline/sources.json, and in data/raw/ rename any <file>.prev back to <file>.")
         return 1
-    notes = follow_ups(fetch.load_sources())
+    notes = follow_ups(fetch.load_sources(), history_changed=bool(found or replaced))
     print("\nStill to do by hand:" if notes else "\nNothing left to do by hand.")
     for note in notes:
         print("  - " + note)
