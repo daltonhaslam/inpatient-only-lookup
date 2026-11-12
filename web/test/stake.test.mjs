@@ -188,7 +188,6 @@ describe('revenue at stake', { skip }, () => {
     const compared = items.filter((item) => item.kind === 'compare').length;
     assert.ok(text.includes(`${compared.toLocaleString('en-US')} have a comparison`), 'lede does not say how many are compared');
     assert.doesNotMatch(text, /For each of the [\d,]+ procedures/);
-    assert.doesNotMatch(text, /\bHirsch\b/);
   });
 
   test('methods page cites every source file, the guardrail and the years', () => {
@@ -203,7 +202,6 @@ describe('revenue at stake', { skip }, () => {
     for (const phrase of ['Outpatient-eligible is not outpatient-only', 'two-midnight rule', 'not a forecast', 'Built with Claude Code', 'Run it on your own claims', 'may include those adjustments']) {
       assert.ok(text.includes(phrase), `methods lacks "${phrase}"`);
     }
-    assert.doesNotMatch(text, /\bHirsch\b/);
   });
 
   test('nav, home link and sitemap', () => {

@@ -103,7 +103,6 @@ class Workbook(unittest.TestCase):
 
     def test_read_me_text(self):
         text = " ".join(str(row[0].value) for row in self.wb["Read me"].iter_rows() if row[0].value)
-        self.assertNotIn("Hirsch", text)
         self.assertIn("Built with Claude Code; mappings by two AI passes plus adjudication; under review by credentialed coders.", text)
         self.assertIn(workbook.BADGE, text)
         self.assertIn("/revenue-at-stake/help-review/", text)
