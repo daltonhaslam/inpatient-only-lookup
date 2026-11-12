@@ -1,6 +1,6 @@
 // Page templates. Build-time only: everything here becomes static HTML in docs/.
 import { SITE, feedbackHref, CFR } from './site.mjs';
-import { formatDate, monthYear, lookup, countsAt, periodIndex, stateAt, dayNumber, num, scale, isScheduled } from './engine.mjs';
+import { formatDate, monthYear, lookup, countsAt, periodIndex, stateAt, dayNumber, num, plural, scale, isScheduled } from './engine.mjs';
 import { esc, out, fr, cfr, verdict, eventList, codeRow, axis, axisYears, pct, scheduledNote } from './views.mjs';
 
 const NAV = [
@@ -14,7 +14,6 @@ const NAV = [
 
 // Pages whose content follows the date of service; only these load the data file.
 const LIVE = new Set(['home', 'code', 'group']);
-const plural = (n, one, many = `${one}s`) => `${num(n)} ${n === 1 ? one : many}`;
 const codeLink = (data, code) => `<a href="/code/${esc(code)}/" title="${esc(data.codes[code] ? data.codes[code].label : '')}">${esc(code)}</a>`;
 
 export function layout(ctx, { path, title, description, page, body }) {

@@ -1,7 +1,7 @@
 // Revenue at stake: the three section pages, the block on each removed code's page, and the CSV.
 // Build-time only. Reads the normalized model from stake-data.mjs, never crosswalk.json keys.
 import { SITE, CFR, claimHref } from './site.mjs';
-import { formatDate, num, csv as toCsv } from './engine.mjs';
+import { formatDate, num, plural, csv as toCsv } from './engine.mjs';
 import { esc, out, cfr } from './views.mjs';
 import { layout } from './pages.mjs';
 import { BADGE, card, money, moneyRange, cents, drgList, dxCode, statusText, noCompareText, yearLines } from './stake-card.mjs';
@@ -28,7 +28,6 @@ export function stakeContext(model, credits, groups, { xlsx = false } = {}) {
   return { model, credits, groups: shown, summary: coverage(items.length, progress), groupName: Object.fromEntries(groups), xlsx, items, byGroup, progress };
 }
 
-const plural = (n, one, many = `${one}s`) => `${num(n)} ${n === 1 ? one : many}`;
 
 /** "922 procedures left the list; 852 have a comparison; the rest ..." from the data, never assumed. */
 function coverage(total, p) {

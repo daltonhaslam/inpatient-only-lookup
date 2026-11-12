@@ -1,12 +1,13 @@
 // The revenue-at-stake card: one code's outpatient payment next to the inpatient MS-DRG family it
 // would group to. Pure HTML from the normalized model (stake-data.mjs), so the build and the
 // browser draw the same card. Inpatient dollars never appear without their range and review status.
+import { num } from './engine.mjs';
 import { esc, out } from './views.mjs';
 import { agreeHref, wrongHref, STATUS as SI_STATUS } from './site.mjs';
 
 export const BADGE = 'Draft · built with Claude Code · under coder review';
 
-const whole = (n) => Math.round(n).toLocaleString('en-US');
+const whole = (n) => num(Math.round(n));
 export const money = (n) => `$${whole(n)}`;
 export const cents = (n) => `${n < 0 ? '−' : ''}$${Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 export const moneyRange = (low, high) => (whole(low) === whole(high) ? money(low) : `${money(low)}–${money(high)}`);

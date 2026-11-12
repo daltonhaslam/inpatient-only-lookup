@@ -129,10 +129,10 @@ export function credits(reviews, model) {
  */
 export function clientModel(model, groups, siteCodes = []) {
   const strings = [];
+  const at = new Map();
   const ref = (text) => {
-    let at = strings.indexOf(text);
-    if (at < 0) at = strings.push(text) - 1;
-    return at;
+    if (!at.has(text)) at.set(text, strings.push(text) - 1);
+    return at.get(text);
   };
   const codes = {};
   for (const [code, item] of Object.entries(model.codes)) {

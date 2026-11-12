@@ -1,18 +1,15 @@
 // Pure search, filter, sort and URL-state logic for the Revenue at stake page. No DOM, so it is
 // unit tested. Works on the browser model from stake-data.mjs clientModel().
-import { search, isCode, normalizeCode } from './engine.mjs';
+import { search, isCode, normalizeCode, wordsOf, num } from './engine.mjs';
 import { hydrate } from './stake-data.mjs';
-import { moneyRange, STATUS } from './stake-card.mjs';
-
-/** "$14,254–$33,166", or one figure when the range rounds to a single dollar amount. */
-export const formatRange = moneyRange;
+import { STATUS } from './stake-card.mjs';
 
 export const PAGE_SIZE = 50;
 export const STATUSES = Object.keys(STATUS);
 export const TIERS = ['1', '2', '3'];
 export const SORTS = ['code', 'gap'];
 
-const words = (text) => String(text || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').match(/[a-z0-9]+/g) || [];
+const words = (text) => wordsOf(String(text || ''));
 
 /** Items in code order plus the search index: label words rank above group, family and DRG-family words. */
 export function prepare(doc) {
@@ -94,6 +91,6 @@ export function paramsFromState(state) {
 /** "12 codes" / "1 code" / "No codes", and how many are showing. */
 export function countText(total, shown) {
   if (!total) return 'No codes match.';
-  const noun = total === 1 ? '1 code' : `${total.toLocaleString('en-US')} codes`;
-  return shown < total ? `Showing ${shown.toLocaleString('en-US')} of ${noun}.` : `${noun}.`;
+  const noun = total === 1 ? '1 code' : `${num(total)} codes`;
+  return shown < total ? `Showing ${num(shown)} of ${noun}.` : `${noun}.`;
 }

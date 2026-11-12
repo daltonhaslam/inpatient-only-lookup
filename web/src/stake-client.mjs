@@ -1,6 +1,7 @@
 // Browser side of /revenue-at-stake/: search, filters, sort and cards over the table the page ships.
 // The server-rendered tables are the baseline; this only adds to them. No inline handlers, no eval:
 // every string put into the page goes through esc() or is a validated code.
+import { num } from './engine.mjs';
 import { esc } from './views.mjs';
 import { card, STATUS } from './stake-card.mjs';
 import { prepare, filterCodes, outsideCrosswalk, stateFromParams, paramsFromState, isFiltered, countText, PAGE_SIZE, TIERS, DEFAULTS } from './stake-engine.mjs';
@@ -46,7 +47,7 @@ function collapseTable(total) {
   if (!section || section.querySelector('.stake-tablewrap')) return;
   const wrap = document.createElement('details');
   wrap.className = 'stake-tablewrap';
-  wrap.innerHTML = `<summary>All ${total.toLocaleString('en-US')} codes as a table</summary>`;
+  wrap.innerHTML = `<summary>All ${num(total)} codes as a table</summary>`;
   wrap.append(...section.childNodes);
   section.append(wrap);
   document.documentElement.classList.add('stake-live');
@@ -55,7 +56,7 @@ function collapseTable(total) {
 export function start(model) {
   const host = $('[data-stake-app]');
   if (!host) return;
-  const data = { ...prepare(model) };
+  const data = prepare(model);
   const state = stateFromParams(window.location.search, data);
   let matches = [];
   let shown = 0;
@@ -86,8 +87,7 @@ export function start(model) {
     shown = from + slice.length;
     const left = matches.length - shown;
     more.hidden = left <= 0;
-    more.textContent = `Show ${Math.min(PAGE_SIZE, left)} more (${left.toLocaleString('en-US')} left)`;
-    return slice.length;
+    more.textContent = `Show ${Math.min(PAGE_SIZE, left)} more (${num(left)} left)`;
   };
 
   const update = () => {

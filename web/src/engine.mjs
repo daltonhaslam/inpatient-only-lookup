@@ -51,6 +51,8 @@ export function periodIndex(data, iso) {
 export const isScheduled = (period) => Boolean(period) && period.basis === 'f';
 export const stateOf = (si) => (si === 'C' ? 'ipo' : si === '' || si === 'D' ? 'gone' : 'off');
 export const num = (n) => n.toLocaleString('en-US');
+/** "1 code" / "2 codes" (or the given plural), with the count formatted. */
+export const plural = (n, one, many = `${one}s`) => `${num(n)} ${n === 1 ? one : many}`;
 
 /** Rows of strings as CSV text. A cell a spreadsheet would run as a formula gets a leading apostrophe. */
 export function csv(rows) {
@@ -159,8 +161,8 @@ export function exemptCodes(data, iso, status = 'active') {
 
 // ---- search -------------------------------------------------------------------------------
 
-const fold = (text) => text.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '');
-const wordsOf = (text) => fold(text).match(/[a-z0-9]+/g) || [];
+export const fold = (text) => text.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '');
+export const wordsOf = (text) => fold(text).match(/[a-z0-9]+/g) || [];
 
 /** Build the search index once: one entry per code with its searchable words. */
 export function buildIndex(data) {

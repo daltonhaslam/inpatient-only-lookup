@@ -1,7 +1,8 @@
 // Pure filter, sort, search, URL-state and format logic for the Revenue at stake page.
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { prepare, filterCodes, sortCodes, gapSize, outsideCrosswalk, stateFromParams, paramsFromState, countText, formatRange, DEFAULTS } from '../src/stake-engine.mjs';
+import { prepare, filterCodes, sortCodes, gapSize, outsideCrosswalk, stateFromParams, paramsFromState, countText, DEFAULTS } from '../src/stake-engine.mjs';
+import { moneyRange } from '../src/stake-card.mjs';
 
 const fam = (name, condition) => ({ condition, name, drgs: [{ drg: '163' }], low: 1000, high: 2000 });
 const item = (extra) => ({ kind: 'compare', year: 2026, group: 'airway', op: { si: 'J1', rate: 3000, asc: null }, review: { status: 'unreviewed' }, tier: { n: 1, why: 'x' }, diff: { low: -500, high: -100 }, ip: { low: 1000, high: 2000, families: [fam('Major chest procedures', 'lung cancer')] }, ...extra });
@@ -86,8 +87,8 @@ describe('URL state', () => {
 
 describe('format', () => {
   test('ranges', () => {
-    assert.equal(formatRange(14254.31, 33165.99), '$14,254–$33,166');
-    assert.equal(formatRange(1000.2, 1000.4), '$1,000');
+    assert.equal(moneyRange(14254.31, 33165.99), '$14,254–$33,166');
+    assert.equal(moneyRange(1000.2, 1000.4), '$1,000');
   });
   test('count text', () => {
     assert.equal(countText(0, 0), 'No codes match.');
