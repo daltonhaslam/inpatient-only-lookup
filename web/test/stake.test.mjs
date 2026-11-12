@@ -9,8 +9,8 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { agreeHref, wrongHref, claimHref, REVIEW_ENTRY } from '../src/site.mjs';
 import { normalize, clientModel, hydrate } from '../src/stake-data.mjs';
-import { card } from '../src/stake-card.mjs';
-import { CSV_HEADER } from '../src/stake.mjs';
+import { card, alternativeLabel } from '../src/stake-card.mjs';
+import { CSV_HEADER, csvRows } from '../src/stake.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '..', '..');
@@ -41,6 +41,7 @@ describe('revenue at stake', { skip }, () => {
   const model = doc ? normalize(doc) : null;
   const codes = model ? Object.keys(model.codes) : [];
   const items = model ? Object.values(model.codes) : [];
+  const stake = { items, groupName: {} };
 
   test('the trimmed browser model draws the same cards as the full one, and stays under 700 KB', () => {
     const slim = clientModel(model, [], ['27447']);
@@ -107,6 +108,18 @@ describe('revenue at stake', { skip }, () => {
       if (item.ip.families.every((f) => !f.when.dx)) assert.ok(!item.tier.why.includes('principal diagnosis'), `${item.code}: ${item.tier.why}`);
     }
     assert.ok(seen.dx > 0 && seen.variant > 0, `labels seen: ${JSON.stringify(seen)}`);
+  });
+
+  test('CSV alternative rows say what selects the family: diagnosis, operation variant, or both', () => {
+    const rows = csvRows(stake);
+    const order = CSV_HEADER.indexOf('family_order');
+    const labels = new Set(rows.slice(1).map((row) => row[order]).filter((v) => v.startsWith('alternative')));
+    assert.ok(labels.has('alternative family (depends on operation variant)'), [...labels].join(' | '));
+    assert.ok(labels.has('alternative family (depends on diagnosis)'), [...labels].join(' | '));
+    for (const item of items.filter((i) => i.kind === 'compare' && i.ip.families.length > 1)) {
+      const mine = rows.filter((row) => row[0] === item.code);
+      item.ip.families.slice(1).forEach((f, i) => assert.equal(mine[i + 1][order], alternativeLabel(f), item.code));
+    }
   });
 
   test('every card with an inpatient range also shows a review status', () => {
@@ -232,6 +245,23 @@ print(json.dumps(sorted({where for where, text in payload["texts"] if checks.cop
       input: JSON.stringify({ codes, texts }), encoding: 'utf8', maxBuffer: 1 << 26,
     }));
     assert.deepEqual(hits, []);
+  });
+});
+
+describe('alternative family label', () => {
+  test('built from what selects the family, like the card labels, and worded as the workbook says it', () => {
+    const f = (when) => ({ condition: 'lung cancer', when });
+    assert.equal(alternativeLabel(f(null)), 'alternative family (depends on diagnosis)');
+    assert.equal(alternativeLabel(f({ dx: 'lung cancer', variant: null })), 'alternative family (depends on diagnosis)');
+    assert.equal(alternativeLabel(f({ dx: null, variant: 'open' })), 'alternative family (depends on operation variant)');
+    assert.equal(alternativeLabel(f({ dx: 'lung cancer', variant: 'open' })), 'alternative family (depends on diagnosis and operation variant)');
+    const flags = JSON.parse(execFileSync('python3', ['-c', `import json, sys
+sys.path.insert(0, sys.argv[1])
+from crosswalk import workbook
+print(json.dumps(workbook.ALT_FLAG))`, join(repo, 'pipeline')], { encoding: 'utf8' }));
+    for (const [kind, when] of [['dx', { dx: 'x', variant: null }], ['variant', { dx: null, variant: 'y' }], ['both', { dx: 'x', variant: 'y' }]]) {
+      assert.equal(flags[kind].toLowerCase(), alternativeLabel(f(when)), kind);
+    }
   });
 });
 

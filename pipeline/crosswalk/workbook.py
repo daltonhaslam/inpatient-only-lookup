@@ -28,7 +28,10 @@ XLSX_PATH = fetch.DERIVED / "crosswalk.xlsx"
 
 BADGE = "Draft · built with Claude Code · under coder review"
 HELP_URL = "https://inpatient-only-lookup.vercel.app/revenue-at-stake/help-review/"
-ALT_FLAG = "Alternative family (depends on diagnosis)"
+# What selects an alternative family, from its "when" (the cards' whenLabel and the CSV say the same).
+ALT_FLAG = {"dx": "Alternative family (depends on diagnosis)",
+            "variant": "Alternative family (depends on operation variant)",
+            "both": "Alternative family (depends on diagnosis and operation variant)"}
 # Leading characters a spreadsheet may read as a formula. Text from data that starts with one is
 # stored as an explicit string, never a formula (openpyxl treats any "=..." value as a formula).
 FORMULA_LEAD = ("=", "+", "-", "@", "\t", "\r")
@@ -82,6 +85,14 @@ def _append(ws, values):
         _plain(cell)
 
 
+def alt_flag(fam):
+    """The caveat for an alternative family: what selects it (diagnosis, operation variant or both)."""
+    when = fam.get("when") or {}
+    if when.get("variant"):
+        return ALT_FLAG["both" if when.get("dx") else "variant"]
+    return ALT_FLAG["dx"]
+
+
 def _header(ws, row, names, widths=None):
     for n, name in enumerate(names, 1):
         cell = ws.cell(row=row, column=n, value=name)
@@ -127,7 +138,7 @@ def _crosswalk_rows(doc):
         for n, fam in enumerate(inpatient["families"], 1):
             notes = []
             if n > 1:
-                notes.append(ALT_FLAG)
+                notes.append(alt_flag(fam))
             if item["tier"]["tier"] == 3:
                 notes.append(item["tier"]["why"])
             if fam.get("caveat"):

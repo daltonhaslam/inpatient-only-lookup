@@ -72,7 +72,7 @@ class Workbook(unittest.TestCase):
             for name in ("Outpatient national rate", "Inpatient low", "Inpatient high", "Gap low", "Gap high"):
                 self.assertTrue(str(ws["%s%d" % (header[name], r)].value).startswith("="), (name, r))
         self.assertIn("OpStd", ws["%s3" % header["Inpatient low"]].value)
-        self.assertEqual(ws["%s4" % header["Caveat"]].value.split(" The DRG")[0], workbook.ALT_FLAG)
+        self.assertEqual(ws["%s4" % header["Caveat"]].value.split(" The DRG")[0], workbook.ALT_FLAG["dx"])
 
     def test_packaged_code_has_blank_inpatient_cells(self):
         ws = self.wb["Crosswalk"]
@@ -107,6 +107,17 @@ class Workbook(unittest.TestCase):
         self.assertIn("Built with Claude Code; mappings by two AI passes plus adjudication; under review by credentialed coders.", text)
         self.assertIn(workbook.BADGE, text)
         self.assertIn("/revenue-at-stake/help-review/", text)
+
+
+class AlternativeFlag(unittest.TestCase):
+    def test_says_what_selects_the_family(self):
+        cases = [(None, "Alternative family (depends on diagnosis)"),
+                 ({"dx": "lung cancer", "variant": None}, "Alternative family (depends on diagnosis)"),
+                 ({"dx": None, "variant": "open"}, "Alternative family (depends on operation variant)"),
+                 ({"dx": "lung cancer", "variant": "open"}, "Alternative family (depends on diagnosis and operation variant)"),
+                 ({"dx": None, "variant": None}, "Alternative family (depends on diagnosis)")]
+        for when, text in cases:
+            self.assertEqual(workbook.alt_flag({"when": when} if when is not None else {}), text, when)
 
 
 class FormulaInjection(unittest.TestCase):

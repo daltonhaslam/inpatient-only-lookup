@@ -4,7 +4,7 @@ import { SITE, CFR, claimHref } from './site.mjs';
 import { formatDate, num, plural, csv as toCsv } from './engine.mjs';
 import { esc, out, cfr } from './views.mjs';
 import { layout } from './pages.mjs';
-import { BADGE, card, money, moneyRange, cents, drgList, dxCode, statusText, noCompareText, yearLines } from './stake-card.mjs';
+import { BADGE, card, money, moneyRange, cents, drgList, dxCode, statusText, noCompareText, yearLines, alternativeLabel } from './stake-card.mjs';
 
 export const ROOT = '/revenue-at-stake/';
 export const PATHS = [ROOT, `${ROOT}help-review/`, `${ROOT}methods/`];
@@ -351,7 +351,7 @@ export function csvRows(stake) {
     }
     item.ip.families.forEach((f, i) => {
       const diff = item.op.rate === null ? ['', ''] : [round2(item.op.rate - f.high), round2(item.op.rate - f.low)];
-      rows.push([...base, 'compared', i === 0 ? 'primary' : 'alternative family (depends on diagnosis)', f.dx ? dxCode(f.dx.code) : '',
+      rows.push([...base, 'compared', i === 0 ? 'primary' : alternativeLabel(f), f.dx ? dxCode(f.dx.code) : '',
         f.condition, f.when && f.when.variant ? f.when.variant : '', f.mdc || '', f.name, f.drgs.map((d) => d.drg).join(' '), f.low, f.high, ...diff,
         item.tier ? item.tier.n : '', item.review.status, item.map.fp]);
     });

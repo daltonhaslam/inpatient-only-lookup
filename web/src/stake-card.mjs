@@ -62,6 +62,9 @@ function whenParts(f) {
   return parts.length ? parts : [{ kind: 'dx', text: f.condition }];
 }
 export const whenLabel = (f) => whenParts(f).map((p) => (p.kind === 'dx' ? p.text : `coded as ${p.text}`)).join(', ');
+/** A second or later family in the CSV: "alternative family (depends on diagnosis)", or on the operation
+ * variant, or both. pipeline/crosswalk/workbook.py ALT_FLAG says the same in the workbook. */
+export const alternativeLabel = (f) => `alternative family (depends on ${whenParts(f).map((p) => (p.kind === 'dx' ? 'diagnosis' : 'operation variant')).join(' and ')})`;
 
 /** The prefilled "Mapping reviewed" summary after the fingerprint. */
 export function mappingSummary(item) {
