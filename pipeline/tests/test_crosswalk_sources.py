@@ -116,6 +116,14 @@ class Sources(unittest.TestCase):
         self.assertEqual(dx_drgs["A0221"], ["023", "024", "094", "095", "096"])   # MDC 25 row dropped
         self.assertEqual(dx_drgs["J705"], ["205", "206"])                       # MDC 22 row dropped
         self.assertEqual(set(dx_drgs), set(sources.load_dx_mdc()))
+        # CMS prints B20 as 969-977; 971-973 no longer exist in Appendix A.
+        self.assertEqual(dx_drgs["B20"], ["969", "970", "974", "975", "976", "977"])
+
+    def test_principal_diagnosis_pre_mdc_drgs(self):
+        pre = sources.load_dx_pre_drgs()
+        self.assertEqual(pre["C320"], ["011", "012", "013"])     # face, mouth and neck
+        self.assertEqual(pre["E1165"], ["008", "010", "019"])    # diabetes, transplant DRGs
+        self.assertNotIn("C3411", pre)
 
     def test_unrelated_designation(self):
         unrelated = sources.load_unrelated()

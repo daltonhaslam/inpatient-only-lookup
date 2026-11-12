@@ -29,6 +29,7 @@ SOURCE_OF = {
     "load_unrelated": "msdrg-v44",         # Appendix F (and Appendix E for the OR designation)
     "load_dx_mdc": "msdrg-v44",            # "MDC nn Assignment of Diagnosis Codes" in mdcs_*.txt
     "load_dx_drgs": "msdrg-v44",           # Appendix B
+    "load_dx_pre_drgs": "msdrg-v44",       # Appendix B, Pre-MDC rows
     "load_opps": "addenda-2027",           # CY2027 final Addendum B
     "load_apc_titles": "addenda-2027",     # CY2027 final Addendum A
     "load_asc": "asc-2027-aa",             # CY2027 final ASC Addendum AA
@@ -386,15 +387,14 @@ _APPENDIX_B_ROW = re.compile(r"^ (%s)? +(Pre|\d\d) +(%s(?:,%s)*)(?: +\S.*)?\s*$"
 
 
 @cached
-def load_dx_drgs():
-    """{ICD-10-CM code: [drg, ...]} the MS-DRGs v44 Appendix B lists for a code within its
-    principal-diagnosis MDC(s) (load_dx_mdc), in CMS's order. Rows under other MDCs (Pre-MDC,
-    MDC 24/25 and other secondary-diagnosis logic) are dropped. Both surgical and medical DRGs
-    are kept: filter on load_drg_titles()[drg]["type"] for the medical ones."""
+def _appendix_b():
+    """v44 Appendix B as [(code, mdc, [drg, ...])], one per row; a blank code continues the code
+    above, Pre-MDC rows have mdc "00", and a range keeps only DRGs Appendix A defines (CMS still
+    prints B20 as 969-977 although 971-973 no longer exist)."""
     lines = _lines(SOURCE_OF["load_dx_drgs"], r"^appendix_B\.txt$")
     start = _find(lines, r"^\s*I10 Dx\s+MDC\s+DRG\(s\)", what="Appendix B header") + 1
-    dx_mdc = load_dx_mdc()
-    drgs, current = {}, None
+    defined = load_drg_titles()
+    rows, current = [], None
     for line in lines[start:]:
         if not line.strip():
             continue
@@ -406,14 +406,43 @@ def load_dx_drgs():
             current = code
         elif current is None:
             raise parse.ParseError("Appendix B: continuation row with no code")
-        if mdc in dx_mdc.get(current, ()):
-            row = drgs.setdefault(current, [])
-            row.extend(drg for drg in _expand(listed) if drg not in row)
+        drgs = [drg for drg in _expand(listed) if drg in defined]
+        if not drgs:
+            raise parse.ParseError("Appendix B: %s row %s names no defined MS-DRG" % (current, listed))
+        rows.append((current, PRE_MDC if mdc == "Pre" else mdc, drgs))
+    return rows
+
+
+@cached
+def load_dx_drgs():
+    """{ICD-10-CM code: [drg, ...]} the MS-DRGs v44 Appendix B lists for a code within its
+    principal-diagnosis MDC(s) (load_dx_mdc), in CMS's order. Rows under other MDCs (Pre-MDC,
+    MDC 24/25 and other secondary-diagnosis logic) are dropped. Both surgical and medical DRGs
+    are kept: filter on load_drg_titles()[drg]["type"] for the medical ones."""
+    dx_mdc = load_dx_mdc()
+    drgs = {}
+    for code, mdc, listed in _appendix_b():
+        if mdc in dx_mdc.get(code, ()):
+            row = drgs.setdefault(code, [])
+            row.extend(drg for drg in listed if drg not in row)
     missing = set(dx_mdc) - set(drgs)
     if missing:
         raise parse.ParseError("Appendix B has no row in the assigned MDC for %d codes, e.g. %s"
                                % (len(missing), sorted(missing)[:5]))
     return drgs
+
+
+@cached
+def load_dx_pre_drgs():
+    """{ICD-10-CM code: [drg, ...]} the Pre-MDC MS-DRGs v44 Appendix B lists for a code: the
+    principal diagnoses of face, mouth and neck that send a tracheostomy to 011-013, and the
+    diabetes and renal-failure codes of the transplant DRGs 008, 010 and 019."""
+    drgs = {}
+    for code, mdc, listed in _appendix_b():
+        if mdc == PRE_MDC:
+            row = drgs.setdefault(code, [])
+            row.extend(drg for drg in listed if drg not in row)
+    return _at_least(drgs, 1000, "Appendix B Pre-MDC rows")
 
 
 # ---------------------------------------------------------------- outpatient (CY2027)
