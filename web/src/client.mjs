@@ -46,14 +46,24 @@ function storedDate() {
 /** The date this tab last chose, or today. */
 const rememberedDate = () => storedDate() ?? state.today;
 
-/** A date in the link wins; otherwise the date this tab last chose; otherwise today. */
+/** The link's date: { date } moved into the range, with `asked` when it was a real date (so the reader can be told
+ *  if it moved), or { unread } when the link has a dos that is not a date at all. */
+function linkDate() {
+  const asked = params().get('dos');
+  if (!asked) return {};
+  return isDate(asked) && asked >= '1000-01-01' ? { date: clampDate(state.data, asked), asked } : { unread: asked };
+}
+
+/** A date in the link wins; otherwise the date this tab last chose; otherwise today. Returns linkDate()'s shape. */
 function startingDate() {
-  const fromUrl = params().get('dos');
+  const link = linkDate();
   // Coming back to a page, the tab's latest choice beats the date frozen in that page's address;
   // with nothing stored, the address is all there is.
   const [navigation] = window.performance.getEntriesByType('navigation');
-  if (navigation && navigation.type === 'back_forward') return storedDate() ?? (usable(fromUrl) ? fromUrl : state.today);
-  return usable(fromUrl) ? fromUrl : rememberedDate();
+  const back = navigation && navigation.type === 'back_forward';
+  const kept = back ? storedDate() : null;
+  if (kept) return { date: kept };
+  return link.date ? link : { ...link, date: back ? state.today : rememberedDate() };
 }
 
 function writeUrl() {
@@ -143,16 +153,17 @@ function announce(...parts) {
   }, 500);
 }
 
-/** Say, beside the date field, that a typed date was outside the range and which date is shown instead. */
-function showRangeNote(input, typed) {
+/** Say, beside the date field, why the date shown is not the one asked for (typed, or in the link). */
+function showDateNote(text) {
   const note = $('[data-dos-note]');
   if (!note) return;
-  const { dosMin, dosMax } = state.data;
-  note.textContent = `${formatDate(typed)} is outside the dates this site covers, ${formatDate(dosMin)} to ${formatDate(dosMax)}. Showing ${formatDate(state.date)}.`;
+  note.textContent = text;
   note.hidden = false;
-  input.setAttribute('aria-describedby', note.id);
+  for (const input of $$('[data-dos]')) input.setAttribute('aria-describedby', note.id);
   announce('range');
 }
+
+const outsideRange = (asked) => `${formatDate(asked)} is outside the dates this site covers, ${formatDate(state.data.dosMin)} to ${formatDate(state.data.dosMax)}. Showing ${formatDate(state.date)}.`;
 
 function clearRangeNote() {
   const note = $('[data-dos-note]');
@@ -357,7 +368,7 @@ function settleDateField(input) {
   const typed = input.value;
   if (isDate(typed) && typed >= '1000-01-01') {
     setDate(typed);
-    if (state.date !== typed) showRangeNote(input, typed);
+    if (state.date !== typed) showDateNote(outsideRange(typed));
   }
   input.value = state.date;
 }
@@ -499,7 +510,8 @@ async function start() {
   const data = await response.json();
   state.data = data;
   state.today = clampDate(data, todayISO());
-  state.date = startingDate();
+  const start = startingDate();
+  state.date = start.date;
   state.cells = $$('[data-cell]').map((node) => ({ node, record: data.codes[node.dataset.cell], state: null }));
   const box = $('[data-q]');
   if (box) {
@@ -509,7 +521,9 @@ async function start() {
   wire();
   drawResults();
   drawDate();
-  persist(true);
+  if (start.asked && start.asked !== state.date) showDateNote(outsideRange(start.asked));
+  else if (start.unread) showDateNote(`The date in this link, “${start.unread.slice(0, 24)}”, is not a date. Showing ${formatDate(state.date)}.`);
+  persist(true);   // the address now carries the date shown
   document.documentElement.classList.add('live');
 }
 

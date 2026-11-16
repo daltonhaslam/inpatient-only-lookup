@@ -428,6 +428,14 @@ td a[target] { white-space: nowrap; }
   .cell--ipo, .key--ipo, .tl__seg--ipo, .bar, .sbar__ip, .meter__bar span, .tl__ex, .key--ex { forced-color-adjust: none; background: CanvasText; }
   .tl__seg--ipo, .bar { box-shadow: inset -2px 0 0 Canvas; }
   .bar--sched { background: Canvas; border-color: CanvasText; box-shadow: none; }
+  /* The date slider's track and thumb, and the timeline's date handle, are fills too. */
+  .scrub__range, .tl__mark::before { forced-color-adjust: none; }
+  .scrub__range:focus-visible { outline-color: Highlight; }
+  .tl__mark::before { background: CanvasText; }
+  .scrub__range::-webkit-slider-runnable-track { background: CanvasText; }
+  .scrub__range::-moz-range-track { background: CanvasText; }
+  .scrub__range::-webkit-slider-thumb { background: CanvasText; border-color: Canvas; box-shadow: 0 0 0 1.5px CanvasText; }
+  .scrub__range::-moz-range-thumb { background: CanvasText; border-color: Canvas; box-shadow: 0 0 0 1.5px CanvasText; }
 }
 
 @media print {

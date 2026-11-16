@@ -294,6 +294,29 @@ await check('date field: a typed date outside the range is named beside the fiel
   eq(await input.getAttribute('aria-describedby'), null, 'description removed with the note');
 });
 
+await check('a link with a date outside the range moves to the nearest date covered and says so', async (page, context) => {
+  await open(page, '/code/27447/?dos=2019-03-03');
+  const input = page.locator('[data-dos]').first();
+  const note = page.locator('[data-dos-note]');
+  const [min, max] = [await input.getAttribute('min'), await input.getAttribute('max')];
+  await note.waitFor({ state: 'visible' });
+  eq(await note.textContent(), `March 3, 2019 is outside the dates this site covers, ${formatDate(min)} to ${formatDate(max)}. Showing ${formatDate(min)}.`, 'note');
+  eq(await input.inputValue(), min, 'field shows the first date covered');
+  eq(await input.getAttribute('aria-describedby'), await note.getAttribute('id'), 'field is described by the note');
+  await waitText(answer(page), (t) => t.includes(formatDate(min)), 'answer for the first date covered');
+  await page.waitForURL(new RegExp(`dos=${min}`), { timeout: 3000 });
+  await waitText(page.locator('[data-announce]'), (t) => t.startsWith('March 3, 2019 is outside'), 'status line');
+  await open(page, '/?q=27447&dos=2031-05-05');
+  await waitText(page.locator('[data-dos-note]'), (t) => t.startsWith('May 5, 2031 is outside') && t.endsWith(`Showing ${formatDate(max)}.`), 'note past the range');
+  eq(await page.locator('[data-dos]').first().inputValue(), max, 'field shows the last date covered');
+  await waitText(page.locator('[data-announce]'), (t) => t.startsWith('May 5, 2031 is outside') && t.includes('27447: '), 'status line with the answer');
+  // A malformed date falls back as before: to this tab's last choice, else today (a new tab has none).
+  const tab = await context.newPage();
+  await open(tab, '/?dos=not-a-date');
+  await waitText(tab.locator('[data-dos-note]'), (t) => t === 'The date in this link, “not-a-date”, is not a date. Showing November 11, 2026.', 'note for a malformed date');
+  eq(await tab.locator('[data-dos]').first().inputValue(), '2026-11-11', 'malformed date falls back to today');
+});
+
 await check('home: Enter in the search box submits, and the status line sums up the answer', async (page) => {
   await open(page, '/');
   eq(await page.locator('[data-ask] button[type="submit"]').count(), 1, 'submit button in the search form');
@@ -346,6 +369,8 @@ await check('forced colors: on-list marks stay filled and the not-in-the-files d
   await open(page, '/code/27132/');
   const seg = await paint('.tl__seg--ipo');
   assert(seg !== canvas && seg !== 'rgba(0, 0, 0, 0)', `timeline segment fill is ${seg}`);
+  const handle = await paint('.tl__mark', '::before');
+  assert(handle !== canvas && handle !== 'rgba(0, 0, 0, 0)', `timeline date handle fill is ${handle}`);
 }, { forcedColors: 'active' });
 
 // ---- a code page --------------------------------------------------------------------------
