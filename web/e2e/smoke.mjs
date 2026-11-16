@@ -347,6 +347,12 @@ await check('home: Enter in the search box submits, and the status line sums up 
     box.form.requestSubmit();
   });
   eq(await page.evaluate(() => document.activeElement.matches('[data-results] .row')), true, 'focus on the first matching code');
+  // Two codes: Enter lands on the note that says only the first is shown, and the status line says it first.
+  await page.fill('[data-q]', '27447 27130');
+  await waitText(page.locator('[data-results] .verdict__code'), (t) => t === '27447', 'verdict for the first of two codes');
+  await page.locator('[data-q]').press('Enter');
+  await page.waitForFunction(() => document.activeElement.matches('[data-results] > .results__none'));
+  await waitText(page.locator('[data-announce]'), (t) => t.startsWith('That looks like 2 codes.') && t.endsWith(`27447: ${head}`), 'status line for two codes');
   // The same sentence again, after a real action, is said again.
   await page.fill('[data-q]', '27447');
   await waitText(page.locator('[data-announce]'), (t) => t === `27447: ${head}`, 'status line, back to 27447');

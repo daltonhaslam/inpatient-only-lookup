@@ -120,7 +120,8 @@ const SAY = {
     if ($('.verdict__wait', host)) return null;
     const code = $('.verdict__code', host);
     const head = $('.verdict__answer', host);
-    if (code && head) return `${code.textContent}: ${head.textContent}`;
+    const lead = $(':scope > .results__none', host);   // "That looks like 2 codes… Showing the first"
+    if (code && head) return `${lead ? `${lead.textContent} ` : ''}${code.textContent}: ${head.textContent}`;
     const line = $('.results__count, .results__none', host);
     return line ? line.textContent : '';
   },
@@ -137,20 +138,22 @@ function announce(...parts) {
   const region = $('[data-announce]');
   if (!region) return;
   parts.forEach((part) => unsaid.add(part));
+  // Also cancels a write still waiting below; its parts stay in `unsaid`, so the next sentence includes them.
   clearTimeout(sayTimer);
   sayTimer = setTimeout(() => {
+    const ready = [];
     const said = [];
     for (const part of Object.keys(SAY).filter((key) => unsaid.has(key))) {
       const text = SAY[part]();
       if (text === null) continue;   // still loading: say it when it arrives
-      unsaid.delete(part);
+      ready.push(part);
       if (text) said.push(text.trim());
     }
-    const text = said.join(' ');
-    if (!text) return;
+    const done = () => ready.forEach((part) => unsaid.delete(part));
+    if (!said.length) { done(); return; }
     // Empty the line first and write it a moment later, so a sentence that repeats the last one is still said.
     region.textContent = '';
-    sayTimer = setTimeout(() => { region.textContent = text; }, 100);
+    sayTimer = setTimeout(() => { done(); region.textContent = said.join(' '); }, 100);
   }, 500);
 }
 
@@ -469,8 +472,9 @@ function wire() {
       if (input) settleDateField(input);
       if (form.matches('[data-ask]')) {
         flush();
-        // Take the reader to the answer: the verdict itself, or the first matching code.
-        const answer = $('[data-results] .verdict__answer') || $('[data-results] .row');
+        // Take the reader to the answer: a note that leads it ("That looks like 2 codes…", "Nothing matches…"),
+        // else the verdict itself, else the first matching code.
+        const answer = $('[data-results] > .results__none') || $('[data-results] .verdict__answer') || $('[data-results] .row');
         if (answer) {
           if (!answer.matches('a')) answer.tabIndex = -1;
           answer.focus();
