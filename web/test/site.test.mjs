@@ -102,6 +102,51 @@ describe('page structure', () => {
   });
 });
 
+describe('accessibility markup', () => {
+  test('aria-current="page" only on the link to the page itself', () => {
+    none(collect(({ rel, html }) => anchors(html)
+      .filter((a) => /aria-current="page"/.test(a.attrs) && a.href !== urlOf(rel))
+      .map((a) => `aria-current="page" on a link to ${a.href}`)), 'wrong current-page links');
+  });
+
+  test('the skip link targets a focusable element inside main, not main itself', () => {
+    none(collect(({ html }) => {
+      const href = (/<a class="skip" href="#([^"]+)"/.exec(html) || [])[1];
+      if (!href) return ['no skip link'];
+      const main = /<main\b[^>]*>([\s\S]*)<\/main>/.exec(html);
+      const out = [];
+      if (/<main\b[^>]*tabindex/.test(html)) out.push('<main> has a tabindex');
+      if (!main || !new RegExp(`<[a-z0-9]+\\b[^>]*\\sid="${href}"[^>]*\\stabindex="-1"`).test(main[1])) out.push(`#${href} is not a tabindex="-1" element in main`);
+      return out;
+    }), 'pages with a broken skip target');
+  });
+
+  test('every table is named, and every sideways scroller is a named, focusable region', () => {
+    none(collect(({ html }) => {
+      const out = [];
+      // Named by a caption, by aria-label(ledby), or by the named region wrapped tightly around it.
+      for (const m of html.matchAll(/(<div class="scroll"[^>]*aria-label[^>]*>)?<table\b([^>]*)>(\s*<caption)?/g)) {
+        if (!m[1] && !m[3] && !/aria-label/.test(m[2])) out.push(`unnamed table <table${m[2]}>`);
+      }
+      for (const m of html.matchAll(/<div class="scroll"([^>]*)>/g)) {
+        if (!/tabindex="0"/.test(m[1]) || !/role="region"/.test(m[1]) || !/aria-label/.test(m[1])) out.push(`scroller without tabindex/role/name:${m[1]}`);
+      }
+      return out;
+    }), 'table naming problems');
+  });
+
+  test('the big answer panels are not live regions; one status line per live page', () => {
+    none(collect(({ html }) => {
+      const out = [];
+      if (/data-(results|bulk-out)[^>]*aria-live/.test(html)) out.push('answer panel is aria-live');
+      const live = /<body data-page="(home|code|group)"/.test(html);
+      const count = (html.match(/data-announce/g) || []).length;
+      if (count !== (live ? 1 : 0)) out.push(`${count} status lines`);
+      return out;
+    }), 'live region problems');
+  });
+});
+
 describe('links', () => {
   const ALLOWED_HOSTS = new Set(['www.govinfo.gov', 'www.ecfr.gov', 'www.cms.gov', 'docs.google.com', 'github.com', 'www.linkedin.com', 'paidandpenalized.org']);
 

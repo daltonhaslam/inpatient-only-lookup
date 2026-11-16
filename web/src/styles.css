@@ -14,8 +14,8 @@
   --ex: #c26a12;        /* data marks: exempt */
   --ex-ink: #8a4705;
   --focus: #14221f;
-  --serif: 'Besley', 'Rockwell', 'Century Schoolbook', Georgia, serif;
-  --sans: 'Archivo', 'Franklin Gothic Medium', 'Helvetica Neue', Arial, sans-serif;
+  --serif: 'Besley', 'Besley Fallback', 'Rockwell', 'Century Schoolbook', Georgia, serif;
+  --sans: 'Archivo', 'Archivo Fallback', 'Franklin Gothic Medium', 'Helvetica Neue', Arial, sans-serif;
   --measure: 68ch;
   --page: 72rem;
   color-scheme: light dark;
@@ -92,7 +92,7 @@ code { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-si
   font: 500 1.35rem/1.3 var(--sans); font-variant-numeric: tabular-nums lining-nums; outline: none; min-height: 2.1rem;
 }
 .field textarea { font-size: 1.05rem; line-height: 1.5; resize: vertical; min-height: 5.2rem; }
-.field input::placeholder, .field textarea::placeholder { color: var(--ink-2); opacity: 0.75; font-weight: 400; }
+.field input::placeholder, .field textarea::placeholder { color: var(--ink-2); opacity: 1; font-weight: 400; }
 .field:focus-within { border-color: var(--on-ink); outline: 3px solid var(--focus); outline-offset: 2px; }
 input[type='search']::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
 button {
@@ -106,7 +106,7 @@ button.quiet:hover { background: var(--panel); color: var(--ink); border-color: 
 
 /* ---- home: the question ---- */
 .ask__sub { max-width: var(--measure); margin-top: 1rem; font-size: 1.15rem; color: var(--ink-2); }
-.ask__form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(11.5rem, 15rem) auto; gap: 0.75rem; align-items: stretch; margin-top: 2rem; max-width: 60rem; }
+.ask__form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(11.5rem, 15rem) auto auto; gap: 0.75rem; align-items: stretch; margin-top: 2rem; max-width: 60rem; }
 .ask__form button { align-self: stretch; }
 .ask__try { margin-top: 0.8rem; color: var(--ink-2); font-size: 0.98rem; }
 .asked .ask__sub, .asked .ask__try { display: none; }
@@ -164,7 +164,7 @@ button.quiet:hover { background: var(--panel); color: var(--ink); border-color: 
 .tl__seg--ipo { background: var(--on); box-shadow: inset -2px 0 0 var(--paper); }
 .tl__seg--off { border: 1.5px solid var(--ink-2); box-shadow: inset 0 0 0 0; margin-left: 0; }
 .tl__ex { position: absolute; top: 1.95rem; height: 0.3rem; background: var(--ex); border-radius: 2px; }
-.tl__open { position: absolute; top: 0.25rem; height: 1.5rem; border: 1.5px dashed var(--rule); border-radius: 3px; }
+.tl__open { position: absolute; top: 0.25rem; height: 1.5rem; border: 1.5px dashed var(--ink-2); border-radius: 3px; }
 .tl__mark { position: absolute; top: -0.35rem; bottom: -0.2rem; width: 0; border-left: 2.5px solid var(--ink); pointer-events: none; }
 .tl__mark::before { content: ''; position: absolute; left: -0.5rem; top: -0.15rem; width: calc(1rem - 2.5px); height: 0.5rem; background: var(--ink); border-radius: 2px; }
 .tl__date { position: absolute; bottom: 100%; left: 0; transform: translateX(-50%); white-space: nowrap; font-size: 0.82rem; font-weight: 600; padding-bottom: 0.3rem; }
@@ -180,7 +180,7 @@ button.quiet:hover { background: var(--panel); color: var(--ink); border-color: 
 .key--ipo { background: var(--on); }
 .key--off { border: 1.5px solid var(--ink-2); }
 .key--ex { background: var(--ex); height: 0.3rem; }
-.key--open { border: 1.5px dashed var(--rule); }
+.key--open { border: 1.5px dashed var(--ink-2); }
 
 /* ---- events ---- */
 .events { list-style: none; padding: 0; max-width: 60rem; border-top: 1px solid var(--rule); }
@@ -230,7 +230,7 @@ blockquote footer { margin-top: 0.6rem; color: var(--ink-2); font-size: 0.95rem;
 .cells .cell { cursor: pointer; }
 .cell--ipo { background: var(--on); }
 .cell--off { border: 1.5px solid var(--ink-2); opacity: 0.75; }
-.cell--gone { background: radial-gradient(circle, var(--rule) 0 1.6px, transparent 2px); }
+.cell--gone::after { content: ''; display: block; margin: 2.5px; height: 4px; border: 2px solid var(--ink-2); border-radius: 50%; }
 .cells .cell:hover { outline: 2px solid var(--ink); outline-offset: 1px; }
 .cellhint { margin-top: 1rem; min-height: 1.6em; color: var(--ink-2); font-size: 0.95rem; }
 @media (hover: none) { .cellhint { display: none; } }
@@ -248,7 +248,7 @@ blockquote footer { margin-top: 0.6rem; color: var(--ink-2); font-size: 0.95rem;
 .bar { position: absolute; bottom: 0; background: var(--on); box-shadow: inset -2px 0 0 var(--paper); border-radius: 3px 3px 0 0; min-width: 2px; }
 .bar--sched { background: repeating-linear-gradient(135deg, var(--on) 0 4px, transparent 4px 7px); border: 1.5px solid var(--on); border-bottom: 0; box-shadow: none; }
 .chart__val { position: absolute; transform: translateY(-0.15rem); font-size: 0.84rem; font-weight: 600; font-variant-numeric: tabular-nums; padding-left: 0.15rem; line-height: 1.2; }
-.chart__open { position: absolute; bottom: 0; top: 0; border: 1.5px dashed var(--rule); border-bottom: 0; border-radius: 3px 3px 0 0; display: grid; place-items: end start; }
+.chart__open { position: absolute; bottom: 0; top: 0; border: 1.5px dashed var(--ink-2); border-bottom: 0; border-radius: 3px 3px 0 0; display: grid; place-items: end start; }
 .chart__open { overflow: hidden; }
 .chart__open span { font-size: 0.8rem; color: var(--ink-2); padding: 0.3rem 0.4rem; line-height: 1.25; }
 .chart__table { margin-top: 0.8rem; }
@@ -266,7 +266,7 @@ summary { cursor: pointer; font-weight: 600; padding: 0.45rem 0; }
 .codes:last-of-type { border-bottom: 1px solid var(--rule); }
 .codes__more { padding-bottom: 1rem; margin: 0; }
 .codes__list + .codes__more { margin-top: -0.4rem; }
-main:focus { outline: none; }
+#content:focus, #ask-h:focus { outline: none; }
 .codes__list { padding: 0.3rem 0 1rem; font-variant-numeric: tabular-nums; line-height: 1.9; word-spacing: 0.45em; }
 .bygroup__cap { max-width: var(--measure); margin-bottom: 0.8rem; }
 .gap__codes { font-variant-numeric: tabular-nums; word-spacing: 0.3em; }
@@ -320,6 +320,8 @@ td a[target] { white-space: nowrap; }
 .btn--quiet:hover { background: var(--panel); color: var(--ink); border-color: var(--ink); }
 .guard .plain { max-width: 62ch; }
 .stab { margin-top: 1.8rem; }
+/* The main page's 900-row tables: skip layout until near the viewport. Height: the measured average section. */
+[data-stake-table] .stab { content-visibility: auto; contain-intrinsic-block-size: auto 150rem; }
 .stab h3 { margin-bottom: 0.4rem; }
 .stab__jump { display: flex; flex-wrap: wrap; gap: 0.3rem 1.2rem; margin-top: 1rem; max-width: 60rem; }
 .stab__n { color: var(--ink-2); font-variant-numeric: tabular-nums; font-size: 0.88rem; }
@@ -419,6 +421,14 @@ td a[target] { white-space: nowrap; }
   .scard__pay { grid-template-columns: minmax(0, 1fr); }
 }
 
+/* ---- Windows High Contrast (forced colors) ----
+   Fills and gradients are dropped there, which would blank every on-list mark while the hollow ones stay.
+   The fill is the information, so keep it, in the system text color. */
+@media (forced-colors: active) {
+  .cell--ipo, .key--ipo, .tl__seg--ipo, .bar, .sbar__ip, .meter__bar span, .tl__ex, .key--ex { forced-color-adjust: none; background: CanvasText; }
+  .tl__seg--ipo, .bar { box-shadow: inset -2px 0 0 Canvas; }
+  .bar--sched { background: Canvas; border-color: CanvasText; box-shadow: none; }
+}
 
 @media print {
   .top__nav, .ask__form, .ask__try, .several, .dos, .tl__range, .skip { display: none; }

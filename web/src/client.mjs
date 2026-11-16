@@ -4,7 +4,7 @@ import {
   isDate, formatDate, todayISO, clampDate, dayNumber, fromDayNumber, normalizeCode, isCode, periodIndex,
   stateAt, lookup, expandOther, countsAt, exemptCodes, buildIndex, search, extractCodes, num, csv, isScheduled,
 } from './engine.mjs';
-import { esc, chip, CHIP, verdict, verdictParts, eventList, codeRow, answer, axis, pct, scheduledNote } from './views.mjs';
+import { esc, chip, CHIP, verdict, verdictParts, eventList, codeRow, answer, axis, pct, scheduledNote, scroller } from './views.mjs';
 
 // Vercel Web Analytics: never send what someone searched for or which date they chose.
 window.va = window.va || function va() { (window.vaq = window.vaq || []).push(arguments); };
@@ -86,7 +86,7 @@ function loadOther() {
       .then((packed) => { state.other = expandOther(packed); })
       .catch(() => { state.otherLoading = null; state.otherFailed = true; })
       // A throw while redrawing must not become an unhandled rejection.
-      .then(() => { drawVerdicts(); drawBulk(); }).catch(() => {});
+      .then(() => { drawVerdicts(); drawBulk(); announce(); }).catch(() => {});
   }
 }
 
@@ -97,6 +97,69 @@ function loadOther() {
 
 function setHtml(node, html) {
   if (node && node.dataset.html !== html) { node.innerHTML = html; node.dataset.html = html; }
+}
+
+// ---- what a screen reader hears ------------------------------------------------------------
+// The answer panels are rebuilt on every keystroke and every step of a date slider, so they are not
+// live regions. One status line says what changed, once things settle.
+
+/** A short sentence for each part of the page; null while that part is still loading. */
+const SAY = {
+  range: () => { const note = $('[data-dos-note]'); return note && !note.hidden ? note.textContent : ''; },
+  results: () => {
+    const host = $('[data-results]');
+    if (!host || !state.query.trim()) return '';
+    if ($('.verdict__wait', host)) return null;
+    const code = $('.verdict__code', host);
+    const head = $('.verdict__answer', host);
+    if (code && head) return `${code.textContent}: ${head.textContent}`;
+    const line = $('.results__count, .results__none', host);
+    return line ? line.textContent : '';
+  },
+  bulk: () => {
+    const host = $('[data-bulk-out]');
+    if (!host || !host.firstElementChild) return '';
+    const line = $('.results__count, .results__none', host);
+    return line ? line.textContent : null;   // "Checking…"
+  },
+};
+const unsaid = new Set();
+let sayTimer = 0;
+function announce(...parts) {
+  const region = $('[data-announce]');
+  if (!region) return;
+  parts.forEach((part) => unsaid.add(part));
+  clearTimeout(sayTimer);
+  sayTimer = setTimeout(() => {
+    const said = [];
+    for (const part of Object.keys(SAY).filter((key) => unsaid.has(key))) {
+      const text = SAY[part]();
+      if (text === null) continue;   // still loading: say it when it arrives
+      unsaid.delete(part);
+      if (text) said.push(text.trim());
+    }
+    const text = said.join(' ');
+    if (text && region.textContent !== text) region.textContent = text;
+  }, 500);
+}
+
+/** Say, beside the date field, that a typed date was outside the range and which date is shown instead. */
+function showRangeNote(input, typed) {
+  const note = $('[data-dos-note]');
+  if (!note) return;
+  const { dosMin, dosMax } = state.data;
+  note.textContent = `${formatDate(typed)} is outside the dates this site covers, ${formatDate(dosMin)} to ${formatDate(dosMax)}. Showing ${formatDate(state.date)}.`;
+  note.hidden = false;
+  input.setAttribute('aria-describedby', note.id);
+  announce('range');
+}
+
+function clearRangeNote() {
+  const note = $('[data-dos-note]');
+  if (!note || note.hidden) return;
+  note.hidden = true;
+  note.textContent = '';
+  for (const input of $$('[data-dos]')) input.removeAttribute('aria-describedby');
 }
 
 function drawControls() {
@@ -258,7 +321,7 @@ function drawBulk() {
     + (state.bulkDropped
       ? `<p class="note note--sched">Only the first ${rows.length} codes were checked; ${state.bulkDropped} more were left out.</p>` : '');
   setHtml(host, `<p class="results__count">${rows.length} ${rows.length === 1 ? 'code' : 'codes'} on ${formatDate(state.date)}: ${tally('ipo')} inpatient only, ${tally('off')} not${missing ? `, ${missing} not in CMS’s files on that date or not found` : ''}.</p>${notes}
-<div class="scroll"><table class="check"><thead><tr><th scope="col">Code</th><th scope="col">Procedure</th><th scope="col">Status</th><th scope="col">Left the list</th><th scope="col">Review exemption</th></tr></thead><tbody>${body}</tbody></table></div>
+${scroller('bulk-cap', `<table class="check"><caption class="sr" id="bulk-cap">Codes checked for ${formatDate(state.date)}</caption><thead><tr><th scope="col">Code</th><th scope="col">Procedure</th><th scope="col">Status</th><th scope="col">Left the list</th><th scope="col">Review exemption</th></tr></thead><tbody>${body}</tbody></table>`)}
 <p><button type="button" class="quiet" data-bulk-csv>Download as CSV</button></p>`);
 }
 
@@ -284,18 +347,24 @@ function drawDate() {
   }
   drawExempt();
   drawBulk();
+  announce('results', 'bulk');
 }
 
 // '1000-01-01': a four-digit year means a real date was typed; a half-typed year (0202) does not.
 /** On leaving the date field: a real date outside the range goes to the nearest date answered;
  *  a half-typed one (year 0202) is dropped. Either way the field ends up showing the date in force. */
 function settleDateField(input) {
-  if (isDate(input.value) && input.value >= '1000-01-01') setDate(input.value);
+  const typed = input.value;
+  if (isDate(typed) && typed >= '1000-01-01') {
+    setDate(typed);
+    if (state.date !== typed) showRangeNote(input, typed);
+  }
   input.value = state.date;
 }
 
 function setDate(date) {
   const next = clampDate(state.data, date);
+  if (next === date) clearRangeNote();   // a date inside the range: an earlier "outside the range" note is stale
   if (next === state.date) return;
   state.date = next;
   persist();
@@ -310,7 +379,9 @@ function wire() {
   const later = (job) => { cancelAnimationFrame(frame); frame = requestAnimationFrame(job); };
   const dateAt = (clientX) => axis.at((clientX - drag.left) / drag.width);
 
+  let pointer = '';   // the kind of the last press: a finger cannot aim at a 9px square
   document.addEventListener('pointerdown', (event) => {
+    pointer = event.pointerType;
     const track = event.target.closest?.('[data-track]');
     if (!track || event.button > 0) return;
     const box = track.getBoundingClientRect();
@@ -349,7 +420,7 @@ function wire() {
     else if (target.matches('[data-q]')) {
       state.query = target.value;
       writeUrl();
-      later(() => { drawResults(); drawLists(); });
+      later(() => { drawResults(); drawLists(); announce('results'); });
     }
   });
   // A date field reports each keystroke of the year as a complete date (0002, 0020, 0202...).
@@ -381,10 +452,12 @@ function wire() {
       state.bulkDropped = pasted.length - state.bulk.length;
       if (!state.bulk.length) {
         setHtml($('[data-bulk-out]'), '<p class="results__none">No five-character codes found in that text.</p>');
+        announce('bulk');
         return;
       }
       loadOther();   // first, so a retry shows "Checking…" rather than the last failure
       drawBulk();
+      announce('bulk');
     }
   });
   // Leaving the page inside the persist delay must not lose the date: save it synchronously on
@@ -397,7 +470,8 @@ function wire() {
     const target = event.target;
     if (target.closest('[data-today]')) setDate(state.today);
     else if (target.closest('[data-bulk-csv]')) downloadBulk();
-    else if (target.matches('[data-cell]')) window.location.assign(`/code/${target.dataset.cell}/`);
+    // On touch the squares only show the list; the body-system links above them navigate.
+    else if (target.matches('[data-cell]') && pointer !== 'touch') window.location.assign(`/code/${target.dataset.cell}/`);
   });
 
   const hint = $('[data-cell-hint]');

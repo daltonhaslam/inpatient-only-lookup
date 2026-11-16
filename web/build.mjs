@@ -276,6 +276,16 @@ const FONTS = [
   ['Archivo', '@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2', '100 900'],
   ['Besley', '@fontsource-variable/besley/files/besley-latin-wght-normal.woff2', '400 900'],
 ];
+// Local fonts reshaped to the web fonts' metrics, listed second in --sans and --serif, so text keeps its size
+// and line breaks while the web fonts load (and if they never do). size-adjust (%): the web font's width over
+// the site's own text in Chromium, against Arial or Georgia (Archivo at 400 and 650, Besley at 500 and 650).
+// Ascent and descent: the web font's hhea values per em (Archivo 878/210 of 1000, Besley 2500/850 of 2000).
+const FALLBACKS = [
+  ['Archivo', 'Arial', 400, 98.24, 0.878, 0.21],
+  ['Archivo', 'Arial Bold', 700, 97.0, 0.878, 0.21],
+  ['Besley', 'Georgia', 400, 114.3, 1.25, 0.425],
+  ['Besley', 'Georgia Bold', 700, 103.09, 1.25, 0.425],
+];
 
 async function main() {
   const today = process.env.BUILD_DATE || todayISO();
@@ -294,7 +304,11 @@ async function main() {
     const bytes = readFileSync(join(here, 'node_modules', path));
     return { family, weights, url: hashed('fonts', family.toLowerCase(), 'woff2', bytes) };
   });
-  const fontCss = faces.map((f) => `@font-face{font-family:'${f.family}';font-style:normal;font-display:swap;font-weight:${f.weights};src:url(${f.url}) format('woff2')}`).join('\n');
+  const fontCss = faces.map((f) => `@font-face{font-family:'${f.family}';font-style:normal;font-display:swap;font-weight:${f.weights};src:url(${f.url}) format('woff2')}`)
+    .concat(FALLBACKS.map(([family, local, weight, size, ascent, descent]) => {
+      const scaled = (metric) => `${((metric * 1e4) / size).toFixed(2)}%`;
+      return `@font-face{font-family:'${family} Fallback';font-weight:${weight};src:local('${local}');size-adjust:${size}%;ascent-override:${scaled(ascent)};descent-override:${scaled(descent)};line-gap-override:0%}`;
+    })).join('\n');
   const css = hashed('assets', 'site', 'css', `${fontCss}\n${readFileSync(join(here, 'src/styles.css'), 'utf8')}`);
   const script = await bundle({
     entryPoints: [join(here, 'src/client.mjs')], bundle: true, minify: true, format: 'iife', target: 'es2020', write: false, legalComments: 'none',

@@ -2,7 +2,7 @@
 // Build-time only. Reads the normalized model from stake-data.mjs, never crosswalk.json keys.
 import { SITE, CFR, claimHref } from './site.mjs';
 import { formatDate, num, plural, csv as toCsv } from './engine.mjs';
-import { esc, out, cfr } from './views.mjs';
+import { esc, out, cfr, scroller } from './views.mjs';
 import { layout } from './pages.mjs';
 import { safeProfile } from './stake-data.mjs';
 import { BADGE, card, money, moneyRange, cents, drgList, dxCode, statusText, noCompareText, yearLines, alternativeLabel } from './stake-card.mjs';
@@ -73,11 +73,11 @@ function tableRow(item) {
 
 function codeTables(stake) {
   const jump = stake.groups.map(([id, name]) => `<a href="#g-${esc(id)}">${esc(name)} <span class="stab__n">${num(stake.byGroup[id].length)}</span></a>`).join('');
-  const tables = stake.groups.map(([id, name]) => `<section class="stab" aria-labelledby="g-${esc(id)}">
+  const tables = stake.groups.map(([id, name]) => `<section class="stab">
 <h3 id="g-${esc(id)}">${esc(name)}</h3>
-<div class="scroll"><table class="stab__table" aria-labelledby="g-${esc(id)}">
+${scroller(`g-${esc(id)}`, `<table class="stab__table" aria-labelledby="g-${esc(id)}">
 <thead><tr><th scope="col">Code</th><th scope="col">Procedure</th><th scope="col" class="num">Outpatient</th><th scope="col" class="num">Inpatient family</th><th scope="col">Review</th></tr></thead>
-<tbody>${stake.byGroup[id].map(tableRow).join('')}</tbody></table></div>
+<tbody>${stake.byGroup[id].map(tableRow).join('')}</tbody></table>`)}
 </section>`).join('\n');
   return `<section class="block" aria-labelledby="all-h" data-stake-table>
 <h2 id="all-h">All ${num(stake.items.length)} codes</h2>
@@ -104,7 +104,7 @@ function downloads(stake) {
 /** Compare · Help review · Methods, shown on all three section pages. */
 function subnav(current) {
   const links = [['compare', ROOT, 'Compare'], ['help', `${ROOT}help-review/`, 'Help review'], ['methods', `${ROOT}methods/`, 'Methods']];
-  return `<nav class="subnav" aria-label="Revenue at stake">${links.map(([id, href, text]) => `<a href="${href}"${id === current ? ' aria-current="page"' : ''}>${text}</a>`).join('')}</nav>`;
+  return `<nav class="subnav" id="content" tabindex="-1" aria-label="Revenue at stake">${links.map(([id, href, text]) => `<a href="${href}"${id === current ? ' aria-current="page"' : ''}>${text}</a>`).join('')}</nav>`;
 }
 
 function helpCallout(stake) {
@@ -151,8 +151,8 @@ function batchTable(stake) {
       const codes = batch.codes.map((code) => `<a href="/code/${esc(code)}/#stake-h">${esc(code)}</a>`).join(' ');
       return `<tr><th scope="row">${esc(batch.id)}</th><td class="stab__codes">${codes}</td><td class="num">${num(open)} of ${num(batch.codes.length)}</td><td>${out(claimHref(batch.id), `Claim ${esc(batch.id)}`)}</td></tr>`;
     }).join('');
-    return `<section class="stab" aria-labelledby="b-${esc(id)}"><h3 id="b-${esc(id)}">${esc(name)}</h3>
-<div class="scroll"><table class="stab__table"><thead><tr><th scope="col">Batch</th><th scope="col">Codes</th><th scope="col" class="num">Unreviewed</th><th scope="col">Claim</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+    return `<section class="stab"><h3 id="b-${esc(id)}">${esc(name)}</h3>
+${scroller(`b-${esc(id)}`, `<table class="stab__table" aria-labelledby="b-${esc(id)}"><thead><tr><th scope="col">Batch</th><th scope="col">Codes</th><th scope="col" class="num">Unreviewed</th><th scope="col">Claim</th></tr></thead><tbody>${rows}</tbody></table>`)}</section>`;
   }).join('\n');
 }
 
@@ -323,9 +323,9 @@ ${guardrail()}
 <section class="block" aria-labelledby="m-src-h">
 <h2 id="m-src-h">Sources</h2>
 <p>Every number on a card comes from one of these CMS files.</p>
-<div class="scroll"><table class="check files">
+${scroller('m-files-cap', `<table class="check files"><caption class="sr" id="m-files-cap">CMS sources and the files read from each</caption>
 <thead><tr><th scope="col">Source</th><th scope="col">Files read</th></tr></thead>
-<tbody>${files}</tbody></table></div>
+<tbody>${files}</tbody></table>`)}
 <ul class="plain">
 <li>Operating: ${esc(r.operatingTable)}: ${cents(r.operating)}.</li>
 <li>Capital: ${esc(r.capitalTable)}: ${cents(r.capital)}.</li>

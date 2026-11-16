@@ -18,6 +18,9 @@ export function fr(cite) {
 
 export const cfr = (section, text) => out(CFR[section], esc(text || `42 CFR ${section}`));
 
+/** A table that may scroll sideways: focusable so the keyboard can scroll it, and named (labelId: its caption or heading). */
+export const scroller = (labelId, table) => `<div class="scroll" tabindex="0" role="region" aria-labelledby="${labelId}">${table}</div>`;
+
 export const CHIP = { ipo: 'Inpatient only', off: 'Not inpatient only', gone: 'Not in the files' };
 export const chip = (state) => `<span class="chip chip--${state}">${CHIP[state]}</span>`;
 

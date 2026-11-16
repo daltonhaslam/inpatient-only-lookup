@@ -6,6 +6,7 @@ import { dirname, join } from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 import { launch } from './browser.mjs';
 import { serve } from './serve.mjs';
+import { formatDate } from '../src/engine.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const AXE = join(here, '..', 'node_modules', 'axe-core', 'axe.min.js');
@@ -270,6 +271,83 @@ await check('home: whole-list count follows the date', async (page) => {
   eq(await waitText(page.locator('[data-count="total"]'), (t) => t === '1,438', 'total on 2021-03-03'), '1,438', 'total on 2021-03-03');
 });
 
+await check('date field: a typed date outside the range is named beside the field until an in-range date replaces it', async (page) => {
+  await open(page, '/code/27447/');
+  const input = page.locator('[data-dos]').first();
+  const note = page.locator('[data-dos-note]');
+  const [min, max] = [await input.getAttribute('min'), await input.getAttribute('max')];
+  assert(await note.isHidden(), 'note shown before anything was typed');
+  await input.fill('2019-03-03');
+  await input.dispatchEvent('change');
+  await input.blur();
+  await note.waitFor({ state: 'visible' });
+  eq(await note.textContent(), `March 3, 2019 is outside the dates this site covers, ${formatDate(min)} to ${formatDate(max)}. Showing ${formatDate(min)}.`, 'note');
+  eq(await input.inputValue(), min, 'field shows the date answered');
+  eq(await input.getAttribute('aria-describedby'), await note.getAttribute('id'), 'field is described by the note');
+  await waitText(answer(page), (t) => t.includes(formatDate(min)), 'answer for the first date covered');
+  await input.fill('2031-05-05');
+  await input.dispatchEvent('change');
+  await input.blur();
+  await waitText(note, (t) => t.startsWith('May 5, 2031') && t.endsWith(`Showing ${formatDate(max)}.`), 'note after a date past the range');
+  await setDate(page, '2021-03-03');
+  await note.waitFor({ state: 'hidden' });
+  eq(await input.getAttribute('aria-describedby'), null, 'description removed with the note');
+});
+
+await check('home: Enter in the search box submits, and the status line sums up the answer', async (page) => {
+  await open(page, '/');
+  eq(await page.locator('[data-ask] button[type="submit"]').count(), 1, 'submit button in the search form');
+  eq(await page.locator('[data-results]').getAttribute('aria-live'), null, 'results panel is not a live region');
+  await page.fill('[data-q]', '27447');
+  await waitText(answer(page), (t) => /inpatient only on/i.test(t), 'verdict for 27447');
+  await page.locator('[data-q]').press('Enter');
+  await page.waitForFunction(() => Boolean(document.activeElement.closest('[data-results]')));
+  const head = (await answer(page).textContent()).trim();
+  await waitText(page.locator('[data-announce]'), (t) => t === `27447: ${head}`, 'status line');
+  // An out-of-range date settles on leaving the field (Chromium does not submit from a date field on Enter),
+  // and the status line leads with the note, then the answer for the date shown.
+  const dos = page.locator('[data-ask] [data-dos]');
+  await dos.fill('2019-03-03');
+  await dos.blur();
+  await page.locator('[data-dos-note]').waitFor({ state: 'visible' });
+  await waitText(page.locator('[data-announce]'), (t) => t.startsWith('March 3, 2019 is outside') && t.includes('27447: '), 'status line with the note');
+});
+
+await check('home: a touch tap on a whole-list square stays on the page; a mouse click opens the code', async (page) => {
+  await open(page, '/');
+  const cell = page.locator('[data-cells] [data-cell]').first();
+  const code = await cell.getAttribute('data-cell');
+  await cell.evaluate((node) => {
+    node.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' }));
+    node.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  });
+  await new Promise((r) => setTimeout(r, 400));
+  eq(new URL(page.url()).pathname, '/', 'page after a touch tap');
+  await cell.click();
+  await page.waitForURL(`**/code/${code}/**`);
+});
+
+await check('forced colors: on-list marks stay filled and the not-in-the-files dot stays visible', async (page) => {
+  const paint = (selector, pseudo = null, prop = 'backgroundColor') => page.evaluate(([s, p, k]) => {
+    const node = document.querySelector(s);
+    return node ? getComputedStyle(node, p)[k] : 'missing';
+  }, [selector, pseudo, prop]);
+  await open(page, '/');
+  const canvas = await paint('body');
+  for (const selector of ['.cellkey .cell--ipo', '.cells .cell--ipo']) {
+    const fill = await paint(selector);
+    assert(fill !== canvas && fill !== 'rgba(0, 0, 0, 0)' && fill !== 'missing', `${selector} fill is ${fill} on a ${canvas} page`);
+  }
+  const dot = await paint('.cellkey .cell--gone', '::after', 'borderTopColor');
+  assert(dot !== canvas && dot !== 'missing', `not-in-the-files dot is ${dot}`);
+  await open(page, '/history/');
+  const bar = await paint('.bar:not(.bar--sched)');
+  assert(bar !== canvas && bar !== 'rgba(0, 0, 0, 0)', `history bar fill is ${bar}`);
+  await open(page, '/code/27132/');
+  const seg = await paint('.tl__seg--ipo');
+  assert(seg !== canvas && seg !== 'rgba(0, 0, 0, 0)', `timeline segment fill is ${seg}`);
+}, { forcedColors: 'active' });
+
 // ---- a code page --------------------------------------------------------------------------
 
 await check('code page: range input by keyboard keeps focus', async (page) => {
@@ -519,6 +597,12 @@ if (!hasStake) {
     assert(await page.locator('tr[data-code="32480"]').count() === 1, 'table row for 32480');
     eq(await page.locator('[data-stake-app] *').count(), 0, 'app is empty without JS');
     eq(await page.locator('details.stake-tablewrap').count(), 0, 'table not wrapped without JS');
+    // The tables render lazily (content-visibility); a jump link must still land on its table.
+    const jump = page.locator('.stab__jump a').last();
+    const target = (await jump.getAttribute('href')).slice(1);
+    await jump.click();
+    await page.waitForFunction((id) => { const box = document.getElementById(id).getBoundingClientRect(); return box.top >= -2 && box.top < innerHeight / 2; }, target);
+    assert(await page.locator(`#${target} + .scroll tbody tr`).first().isVisible(), 'jumped-to table shows its rows');
   }, { javaScriptEnabled: false });
 }
 
@@ -560,6 +644,7 @@ await check('keyboard: Tab reaches the skip link first and it moves focus into m
     return { inMain: Boolean(el && el.closest('main')), tag: el ? `${el.tagName.toLowerCase()}#${el.id}` : 'none' };
   });
   assert(where.inMain, `focus after activating the skip link is ${where.tag}, not inside main`);
+  eq(where.tag, 'h1#ask-h', 'skip link target');
 });
 
 await check('404: missing path returns the 404 page with a link home', async (page) => {
