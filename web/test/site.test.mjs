@@ -109,14 +109,13 @@ describe('accessibility markup', () => {
       .map((a) => `aria-current="page" on a link to ${a.href}`)), 'wrong current-page links');
   });
 
-  test('the skip link targets a focusable element inside main, not main itself', () => {
+  test('the skip link targets an empty focus point at the top of main, not main itself', () => {
     none(collect(({ html }) => {
-      const href = (/<a class="skip" href="#([^"]+)"/.exec(html) || [])[1];
-      if (!href) return ['no skip link'];
-      const main = /<main\b[^>]*>([\s\S]*)<\/main>/.exec(html);
       const out = [];
+      if (!html.includes('<a class="skip" href="#content">')) out.push('no skip link to #content');
       if (/<main\b[^>]*tabindex/.test(html)) out.push('<main> has a tabindex');
-      if (!main || !new RegExp(`<[a-z0-9]+\\b[^>]*\\sid="${href}"[^>]*\\stabindex="-1"`).test(main[1])) out.push(`#${href} is not a tabindex="-1" element in main`);
+      if (!/<main\b[^>]*>\s*<span id="content" tabindex="-1"><\/span>/.test(html)) out.push('main does not open with the skip target');
+      if ((html.match(/\sid="content"/g) || []).length !== 1) out.push('id="content" is not unique');
       return out;
     }), 'pages with a broken skip target');
   });

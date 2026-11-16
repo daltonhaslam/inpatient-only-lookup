@@ -1,10 +1,10 @@
 // Browser behavior: the date of service, the search box, the timeline scrubber, the bulk check.
 // Every page is complete without this script; it only makes the date and the search live.
 import {
-  isDate, formatDate, todayISO, clampDate, dayNumber, fromDayNumber, normalizeCode, isCode, periodIndex,
+  isDate, isFullDate, formatDate, todayISO, clampDate, outsideRangeNote, unreadDateNote, dayNumber, fromDayNumber, normalizeCode, isCode, periodIndex,
   stateAt, lookup, expandOther, countsAt, exemptCodes, buildIndex, search, extractCodes, num, csv, isScheduled,
 } from './engine.mjs';
-import { esc, chip, CHIP, verdict, verdictParts, eventList, codeRow, answer, axis, pct, scheduledNote, scroller } from './views.mjs';
+import { esc, chip, CHIP, verdict, verdictParts, eventList, codeRow, answer, axis, pct, scheduledNote, captionedScroller } from './views.mjs';
 
 // Vercel Web Analytics: never send what someone searched for or which date they chose.
 window.va = window.va || function va() { (window.vaq = window.vaq || []).push(arguments); };
@@ -46,24 +46,22 @@ function storedDate() {
 /** The date this tab last chose, or today. */
 const rememberedDate = () => storedDate() ?? state.today;
 
-/** The link's date: { date } moved into the range, with `asked` when it was a real date (so the reader can be told
- *  if it moved), or { unread } when the link has a dos that is not a date at all. */
-function linkDate() {
-  const asked = params().get('dos');
-  if (!asked) return {};
-  return isDate(asked) && asked >= '1000-01-01' ? { date: clampDate(state.data, asked), asked } : { unread: asked };
-}
-
-/** A date in the link wins; otherwise the date this tab last chose; otherwise today. Returns linkDate()'s shape. */
+/** A date in the link wins (moved into the range if it is outside it); otherwise the date this tab last chose;
+ *  otherwise today. Returns { date, note }: note says why the date shown is not the link's, or is ''. */
 function startingDate() {
-  const link = linkDate();
+  const asked = params().get('dos');
   // Coming back to a page, the tab's latest choice beats the date frozen in that page's address;
   // with nothing stored, the address is all there is.
   const [navigation] = window.performance.getEntriesByType('navigation');
   const back = navigation && navigation.type === 'back_forward';
   const kept = back ? storedDate() : null;
-  if (kept) return { date: kept };
-  return link.date ? link : { ...link, date: back ? state.today : rememberedDate() };
+  if (kept) return { date: kept, note: '' };
+  if (isFullDate(asked)) {
+    const date = clampDate(state.data, asked);
+    return { date, note: date === asked ? '' : outsideRangeNote(state.data, asked, date) };
+  }
+  const date = back ? state.today : rememberedDate();
+  return { date, note: asked ? unreadDateNote(asked, date) : '' };
 }
 
 function writeUrl() {
@@ -153,6 +151,8 @@ function announce(...parts) {
   }, 500);
 }
 
+let shownNote = null;   // the date note while it is showing: clearing it runs on every slider step
+
 /** Say, beside the date field, why the date shown is not the one asked for (typed, or in the link). */
 function showDateNote(text) {
   const note = $('[data-dos-note]');
@@ -160,17 +160,16 @@ function showDateNote(text) {
   note.textContent = text;
   note.hidden = false;
   for (const input of $$('[data-dos]')) input.setAttribute('aria-describedby', note.id);
+  shownNote = note;
   announce('range');
 }
 
-const outsideRange = (asked) => `${formatDate(asked)} is outside the dates this site covers, ${formatDate(state.data.dosMin)} to ${formatDate(state.data.dosMax)}. Showing ${formatDate(state.date)}.`;
-
 function clearRangeNote() {
-  const note = $('[data-dos-note]');
-  if (!note || note.hidden) return;
-  note.hidden = true;
-  note.textContent = '';
+  if (!shownNote) return;
+  shownNote.hidden = true;
+  shownNote.textContent = '';
   for (const input of $$('[data-dos]')) input.removeAttribute('aria-describedby');
+  shownNote = null;
 }
 
 function drawControls() {
@@ -332,7 +331,7 @@ function drawBulk() {
     + (state.bulkDropped
       ? `<p class="note note--sched">Only the first ${rows.length} codes were checked; ${state.bulkDropped} more were left out.</p>` : '');
   setHtml(host, `<p class="results__count">${rows.length} ${rows.length === 1 ? 'code' : 'codes'} on ${formatDate(state.date)}: ${tally('ipo')} inpatient only, ${tally('off')} not${missing ? `, ${missing} not in CMS’s files on that date or not found` : ''}.</p>${notes}
-${scroller('bulk-cap', `<table class="check"><caption class="sr" id="bulk-cap">Codes checked for ${formatDate(state.date)}</caption><thead><tr><th scope="col">Code</th><th scope="col">Procedure</th><th scope="col">Status</th><th scope="col">Left the list</th><th scope="col">Review exemption</th></tr></thead><tbody>${body}</tbody></table>`)}
+${captionedScroller('bulk-cap', `Codes checked for ${formatDate(state.date)}`, 'class="check"', `<thead><tr><th scope="col">Code</th><th scope="col">Procedure</th><th scope="col">Status</th><th scope="col">Left the list</th><th scope="col">Review exemption</th></tr></thead><tbody>${body}</tbody>`)}
 <p><button type="button" class="quiet" data-bulk-csv>Download as CSV</button></p>`);
 }
 
@@ -361,14 +360,13 @@ function drawDate() {
   announce('results', 'bulk');
 }
 
-// '1000-01-01': a four-digit year means a real date was typed; a half-typed year (0202) does not.
-/** On leaving the date field: a real date outside the range goes to the nearest date answered;
+/** On leaving the date field: a real date outside the range goes to the nearest date answered, and says so;
  *  a half-typed one (year 0202) is dropped. Either way the field ends up showing the date in force. */
 function settleDateField(input) {
   const typed = input.value;
-  if (isDate(typed) && typed >= '1000-01-01') {
+  if (isFullDate(typed)) {
     setDate(typed);
-    if (state.date !== typed) showDateNote(outsideRange(typed));
+    if (state.date !== typed) showDateNote(outsideRangeNote(state.data, typed, state.date));
   }
   input.value = state.date;
 }
@@ -390,9 +388,7 @@ function wire() {
   const later = (job) => { cancelAnimationFrame(frame); frame = requestAnimationFrame(job); };
   const dateAt = (clientX) => axis.at((clientX - drag.left) / drag.width);
 
-  let pointer = '';   // the kind of the last press: a finger cannot aim at a 9px square
   document.addEventListener('pointerdown', (event) => {
-    pointer = event.pointerType;
     const track = event.target.closest?.('[data-track]');
     if (!track || event.button > 0) return;
     const box = track.getBoundingClientRect();
@@ -481,8 +477,9 @@ function wire() {
     const target = event.target;
     if (target.closest('[data-today]')) setDate(state.today);
     else if (target.closest('[data-bulk-csv]')) downloadBulk();
-    // On touch the squares only show the list; the body-system links above them navigate.
-    else if (target.matches('[data-cell]') && pointer !== 'touch') window.location.assign(`/code/${target.dataset.cell}/`);
+    // A finger cannot aim at a 9px square: on touch the squares only show the list, and the body-system links
+    // above them navigate. (A click from a keyboard has pointerType '', and older browsers none: both navigate.)
+    else if (target.matches('[data-cell]') && event.pointerType !== 'touch') window.location.assign(`/code/${target.dataset.cell}/`);
   });
 
   const hint = $('[data-cell-hint]');
@@ -521,8 +518,7 @@ async function start() {
   wire();
   drawResults();
   drawDate();
-  if (start.asked && start.asked !== state.date) showDateNote(outsideRange(start.asked));
-  else if (start.unread) showDateNote(`The date in this link, “${start.unread.slice(0, 24)}”, is not a date. Showing ${formatDate(state.date)}.`);
+  if (start.note) showDateNote(start.note);
   persist(true);   // the address now carries the date shown
   document.documentElement.classList.add('live');
 }

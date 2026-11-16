@@ -1,7 +1,7 @@
 // Page templates. Build-time only: everything here becomes static HTML in docs/.
 import { SITE, feedbackHref, CFR } from './site.mjs';
 import { formatDate, monthYear, lookup, countsAt, periodIndex, stateAt, dayNumber, num, plural, scale, isScheduled } from './engine.mjs';
-import { esc, out, fr, cfr, verdict, eventList, codeRow, axis, axisYears, pct, scheduledNote, scroller } from './views.mjs';
+import { esc, out, fr, cfr, verdict, eventList, codeRow, axis, axisYears, pct, scheduledNote, captionedScroller } from './views.mjs';
 
 const NAV = [
   ['/', 'Lookup'],
@@ -16,8 +16,7 @@ const NAV = [
 const LIVE = new Set(['home', 'code', 'group']);
 const codeLink = (data, code) => `<a href="/code/${esc(code)}/" title="${esc(data.codes[code] ? data.codes[code].label : '')}">${esc(code)}</a>`;
 
-/** skip: the id of the page's first meaningful element (focusable with tabindex="-1"), the skip link's target. */
-export function layout(ctx, { path, title, description, page, body, skip = 'content' }) {
+export function layout(ctx, { path, title, description, page, body }) {
   const full = path === '/' ? `${SITE.name}: Medicare’s inpatient-only list by date of service` : `${title} | ${SITE.name}`;
   // Revenue at stake is linked only when the build has its crosswalk (ctx.stake).
   const nav = NAV.filter(([href]) => ctx.stake || href !== '/revenue-at-stake/').map(([href, text]) => {
@@ -47,12 +46,13 @@ ${ctx.assets.preload}${LIVE.has(page) ? `\n<link rel="preload" href="${ctx.asset
 <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body data-page="${page}"${LIVE.has(page) ? ` data-ipo="${ctx.assets.data}" data-other="${ctx.assets.other}"` : ''}${page === 'stake' ? ` data-stake="${ctx.assets.stake}"` : ''}>
-<a class="skip" href="#${skip}">Skip to content</a>
+<a class="skip" href="#content">Skip to content</a>
 <header class="top">
 <a class="top__name" href="/">${SITE.name}</a>
 <nav class="top__nav" aria-label="Site">${nav}</nav>
 </header>
 <main id="main">
+<span id="content" tabindex="-1"></span>
 ${body}
 </main>
 <footer class="foot">
@@ -135,7 +135,7 @@ export function home(ctx) {
   const date = ctx.today;
   const newest = ctx.phases[ctx.phases.length - 1];
   const body = `<section class="ask" aria-labelledby="ask-h">
-<h1 id="ask-h" tabindex="-1">Was it inpatient only on that date?</h1>
+<h1 id="ask-h">Was it inpatient only on that date?</h1>
 <p class="ask__sub">Medicare’s inpatient-only list, code by code and day by day: every date of service from ${formatDate(data.dosMin)} through ${formatDate(data.dosMax)}, with what left the list, what came back, and what is still exempt from medical review.</p>
 <form class="ask__form" role="search" action="/" method="get" data-ask>
 <label class="field field--q"><span>Code or procedure</span><input type="search" name="q" data-q autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="27447 or hip replacement"></label>
@@ -174,7 +174,7 @@ ${ctx.stake ? `<p><strong>What removal does to payment.</strong> ${ctx.stakeSumm
 <p class="status__after">The date of service will still matter after the list ends. Audits and appeals turn on what was true that day, and on whether a code’s exemption was still running.</p>
 </section>`;
   return layout(ctx, {
-    path: '/', page: 'home', title: SITE.name, body, skip: 'ask-h',
+    path: '/', page: 'home', title: SITE.name, body,
     description: 'Look up any CPT or HCPCS code and a date of service: was it on Medicare’s inpatient-only list, when did it leave, did it come back, and is it exempt from medical review? Built from CMS’s Addendum B files, 2020 to 2027.',
   });
 }
@@ -189,7 +189,7 @@ export function codePage(ctx, code) {
   const [groupId, groupName] = data.groups[groupIndex];
   const siblings = ctx.byFamily[record.family].filter((other) => other !== code);
   const result = lookup(data, code, date);
-  const body = `<nav class="crumbs" id="content" tabindex="-1" aria-label="Breadcrumb"><a href="/">Lookup</a> <span aria-hidden="true">/</span> <a href="/group/${groupId}/">${esc(groupName)}</a> <span aria-hidden="true">/</span> <span>${esc(family)}</span></nav>
+  const body = `<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Lookup</a> <span aria-hidden="true">/</span> <a href="/group/${groupId}/">${esc(groupName)}</a> <span aria-hidden="true">/</span> <span>${esc(family)}</span></nav>
 ${dateControl(data, date)}
 <div data-verdict-host="${code}" data-title="h1" data-heading="h2">
 ${verdict(data, code, date, ctx.today, null, { title: 'h1', heading: 'h2' })}
@@ -229,7 +229,7 @@ export function groupPage(ctx, g) {
 </section>`).join('\n');
   const others = data.groups.map(([otherId, otherName], i) => (i === g ? '' : `<a href="/group/${otherId}/">${esc(otherName)}</a>`)).filter(Boolean).join('');
   const body = `<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Lookup</a> <span aria-hidden="true">/</span> <span>${esc(name)}</span></nav>
-<h1 id="content" tabindex="-1">${esc(name)}</h1>
+<h1>${esc(name)}</h1>
 ${dateControl(data, date)}
 <p class="lede"><strong data-count="${g}">${counts.groups[g]}</strong> of ${ctx.byGroup[g].length} codes are inpatient only on <span data-dos-text>${formatDate(date)}</span>. The groups and procedure names are this site’s own; CMS’s files list codes only.</p>
 ${families}
@@ -319,7 +319,7 @@ ${codeList(data, 'Removed', change.removed)}${codeList(data, 'Returned to the li
 
   const checks = ctx.reconciliation.map((row) => `<tr><th scope="row">${row.year}</th><td>${esc(row.what)}</td><td>${num(row.cms)}</td><td>${num(row.computed)}</td><td>${row.cite ? fr(row.cite) : '—'}</td><td>${row.note ? esc(row.note) : 'Match'}</td></tr>`).join('');
 
-  const body = `<h1 id="content" tabindex="-1">The list, year by year</h1>
+  const body = `<h1>The list, year by year</h1>
 <p class="lede">CMS has tried to end the inpatient-only list twice. The first attempt lasted one year. A code removed in 2021 may have been inpatient only again in 2022 and gone again in 2026, which is why the date of service matters.</p>
 ${sizeChart(ctx)}
 <section class="block" aria-labelledby="next-h">
@@ -330,9 +330,8 @@ ${years}
 <section class="block" aria-labelledby="rec-h">
 <h2 id="rec-h">Do these counts match CMS’s?</h2>
 <p>Every count on this site is computed from status indicator C in CMS’s Addendum B files. Where a final rule states a number, the two are compared here. <a href="/methods/">How the comparison works</a>.</p>
-${scroller('rec-cap', `<table class="check"><caption class="sr" id="rec-cap">Counts stated in CMS’s rules against counts computed from CMS’s files</caption>
-<thead><tr><th scope="col">Year</th><th scope="col">What CMS counted</th><th scope="col">CMS says</th><th scope="col">Files show</th><th scope="col">Source</th><th scope="col">Result</th></tr></thead>
-<tbody>${checks}</tbody></table>`)}
+${captionedScroller('rec-cap', 'Counts stated in CMS’s rules against counts computed from CMS’s files', 'class="check"', `<thead><tr><th scope="col">Year</th><th scope="col">What CMS counted</th><th scope="col">CMS says</th><th scope="col">Files show</th><th scope="col">Source</th><th scope="col">Result</th></tr></thead>
+<tbody>${checks}</tbody>`)}
 </section>`;
   return layout(ctx, {
     path: '/history/', page: 'history', title: 'The inpatient-only list, year by year', body,
@@ -361,7 +360,7 @@ const PHASE_NOTES = {
 
 export function phaseOut(ctx) {
   const newest = ctx.phases[ctx.phases.length - 1];
-  const body = `<h1 id="content" tabindex="-1">The phase-out schedule</h1>
+  const body = `<h1>The phase-out schedule</h1>
 <p class="lede">Since January 1, 2026 the regulation has required CMS to eliminate the inpatient-only list “through a 3-year transition, with the list eliminated in its entirety by January 1, 2029” (${cfr('419.22', '42 CFR 419.22(n)')}; ${fr('90 FR 54086')}).</p>
 <ol class="phases">
 ${ctx.phases.map((phase) => `<li class="phase${phase.past ? ' phase--done' : ''}"><p class="phase__when">${formatDate(phase.date)}</p><h2>${num(phase.removed)} codes removed</h2><p>${PHASE_NOTES[phase.year]()}${phase === ctx.phases[ctx.phases.length - 1] ? ` ${num(phase.start)} codes stay on the list for ${phase.year}.` : ''}</p></li>`).join('\n')}
@@ -405,7 +404,7 @@ ${byGroupTable(ctx, newest.staying, `The ${num(newest.start)} codes with status 
 export function exemption(ctx) {
   const { data } = ctx;
   const cohorts = ctx.exemptCohorts.map((c) => `<details class="codes"><summary>Removed ${formatDate(c.from)}: ${plural(c.codes.length, 'code')}, ${c.status}</summary><p class="codes__list">${c.codes.map((code) => codeLink(data, code)).join(' ')}</p></details>`).join('');
-  const body = `<h1 id="content" tabindex="-1">The medical-review exemption</h1>
+  const body = `<h1>The medical-review exemption</h1>
 <p class="lede">When a procedure comes off the inpatient-only list, the two-midnight rule starts to apply to it. To give hospitals time to adjust, CMS exempts claims for the procedure from some kinds of review. For anything removed in 2021 or later, that exemption has no end date yet.</p>
 
 <section class="block" aria-labelledby="reg-h">
@@ -468,7 +467,7 @@ export function methods(ctx) {
   const { data } = ctx;
   const files = ctx.sources.map((s) => `<tr><td>${out(s.landing, esc(s.label))}</td><td>${esc(s.use)}</td><td><code title="${esc(s.sha256)}">${esc(s.sha256.slice(0, 12))}</code></td></tr>`).join('');
   const gaps = ctx.gaps.map((g) => `<li><strong>${g.year}, ${esc(g.table)}.</strong> ${esc(g.why)} <span class="gap__codes">${g.codes.map((code) => (data.codes[code] ? codeLink(data, code) : esc(code))).join(' ')}</span></li>`).join('');
-  const body = `<h1 id="content" tabindex="-1">Methods and sources</h1>
+  const body = `<h1>Methods and sources</h1>
 <p class="lede">Every answer on this site comes from a file CMS published. This page says which files, how they are read, where they disagree with each other, and what the site cannot tell you.</p>
 
 <section class="block" aria-labelledby="test-h">
@@ -525,9 +524,8 @@ export function methods(ctx) {
 <section class="block" aria-labelledby="src-h">
 <h2 id="src-h">Files</h2>
 <p>Each file is pinned by its SHA-256 hash, so a silent replacement by CMS is caught on the next refresh.</p>
-${scroller('files-cap', `<table class="check files"><caption class="sr" id="files-cap">CMS files used, what each is used for, and its SHA-256 hash</caption>
-<thead><tr><th scope="col">File</th><th scope="col">Used for</th><th scope="col">SHA-256</th></tr></thead>
-<tbody>${files}</tbody></table>`)}
+${captionedScroller('files-cap', 'CMS files used, what each is used for, and its SHA-256 hash', 'class="check files"', `<thead><tr><th scope="col">File</th><th scope="col">Used for</th><th scope="col">SHA-256</th></tr></thead>
+<tbody>${files}</tbody>`)}
 <p>Regulations: ${out(CFR['412.3'], '42 CFR 412.3')} (inpatient admissions and the exemption) and ${out(CFR['419.22'], '42 CFR 419.22(n)')} (the list and its elimination).</p>
 </section>`;
   return layout(ctx, {
@@ -539,7 +537,7 @@ ${scroller('files-cap', `<table class="check files"><caption class="sr" id="file
 export function notFound(ctx) {
   return layout(ctx, {
     path: '/404.html', page: 'missing', title: 'Page not found', description: 'That page does not exist.',
-    body: `<h1 id="content" tabindex="-1">That page does not exist</h1><p class="lede">If you were looking for a code, it may never have been on the inpatient-only list. <a href="/">Look it up</a> to check.</p>`,
+    body: `<h1>That page does not exist</h1><p class="lede">If you were looking for a code, it may never have been on the inpatient-only list. <a href="/">Look it up</a> to check.</p>`,
   });
 }
 

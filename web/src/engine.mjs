@@ -7,6 +7,10 @@ const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 
 export const isDate = (text) => /^\d{4}-\d\d-\d\d$/.test(text || '') && !Number.isNaN(Date.parse(`${text}T00:00:00Z`))
   && new Date(`${text}T00:00:00Z`).toISOString().slice(0, 10) === text;
 
+// '1000-01-01': a four-digit year means a real date was typed; a half-typed year (0202) does not.
+// (A date field reports each keystroke of the year as a complete date: 0002, 0020, 0202, then 2021.)
+export const isFullDate = (text) => isDate(text) && text >= '1000-01-01';
+
 export function formatDate(iso, style = 'long') {
   const [y, m, d] = iso.split('-').map(Number);
   const month = style === 'short' ? MONTHS[m - 1].slice(0, 3) : MONTHS[m - 1];
@@ -30,6 +34,12 @@ export function todayISO(now = new Date()) {
 }
 
 export const clampDate = (data, iso) => (iso < data.dosMin ? data.dosMin : iso > data.dosMax ? data.dosMax : iso);
+
+/** Said beside the date field when the date asked for (typed, or in a link) is outside the range. */
+export const outsideRangeNote = (data, asked, shown) =>
+  `${formatDate(asked)} is outside the dates this site covers, ${formatDate(data.dosMin)} to ${formatDate(data.dosMax)}. Showing ${formatDate(shown)}.`;
+/** Said when a link's date is not a date at all. */
+export const unreadDateNote = (asked, shown) => `The date in this link, “${asked.slice(0, 24)}”, is not a date. Showing ${formatDate(shown)}.`;
 
 // A CPT/HCPCS code is five characters: a digit or letter, three digits, a digit or letter.
 export const normalizeCode = (text) => String(text || '').trim().toUpperCase();

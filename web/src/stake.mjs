@@ -2,7 +2,7 @@
 // Build-time only. Reads the normalized model from stake-data.mjs, never crosswalk.json keys.
 import { SITE, CFR, claimHref } from './site.mjs';
 import { formatDate, num, plural, csv as toCsv } from './engine.mjs';
-import { esc, out, cfr, scroller } from './views.mjs';
+import { esc, out, cfr, scroller, captionedScroller } from './views.mjs';
 import { layout } from './pages.mjs';
 import { safeProfile } from './stake-data.mjs';
 import { BADGE, card, money, moneyRange, cents, drgList, dxCode, statusText, noCompareText, yearLines, alternativeLabel } from './stake-card.mjs';
@@ -104,7 +104,7 @@ function downloads(stake) {
 /** Compare · Help review · Methods, shown on all three section pages. */
 function subnav(current) {
   const links = [['compare', ROOT, 'Compare'], ['help', `${ROOT}help-review/`, 'Help review'], ['methods', `${ROOT}methods/`, 'Methods']];
-  return `<nav class="subnav" id="content" tabindex="-1" aria-label="Revenue at stake">${links.map(([id, href, text]) => `<a href="${href}"${id === current ? ' aria-current="page"' : ''}>${text}</a>`).join('')}</nav>`;
+  return `<nav class="subnav" aria-label="Revenue at stake">${links.map(([id, href, text]) => `<a href="${href}"${id === current ? ' aria-current="page"' : ''}>${text}</a>`).join('')}</nav>`;
 }
 
 function helpCallout(stake) {
@@ -323,9 +323,8 @@ ${guardrail()}
 <section class="block" aria-labelledby="m-src-h">
 <h2 id="m-src-h">Sources</h2>
 <p>Every number on a card comes from one of these CMS files.</p>
-${scroller('m-files-cap', `<table class="check files"><caption class="sr" id="m-files-cap">CMS sources and the files read from each</caption>
-<thead><tr><th scope="col">Source</th><th scope="col">Files read</th></tr></thead>
-<tbody>${files}</tbody></table>`)}
+${captionedScroller('m-files-cap', 'CMS sources and the files read from each', 'class="check files"', `<thead><tr><th scope="col">Source</th><th scope="col">Files read</th></tr></thead>
+<tbody>${files}</tbody>`)}
 <ul class="plain">
 <li>Operating: ${esc(r.operatingTable)}: ${cents(r.operating)}.</li>
 <li>Capital: ${esc(r.capitalTable)}: ${cents(r.capital)}.</li>

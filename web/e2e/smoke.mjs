@@ -6,7 +6,7 @@ import { dirname, join } from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 import { launch } from './browser.mjs';
 import { serve } from './serve.mjs';
-import { formatDate } from '../src/engine.mjs';
+import { formatDate, outsideRangeNote, unreadDateNote } from '../src/engine.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const AXE = join(here, '..', 'node_modules', 'axe-core', 'axe.min.js');
@@ -281,14 +281,14 @@ await check('date field: a typed date outside the range is named beside the fiel
   await input.dispatchEvent('change');
   await input.blur();
   await note.waitFor({ state: 'visible' });
-  eq(await note.textContent(), `March 3, 2019 is outside the dates this site covers, ${formatDate(min)} to ${formatDate(max)}. Showing ${formatDate(min)}.`, 'note');
+  eq(await note.textContent(), outsideRangeNote({ dosMin: min, dosMax: max }, '2019-03-03', min), 'note');
   eq(await input.inputValue(), min, 'field shows the date answered');
   eq(await input.getAttribute('aria-describedby'), await note.getAttribute('id'), 'field is described by the note');
   await waitText(answer(page), (t) => t.includes(formatDate(min)), 'answer for the first date covered');
   await input.fill('2031-05-05');
   await input.dispatchEvent('change');
   await input.blur();
-  await waitText(note, (t) => t.startsWith('May 5, 2031') && t.endsWith(`Showing ${formatDate(max)}.`), 'note after a date past the range');
+  await waitText(note, (t) => t === outsideRangeNote({ dosMin: min, dosMax: max }, '2031-05-05', max), 'note after a date past the range');
   await setDate(page, '2021-03-03');
   await note.waitFor({ state: 'hidden' });
   eq(await input.getAttribute('aria-describedby'), null, 'description removed with the note');
@@ -300,20 +300,20 @@ await check('a link with a date outside the range moves to the nearest date cove
   const note = page.locator('[data-dos-note]');
   const [min, max] = [await input.getAttribute('min'), await input.getAttribute('max')];
   await note.waitFor({ state: 'visible' });
-  eq(await note.textContent(), `March 3, 2019 is outside the dates this site covers, ${formatDate(min)} to ${formatDate(max)}. Showing ${formatDate(min)}.`, 'note');
+  eq(await note.textContent(), outsideRangeNote({ dosMin: min, dosMax: max }, '2019-03-03', min), 'note');
   eq(await input.inputValue(), min, 'field shows the first date covered');
   eq(await input.getAttribute('aria-describedby'), await note.getAttribute('id'), 'field is described by the note');
   await waitText(answer(page), (t) => t.includes(formatDate(min)), 'answer for the first date covered');
   await page.waitForURL(new RegExp(`dos=${min}`), { timeout: 3000 });
   await waitText(page.locator('[data-announce]'), (t) => t.startsWith('March 3, 2019 is outside'), 'status line');
   await open(page, '/?q=27447&dos=2031-05-05');
-  await waitText(page.locator('[data-dos-note]'), (t) => t.startsWith('May 5, 2031 is outside') && t.endsWith(`Showing ${formatDate(max)}.`), 'note past the range');
+  await waitText(page.locator('[data-dos-note]'), (t) => t === outsideRangeNote({ dosMin: min, dosMax: max }, '2031-05-05', max), 'note past the range');
   eq(await page.locator('[data-dos]').first().inputValue(), max, 'field shows the last date covered');
   await waitText(page.locator('[data-announce]'), (t) => t.startsWith('May 5, 2031 is outside') && t.includes('27447: '), 'status line with the answer');
   // A malformed date falls back as before: to this tab's last choice, else today (a new tab has none).
   const tab = await context.newPage();
   await open(tab, '/?dos=not-a-date');
-  await waitText(tab.locator('[data-dos-note]'), (t) => t === 'The date in this link, “not-a-date”, is not a date. Showing November 11, 2026.', 'note for a malformed date');
+  await waitText(tab.locator('[data-dos-note]'), (t) => t === unreadDateNote('not-a-date', '2026-11-11'), 'note for a malformed date');
   eq(await tab.locator('[data-dos]').first().inputValue(), '2026-11-11', 'malformed date falls back to today');
 });
 
@@ -336,16 +336,19 @@ await check('home: Enter in the search box submits, and the status line sums up 
   await waitText(page.locator('[data-announce]'), (t) => t.startsWith('March 3, 2019 is outside') && t.includes('27447: '), 'status line with the note');
 });
 
-await check('home: a touch tap on a whole-list square stays on the page; a mouse click opens the code', async (page) => {
+await check('home: a touch tap on a whole-list square stays on the page; other clicks open the code', async (page) => {
   await open(page, '/');
   const cell = page.locator('[data-cells] [data-cell]').first();
   const code = await cell.getAttribute('data-cell');
-  await cell.evaluate((node) => {
-    node.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' }));
-    node.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-  });
+  const click = (pointerType) => cell.evaluate((node, type) => node.dispatchEvent(new PointerEvent('click', { bubbles: true, pointerType: type })), pointerType);
+  await click('touch');
   await new Promise((r) => setTimeout(r, 400));
   eq(new URL(page.url()).pathname, '/', 'page after a touch tap');
+  // Each click decides for itself: a click with no pointer (the kind a keyboard sends) right after a touch tap
+  // still navigates. (The squares are aria-hidden and not focusable, so a real Enter cannot reach them.)
+  await click('');
+  await page.waitForURL(`**/code/${code}/**`);
+  await open(page, '/');
   await cell.click();
   await page.waitForURL(`**/code/${code}/**`);
 });
@@ -669,7 +672,7 @@ await check('keyboard: Tab reaches the skip link first and it moves focus into m
     return { inMain: Boolean(el && el.closest('main')), tag: el ? `${el.tagName.toLowerCase()}#${el.id}` : 'none' };
   });
   assert(where.inMain, `focus after activating the skip link is ${where.tag}, not inside main`);
-  eq(where.tag, 'h1#ask-h', 'skip link target');
+  eq(where.tag, 'span#content', 'skip link target');
 });
 
 await check('404: missing path returns the 404 page with a link home', async (page) => {

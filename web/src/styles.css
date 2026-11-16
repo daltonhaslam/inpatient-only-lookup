@@ -164,7 +164,9 @@ button.quiet:hover { background: var(--panel); color: var(--ink); border-color: 
 .tl__seg--ipo { background: var(--on); box-shadow: inset -2px 0 0 var(--paper); }
 .tl__seg--off { border: 1.5px solid var(--ink-2); box-shadow: inset 0 0 0 0; margin-left: 0; }
 .tl__ex { position: absolute; top: 1.95rem; height: 0.3rem; background: var(--ex); border-radius: 2px; }
-.tl__open { position: absolute; top: 0.25rem; height: 1.5rem; border: 1.5px dashed var(--ink-2); border-radius: 3px; }
+/* Not yet decided (the year after the newest rule): dashed, in --ink-2 for 3:1 against the page. */
+.tl__open, .key--open, .chart__open { border: 1.5px dashed var(--ink-2); }
+.tl__open { position: absolute; top: 0.25rem; height: 1.5rem; border-radius: 3px; }
 .tl__mark { position: absolute; top: -0.35rem; bottom: -0.2rem; width: 0; border-left: 2.5px solid var(--ink); pointer-events: none; }
 .tl__mark::before { content: ''; position: absolute; left: -0.5rem; top: -0.15rem; width: calc(1rem - 2.5px); height: 0.5rem; background: var(--ink); border-radius: 2px; }
 .tl__date { position: absolute; bottom: 100%; left: 0; transform: translateX(-50%); white-space: nowrap; font-size: 0.82rem; font-weight: 600; padding-bottom: 0.3rem; }
@@ -180,7 +182,6 @@ button.quiet:hover { background: var(--panel); color: var(--ink); border-color: 
 .key--ipo { background: var(--on); }
 .key--off { border: 1.5px solid var(--ink-2); }
 .key--ex { background: var(--ex); height: 0.3rem; }
-.key--open { border: 1.5px dashed var(--ink-2); }
 
 /* ---- events ---- */
 .events { list-style: none; padding: 0; max-width: 60rem; border-top: 1px solid var(--rule); }
@@ -248,8 +249,7 @@ blockquote footer { margin-top: 0.6rem; color: var(--ink-2); font-size: 0.95rem;
 .bar { position: absolute; bottom: 0; background: var(--on); box-shadow: inset -2px 0 0 var(--paper); border-radius: 3px 3px 0 0; min-width: 2px; }
 .bar--sched { background: repeating-linear-gradient(135deg, var(--on) 0 4px, transparent 4px 7px); border: 1.5px solid var(--on); border-bottom: 0; box-shadow: none; }
 .chart__val { position: absolute; transform: translateY(-0.15rem); font-size: 0.84rem; font-weight: 600; font-variant-numeric: tabular-nums; padding-left: 0.15rem; line-height: 1.2; }
-.chart__open { position: absolute; bottom: 0; top: 0; border: 1.5px dashed var(--ink-2); border-bottom: 0; border-radius: 3px 3px 0 0; display: grid; place-items: end start; }
-.chart__open { overflow: hidden; }
+.chart__open { position: absolute; bottom: 0; top: 0; border-bottom: 0; border-radius: 3px 3px 0 0; display: grid; place-items: end start; overflow: hidden; }
 .chart__open span { font-size: 0.8rem; color: var(--ink-2); padding: 0.3rem 0.4rem; line-height: 1.25; }
 .chart__table { margin-top: 0.8rem; }
 .chart__table table { margin-top: 0.5rem; }
@@ -266,7 +266,7 @@ summary { cursor: pointer; font-weight: 600; padding: 0.45rem 0; }
 .codes:last-of-type { border-bottom: 1px solid var(--rule); }
 .codes__more { padding-bottom: 1rem; margin: 0; }
 .codes__list + .codes__more { margin-top: -0.4rem; }
-#content:focus, #ask-h:focus { outline: none; }
+#content:focus { outline: none; }
 .codes__list { padding: 0.3rem 0 1rem; font-variant-numeric: tabular-nums; line-height: 1.9; word-spacing: 0.45em; }
 .bygroup__cap { max-width: var(--measure); margin-bottom: 0.8rem; }
 .gap__codes { font-variant-numeric: tabular-nums; word-spacing: 0.3em; }
