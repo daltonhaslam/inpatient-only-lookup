@@ -1,7 +1,7 @@
 // Browser behavior: the date of service, the search box, the timeline scrubber, the bulk check.
 // Every page is complete without this script; it only makes the date and the search live.
 import {
-  isDate, isFullDate, formatDate, todayISO, clampDate, outsideRangeNote, unreadDateNote, dayNumber, fromDayNumber, normalizeCode, isCode, periodIndex,
+  isDate, isFullDate, formatDate, todayISO, clampDate, outsideRangeNote, unreadDateNote, printable, dayNumber, fromDayNumber, normalizeCode, isCode, periodIndex,
   stateAt, lookup, expandOther, countsAt, exemptCodes, buildIndex, search, extractCodes, num, csv, isScheduled,
 } from './engine.mjs';
 import { esc, chip, CHIP, verdict, verdictParts, eventList, codeRow, answer, axis, pct, scheduledNote, captionedScroller } from './views.mjs';
@@ -147,7 +147,10 @@ function announce(...parts) {
       if (text) said.push(text.trim());
     }
     const text = said.join(' ');
-    if (text && region.textContent !== text) region.textContent = text;
+    if (!text) return;
+    // Empty the line first and write it a moment later, so a sentence that repeats the last one is still said.
+    region.textContent = '';
+    sayTimer = setTimeout(() => { region.textContent = text; }, 100);
   }, 500);
 }
 
@@ -285,7 +288,7 @@ function drawResults() {
   state.index ||= buildIndex(data);
   const found = search(state.index, query);
   if (!found.total) {
-    host.innerHTML = `<p class="results__none">Nothing matches “${esc(query)}”. Procedure names here cover only codes that have been on the list. A full five-character code gets an answer either way.</p>`;
+    host.innerHTML = `<p class="results__none">Nothing matches “${esc(printable(query))}”. Procedure names here cover only codes that have been on the list. A full five-character code gets an answer either way.</p>`;
     return;
   }
   const more = found.total > found.codes.length ? ` Showing the first ${found.codes.length}; keep typing to narrow it.` : '';
@@ -371,9 +374,11 @@ function settleDateField(input) {
   input.value = state.date;
 }
 
+/** Show `date`, moved into the range. Any "outside the range" note is cleared when the date changes (or an
+ *  in-range date is asked for); a caller that wants the reader told about a move shows a fresh one after. */
 function setDate(date) {
   const next = clampDate(state.data, date);
-  if (next === date) clearRangeNote();   // a date inside the range: an earlier "outside the range" note is stale
+  if (next === date || next !== state.date) clearRangeNote();
   if (next === state.date) return;
   state.date = next;
   persist();
@@ -383,12 +388,23 @@ function setDate(date) {
 // ---- events -------------------------------------------------------------------------------
 
 function wire() {
+  // Without the script (or its data) the search cannot answer, so its button stays hidden.
+  for (const button of $$('[data-submit]')) button.hidden = false;
   let frame = 0;
+  let queued = null;   // the job waiting for the next frame
   let drag = null;   // the box of the track being dragged, read once when the drag starts
-  const later = (job) => { cancelAnimationFrame(frame); frame = requestAnimationFrame(job); };
+  let press = null;   // the last press on a whole-list square: {node, kind, at}, used by its click and then cleared
+  const later = (job) => {
+    cancelAnimationFrame(frame);
+    queued = job;
+    frame = requestAnimationFrame(() => { queued = null; job(); });
+  };
+  /** Run a queued frame's job now (Enter right after typing must act on what was typed). */
+  const flush = () => { if (queued) { cancelAnimationFrame(frame); const job = queued; queued = null; job(); } };
   const dateAt = (clientX) => axis.at((clientX - drag.left) / drag.width);
 
   document.addEventListener('pointerdown', (event) => {
+    if (event.target.matches?.('[data-cell]')) press = { node: event.target, kind: event.pointerType, at: event.timeStamp };
     const track = event.target.closest?.('[data-track]');
     if (!track || event.button > 0) return;
     const box = track.getBoundingClientRect();
@@ -451,7 +467,15 @@ function wire() {
       event.preventDefault();
       const input = $('[data-dos]', form);
       if (input) settleDateField(input);
-      $('[data-results] a')?.focus();
+      if (form.matches('[data-ask]')) {
+        flush();
+        // Take the reader to the answer: the verdict itself, or the first matching code.
+        const answer = $('[data-results] .verdict__answer') || $('[data-results] .row');
+        if (answer) {
+          if (!answer.matches('a')) answer.tabIndex = -1;
+          answer.focus();
+        }
+      }
     } else if (form.matches('[data-bulk]')) {
       event.preventDefault();
       const pasted = extractCodes($('[data-bulk-input]', form).value);
@@ -477,9 +501,14 @@ function wire() {
     const target = event.target;
     if (target.closest('[data-today]')) setDate(state.today);
     else if (target.closest('[data-bulk-csv]')) downloadBulk();
-    // A finger cannot aim at a 9px square: on touch the squares only show the list, and the body-system links
-    // above them navigate. (A click from a keyboard has pointerType '', and older browsers none: both navigate.)
-    else if (target.matches('[data-cell]') && event.pointerType !== 'touch') window.location.assign(`/code/${target.dataset.cell}/`);
+    else if (target.matches('[data-cell]')) {
+      // A finger cannot aim at a 9px square: on touch the squares only show the list, and the body-system links
+      // above them navigate. A click from a keyboard has pointerType ''. Where a click carries no pointerType
+      // (older Safari), use this square's own press, if it was just now.
+      const own = press && press.node === target && event.timeStamp - press.at < 800 ? press.kind : '';
+      press = null;
+      if ((event.pointerType ?? own) !== 'touch') window.location.assign(`/code/${target.dataset.cell}/`);
+    }
   });
 
   const hint = $('[data-cell-hint]');

@@ -310,6 +310,18 @@ await check('a link with a date outside the range moves to the nearest date cove
   await waitText(page.locator('[data-dos-note]'), (t) => t === outsideRangeNote({ dosMin: min, dosMax: max }, '2031-05-05', max), 'note past the range');
   eq(await page.locator('[data-dos]').first().inputValue(), max, 'field shows the last date covered');
   await waitText(page.locator('[data-announce]'), (t) => t.startsWith('May 5, 2031 is outside') && t.includes('27447: '), 'status line with the answer');
+  // A click on the timeline before the range moves the date to the first date covered; the old note
+  // ("Showing December 31, 2027") must not stay behind.
+  await open(page, '/code/27447/?dos=2031-05-05');
+  await page.locator('[data-dos-note]').waitFor({ state: 'visible' });
+  const track = page.locator('[data-track]').first();
+  await track.scrollIntoViewIfNeeded();
+  const box = await track.boundingBox();
+  await page.mouse.click(box.x + box.width * 0.12, box.y + box.height / 2);   // about mid-2018 on the 2017-2029 axis
+  await page.waitForFunction((first) => document.querySelector('[data-dos]').value === first, min);
+  const left = page.locator('[data-dos-note]');
+  assert(await left.isHidden() || (await left.textContent()).endsWith(`Showing ${formatDate(min)}.`), `stale note: ${await left.textContent()}`);
+  if (await left.isHidden()) eq(await input.getAttribute('aria-describedby'), null, 'description removed with the note');
   // A malformed date falls back as before: to this tab's last choice, else today (a new tab has none).
   const tab = await context.newPage();
   await open(tab, '/?dos=not-a-date');
@@ -319,14 +331,29 @@ await check('a link with a date outside the range moves to the nearest date cove
 
 await check('home: Enter in the search box submits, and the status line sums up the answer', async (page) => {
   await open(page, '/');
-  eq(await page.locator('[data-ask] button[type="submit"]').count(), 1, 'submit button in the search form');
+  assert(await page.locator('[data-ask] button[type="submit"]').isVisible(), 'submit button in the live search form');
   eq(await page.locator('[data-results]').getAttribute('aria-live'), null, 'results panel is not a live region');
   await page.fill('[data-q]', '27447');
   await waitText(answer(page), (t) => /inpatient only on/i.test(t), 'verdict for 27447');
   await page.locator('[data-q]').press('Enter');
-  await page.waitForFunction(() => Boolean(document.activeElement.closest('[data-results]')));
+  await page.waitForFunction(() => document.activeElement.matches('[data-results] .verdict__answer'));
   const head = (await answer(page).textContent()).trim();
   await waitText(page.locator('[data-announce]'), (t) => t === `27447: ${head}`, 'status line');
+  // Typed and submitted in one go, before the results frame runs: Enter still lands on the new results.
+  await page.evaluate(() => {
+    const box = document.querySelector('[data-q]');
+    box.value = 'hip replacement';
+    box.dispatchEvent(new Event('input', { bubbles: true }));
+    box.form.requestSubmit();
+  });
+  eq(await page.evaluate(() => document.activeElement.matches('[data-results] .row')), true, 'focus on the first matching code');
+  // The same sentence again, after a real action, is said again.
+  await page.fill('[data-q]', '27447');
+  await waitText(page.locator('[data-announce]'), (t) => t === `27447: ${head}`, 'status line, back to 27447');
+  await page.fill('[data-q]', '');
+  await page.fill('[data-q]', '27447');
+  await page.waitForFunction(() => document.querySelector('[data-announce]').textContent === '');
+  await waitText(page.locator('[data-announce]'), (t) => t === `27447: ${head}`, 'status line said again');
   // An out-of-range date settles on leaving the field (Chromium does not submit from a date field on Enter),
   // and the status line leads with the note, then the answer for the date shown.
   const dos = page.locator('[data-ask] [data-dos]');
@@ -347,6 +374,19 @@ await check('home: a touch tap on a whole-list square stays on the page; other c
   // Each click decides for itself: a click with no pointer (the kind a keyboard sends) right after a touch tap
   // still navigates. (The squares are aria-hidden and not focusable, so a real Enter cannot reach them.)
   await click('');
+  await page.waitForURL(`**/code/${code}/**`);
+  // Where a click has no pointerType (older Safari), a touch press on the same square just before counts;
+  // a stale one does not.
+  await open(page, '/');
+  const press = (wait) => cell.evaluate(async (node, ms) => {
+    node.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' }));
+    await new Promise((r) => setTimeout(r, ms));
+    node.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  }, wait);
+  await press(0);
+  await new Promise((r) => setTimeout(r, 400));
+  eq(new URL(page.url()).pathname, '/', 'page after a touch tap without pointerType on the click');
+  await press(900);
   await page.waitForURL(`**/code/${code}/**`);
   await open(page, '/');
   await cell.click();
@@ -439,6 +479,7 @@ await check('no-JS: code page still answers, home shows the noscript note and sy
   assert(await page.locator('.events li').count() > 0, 'history list is empty');
   await page.goto(`${base}/`);
   has(await page.locator('noscript').first().textContent(), 'Search needs JavaScript', 'noscript note');
+  assert(await page.locator('[data-ask] [data-submit]').isHidden(), 'Look up button shows without JavaScript');
   assert(await page.locator('a[href^="/group/"]').count() >= 20, 'body-system links missing');
 }, { javaScriptEnabled: false });
 

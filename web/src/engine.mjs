@@ -38,8 +38,11 @@ export const clampDate = (data, iso) => (iso < data.dosMin ? data.dosMin : iso >
 /** Said beside the date field when the date asked for (typed, or in a link) is outside the range. */
 export const outsideRangeNote = (data, asked, shown) =>
   `${formatDate(asked)} is outside the dates this site covers, ${formatDate(data.dosMin)} to ${formatDate(data.dosMax)}. Showing ${formatDate(shown)}.`;
+/** Text from the address or the search box, safe to echo back: control and format characters (bidi overrides
+ *  among them) removed, so it cannot reorder or hide the words around it. Still escape it for HTML. */
+export const printable = (text) => String(text).replace(/[\p{Cc}\p{Cf}]/gu, '');
 /** Said when a link's date is not a date at all. */
-export const unreadDateNote = (asked, shown) => `The date in this link, “${asked.slice(0, 24)}”, is not a date. Showing ${formatDate(shown)}.`;
+export const unreadDateNote = (asked, shown) => `The date in this link, “${printable(asked).slice(0, 24)}”, is not a date. Showing ${formatDate(shown)}.`;
 
 // A CPT/HCPCS code is five characters: a digit or letter, three digits, a digit or letter.
 export const normalizeCode = (text) => String(text || '').trim().toUpperCase();

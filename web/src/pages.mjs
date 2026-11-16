@@ -141,7 +141,7 @@ export function home(ctx) {
 <label class="field field--q"><span>Code or procedure</span><input type="search" name="q" data-q autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="27447 or hip replacement"></label>
 <label class="field field--dos"><span>Date of service</span><input type="date" name="dos" data-dos min="${data.dosMin}" max="${data.dosMax}" value="${date}" required></label>
 <button type="button" class="quiet" data-today hidden>Today</button>
-<button type="submit">Look up</button>
+<button type="submit" data-submit hidden>Look up</button>
 </form>
 ${rangeNote}
 ${scheduledBanner(data, date)}
