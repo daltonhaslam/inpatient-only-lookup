@@ -48,6 +48,10 @@ for (const [name, viewport] of Object.entries(views)) {
     const two = page.locator('[data-stake-card="19305"]');
     await two.locator('[data-fold="split"] > summary').click();
     await shot('10-ohsu-two-family', two);
+    await page.locator('#sf-q').fill('47600');
+    await page.waitForFunction(() => document.querySelector('[data-results] [data-stake-card="47600"]'));
+    await page.locator('[data-stake-card="47600"] [data-fold="split"] > summary').click();
+    await shot('11-ohsu-six-drgs', page.locator('[data-stake-card="47600"] [data-fold="split"]'));
     await page.locator('[data-hpick-change]').click();
     await pick(page, 'arizona spine', '030107');
     await page.locator('#sf-q').fill('32480');

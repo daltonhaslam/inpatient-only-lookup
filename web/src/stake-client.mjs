@@ -184,8 +184,12 @@ async function load() {
   const source = document.body.dataset.stake;
   if (!source) return;
   const response = await fetch(source);
-  if (!response.ok) return;
+  if (!response.ok) throw new Error(String(response.status));
   start(await response.json());
 }
 
-load().catch(() => { /* the tables below stand on their own */ });
+load().catch(() => {
+  // The tables below stand on their own; drop the picker's reserved space, which would stay blank.
+  const mount = $('[data-hospital-pick]');
+  if (mount && !mount.firstChild) mount.remove();
+});

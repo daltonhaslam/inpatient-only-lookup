@@ -476,7 +476,11 @@ td a[target] { white-space: nowrap; }
 
 /* ---- revenue at stake: the hospital picker's empty box (stake-client.mjs draws it). The rest of the
    hospital view's styles load with the picker, on first use: web/src/hospital.css. ---- */
-@media (scripting: enabled) { .hpick:empty { min-height: 4.25rem; } }   /* hold the picker's place until it draws */
+/* Hold the picker's place until it draws (no layout shift). If it never draws (the page's script failed
+   to load or start), the hold lets go after 8 s: stake-client.mjs removes the mount at once when its own
+   start fails, and this covers a script that never ran. */
+@media (scripting: enabled) { .hpick:empty { min-height: 4.25rem; animation: hpick-release 0s 8s forwards; } }
+@keyframes hpick-release { to { min-height: 0; } }
 .hpick { margin-top: 1.3rem; max-width: 46rem; }
 .hpick__box { position: relative; }
 .hpick__field input { font-size: 1.15rem; }

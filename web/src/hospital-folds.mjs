@@ -3,7 +3,7 @@
 // cases in those DRGs, with counts anyone can change). Pure: strings in, HTML strings out; the hospital
 // bundle's DOM code (hospital-picker.mjs) applies yearUpdate() to the card when a count changes.
 // Every string from data or from a typed count goes through esc(); figures come from cents().
-import { esc, out, scroller } from './views.mjs';
+import { esc, out, fr, scroller } from './views.mjs';
 import { cents, drgList, whenLabel } from './stake-card.mjs';
 import { splitRows, perYearTable, count } from './hospital-math.mjs';
 import { EMPTY, roughMoney } from './hospital-words.mjs';
@@ -11,6 +11,16 @@ import { EMPTY, roughMoney } from './hospital-words.mjs';
 const ECFR = (section) => `https://www.ecfr.gov/current/title-42/section-${section}`;
 const cite = (section, text) => out(ECFR(section), esc(text));
 const PAYERS = { trad: 'traditional Medicare', ma: 'Medicare Advantage' };
+
+/**
+ * What a traditional Medicare case's add-on is made of at this hospital, from its nonzero factors:
+ * "IME + DSH", "DSH", "IME", "capital IME + DSH", "capital DSH"… (IME or DSH with an operating factor
+ * includes its capital part; "capital" only when the operating factor is 0).
+ */
+export function addOnName(h) {
+  const part = (operating, capital, word) => (h[operating] > 0 ? word : h[capital] > 0 ? `capital ${word}` : null);
+  return [part('tchop', 'tchcp', 'IME'), part('dshopp', 'dshcpp', 'DSH')].filter(Boolean).join(' + ');
+}
 
 /** "165 without CC/MCC": the DRG and the severity part of its title (hospitals list meta.drg_sev). */
 export const drgLabel = (drg, sev = {}) => (sev[drg] ? `${drg} ${sev[drg]}` : drg);
@@ -98,12 +108,13 @@ function yearFold(item, ctx, { name, sev, edits, open }) {
   const teaching = ctx.teaching === 'teaching';
   const drgs = drgList(rows.map((row) => ({ drg: row.drg })));
   const capId = id(item.code, 'y');
+  const what = addOnName(ctx.hospital);
   // Teaching: a heading row per DRG, then traditional Medicare and Medicare Advantage under it.
   const body = rows.map((row) => {
     const drg = esc(drgLabel(row.drg, sev));
-    if (!teaching) return line(item, row, 'trad', up, `${drg}${perCase(row, 'trad', 'IME + DSH')}`);
+    if (!teaching) return line(item, row, 'trad', up, `${drg}${perCase(row, 'trad', what)}`);
     return `<tbody><tr class="hyr__drg"><th scope="rowgroup" colspan="3">${drg}</th></tr>
-${line(item, row, 'trad', up, `Traditional Medicare${perCase(row, 'trad', 'IME + DSH')}`)}
+${line(item, row, 'trad', up, `Traditional Medicare${perCase(row, 'trad', what)}`)}
 ${line(item, row, 'ma', up, `Medicare Advantage${perCase(row, 'ma', 'operating IME only')}`)}</tbody>`;
   }).join('');
   const table = `<table class="hyr"><caption class="sr" id="${capId}">IME and DSH a year on ${esc(name)}’s cases in MS-DRG ${esc(drgs)}</caption>
@@ -112,7 +123,7 @@ ${line(item, row, 'ma', up, `Medicare Advantage${perCase(row, 'ma', 'operating I
   const ratio = ctx.maRatio === null ? '' : ` (${ctx.maRatio.toFixed(2)} MA cases per traditional case in CMS’s impact file)`;
   const notes = teaching
     ? [`IME is paid on traditional Medicare and Medicare Advantage cases, DSH on traditional Medicare only: MA cases carry operating IME only (${cite('412.105', '42 CFR 412.105(g)')}).`,
-      `MA plans must follow the inpatient-only list too, and the risk is that they default removed procedures to outpatient, so MA cases count here. MA counts are estimates: they assume ${esc(name)}’s MA cases have the same DRG mix as its traditional Medicare cases${esc(ratio)}.`,
+      `MA plans must follow the 2-midnight rule and may not treat a removal from the inpatient-only list as requiring outpatient care (${fr('91 FR 70572')}); the risk is that they default removed procedures to outpatient anyway, so MA cases count here. MA counts are estimates: they assume ${esc(name)}’s MA cases have the same DRG mix as its traditional Medicare cases${esc(ratio)}.`,
       `Direct GME is not counted: it follows the Medicare and MA share of inpatient days, so it falls slightly and later (${cite('413.76', '42 CFR 413.76')}). Medicaid GME is separate and state-run; commercial payers pay no add-on.`]
     : [`DSH is paid on traditional Medicare cases only. Medicare Advantage cases carry no add-on at a hospital without operating IME (${cite('412.105', '42 CFR 412.105(g)')}), and commercial payers pay none.`];
   notes.push('Traditional counts: CMS’s Medicare Inpatient Hospitals by Provider and Service, 2024. CMS does not publish a count under 11.');

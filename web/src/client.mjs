@@ -113,11 +113,12 @@ function shareFor(code) {
   const result = lookup(data, code, date);
   if (result.state !== 'off' || result.removed !== SHARES.from || date < SHARES.from) return '';
   if (state.shares) return lookupShare(state.shares, code, result.state, date, result.removed);
+  // One try per page load: a failed fetch leaves sharesLoading set, so a redraw never retries it.
+  // No line without the file; the rest of the answer stands.
   state.sharesLoading ||= fetch(SHARES.url)
     .then((response) => { if (!response.ok) throw new Error(String(response.status)); return response.json(); })
     .then((file) => { state.shares = file; drawVerdicts(); })
-    // No line without the file; a later answer tries again.
-    .catch(() => { state.sharesLoading = null; });
+    .catch(() => {});
   return '';
 }
 

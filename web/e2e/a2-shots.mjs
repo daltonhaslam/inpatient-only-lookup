@@ -1,12 +1,23 @@
 // Screenshots of the approved mockup A2, the "before" for the review list's A2 departures:
 //   node e2e/a2-shots.mjs [outdir]   (a2.html is local-only, in planning-docs/; output is gitignored)
+import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync } from 'node:fs';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { launch } from './browser.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const mockup = process.env.A2_HTML || join(here, '..', '..', '..', '..', '..', 'planning-docs/mockups/2026-11-18-teaching/a2.html');
+// planning-docs/ is local-only, so it lives in the main checkout, not in a worktree: find that checkout
+// through git's shared directory (the same from the main checkout and from any worktree). A2_HTML wins.
+function mainCheckout() {
+  try {
+    const common = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: here, encoding: 'utf8' }).trim();
+    return dirname(common);
+  } catch {
+    return join(here, '..', '..');
+  }
+}
+const mockup = process.env.A2_HTML || join(mainCheckout(), 'planning-docs/mockups/2026-11-18-teaching/a2.html');
 if (!existsSync(mockup)) { console.error(`No mockup at ${mockup}; set A2_HTML.`); process.exit(2); }
 const outDir = process.argv[2] || join(here, 'screenshots', 'a2');
 mkdirSync(outDir, { recursive: true });

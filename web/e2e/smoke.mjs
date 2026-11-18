@@ -850,6 +850,13 @@ if (!hasStake) {
     await cardFor(page, '19305');
     await openFolds(page, '19305');
     await measure('OHSU 19305 (two families), folds open');
+    // A six-DRG family (47600, MS-DRG 411–416) may scroll inside its named region, never the page.
+    await cardFor(page, '47600');
+    await openFolds(page, '47600');
+    await measure('OHSU 47600 (six DRGs), folds open');
+    const region = page.locator('[data-stake-card="47600"] [data-fold="split"] .scroll').first();
+    eq(await region.getAttribute('role'), 'region', 'a wide split table scrolls in a named region');
+    eq(await region.getAttribute('tabindex'), '0', 'reachable by keyboard');
     assert(wide.length === 0, wide.join('\n'));
   }, { viewport: { width: 400, height: 860 } });
 
@@ -1021,6 +1028,37 @@ if (!hasStake) {
     await page.fill('[data-q]', '27447');
     await waitText(page.locator('[data-results] .verdict__code'), (t) => t === '27447', 'another code');
     eq(await page.locator('.facts__share').count(), 0, 'no line for a code CMS did not add for 2027');
+  });
+
+  await check('lookup: a failed shares file is tried once per page load, and the answer still stands', async (page) => {
+    let asked = 0;
+    await page.route(/\/data\/shares\./, (route) => { asked += 1; route.fulfill({ status: 404, body: '' }); });
+    ignore404 = true;   // the browser logs the failed load as a console error
+    try {
+      await open(page, '/?q=32480&dos=2027-03-01');
+      await waitText(answer(page), (t) => t.startsWith('Not inpatient only'), 'answer');
+      for (const day of ['2027-03-02', '2027-03-03']) {
+        await setDate(page, day);
+        await waitText(answer(page), (t) => t.includes(`March ${Number(day.slice(-2))}, 2027`), `answer on ${day}`);
+      }
+      await page.waitForTimeout(300);
+      eq(asked, 1, 'one try');
+      eq(await page.locator('.facts__share').count(), 0, 'no line without the file');
+    } finally {
+      ignore404 = false;
+    }
+  });
+
+  await check('stake: if the page data fails to load, the picker leaves no blank band', async (page) => {
+    await page.route(/\/data\/stake\./, (route) => route.fulfill({ status: 404, body: '' }));
+    ignore404 = true;
+    try {
+      await page.goto(`${base}/revenue-at-stake/`);
+      await page.waitForFunction(() => !document.querySelector('[data-hospital-pick]'));
+      eq(await page.locator('[data-stake-table] table').count() > 0, true, 'the server tables still stand');
+    } finally {
+      ignore404 = false;
+    }
   });
 }
 

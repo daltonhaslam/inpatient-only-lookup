@@ -109,8 +109,8 @@ export function createView({ list, record, ccn, data, meta }) {
       const item = byCode[code];
       if (!item || item.kind !== 'compare' || !ctx.addOns) return null;
       const [drg, payer] = String(key).split(':');
-      const row = yearUpdate(item, ctx, edits.get(code)).table.rows.find((r) => r.drg === drg);
-      if (!row || !row[payer] || !(payer === 'trad' || payer === 'ma')) return null;
+      const inCard = item.ip.families.some((f) => f.drgs.some((d) => d.drg === drg));
+      if (!inCard || !(payer === 'trad' || (payer === 'ma' && ctx.teaching === 'teaching'))) return null;
       const typed = { ...edits.get(code), [drg]: { ...edits.get(code)?.[drg], [payer]: String(raw) } };
       edits.set(code, typed);
       return yearUpdate(item, ctx, typed);

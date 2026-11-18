@@ -9,7 +9,7 @@ import { normalize, clientModel } from '../src/stake-data.mjs';
 import { prepare } from '../src/stake-engine.mjs';
 import { hospitalList, hospitalRecord, drgSeverity } from '../src/hospital-data.mjs';
 import { createView } from '../src/hospital-view.mjs';
-import { drgLabel, yearUpdate } from '../src/hospital-folds.mjs';
+import { drgLabel, yearUpdate, addOnName } from '../src/hospital-folds.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (path) => JSON.parse(readFileSync(join(root, path), 'utf8'));
@@ -91,6 +91,7 @@ describe('per year', () => {
     assert.ok(t.includes('A ceiling, not a forecast'));
     assert.ok(t.includes('not saved'));
     assert.ok(t.includes('412.105(g)'));
+    assert.match(html, /may not treat a removal from the inpatient-only list as requiring outpatient care \(<a href="https:\/\/www\.govinfo\.gov\/link\/fr\/91\/70572"/);
     assert.match(html, /inputmode="numeric"/);
     assert.match(html, /aria-label="MS-DRG 163, traditional Medicare cases"/);
     assert.match(html, /aria-label="MS-DRG 163, Medicare Advantage cases \(estimate\)"/);
@@ -153,6 +154,17 @@ describe('per year', () => {
     assert.ok(html.length > 0);
     assert.ok(!html.includes(':ma"'), 'no MA inputs');
     assert.ok(text(html).includes('Medicare Advantage cases carry no add-on'), text(html));
+    assert.match(text(html), /a case: DSH /, 'names only the add-on it gets');
+    assert.ok(!text(html).includes('IME + DSH'), text(html));
+    assert.equal(view.count('32480', '163:ma', '3'), null, 'no MA count to type');
+  });
+  test('the per-case label names the add-ons the hospital actually gets', () => {
+    assert.equal(addOnName(hospitals.hospitals['380009']), 'IME + DSH');
+    assert.equal(addOnName(hospitals.hospitals['010005']), 'DSH');
+    assert.equal(addOnName(hospitals.hospitals['110165']), 'capital IME + DSH');
+    assert.equal(addOnName({ tchop: 0, tchcp: 0, dshopp: 0, dshcpp: 0.1 }), 'capital DSH');
+    assert.equal(addOnName({ tchop: 0.2, tchcp: 0, dshopp: 0, dshcpp: 0 }), 'IME');
+    assert.match(text(fold(folds(viewOf('110165'), '32480'), 'year')), /a case: capital IME \+ DSH/);
   });
   test('Review Focus 1: a hospital with no add-ons has no per year fold', () => {
     const view = viewOf('030107');
