@@ -13,7 +13,11 @@ One run does four things:
   3. Runs build.py, which reconciles the whole history and leaves the published tables alone if
      any check fails.
   4. Runs the tests, then lists what still needs a person: a new rule's Federal Register facts in
-     rules.json, plain-language labels for new codes, and a crosswalk rebuild when the history changed.
+     rules.json, plain-language labels for new codes, a crosswalk rebuild when the history changed,
+     a check of the quarterly ASC update when a new quarter came in, and the Revenue at stake sources
+     it does not discover, each on its own calendar: the next FY's IPPS impact file each October, the
+     next MUP inpatient file each spring, the deductibles each November (facts.json) and the next
+     year's ASC additions list with each November rule.
 Every new download is checked to be the table it claims to be before sources.json is touched.
 
 To add a file CMS posted somewhere discovery does not look:
@@ -21,6 +25,7 @@ To add a file CMS posted somewhere discovery does not look:
     python3 pipeline/refresh.py --add-rule 2028 https://www.cms.gov/files/zip/....zip [--removal-file URL]
 """
 import argparse
+import datetime
 import re
 import subprocess
 import sys
@@ -268,9 +273,50 @@ CROSSWALK_NOTE = ("The list history changed: rebuild the Revenue at stake crossw
                   "date disagrees with the history.")
 
 
-def follow_ups(sources, history_changed=False):
+QUARTER_ASC_NOTE = ("A new quarterly Addendum B came in. Revenue at stake's outpatient and surgery-center rates and the "
+                    "patient shares are the CY final rule's (Addenda B and AA), which refresh.py does not re-read each "
+                    "quarter: check CMS's quarterly OPPS and ASC updates for changes to the removed codes, and repin the "
+                    "rule's addenda if CMS corrected them.")
+BUILD = "python3 pipeline/crosswalk/build.py"
+
+
+def calendar_follow_ups(sources, facts, today):
+    """The Revenue at stake sources refresh.py does not discover, each listed from the day its next
+    version is due until it is repinned: the IPPS impact file when the next FY starts (October 1), the
+    MUP inpatient file each spring (data year + 3, April), the deductibles each November (facts.json)
+    and the next year's ASC additions with the November final rule."""
+    def newest(kind, key):
+        years = [source[key] for source in sources if source["kind"] == kind and key in source]
+        return max(years) if years else None
+
+    notes = []
+    fy = newest("ipps_impact", "fy")
+    if fy and today >= datetime.date(fy, 10, 1):
+        notes.append("FY %d started %s: pin CMS's FY %d IPPS impact file (the correction-notice version) as ipps-%d-impact "
+                     "in sources.json, with that year's Tables 1A-1E and 5 (pipeline/crosswalk/exposure_sources.py names the "
+                     "source ids), update facts.json expected (hospital counts, the OHSU anchors) and rebuild: %s"
+                     % (fy + 1, datetime.date(fy, 10, 1).isoformat(), fy + 1, fy + 1, BUILD))
+    dy = newest("mup_inpatient", "dy")
+    if dy and today >= datetime.date(dy + 3, 4, 1):
+        notes.append("CMS posts Medicare Inpatient Hospitals - by Provider and Service each spring: pin data year %d as "
+                     "mup-inp-%d in sources.json and rebuild: %s" % (dy + 1, dy + 1, BUILD))
+    deductibles = (facts or {}).get("deductibles")
+    if deductibles and today >= datetime.date(deductibles["year"], 11, 1):
+        notes.append("CMS announces the %d Part A and Part B deductibles each November: update deductibles in "
+                     "pipeline/facts.json (year, amounts, fact-sheet source, URL and quotes) and rebuild the patient "
+                     "shares: %s" % (deductibles["year"] + 1, BUILD))
+    cy = newest("asc_additions", "cy")
+    if cy and today >= datetime.date(cy, 11, 1):
+        notes.append("The CY %d OPPS/ASC final rule (each November) adds codes to the ASC covered procedures list: pin its "
+                     "additions file as asc-%d-additions, update the ASC additions count, extra codes and citation in "
+                     "pipeline/facts.json and citations.json, and rebuild: %s" % (cy + 1, cy + 1, BUILD))
+    return notes
+
+
+def follow_ups(sources, history_changed=False, new_quarter=False, today=None):
     """What a person still has to do by hand after an automatic refresh. history_changed: the run
-    adopted a new or replaced file, so ipo-history.json may have changed."""
+    adopted a new or replaced file, so ipo-history.json may have changed. new_quarter: it adopted a
+    new quarterly Addendum B. today: the date the calendar notes are judged on (default: today)."""
     notes = []
     have_rules = {rule["cy"] for rule in fetch.load_rules()["rules"]}
     first_quarterly = min(int(source["effective"][:4]) for source in sources if source["kind"] == "addendum_b")
@@ -290,7 +336,10 @@ def follow_ups(sources, history_changed=False):
             notes.append("data/labels.json has labels for codes with no list history: %s" % ", ".join(sorted(labels - listed)))
     if history_changed:
         notes.append(CROSSWALK_NOTE)
-    return notes
+    if new_quarter:
+        notes.append(QUARTER_ASC_NOTE)
+    facts = fetch.read_json_or(fetch.PIPELINE / "facts.json", {})
+    return notes + calendar_follow_ups(sources, facts, today or datetime.date.today())
 
 
 def manual_sources(args, parser):
@@ -385,7 +434,8 @@ def main(argv=None):
         print("\nREFRESH FAILED. The site's tables were not updated. Fix what is reported above and run it again.")
         print("To undo: git checkout pipeline/sources.json, and in data/raw/ rename any <file>.prev back to <file>.")
         return 1
-    notes = follow_ups(fetch.load_sources(), history_changed=bool(found or replaced))
+    notes = follow_ups(fetch.load_sources(), history_changed=bool(found or replaced),
+                       new_quarter=any(source["kind"] == "addendum_b" for source, _ in found))
     print("\nStill to do by hand:" if notes else "\nNothing left to do by hand.")
     for note in notes:
         print("  - " + note)
