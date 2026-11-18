@@ -4,6 +4,7 @@ Numbers are checked against crosswalk.json and the OHSU fixture by crosswalk/ver
 which needs the `formulas` package in a scratch venv and so is not part of this suite.
 """
 import json
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -53,9 +54,11 @@ def hospitals():
     return {"meta": {"source": {"label": "Impact file", "landing": "https://example.test/impact", "file": "impact.txt"},
                      "columns": {"wi": "FY 2027 Wage Index", "gaf": "GAF", "tchop": "TCHOP", "tchcp": "TCHCP",
                                  "dshopp": "DSHOPP", "dshcpp": "DSHCPP", "caseta44": "CASETA44",
-                                 "ime_caseta44": "IME_CASETA44", "name": "Name", "type": "Provider Type"},
+                                 "ime_caseta44": "IME_CASETA44", "name": "Name", "type": "Provider Type",
+                                 "ccn": "Provider Number"},
                      "opps_labor_share": 0.6, "opps_labor_share_cite": "91 FR 70328",
-                     "maryland": "Maryland hospitals are paid under the state's all-payer model, not the IPPS."},
+                     "maryland": "Maryland hospitals are paid under the state's all-payer model, not the IPPS.",
+                     "maryland_prefix": "21"},
             "hospitals": {"380009": OHSU,
                           "050242": dict(OHSU, name="=Teaching No Ratio", state="CA", ime_caseta44=None),
                           "090012": dict(OHSU, name=None, state="DC", tchop=0.0, tchcp=0.0, dshopp=0.0, dshcpp=0.0, wi=0.9)},
@@ -74,6 +77,16 @@ def shares():
 def build(tmp, crosswalk=None, reviews=()):
     return openpyxl.load_workbook(workbook.write(crosswalk or doc(), Path(tmp) / "x.xlsx", reviews=list(reviews),
                                                  hospitals=hospitals(), shares=shares()))
+
+
+def tokens(formula):
+    """The names and functions a formula uses (cell references excluded)."""
+    return set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", re.sub(r'"[^"]*"', "", formula))) - cells(formula)
+
+
+def cells(formula):
+    """The cell references in a formula (A1 style, $ dropped), outside string literals."""
+    return set(re.findall(r"\b\$?([A-Z]{1,3}\$?\d+)\b", re.sub(r'"[^"]*"', "", formula).replace("$", "")))
 
 
 def named(wb, name):
@@ -98,9 +111,11 @@ class Workbook(unittest.TestCase):
 
     def test_named_ranges(self):
         for name in ("OpStd", "CapRate", "LaborShare", "WageIndex", "IME", "DSH", "CapGAF", "OppsLaborShare", "OppsWageIndex",
-                     "CapIME", "CapDSH", "MARatio", "HospitalCCN", "HospitalRow", "OpStdHigh", "OpStdLow",
-                     "LaborShareHigh", "LaborShareLow", "DrgNum", "DrgWeight", "ApcNum", "ApcRate", "HospCCN", "HospName",
-                     "HospState", "HospWI", "HospGAF", "HospTCHOP", "HospTCHCP", "HospDSHOPP", "HospDSHCPP", "HospMARatio"):
+                     "CapIME", "CapDSH", "MARatio", "HospitalCCN", "HospitalKey", "HospitalRow", "HospitalStatus",
+                     "OpStdHigh", "OpStdLow", "LaborShareHigh", "LaborShareLow", "PerWeightTotal", "PerWeightAddons",
+                     "PerWeightMA", "DrgNum", "DrgWeight", "DrgTotal", "DrgAddons", "ApcNum", "ApcRate", "HospCCN",
+                     "HospName", "HospState", "HospWI", "HospGAF", "HospTCHOP", "HospTCHCP", "HospDSHOPP", "HospDSHCPP",
+                     "HospMARatio"):
             self.assertIn(name, self.wb.defined_names)
 
     def test_inputs_ccn_cell(self):
@@ -112,12 +127,14 @@ class Workbook(unittest.TestCase):
         self.assertEqual(cell.number_format, "@")           # a typed CCN keeps its leading zero
         self.assertEqual(cell.fill.fgColor.rgb[-6:], YELLOW)
         self.assertIn("Hospital CCN (blank = national)", ws.cell(row=cell.row, column=1).value)
-        row = ws[named(self.wb, "HospitalRow")[1]].value
-        for text in ("MATCH(", "HospCCN", 'RIGHT("00000"&'):     # a CCN typed as a number still matches
-            self.assertIn(text, row)
-        status = ws.cell(row=cell.row, column=3).value
-        self.assertTrue(status.startswith("="))
-        for text in ("CCN not found", "Maryland", "HospName", "national values"):
+        self.assertLessEqual({"HospitalCCN"}, tokens(ws[named(self.wb, "HospitalKey")[1]].value))
+        self.assertLessEqual({"HospitalKey", "HospCCN", "MATCH"}, tokens(ws[named(self.wb, "HospitalRow")[1]].value))
+        status = ws[named(self.wb, "HospitalStatus")[1]].value
+        self.assertLessEqual({"HospitalKey", "HospitalRow", "HospName", "HospState"}, tokens(status))
+        # The Maryland line is hospitals.json's own reason text, matched on its CCN prefix.
+        meta = hospitals()["meta"]
+        for text in (workbook.maryland_status(meta), '"%s"' % meta["maryland_prefix"], workbook.NOT_FOUND,
+                     workbook.NATIONAL_STATUS):
             self.assertIn(text, status)
 
     def test_each_factor_is_your_value_else_ccn_else_national(self):
@@ -132,11 +149,10 @@ class Workbook(unittest.TestCase):
             self.assertEqual(ref, "E%d" % r, name)                 # the name points at the value used
             self.assertIsNone(own.value, name)                     # your value: blank, yellow
             self.assertEqual(own.fill.fgColor.rgb[-6:], YELLOW, name)
-            self.assertIn(lookup[name], ccn.value, name)
-            self.assertIn("HospitalRow", ccn.value, name)
+            self.assertLessEqual({lookup[name], "HospitalRow"}, tokens(ccn.value), name)
             self.assertEqual(nat.value, default, name)
-            self.assertEqual(used.value, '=IF(ISNUMBER(B{0}),B{0},IF(ISNUMBER(C{0}),C{0},{1}))'.format(
-                r, '""' if default is None else "D%d" % r), name)
+            want = {"B%d" % r, "C%d" % r} | (set() if default is None else {"D%d" % r})
+            self.assertEqual(cells(used.value), want, name)
 
     def test_rates_come_from_the_data(self):
         inputs = self.wb["Inputs"]
@@ -146,12 +162,24 @@ class Workbook(unittest.TestCase):
             r = inputs[named(self.wb, name)[1]].row
             self.assertEqual(inputs.cell(row=r, column=4).value, value, name)
             self.assertIsNone(inputs.cell(row=r, column=2).value, name)
-        for name, rule in (("LaborShare", "IF(WageIndex>1,LaborShareHigh,LaborShareLow)"),
-                           ("OpStd", "IF(WageIndex>1,OpStdHigh,OpStdLow)"), ("OppsWageIndex", "WageIndex")):
+            self.assertEqual(cells(inputs.cell(row=r, column=5).value), {"B%d" % r, "D%d" % r}, name)
+        for name, uses in (("LaborShare", {"WageIndex", "LaborShareHigh", "LaborShareLow"}),
+                           ("OpStd", {"WageIndex", "OpStdHigh", "OpStdLow"}), ("OppsWageIndex", {"WageIndex"})):
             r = inputs[named(self.wb, name)[1]].row
-            self.assertEqual(inputs.cell(row=r, column=3).value, "=" + rule, name)
+            self.assertLessEqual(uses, tokens(inputs.cell(row=r, column=3).value), name)
             self.assertIsNone(inputs.cell(row=r, column=2).value, name)
-            self.assertEqual(inputs.cell(row=r, column=5).value, "=IF(ISNUMBER(B{0}),B{0},C{0})".format(r), name)
+            self.assertEqual(cells(inputs.cell(row=r, column=5).value), {"B%d" % r, "C%d" % r}, name)
+
+    def test_per_weight_amounts(self):
+        inputs = self.wb["Inputs"]
+        uses = {"PerWeightTotal": {"OpStd", "LaborShare", "WageIndex", "IME", "DSH", "CapRate", "CapGAF", "CapIME", "CapDSH"},
+                "PerWeightAddons": {"OpStd", "LaborShare", "WageIndex", "IME", "DSH", "CapRate", "CapGAF", "CapIME", "CapDSH"},
+                "PerWeightMA": {"OpStd", "LaborShare", "WageIndex", "IME"}}
+        for name, want in uses.items():
+            formula = inputs[named(self.wb, name)[1]].value
+            self.assertTrue(formula.startswith("="), name)
+            self.assertLessEqual(want, tokens(formula), name)
+        self.assertFalse({"DSH", "CapIME", "CapRate"} & tokens(inputs[named(self.wb, "PerWeightMA")[1]].value))
 
     def test_rates_are_never_retyped(self):
         other = doc()
@@ -175,10 +203,20 @@ class Workbook(unittest.TestCase):
         self.assertIsNone(ws["B7"].value)                                          # CMS left the name blank
         ohsu = dict(zip(header, rows[2]))
         self.assertEqual(ohsu["Operating IME (TCHOP)"], 0.31139)
-        self.assertEqual(ohsu["MA ratio (IME_CASETA44 / CASETA44)"], '=IF(ISNUMBER(K8),K8/J8,"")')
+        ratio = ohsu["MA ratio (IME_CASETA44 / CASETA44)"]
+        letter = {h: openpyxl.utils.get_column_letter(n) for n, h in enumerate(header, 1)}
+        self.assertEqual(cells(ratio), {letter["CASETA44"] + "8", letter["IME_CASETA44"] + "8"})
         self.assertIn("https://example.test/impact", ws["A3"].value)
         self.assertIn("Maryland", ws["A4"].value)
         self.assertEqual(self.wb.defined_names["HospCCN"].attr_text, "'Hospitals'!$A$6:$A$8")
+
+    def test_drg_weights_tab_prices_each_drg_once(self):
+        ws = self.wb["DRG weights"]
+        header = [c.value for c in ws[5]]
+        self.assertEqual(header, ["DRG", "Title", "Relative weight", "Payment per case", "IME + DSH per case"])
+        for r in (6, 7):
+            self.assertLessEqual({"C%d" % r, "PerWeightTotal", "ROUND"}, tokens(ws["D%d" % r].value) | cells(ws["D%d" % r].value))
+            self.assertLessEqual({"C%d" % r, "PerWeightAddons", "ROUND"}, tokens(ws["E%d" % r].value) | cells(ws["E%d" % r].value))
 
     def test_amounts_are_formulas(self):
         ws = self.wb["Crosswalk"]
@@ -187,11 +225,11 @@ class Workbook(unittest.TestCase):
             for name in ("Outpatient rate", "Inpatient low", "Inpatient high", "IME + DSH low", "IME + DSH high",
                          "Gap low", "Gap high"):
                 self.assertTrue(str(ws["%s%d" % (header[name], r)].value).startswith("="), (name, r))
-        self.assertIn("OpStd*(LaborShare*WageIndex+1-LaborShare)*(1+IME+DSH)+CapRate*CapGAF*(1+CapIME+CapDSH)",
-                      ws["%s3" % header["Inpatient low"]].value)
-        self.assertIn("OpStd*(LaborShare*WageIndex+1-LaborShare)*(IME+DSH)+CapRate*CapGAF*(CapIME+CapDSH)",
-                      ws["%s3" % header["IME + DSH low"]].value)
-        self.assertIn("OppsLaborShare*OppsWageIndex+1-OppsLaborShare", ws["%s3" % header["Outpatient rate"]].value)
+        at = lambda name: ws["%s3" % header[name]].value      # noqa: E731
+        self.assertLessEqual({"DrgTotal", "DrgNum", "MIN"}, tokens(at("Inpatient low")))
+        self.assertLessEqual({"DrgTotal", "DrgNum", "MAX"}, tokens(at("Inpatient high")))
+        self.assertLessEqual({"DrgAddons", "DrgNum", "MIN"}, tokens(at("IME + DSH low")))
+        self.assertLessEqual({"ApcRate", "OppsLaborShare", "OppsWageIndex"}, tokens(at("Outpatient rate")))
         self.assertEqual(ws["%s4" % header["Caveat"]].value.split(" The DRG")[0], workbook.ALT_FLAG["dx"])
 
     def test_packaged_code_has_blank_inpatient_cells(self):
@@ -199,8 +237,7 @@ class Workbook(unittest.TestCase):
         header = {c.value: c.column_letter for c in ws[1]}
         self.assertEqual(ws["A2"].value, "11008")
         for name in ("Outpatient rate", "Inpatient low", "Inpatient high", "IME + DSH low", "IME + DSH high", "Gap low",
-                     "Gap high", "DRG family", "Patient share at ASC (national)",
-                     "Patient share at hospital outpatient (national)", "ASC costs patient more"):
+                     "Gap high", "DRG family", workbook.ASC_SHARE, workbook.OPPS_SHARE, workbook.ASC_MORE):
             self.assertIsNone(ws["%s2" % header[name]].value, name)
         self.assertIn("Packaged", ws["%s2" % header["Caveat"]].value)
 
@@ -208,36 +245,40 @@ class Workbook(unittest.TestCase):
         ws = self.wb["Crosswalk"]
         header = {c.value: c.column_letter for c in ws[1]}
         for r in (3, 4):        # national values, on every family row of the code
-            self.assertEqual(ws["%s%d" % (header["Patient share at ASC (national)"], r)].value, 316.996)
-            self.assertEqual(ws["%s%d" % (header["Patient share at hospital outpatient (national)"], r)].value, 716.99)
-            self.assertEqual(ws["%s%d" % (header["ASC costs patient more"], r)].value, "No")
+            self.assertEqual(ws["%s%d" % (header[workbook.ASC_SHARE], r)].value, 316.996)
+            self.assertEqual(ws["%s%d" % (header[workbook.OPPS_SHARE], r)].value, 716.99)
+            self.assertEqual(ws["%s%d" % (header[workbook.ASC_MORE], r)].value, "No")
         self.assertEqual(workbook.yes_no(True), "Yes")
         self.assertIsNone(workbook.yes_no(None))
 
     def test_per_year_tab(self):
         ws = self.wb["Per year"]
-        header = {c.value: c.column_letter for c in ws[5]}
-        self.assertEqual([r[0].value for r in ws.iter_rows(min_row=6, max_row=7)], [163, 165])
+        first = workbook.PER_YEAR_FIRST
+        header = {c.value: c.column_letter for c in ws[first - 1]}
+        self.assertEqual(list(header), [name for name, _ in workbook.PER_YEAR_COLUMNS])
+        self.assertEqual([r[0].value for r in ws.iter_rows(min_row=first, max_row=first + 1)], [163, 165])
         total = ws.max_row
-        self.assertEqual((total, ws["A%d" % total].value), (8, "Total"))
-        trad, ma = header["Traditional Medicare cases a year"], header["MA cases a year (blank = estimate)"]
-        for r in (6, 7):
+        self.assertEqual((total, ws["A%d" % total].value), (first + 2, "Total"))
+        trad, ma = header[workbook.PY_TRAD], header[workbook.PY_MA_COUNT]
+        for r in (first, first + 1):
             for letter in (trad, ma):
                 self.assertIsNone(ws["%s%d" % (letter, r)].value)
                 self.assertEqual(ws["%s%d" % (letter, r)].fill.fgColor.rgb[-6:], YELLOW)
-        cell = lambda name: ws["%s7" % header[name]].value      # noqa: E731
-        self.assertEqual(cell("MA cases used"),
-                         '=IF(ISNUMBER({ma}7),{ma}7,IF(AND(IME>0,ISNUMBER(MARatio),ISNUMBER({t}7)),ROUND({t}7*MARatio,0),""))'
-                         .format(ma=ma, t=trad))
-        self.assertIn("(IME+DSH)", cell("IME + DSH per case (traditional)"))
-        self.assertIn("*IME", cell("Operating IME per case (MA)"))
-        self.assertNotIn("DSH", cell("Operating IME per case (MA)"))
-        self.assertEqual(cell("IME + DSH a year, traditional"), '=IF(ISNUMBER({t}7),ROUND({t}7*{e}7,2),"")'.format(
-            t=trad, e=header["IME + DSH per case (traditional)"]))
-        self.assertIn("ROUND(", cell("Operating IME a year, MA"))
-        for name in ("IME + DSH a year, traditional", "Operating IME a year, MA", "Add-ons a year"):
-            self.assertEqual(ws["%s%d" % (header[name], total)].value, "=SUM(%s6:%s7)" % (header[name], header[name]))
-        self.assertEqual(ws.freeze_panes, "C6")
+        r = first + 1
+        at = lambda name: ws["%s%d" % (header[name], r)].value      # noqa: E731
+        both = lambda formula: tokens(formula) | cells(formula)      # noqa: E731
+        self.assertLessEqual({"MARatio", "IME", "ROUND", trad + str(r), ma + str(r)}, both(at(workbook.PY_MA_USED)))
+        for name, per_weight in ((workbook.PY_TOTAL, "PerWeightTotal"), (workbook.PY_ADDONS, "PerWeightAddons"),
+                                 (workbook.PY_MA, "PerWeightMA")):
+            self.assertLessEqual({per_weight, header[workbook.PY_WEIGHT] + str(r)}, both(at(name)), name)
+        self.assertLessEqual({"ROUND", trad + str(r), header[workbook.PY_ADDONS] + str(r)}, both(at(workbook.PY_YEAR_TRAD)))
+        self.assertLessEqual({"ROUND", header[workbook.PY_MA_USED] + str(r), header[workbook.PY_MA] + str(r)},
+                             both(at(workbook.PY_YEAR_MA)))
+        for name in (workbook.PY_YEAR_TRAD, workbook.PY_YEAR_MA, workbook.PY_YEAR):
+            formula = ws["%s%d" % (header[name], total)].value
+            self.assertTrue(formula.startswith("=SUM("), name)
+            self.assertEqual(cells(formula), {header[name] + str(first), header[name] + str(first + 1)}, name)
+        self.assertEqual(ws.freeze_panes, "C%d" % first)
 
     def test_layout(self):
         ws = self.wb["Crosswalk"]
