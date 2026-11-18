@@ -2,9 +2,9 @@
 // hospital mode, run against the real derived tables the way the browser gets them.
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { hospitals, volume, model, list, doc, data, recordOf, viewOf } from './hospital-fixture.mjs';
+import { hospitals, volume, model, list, doc, data, recordOf, viewOf, read } from './hospital-fixture.mjs';
 import { card, gapParts } from '../src/stake-card.mjs';
-import { uncoveredDrgs } from '../src/hospital-data.mjs';
+import { uncoveredDrgs, staleHospitalTables } from '../src/hospital-data.mjs';
 import { hospitalIndex, findHospitals } from '../src/hospital-pick.mjs';
 import { facts, summaryHtml, hospitalLede, LEDE_NATIONAL, LEDE_HOSPITAL } from '../src/hospital-view.mjs';
 
@@ -38,6 +38,23 @@ describe('the files the build ships', () => {
     delete weights['165'];
     assert.deepEqual(uncoveredDrgs(model, { drg_weights: weights }, { drgs: volume.meta.drgs.filter((d) => d !== '163') }),
       { 'hospitals.json meta.drg_weights': ['165'], 'drg-volume.json meta.drgs': ['163'] });
+  });
+  test('hospitals.json must price as the crosswalk does: a changed weight or rate fails the build (staleHospitalTables)', () => {
+    const rates = read('pipeline/derived/crosswalk.json').meta.rates;
+    assert.deepEqual(staleHospitalTables(model, rates, hospitals.meta), []);
+    // Mismatched fixture: last year's weight for DRG 165 and a different capital rate.
+    const stale = { ...hospitals.meta, drg_weights: { ...hospitals.meta.drg_weights, 165: hospitals.meta.drg_weights['165'] + 0.0001 },
+      rates: { ...hospitals.meta.rates, capital: hospitals.meta.rates.capital + 1 } };
+    const problems = staleHospitalTables(model, rates, stale);
+    assert.equal(problems.length, 2, problems.join('; '));
+    assert.match(problems[0], /^MS-DRG 165 weight [\d.]+ in hospitals\.json, [\d.]+ in the crosswalk \(\w+\)$/);
+    assert.match(problems[1], /^rate capital [\d.]+ in hospitals\.json, [\d.]+ in the crosswalk$/);
+    // A rate the crosswalk does not carry, or no rates at all, fails too; a missing weight is uncoveredDrgs()'s.
+    assert.equal(staleHospitalTables(model, { ...rates, labor_share: undefined }, hospitals.meta).length, 1);
+    assert.deepEqual(staleHospitalTables(model, rates, { ...hospitals.meta, rates: {} }), ['hospitals.json has no meta.rates']);
+    const weights = { ...hospitals.meta.drg_weights };
+    delete weights['165'];
+    assert.deepEqual(staleHospitalTables(model, rates, { ...hospitals.meta, drg_weights: weights }), []);
   });
   test('the list finds OHSU by name, state and CCN', () => {
     const index = hospitalIndex(list);

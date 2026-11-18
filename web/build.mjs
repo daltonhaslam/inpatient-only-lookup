@@ -15,7 +15,7 @@ import { todayISO, isDate, monthYear, formatDate, clampDate, periodIndex, siAt, 
 import * as pages from './src/pages.mjs';
 import * as stake from './src/stake.mjs';
 import { normalize, credits, clientModel, removalMismatches } from './src/stake-data.mjs';
-import { hospitalList, hospitalRecord, uncoveredDrgs } from './src/hospital-data.mjs';
+import { hospitalList, hospitalRecord, uncoveredDrgs, staleHospitalTables } from './src/hospital-data.mjs';
 import { sharesFile } from './src/patient-share.mjs';
 import { methodsTables } from './src/hospital-methods.mjs';
 
@@ -277,7 +277,8 @@ function stakeData(ctx) {
     console.warn(`No crosswalk at ${process.env.CROSSWALK_JSON ? path : 'pipeline/derived/crosswalk.json'}: building without the Revenue at stake section. Run python3 pipeline/crosswalk/build.py, or set CROSSWALK_JSON.`);
     return null;
   }
-  const model = normalize(JSON.parse(readFileSync(path, 'utf8')));
+  const raw = JSON.parse(readFileSync(path, 'utf8'));
+  const model = normalize(raw);
   const missing = Object.keys(model.codes).filter((code) => !ctx.data.codes[code]);
   if (missing.length) throw new Error(`crosswalk.json has codes with no page on this site: ${missing.slice(0, 10).join(', ')}`);
   const moved = removalMismatches(model, ctx.data);
@@ -294,7 +295,8 @@ function stakeData(ctx) {
   const resolutions = existsSync(resolutionsPath) ? JSON.parse(readFileSync(resolutionsPath, 'utf8')) : {};
   const xlsx = join(dirname(path), 'crosswalk.xlsx');
   if (!existsSync(xlsx)) console.warn('No crosswalk.xlsx next to crosswalk.json: the Excel download is left out.');
-  return { ...stake.stakeContext(model, credits(reviews, model, resolutions), ctx.data.groups, { xlsx: existsSync(xlsx) }), xlsxPath: xlsx };
+  // rates: crosswalk.json meta.rates as written (the model keeps only some), for hospitalAssets' check.
+  return { ...stake.stakeContext(model, credits(reviews, model, resolutions), ctx.data.groups, { xlsx: existsSync(xlsx) }), xlsxPath: xlsx, rates: (raw.meta || {}).rates };
 }
 
 /**
@@ -304,7 +306,7 @@ function stakeData(ctx) {
  * does not change. Returns {assets (those URLs), hospitals, volume (the two tables, for Methods)}, or null
  * (no picker) when the derived hospital tables are absent.
  */
-async function hospitalAssets(model) {
+async function hospitalAssets(model, rates) {
   const paths = ['pipeline/derived/hospitals.json', 'pipeline/derived/drg-volume.json'];
   if (!paths.every((path) => existsSync(join(root, path)))) {
     console.warn('No hospitals.json or drg-volume.json: building Revenue at stake without the hospital picker.');
@@ -316,6 +318,9 @@ async function hospitalAssets(model) {
   for (const [table, missing] of Object.entries(uncoveredDrgs(model, hospitals.meta, volume.meta))) {
     if (missing.length) throw new Error(`${table} lacks ${missing.length} MS-DRG(s) the crosswalk prices: ${missing.slice(0, 10).join(', ')}. Rebuild the derived tables: python3 pipeline/crosswalk/build.py`);
   }
+  // And price them as the crosswalk does: old tables beside a newer crosswalk.json fail the build.
+  const stale = staleHospitalTables(model, rates, hospitals.meta);
+  if (stale.length) throw new Error(`hospitals.json disagrees with the crosswalk in ${stale.length} place(s): ${stale.slice(0, 10).join('; ')}. Rebuild the derived tables: python3 pipeline/crosswalk/build.py (its hospital checks must pass)`);
   const records = Object.keys(hospitals.hospitals).sort()
     .map((ccn) => [ccn, JSON.stringify(hospitalRecord(hospitals.hospitals[ccn], volume.volume[ccn], volume.meta.drgs))]);
   const dir = `data/h.${sha(records.map(([ccn, text]) => `${ccn}\n${text}`).join('\n'))}`;
@@ -407,7 +412,7 @@ async function main() {
   const shares = patientShares(ctx);
   ctx.shares = shares && shares.doc;
   const script = await bundleEntry('client.mjs', 'iife', { __SHARES__: JSON.stringify(shares && shares.lookup) });
-  const tables = ctx.stake ? await hospitalAssets(ctx.stake.model) : null;
+  const tables = ctx.stake ? await hospitalAssets(ctx.stake.model, ctx.stake.rates) : null;
   const hospitals = tables && tables.assets;
   // The Methods page's hospital sections (with the hospital tables) and patient-share section (with the
   // share tables), each built when its own tables are.

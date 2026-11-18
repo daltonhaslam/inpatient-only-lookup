@@ -81,6 +81,36 @@ export function uncoveredDrgs(model, hospitalsMeta, volumeMeta) {
 }
 
 /**
+ * Where hospitals.json disagrees with the crosswalk being built, as readable lines ([] when it agrees):
+ * a DRG whose meta.drg_weights weight is not the weight a crosswalk row carries for it (the normalized
+ * model keeps each family DRG's weight), and a meta.rates value that is not crosswalk.json's meta.rates
+ * value under the same key (rates: the raw crosswalk.json meta.rates; the model renames and drops some).
+ * The pipeline writes both from one run, but its gates let old hospital tables sit beside a newer
+ * crosswalk.json (an October rebuild with a stale impact file): the build fails rather than price the
+ * hospital view with last year's weights or rates. A missing weight is uncoveredDrgs()'s to report.
+ */
+export function staleHospitalTables(model, rates, hospitalsMeta) {
+  const problems = [];
+  const seen = new Set();
+  for (const item of Object.values(model.codes)) {
+    for (const family of item.ip ? item.ip.families : []) {
+      for (const { drg, weight } of family.drgs) {
+        const shipped = hospitalsMeta.drg_weights[drg];
+        const key = `${drg}:${weight}`;
+        if (!Number.isFinite(shipped) || shipped === weight || seen.has(key)) continue;
+        seen.add(key);
+        problems.push(`MS-DRG ${drg} weight ${shipped} in hospitals.json, ${weight} in the crosswalk (${item.code})`);
+      }
+    }
+  }
+  for (const [key, value] of Object.entries(hospitalsMeta.rates || {}).sort(([a], [b]) => a.localeCompare(b))) {
+    if (!rates || rates[key] !== value) problems.push(`rate ${key} ${value} in hospitals.json, ${rates ? rates[key] : undefined} in the crosswalk`);
+  }
+  if (!Object.keys(hospitalsMeta.rates || {}).length) problems.push('hospitals.json has no meta.rates');
+  return problems;
+}
+
+/**
  * One hospital's file: its hospitals.json factors and v: {DRG: discharges in the counts' data year} for the
  * crosswalk's DRGs (drgs: drg-volume.json meta.drgs). volume is undefined for a hospital CMS gives no counts.
  */
