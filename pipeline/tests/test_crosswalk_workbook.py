@@ -306,6 +306,9 @@ class Workbook(unittest.TestCase):
         for words in ("Hospital CCN", "Per year", "42 CFR 412.105(g)", "Uncompensated care", "$1,776", "$292",
                       "https://example.test/impact", "https://example.test/aa"):
             self.assertIn(words, text)
+        # hospitals.json's Maryland reason is its own sentence, never spliced into a parenthetical.
+        self.assertIn("says so beside the cell. " + hospitals()["meta"]["maryland"] + " ", text)
+        self.assertNotIn("(" + hospitals()["meta"]["maryland"], text)
 
 
 class AlternativeFlag(unittest.TestCase):

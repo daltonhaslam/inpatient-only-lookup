@@ -258,6 +258,12 @@ def replaced_in_place(sources, grab, skip=()):
     return changed, problems
 
 
+def new_addendum_b(found, replaced):
+    """True when this run adopted an Addendum B, new or replaced in place by CMS (a corrected
+    quarter changes rates as much as a new one)."""
+    return any(source["kind"] == "addendum_b" for source, _ in list(found) + list(replaced))
+
+
 def keep_previous(path):
     """Set the current download aside as <name>.prev so a refresh can be undone by hand."""
     if path.exists():
@@ -435,7 +441,7 @@ def main(argv=None):
         print("To undo: git checkout pipeline/sources.json, and in data/raw/ rename any <file>.prev back to <file>.")
         return 1
     notes = follow_ups(fetch.load_sources(), history_changed=bool(found or replaced),
-                       new_quarter=any(source["kind"] == "addendum_b" for source, _ in found))
+                       new_quarter=new_addendum_b(found, replaced))
     print("\nStill to do by hand:" if notes else "\nNothing left to do by hand.")
     for note in notes:
         print("  - " + note)

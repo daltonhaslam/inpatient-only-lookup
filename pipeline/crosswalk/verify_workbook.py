@@ -7,15 +7,16 @@
 Evaluates the workbook as shipped and copies with inputs typed in (in parallel), and compares:
 1. National (CCN blank): every amount on the Crosswalk tab against crosswalk.json to the cent
    (outpatient rate, inpatient low and high, gap low and high); IME + DSH is $0 on every row.
-2. Your own wage index 1.2: the DRG 165 row against price.py's formula at that wage index.
+2. Your own wage index 1.2: the DRG 165 row against price.py's formula at that wage index, and
+   independently, moved by exactly the operating labor portion, weight x OpStd x LaborShare x 0.2.
 3. CCN 380009 (OHSU) with 10 traditional DRG 165 cases: the OHSU anchors in facts.json
    "expected" (DRG 165 and 163 totals and add-ons, operating IME, APC 5183, the per-year
    add-ons) on the Per year and Crosswalk tabs, and every Crosswalk amount against price.py's
    hospital formula (the reference the site is held to).
 4. A hospital with no IME or DSH and a wage index below 1, its CCN typed as a number (leading zero
    dropped): every Crosswalk amount against price.py, IME + DSH $0, no MA estimate.
-5. A Maryland CCN: the status reads hospitals.json's Maryland reason, and the DRG 165 row stays
-   national.
+5. A Maryland CCN: the status reads hospitals.json's Maryland reason, and every Crosswalk amount
+   stays national (against crosswalk.json).
 No scenario may leave an error value (#N/A, #VALUE!, ...) on the Crosswalk, Per year or Inputs tab.
 Needs: python3 -m venv V && V/bin/pip install formulas openpyxl. Exits 1 on any mismatch.
 """
@@ -209,6 +210,12 @@ def main(argv=None):
         moved = number(results["wage12"]["CROSSWALK"]["%s%d" % (header["Inpatient low"], r165)])
         want = cents(hospital_drg_payment(w165["weight"], dict(NATIONAL, wi=1.2), rates)["total"])
         report.match("Your wage index 1.2, DRG 165 (row %d, national %.2f), against price.py" % (r165, w165["amount"]), moved, want)
+        # Independently of price.py, from the rates alone: above 1 the wage index applies the Table 1A
+        # labor share to the Table 1A amount, so the row moves by exactly weight x OpStd x LaborShare x 0.2.
+        delta = round(w165["weight"] * rates["operating"] * rates["labor_share"] * 0.2, 2)
+        report.line(moved is not None and abs((moved - w165["amount"]) - delta) <= 0.011,
+                    "Your wage index 1.2, DRG 165: moves %s; the labor portion alone, weight x OpStd x LaborShare x 0.2, is %.2f"
+                    % ("%.2f" % (moved - w165["amount"]) if moved is not None else None, delta))
 
         # 3. OHSU by CCN, with a per-year count.
         values, label = results["ohsu"], "CCN %s" % anchors["ccn"]
@@ -265,10 +272,7 @@ def main(argv=None):
         values, label = results["maryland"], "CCN %s (Maryland)" % maryland
         report.line(values["INPUTS"][status] == wbk.maryland_status(table["meta"]),
                     "%s: status reads %r" % (label, values["INPUTS"][status]))
-        report.match("%s row %d inpatient low (national)" % (label, r165),
-                     number(values["CROSSWALK"]["%s%d" % (header["Inpatient low"], r165)]), w165["amount"])
-        report.match("%s row %d IME + DSH low" % (label, r165),
-                     number(values["CROSSWALK"]["%s%d" % (header["IME + DSH low"], r165)]), 0.0)
+        report.rows(label, values, header, national, "crosswalk.json (national)")
         report.clean(label, values)
     finally:
         shutil.rmtree(folder)

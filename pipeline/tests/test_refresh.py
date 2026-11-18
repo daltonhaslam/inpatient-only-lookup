@@ -242,6 +242,13 @@ class CalendarFollowUps(unittest.TestCase):
         self.assertNotIn(refresh.QUARTER_ASC_NOTE, refresh.follow_ups(sources))
         self.assertIn(refresh.QUARTER_ASC_NOTE, refresh.follow_ups(sources, new_quarter=True))
 
+    def test_an_addendum_b_replaced_in_place_counts_as_a_new_quarter(self):
+        addendum, rule = {"kind": "addendum_b"}, {"kind": "rule_addenda"}
+        self.assertTrue(refresh.new_addendum_b([], [(addendum, b"x")]))       # CMS corrected a quarter in place
+        self.assertTrue(refresh.new_addendum_b([(addendum, b"x")], []))
+        self.assertFalse(refresh.new_addendum_b([(rule, b"x")], [(rule, b"x")]))
+        self.assertFalse(refresh.new_addendum_b([], []))
+
 
 if __name__ == "__main__":
     unittest.main()
