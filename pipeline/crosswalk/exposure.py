@@ -1,7 +1,9 @@
 """The derived tables behind the hospital view and the patient share (see build.py).
 
     hospitals.json        every hospital the picker offers, with its FY 2027 impact-file factors,
-                          and the Maryland hospitals it names but does not offer
+                          and the Maryland hospitals it names but does not offer; meta.drg_weights
+                          has the Table 5 weight of every DRG the crosswalk prices (the browser's
+                          card model carries none, and crosswalk.json must not change)
     drg-volume.json       2024 traditional Medicare discharges by hospital, for the DRGs the
                           crosswalk uses
     asc-new-2027.json     the codes CMS adds to the ASC covered procedures list for CY 2027
@@ -62,6 +64,11 @@ def crosswalk_drgs(doc):
     """Every MS-DRG the crosswalk prices, sorted."""
     return sorted({row["drg"] for entry in doc["codes"].values() if entry["inpatient"]
                    for family in entry["inpatient"]["families"] for row in family["drgs"]})
+
+
+def drg_weights(doc, t):
+    """{DRG: FY 2027 Table 5 weight} for every MS-DRG the crosswalk prices, for the hospital view."""
+    return {drg: t.table5[drg]["weight"] for drg in crosswalk_drgs(doc)}
 
 
 def compared_codes(doc):
@@ -168,5 +175,6 @@ def shares_table(doc, t):
 def assemble(doc, removed, t):
     """{file name: document} for the four derived tables."""
     hospitals = hospitals_table(t)
+    hospitals["meta"]["drg_weights"] = drg_weights(doc, t)
     return {HOSPITALS: hospitals, VOLUME: volume_table(doc, t, hospitals["hospitals"]),
             ASC_NEW: asc_new_table(removed, t), SHARES: shares_table(doc, t)}

@@ -196,6 +196,30 @@ class NationalMode(unittest.TestCase):
         self.assertEqual((paid["ime"], paid["dsh"], paid["addons"]), (0.0, 0.0, 0.0))
 
 
+class DrgWeights(unittest.TestCase):
+    @staticmethod
+    def doc(*weights):
+        families = [{"drgs": [{"drg": "165", "weight": w, "amount": 0}]} for w in weights]
+        return {"codes": {"3248%d" % i: {"inpatient": {"families": [family]}} for i, family in enumerate(families)}}
+
+    def check(self, doc, weights):
+        report = checks.Report()
+        exposure_checks._weights(report, doc, {"meta": {"drg_weights": weights}})
+        return report
+
+    def test_table5_weights_for_the_crosswalk_drgs(self):
+        t = types.SimpleNamespace(table5={"165": {"weight": 1.9294}, "166": {"weight": 2.0}})
+        self.assertEqual(exposure.drg_weights(self.doc(1.9294), t), {"165": 1.9294})
+        self.assertEqual(self.check(self.doc(1.9294), {"165": 1.9294}).failures, 0)
+
+    def test_a_drg_with_two_weights_fails(self):
+        self.assertEqual(self.check(self.doc(1.9294, 1.93), {"165": 1.9294}).failures, 1)
+
+    def test_a_missing_or_extra_drg_fails(self):
+        self.assertEqual(self.check(self.doc(1.9294), {}).failures, 1)
+        self.assertEqual(self.check(self.doc(1.9294), {"165": 1.9294, "166": 2.0}).failures, 1)
+
+
 class HospitalsCheck(unittest.TestCase):
     ROW = {"name": "A", "state": "OR", "wi": 1.0, "gaf": 1.0, "tchop": 0.1, "tchcp": 0.0, "dshopp": 0.0, "dshcpp": 0.0,
            "caseta44": 10.0, "ime_caseta44": None, "type": 0}
@@ -264,7 +288,8 @@ class FixtureBuildTables(unittest.TestCase):
     def test_tables_written_and_checks_pass(self):
         self.assertEqual(self.status, 0, self.checks_text)
         for line in ("ok hospitals from the impact file: 3032 offered", "ok OHSU fixture:",
-                     "ok national mode reproduces every DRG amount:", "ok CY 2027 ASC additions reconcile to the rule: 619 codes",
+                     "ok national mode reproduces every DRG amount:", "ok DRG weights for the hospital view:",
+                     "ok CY 2027 ASC additions reconcile to the rule: 619 codes",
                      "ok hospital states:", "ok 2024 DRG volume:", "ok patient shares recompute:",
                      "ok no CPT descriptor text in the hospital and patient-share tables:"):
             self.assertIn(line, self.checks_text)

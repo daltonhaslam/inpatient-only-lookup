@@ -44,6 +44,7 @@ def run(report, doc, tables, removed, t):
     _states(report, hospitals, t)
     _fixture(report, doc, tables, t)
     _national(report, doc)
+    _weights(report, doc, hospitals)
     _volume(report, doc, tables[VOLUME], hospitals, t)
     _asc_new(report, tables[ASC_NEW], removed, t)
     _shares(report, doc, tables[SHARES], t)
@@ -138,6 +139,22 @@ def _national(report, doc):
                     problems.append("%s DRG %s: %s, crosswalk.json has %s" % (code, row["drg"], found, row["amount"]))
     report.check("national mode reproduces every DRG amount", problems,
                  "%d DRG rows: wage index 1, GAF 1, no IME or DSH" % rows)
+
+
+def _weights(report, doc, table):
+    """meta.drg_weights has exactly the crosswalk's DRGs, each with the weight every crosswalk.json
+    row uses, so a DRG priced with two weights fails."""
+    weights, problems = table["meta"]["drg_weights"], []
+    if sorted(weights) != crosswalk_drgs(doc):
+        problems.append("the weights are not for exactly the crosswalk's DRGs")
+    for code, entry in sorted(doc["codes"].items()):
+        for family in (entry["inpatient"] or {}).get("families", []):
+            for row in family["drgs"]:
+                if weights.get(row["drg"]) != row["weight"]:
+                    problems.append("%s DRG %s: weight %s, hospitals.json has %s" % (
+                        code, row["drg"], row["weight"], weights.get(row["drg"])))
+    report.check("DRG weights for the hospital view", problems,
+                 "%d DRGs in hospitals.json meta.drg_weights, each the weight every crosswalk.json row uses" % len(weights))
 
 
 def _volume(report, doc, table, hospitals, t):

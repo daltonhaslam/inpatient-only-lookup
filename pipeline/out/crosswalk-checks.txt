@@ -59,6 +59,7 @@ ok hospitals from the impact file: 3032 offered (3075 in the file less 43 in Mar
 ok hospital states: from the CCN; agree with the 2024 discharge file for the 2824 hospitals in both
 ok OHSU fixture: DRG 165 $22,116.60 (IME + DSH $6,067.07, operating IME $4,632.08); DRG 163 $51,459.44 (IME + DSH $14,116.45); APC 5183 $3,995.14; 10 cases of DRG 165 $60,670.69 a year; 2024 counts 15/34/11
 ok national mode reproduces every DRG amount: 2845 DRG rows: wage index 1, GAF 1, no IME or DSH
+ok DRG weights for the hospital view: 282 DRGs in hospitals.json meta.drg_weights, each the weight every crosswalk.json row uses
 ok 2024 DRG volume: 2663 hospitals, 45070 hospital-DRG counts over 282 crosswalk DRGs; dropped: 43 Maryland (all-payer model), 22 not in the FY 2027 impact file
 ok CY 2027 ASC additions reconcile to the rule: 619 codes: 618 removed from the IPO list for 2027 (91 FR 70665 states 618) + 64629; none on the CY 2026 AA, none new to HCPCS
 info CY 2027 AA less CY 2026 AA, less comment indicator NI: 716 codes, not 619: the additions plus 97 others (85 NC, 12 blank). NC and NP mark new HCPCS codes too (Addendum DD2); a blank indicator marks no change from the current year
