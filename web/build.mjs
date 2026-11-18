@@ -27,7 +27,7 @@ const out = process.env.OUT_DIR ? safeOutDir(resolve(process.env.OUT_DIR)) : DOC
 
 /**
  * The build empties its output directory first, so an OUT_DIR is checked before anything is deleted: never
- * the repo, web/ or a parent of them; only a new directory, one under the system temp dir, or one this
+ * the repo, web/ or a parent of them; only a new directory, one strictly under the system temp dir, or one this
  * build wrote before (it holds MARKER).
  */
 function safeOutDir(dir) {
@@ -35,7 +35,8 @@ function safeOutDir(dir) {
   const target = real(dir);
   const inside = (parent, child) => child === parent || child.startsWith(`${parent}${sep}`);
   if ([real(root), real(here)].some((guarded) => inside(target, guarded))) throw new Error(`Refusing OUT_DIR=${dir}: it is the repository, web/ or a parent of them.`);
-  if (target !== real(DOCS) && existsSync(target) && !inside(real(tmpdir()), target) && !existsSync(join(target, MARKER))) {
+  const underTmp = target.startsWith(`${real(tmpdir())}${sep}`); // strictly under: never the temp dir itself
+  if (target !== real(DOCS) && existsSync(target) && !underTmp && !existsSync(join(target, MARKER))) {
     throw new Error(`Refusing OUT_DIR=${dir}: it already exists and does not look like a build output (no ${MARKER}, not under ${tmpdir()}). Use a new or empty-to-be directory.`);
   }
   return dir;

@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -29,5 +29,20 @@ test('OUT_DIR: a directory under the temp dir is built, and marked as a build ou
     assert.ok(existsSync(join(dir, 'index.html')));
   } finally {
     rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('OUT_DIR: the temp dir itself is refused (only a directory strictly under it is allowed)', () => {
+  // A private stand-in for the system temp dir (os.tmpdir() reads TMPDIR), so a regression empties only this sandbox.
+  const fakeTmp = mkdtempSync(join(tmpdir(), 'iol-fake-tmp-'));
+  const keep = join(fakeTmp, 'keep.txt');
+  writeFileSync(keep, 'not a build output');
+  try {
+    const run = spawnSync(process.execPath, ['build.mjs'], { cwd: web, env: { ...process.env, TMPDIR: fakeTmp, OUT_DIR: fakeTmp, BUILD_DATE: '2026-11-11' }, encoding: 'utf8' });
+    assert.notEqual(run.status, 0);
+    assert.match(run.stderr, /Refusing OUT_DIR=/);
+    assert.ok(existsSync(keep), 'nothing deleted');
+  } finally {
+    rmSync(fakeTmp, { recursive: true, force: true });
   }
 });
