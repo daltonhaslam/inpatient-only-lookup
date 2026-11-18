@@ -21,6 +21,10 @@ describe('roughMoney: the per-year fold headline', () => {
   for (const [n, text] of [[1_134_000, '$1.1 million'], [2_000_000, '$2 million'], [60_670.69, '$61,000'], [9_499, '$9,500'], [480, '$480'], [0, '$0']]) {
     test(`${n} -> ${text}`, () => assert.equal(roughMoney(n), text));
   }
+  test('no total (null): null, not "$0"', () => {
+    assert.equal(roughMoney(null), null);
+    assert.equal(roughMoney(undefined), null);
+  });
 });
 
 test('EMPTY labels the two reasons a count cell is empty', () => {

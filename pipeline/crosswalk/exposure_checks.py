@@ -8,7 +8,7 @@ import collections
 
 from crosswalk import checks, exposure
 from crosswalk import exposure_sources as xs
-from crosswalk.exposure import ASC_NEW, COINSURANCE, HOSPITALS, MARYLAND, SHARES, VOLUME
+from crosswalk.exposure import ASC_NEW, COINSURANCE, HOSPITAL_RATES, HOSPITALS, MARYLAND, SHARES, VOLUME
 from crosswalk.exposure import compared_codes, crosswalk_drgs, patient_share
 from crosswalk.price import NATIONAL, hospital_drg_payment, hospital_outpatient, per_year
 
@@ -45,6 +45,7 @@ def run(report, doc, tables, removed, t):
     _fixture(report, doc, tables, t)
     _national(report, doc)
     _weights(report, doc, hospitals)
+    _rates(report, doc, hospitals)
     _volume(report, doc, tables[VOLUME], hospitals, t)
     _asc_new(report, tables[ASC_NEW], removed, t)
     _shares(report, doc, tables[SHARES], t)
@@ -94,9 +95,9 @@ def _dollars(value):
 
 
 def _fixture(report, doc, tables, t):
-    """The plan's OHSU anchors (facts.json expected.ohsu) to the cent, from the table that ships,
-    crosswalk.json meta.rates and Table 5."""
-    rates, fixture, problems = doc["meta"]["rates"], t.facts["expected"]["ohsu"], []
+    """The plan's OHSU anchors (facts.json expected.ohsu) to the cent, from the table that ships (its
+    hospital row and meta.rates, which _rates holds to crosswalk.json's) and Table 5."""
+    rates, fixture, problems = tables[HOSPITALS]["meta"]["rates"], t.facts["expected"]["ohsu"], []
     ohsu = tables[HOSPITALS]["hospitals"].get(fixture["ccn"])
     if ohsu is None:
         report.check("OHSU fixture", ["%s not offered" % fixture["ccn"]], "")
@@ -155,6 +156,16 @@ def _weights(report, doc, table):
                         code, row["drg"], row["weight"], weights.get(row["drg"])))
     report.check("DRG weights for the hospital view", problems,
                  "%d DRGs in hospitals.json meta.drg_weights, each the weight every crosswalk.json row uses" % len(weights))
+
+
+def _rates(report, doc, table):
+    """hospitals.json meta.rates is exactly the crosswalk.json meta.rates the hospital formula reads."""
+    shipped, source = table["meta"]["rates"], doc["meta"]["rates"]
+    problems = [] if sorted(shipped) == sorted(HOSPITAL_RATES) else ["keys %s, expected %s" % (sorted(shipped), sorted(HOSPITAL_RATES))]
+    problems += ["%s: %s, crosswalk.json has %s" % (key, shipped.get(key), source.get(key))
+                 for key in HOSPITAL_RATES if shipped.get(key) != source.get(key)]
+    report.check("IPPS rates for the hospital view", problems,
+                 "hospitals.json meta.rates equals crosswalk.json meta.rates for %s" % ", ".join(HOSPITAL_RATES))
 
 
 def _volume(report, doc, table, hospitals, t):

@@ -2,8 +2,10 @@
 
     hospitals.json        every hospital the picker offers, with its FY 2027 impact-file factors,
                           and the Maryland hospitals it names but does not offer; meta.drg_weights
-                          has the Table 5 weight of every DRG the crosswalk prices (the browser's
-                          card model carries none, and crosswalk.json must not change)
+                          has the Table 5 weight of every DRG the crosswalk prices and meta.rates
+                          the IPPS rates the hospital formula reads, copied from crosswalk.json
+                          (the browser's card model carries neither, and crosswalk.json must not
+                          change): the browser's hospital math reads only this meta
     drg-volume.json       2024 traditional Medicare discharges by hospital, for the DRGs the
                           crosswalk uses
     asc-new-2027.json     the codes CMS adds to the ASC covered procedures list for CY 2027
@@ -29,7 +31,9 @@ ASC_NEW, SHARES = "asc-new-2027.json", "patient-shares.json"
 TABLES = tuple(sorted((HOSPITALS, VOLUME, ASC_NEW, SHARES)))
 MARYLAND = "21"
 MARYLAND_REASON = "Maryland hospitals are paid under the state's all-payer model, not the IPPS."
-COINSURANCE = 0.2                  # Part B coinsurance: the ASC share, and Addendum B's minimum copayment
+# The crosswalk.json meta.rates keys price.hospital_drg_payment reads, shipped in hospitals.json meta.
+HOSPITAL_RATES = ("operating", "operating_wi_le1", "capital", "labor_share", "labor_share_le1")
+COINSURANCE = 0.2                 # Part B coinsurance: the ASC share, and Addendum B's minimum copayment
 
 SOURCE_LABELS = {
     "ipps-2027-impact": ("FY 2027 IPPS final rule impact file, correction notice", xs.IMPACT_MEMBER),
@@ -176,5 +180,6 @@ def assemble(doc, removed, t):
     """{file name: document} for the four derived tables."""
     hospitals = hospitals_table(t)
     hospitals["meta"]["drg_weights"] = drg_weights(doc, t)
+    hospitals["meta"]["rates"] = {key: doc["meta"]["rates"][key] for key in HOSPITAL_RATES}
     return {HOSPITALS: hospitals, VOLUME: volume_table(doc, t, hospitals["hospitals"]),
             ASC_NEW: asc_new_table(removed, t), SHARES: shares_table(doc, t)}

@@ -1,8 +1,8 @@
 // Words and round figures for the hospital view: the summary's fraction word, the empty-cell labels of
 // the per-year table and the fold's ceiling. Pure; the numbers come from hospital-math.mjs.
-import { num } from './engine.mjs';
+import { money } from './stake-card.mjs';
 
-/** Why a per-year count cell is empty (perYearTable's trad.suppressed and ma.reason). */
+/** Why a per-year count cell is empty (perYearTable's trad.suppressed, and ma.reason: either key). */
 export const EMPTY = {
   suppressed: 'under 11 or none',
   'no-ma-ratio': 'no MA count in CMS’s file',
@@ -23,9 +23,13 @@ export function fractionWord(ratio) {
   return LADDER.find(([from]) => ratio >= from)[1];
 }
 
-/** A per-year ceiling in round figures: "$1.1 million", "$61,000", "$9,500", "$480". */
+/**
+ * A per-year ceiling in round figures: "$1.1 million", "$61,000", "$9,500", "$480". null for no total
+ * (perYearTable's total when no count is published or typed), so the view says so instead of "$0".
+ */
 export function roughMoney(n) {
+  if (!Number.isFinite(n)) return null;
   const step = n >= 10_000 ? 1000 : n >= 1000 ? 100 : 1;
   const r = Math.round(n / step) * step;
-  return r >= 1_000_000 ? `$${Number((n / 1_000_000).toFixed(1))} million` : `$${num(r)}`;
+  return r >= 1_000_000 ? `$${Number((n / 1_000_000).toFixed(1))} million` : money(r);
 }

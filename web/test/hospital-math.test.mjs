@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { normalize, clientModel } from '../src/stake-data.mjs';
 import { prepare } from '../src/stake-engine.mjs';
 import {
-  NATIONAL, round2, teaching, drgPayment, outpatientRate, hospitalContext, hospitalItem,
+  NATIONAL, round2, teaching, count, drgPayment, outpatientRate, hospitalContext, hospitalItem,
   splitRows, perYearTable, summary,
 } from '../src/hospital-math.mjs';
 import { fractionWord } from '../src/hospital-words.mjs';
@@ -21,7 +21,9 @@ const hospitals = derived('hospitals.json');
 const volume = derived('drg-volume.json').volume;
 const model = normalize(crosswalk);
 const { items, byCode } = prepare(clientModel(model, []));   // exactly what the browser draws cards from
-const env = { rates: crosswalk.meta.rates, weights: hospitals.meta.drg_weights, oppsLaborShare: hospitals.meta.opps_labor_share };
+// The hospital view's only constants: hospitals.json meta (rates, DRG weights, OPPS labor share).
+const env = { meta: hospitals.meta };
+const { rates: RATES, drg_weights: WEIGHTS, opps_labor_share: LABOR } = hospitals.meta;
 const at = (ccn) => hospitalContext({ ...env, hospital: hospitals.hospitals[ccn], volume: volume[ccn] });
 
 const OHSU = '380009';
@@ -68,7 +70,7 @@ describe('correctness anchors (OHSU 380009, from the derived tables)', () => {
   test('the gap is from unrounded amounts: outpatient less each end of the family', () => {
     assert.equal(item.ip.low, 22116.60);
     assert.equal(item.ip.high, 51459.44);
-    assert.deepEqual(item.diff, { low: round2(outpatientRate(3584.95, 1.1907, 0.6) - drgPayment(4.4892, hospitals.hospitals[OHSU], crosswalk.meta.rates).total), high: -18121.46 });
+    assert.deepEqual(item.diff, { low: round2(outpatientRate(3584.95, 1.1907, 0.6) - drgPayment(4.4892, hospitals.hospitals[OHSU], RATES).total), high: -18121.46 });
     assert.equal(item.diff.low, -47464.30);
   });
   test('per year: 10 traditional cases of DRG 165 is $60,670.69 (not 10 × $6,067.07)', () => {
@@ -84,14 +86,14 @@ describe('correctness anchors (OHSU 380009, from the derived tables)', () => {
 });
 
 describe('JS agrees with the Python reference (price.py), exactly, for every DRG and APC rate the crosswalk uses', () => {
-  const weights = Object.entries(env.weights).sort();
+  const weights = Object.entries(WEIGHTS).sort();
   const rates = [...new Set(compared.map((item) => item.op.rate))].sort((a, b) => a - b);
   const ccns = [OHSU, LOW_WAGE, NO_ADDONS, CAPITAL_ONLY];
   const years = weights.map(([, w], i) => [i % 97 + 1, w]);
   let reference = null;
   try {
     reference = JSON.parse(execFileSync('python3', ['-I', join(here, 'hospital-reference.py')], {
-      input: JSON.stringify({ rates: crosswalk.meta.rates, opps_labor_share: env.oppsLaborShare, hospitals: ccns.map((c) => hospitals.hospitals[c]), weights: weights.map(([, w]) => w), apc: rates, years }),
+      input: JSON.stringify({ rates: RATES, opps_labor_share: LABOR, hospitals: ccns.map((c) => hospitals.hospitals[c]), weights: weights.map(([, w]) => w), apc: rates, years }),
       maxBuffer: 64 * 1024 * 1024,
     }).toString());
   } catch (error) {
@@ -109,14 +111,14 @@ describe('JS agrees with the Python reference (price.py), exactly, for every DRG
       const hospital = hospitals.hospitals[ccn];
       const ref = reference[h];
       weights.forEach(([drg, w], i) => {
-        const paid = drgPayment(w, hospital, crosswalk.meta.rates);
+        const paid = drgPayment(w, hospital, RATES);
         for (const [js, py] of Object.entries(KEYS)) {
           assert.equal(paid[js], ref.drgs[i][py], `${ccn} DRG ${drg} ${js}`);
           assert.equal(round2(paid[js]), ref.drgs_cents[i][py], `${ccn} DRG ${drg} ${js} cents`);
         }
       });
       rates.forEach((rate, i) => {
-        assert.equal(outpatientRate(rate, hospital.wi, env.oppsLaborShare), ref.outpatient[i], `${ccn} APC rate ${rate}`);
+        assert.equal(outpatientRate(rate, hospital.wi, LABOR), ref.outpatient[i], `${ccn} APC rate ${rate}`);
         assert.equal(round2(ref.outpatient[i]), ref.outpatient_cents[i]);
       });
       const ctx = at(ccn);
@@ -160,15 +162,22 @@ describe('national mode: no drift, by even a cent, on any item (Review Focus 5)'
     assert.ok(drgRows > 2800, `${drgRows} DRG rows`);
   });
   test('hospitals.json meta.drg_weights: every crosswalk DRG row has its weight, and weight × the combined rate is the national amount', () => {
-    assert.equal(Object.keys(env.weights).length, 282);
+    assert.equal(Object.keys(WEIGHTS).length, 282);
     for (const item of Object.values(model.codes)) for (const f of item.ip ? item.ip.families : []) for (const d of f.drgs) {
-      assert.equal(env.weights[d.drg], d.weight, `DRG ${d.drg} weight`);
+      assert.equal(WEIGHTS[d.drg], d.weight, `DRG ${d.drg} weight`);
       assert.equal(round2(d.weight * crosswalk.meta.rates.combined), d.amount, `DRG ${d.drg}`);
     }
   });
   test('a DRG with no weight throws rather than drawing NaN', () => {
-    const ctx = hospitalContext({ ...env, weights: {}, hospital: hospitals.hospitals[OHSU], volume: undefined });
+    const ctx = hospitalContext({ meta: { ...hospitals.meta, drg_weights: {} }, hospital: hospitals.hospitals[OHSU], volume: undefined });
     assert.throws(() => hospitalItem(byCode['32480'], ctx), /MS-DRG 16\d has no weight/);
+  });
+  test('hospitals.json meta.rates is the five crosswalk.json rates the formula reads, and a missing one throws', () => {
+    assert.deepEqual(RATES, Object.fromEntries(Object.keys(RATES).map((key) => [key, crosswalk.meta.rates[key]])));
+    assert.deepEqual(Object.keys(RATES).sort(), ['capital', 'labor_share', 'labor_share_le1', 'operating', 'operating_wi_le1']);
+    const { labor_share: _drop, ...short } = RATES;
+    assert.throws(() => hospitalContext({ meta: { ...hospitals.meta, rates: short }, hospital: NATIONAL }), /meta\.rates\.labor_share is missing/);
+    assert.throws(() => hospitalContext({ meta: { ...hospitals.meta, opps_labor_share: undefined }, hospital: NATIONAL }), /opps_labor_share/);
   });
 });
 
@@ -193,6 +202,12 @@ describe('a hospital with no IME and no DSH (Review Focus 1)', () => {
     assert.ok(s.medianGap > 0);
     assertFinite(s);
   });
+  test('no add-ons and no gap at the median: "no-gap", not "the gap is base payment only"', () => {
+    const paidMore = compared.slice(0, 9).map((item) => ({ ...item, op: { ...item.op, rate: 1e6 } }));   // outpatient above every DRG
+    const s = summary(paidMore, ctx);
+    assert.ok(s.medianGap <= 0, `${s.medianGap}`);
+    assert.deepEqual([s.state, s.ratio], ['no-gap', null]);
+  });
   test('per year: no MA row, $0 add-ons, totals still numbers', () => {
     const table = perYearTable(byCode['32480'], ctx);
     for (const row of table.rows) {
@@ -213,6 +228,8 @@ describe('suppressed or missing DRG volume (Review Focus 3)', () => {
     const table = perYearTable(byCode['32480'], ctx);
     const r165 = table.rows.find((r) => r.drg === '165');
     assert.deepEqual([r165.trad.count, r165.trad.suppressed, r165.trad.perYear, r165.ma.count, r165.ma.perYear], [null, true, null, null, null]);
+    assert.equal(r165.ma.reason, 'suppressed');   // the MA cell says why it is empty too
+    assert.equal(table.rows[0].ma.reason, null);   // an estimated MA count carries no reason
     assert.ok(table.total > 0);
     const edited = perYearTable(byCode['32480'], ctx, { 165: { trad: 10 } });
     const e165 = edited.rows.find((r) => r.drg === '165');
@@ -227,13 +244,22 @@ describe('suppressed or missing DRG volume (Review Focus 3)', () => {
     assert.equal(table.total, null);
     assertFinite(table);
     const edited = perYearTable(byCode['32480'], ctx, { 165: { trad: 10 } });
-    assert.equal(edited.total, round2(10 * drgPayment(env.weights['165'], hospitals.hospitals[OHSU], crosswalk.meta.rates).addons
-      + Math.round(10 * hospitals.hospitals[OHSU].ime_caseta44 / hospitals.hospitals[OHSU].caseta44) * drgPayment(env.weights['165'], hospitals.hospitals[OHSU], crosswalk.meta.rates).imeOperating));
+    assert.equal(edited.total, round2(10 * drgPayment(WEIGHTS['165'], hospitals.hospitals[OHSU], RATES).addons
+      + Math.round(10 * hospitals.hospitals[OHSU].ime_caseta44 / hospitals.hospitals[OHSU].caseta44) * drgPayment(WEIGHTS['165'], hospitals.hospitals[OHSU], RATES).imeOperating));
   });
-  test('bad edits (negative, NaN, text) read as an empty cell, never NaN', () => {
-    const table = perYearTable(byCode['32480'], ohsu, { 163: { trad: -1, ma: NaN }, 164: { trad: '12' }, 165: { trad: null } });
+  test('bad edits (negative, NaN, fractions, text, blank) read as an empty cell, never NaN', () => {
+    const table = perYearTable(byCode['32480'], ohsu, { 163: { trad: -1, ma: NaN }, 164: { trad: 2.5 }, 165: { trad: null } });
     assert.deepEqual(table.rows.map((r) => r.trad.count), [null, null, null]);
     assertFinite(table);
+  });
+  test('typed counts arrive as input strings: "10" is 10; "2.5", "", "-1", "1e3", "0x10", "ten" are empty', () => {
+    assert.equal(count('10'), 10);
+    assert.equal(count(' 7 '), 7);
+    assert.equal(count('0'), 0);
+    for (const bad of ['2.5', '', '  ', '-1', '1e3', '0x10', 'ten', 2.5, -1, NaN, Infinity, null, undefined, {}]) assert.equal(count(bad), null, String(bad));
+    const table = perYearTable(byCode['32480'], ohsu, { 163: { trad: '10', ma: '' }, 164: { trad: '2.5' } });
+    assert.deepEqual(table.rows.slice(0, 2).map((r) => [r.trad.count, r.ma.count]), [[10, null], [null, null]]);
+    assert.equal(table.rows[0].trad.perYear, round2(10 * drgPayment(WEIGHTS['163'], hospitals.hospitals[OHSU], RATES).addons));
   });
 });
 
@@ -242,14 +268,14 @@ describe('MA cases: teaching hospitals only, operating IME only', () => {
   test('OHSU: MA count = round(traditional × IME_CASETA44 ÷ CASETA44), add-on per case = operating IME', () => {
     const table = perYearTable(byCode['32480'], ohsu);
     const r = table.rows.find((x) => x.drg === '163');
-    const paid = drgPayment(env.weights['163'], h, crosswalk.meta.rates);
+    const paid = drgPayment(WEIGHTS['163'], h, RATES);
     assert.equal(r.ma.count, Math.round(15 * h.ime_caseta44 / h.caseta44));
     assert.equal(r.ma.count, 17);
     assert.equal(r.ma.estimated, true);
     assert.equal(r.ma.perCase, round2(paid.imeOperating));
     assert.equal(r.ma.perYear, round2(17 * paid.imeOperating));
     const sum = table.rows.reduce((s, x) => {
-      const p = drgPayment(env.weights[x.drg], h, crosswalk.meta.rates);
+      const p = drgPayment(WEIGHTS[x.drg], h, RATES);
       return s + x.trad.count * p.addons + x.ma.count * p.imeOperating;
     }, 0);
     assert.equal(table.total, round2(sum));
@@ -265,7 +291,7 @@ describe('MA cases: teaching hospitals only, operating IME only', () => {
     const ctx = at(CAPITAL_ONLY);
     assert.equal(ctx.addOns, true);
     assert.ok(perYearTable(byCode['32480'], ctx).rows.every((r) => r.ma === null));
-    assert.ok(drgPayment(1, hospitals.hospitals[CAPITAL_ONLY], crosswalk.meta.rates).imeCapital > 0);
+    assert.ok(drgPayment(1, hospitals.hospitals[CAPITAL_ONLY], RATES).imeCapital > 0);
     assert.equal(teaching(NATIONAL), 'none');
   });
   test('a teaching hospital with no IME_CASETA44: MA count empty with the reason, totals still work', () => {
@@ -275,8 +301,10 @@ describe('MA cases: teaching hospitals only, operating IME only', () => {
     for (const row of table.rows) assert.deepEqual([row.ma.count, row.ma.reason], [null, 'no-ma-ratio']);
     assert.ok(table.total > 0);
     const typed = perYearTable(byCode['32480'], ctx, { 163: { trad: 20, ma: 5 } });
-    assert.equal(typed.rows[0].ma.count, 5);
+    assert.deepEqual([typed.rows[0].ma.count, typed.rows[0].ma.reason], [5, null]);   // a typed count needs no reason
     assert.ok(typed.total > table.total);
+    const cleared = perYearTable(byCode['32480'], ctx, { 163: { ma: '' } });
+    assert.deepEqual([cleared.rows[0].ma.count, cleared.rows[0].ma.reason], [null, null]);   // the reader's own empty cell
   });
 });
 

@@ -220,6 +220,24 @@ class DrgWeights(unittest.TestCase):
         self.assertEqual(self.check(self.doc(1.9294), {"165": 1.9294, "166": 2.0}).failures, 1)
 
 
+class HospitalRates(unittest.TestCase):
+    DOC = {"meta": {"rates": dict(RATES, combined=7387.95, version="v")}}
+
+    def check(self, shipped):
+        report = checks.Report()
+        exposure_checks._rates(report, self.DOC, {"meta": {"rates": shipped}})
+        return report
+
+    def test_the_five_rates_the_formula_reads_pass(self):
+        self.assertEqual(sorted(exposure.HOSPITAL_RATES), sorted(RATES))
+        self.assertEqual(self.check(dict(RATES)).failures, 0)
+
+    def test_a_changed_missing_or_extra_rate_fails(self):
+        self.assertEqual(self.check(dict(RATES, capital=540.0)).failures, 1)
+        self.assertEqual(self.check({k: v for k, v in RATES.items() if k != "labor_share"}).failures, 1)
+        self.assertEqual(self.check(dict(RATES, combined=7387.95)).failures, 1)
+
+
 class HospitalsCheck(unittest.TestCase):
     ROW = {"name": "A", "state": "OR", "wi": 1.0, "gaf": 1.0, "tchop": 0.1, "tchcp": 0.0, "dshopp": 0.0, "dshcpp": 0.0,
            "caseta44": 10.0, "ime_caseta44": None, "type": 0}
@@ -289,6 +307,7 @@ class FixtureBuildTables(unittest.TestCase):
         self.assertEqual(self.status, 0, self.checks_text)
         for line in ("ok hospitals from the impact file: 3032 offered", "ok OHSU fixture:",
                      "ok national mode reproduces every DRG amount:", "ok DRG weights for the hospital view:",
+                     "ok IPPS rates for the hospital view:",
                      "ok CY 2027 ASC additions reconcile to the rule: 619 codes",
                      "ok hospital states:", "ok 2024 DRG volume:", "ok patient shares recompute:",
                      "ok no CPT descriptor text in the hospital and patient-share tables:"):

@@ -5,13 +5,15 @@
 //
 // The formula is pipeline/crosswalk/price.py's (hospital_drg_payment, hospital_outpatient, per_year),
 // with the same order of operations so the doubles agree exactly (web/test/hospital-math.test.mjs
-// runs price.py to prove it). Rates are crosswalk.json meta.rates; DRG weights and the OPPS labor
-// share are hospitals.json meta.drg_weights and meta.opps_labor_share; a hospital is one
-// hospitals.json record: none retyped here.
+// runs price.py to prove it). hospitals.json meta is the only source of every constant: meta.rates
+// (the IPPS rates, which the pipeline copies from crosswalk.json and checks), meta.drg_weights and
+// meta.opps_labor_share. A hospital is one hospitals.json record. Nothing is retyped here, and
+// nothing here reads crosswalk.json keys (stake-data.mjs is the one place that does).
 //
 // Rounding: everything is computed unrounded; each figure returned for display is rounded to the cent
 // once, and every sum, gap and per-year value is taken from unrounded parts.
 
+// The hospitals.json meta.rates keys drgPayment reads (pipeline/crosswalk/exposure.py HOSPITAL_RATES).
 const RATES = ['operating', 'operating_wi_le1', 'capital', 'labor_share', 'labor_share_le1'];
 
 /** No adjustment: what the national figures assume (wage index and GAF 1, no add-ons). price.py NATIONAL. */
@@ -65,17 +67,25 @@ export function drgPayment(weight, hospital, rates) {
 /** An APC's national rate wage-adjusted for a hospital, unrounded. OPPS pays no IME or DSH. */
 export const outpatientRate = (rate, wi, laborShare) => rate * (laborShare * wi + 1 - laborShare);
 
-const count = (value) => (typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : null);
+/**
+ * A count of cases: a whole number of zero or more, given as a number or as the digits an input's
+ * value holds ("10"). Anything else ("", "2.5", "-1", "1e3", NaN, null) is an empty cell: null.
+ */
+export function count(value) {
+  const n = typeof value === 'string' ? (/^\s*\d+\s*$/.test(value) ? Number(value) : null) : value;
+  return Number.isSafeInteger(n) && n >= 0 ? n : null;
+}
 
 /**
  * Everything the functions below need for one hospital. hospital: a hospitals.json record (or
  * NATIONAL); volume: that hospital's drg-volume.json entry ({DRG: 2024 discharges}), or undefined when
- * it has none; rates: crosswalk.json meta.rates; weights: hospitals.json meta.drg_weights;
- * oppsLaborShare: hospitals.json meta.opps_labor_share. Throws on a missing rate rather than drawing NaN.
+ * it has none; meta: hospitals.json meta (rates, drg_weights, opps_labor_share). Throws on a missing
+ * constant rather than drawing NaN.
  */
-export function hospitalContext({ hospital, volume, rates, weights, oppsLaborShare }) {
-  for (const key of RATES) if (!Number.isFinite(rates[key])) throw new Error(`meta.rates.${key} is missing`);
-  if (!Number.isFinite(oppsLaborShare)) throw new Error('the OPPS labor share is missing');
+export function hospitalContext({ hospital, volume, meta }) {
+  const { rates = {}, drg_weights: weights = {}, opps_labor_share: oppsLaborShare } = meta;
+  for (const key of RATES) if (!Number.isFinite(rates[key])) throw new Error(`hospitals.json meta.rates.${key} is missing`);
+  if (!Number.isFinite(oppsLaborShare)) throw new Error('hospitals.json meta.opps_labor_share is missing');
   const paid = new Map();
   return {
     hospital,
@@ -150,10 +160,11 @@ export function splitRows(item, ctx) {
  *     add-on per case = IME + DSH.
  *   ma: null unless the hospital is a teaching hospital (operating IME > 0); else {count, estimated,
  *     reason, perCase, perYear}: count = round(traditional × MA ratio) unless typed; add-on per case =
- *     operating IME only (42 CFR 412.105(g); no capital IME or DSH on MA claims). reason is
- *     'no-ma-ratio' when CMS's file has no IME_CASETA44, so there is no estimate.
- * edits: {DRG: {trad, ma}}, the counts someone typed: a number, or null for a cleared cell; anything
- * else reads as empty. An edited traditional count moves the MA estimate with it.
+ *     operating IME only (42 CFR 412.105(g); no capital IME or DSH on MA claims). reason is set only
+ *     when the count is null and was not typed: 'no-ma-ratio' when CMS's file has no IME_CASETA44
+ *     (no estimate), else 'suppressed' when CMS published no traditional count to scale; else null.
+ * edits: {DRG: {trad, ma}}, the counts someone typed (see count(): a whole number or its digits; ""
+ * or anything else is a cleared cell). An edited traditional count moves the MA estimate with it.
  * total: round(the unrounded sum of every count × per case), or null when no row has a count.
  */
 export function perYearTable(item, ctx, edits = {}) {
@@ -175,7 +186,9 @@ export function perYearTable(item, ctx, edits = {}) {
     if (ctx.teaching === 'teaching') {
       const typed = edit.ma !== undefined;
       const ma = typed ? count(edit.ma) : trad !== null && ctx.maRatio !== null ? Math.round(trad * ctx.maRatio) : null;
-      row.ma = { count: ma, estimated: !typed && ma !== null, reason: ctx.maRatio === null ? 'no-ma-ratio' : null, perCase: round2(p.imeOperating), perYear: add(ma, p.imeOperating) };
+      // Why an untyped MA cell is empty: no ratio to estimate with, or no traditional count to scale.
+      const reason = ma !== null || typed ? null : ctx.maRatio === null ? 'no-ma-ratio' : cms === null ? 'suppressed' : null;
+      row.ma = { count: ma, estimated: !typed && ma !== null, reason, perCase: round2(p.imeOperating), perYear: add(ma, p.imeOperating) };
     }
     return row;
   });
@@ -194,9 +207,9 @@ function median(values) {
  * with several families, the lowest DRG across all of them, so the gap is never overstated.
  * {codes, below (codes where outpatient pays less than even the lowest DRG), medianGap, medianAddOn
  * (the median of that lowest DRG's IME + DSH), ratio (median add-on ÷ median gap, unrounded), state}.
- * Medians are of unrounded values, rounded once. state: 'addons' (ratio set), 'no-addons' (the gap is
- * base payment only), 'no-gap' (at the median outpatient pays at least the lowest DRG) or 'empty' (no
- * compared codes). null with no hospital.
+ * Medians are of unrounded values, rounded once. state: 'no-gap' (at the median outpatient pays at
+ * least the lowest DRG; checked first), 'no-addons' (the gap is base payment only), 'addons' (ratio
+ * set) or 'empty' (no compared codes). null with no hospital.
  */
 export function summary(items, ctx) {
   if (!ctx) return null;
@@ -214,6 +227,7 @@ export function summary(items, ctx) {
   if (!gaps.length) return { codes: 0, below: 0, medianGap: null, medianAddOn: null, ratio: null, state: 'empty' };
   const gap = median(gaps);
   const addOn = median(addOns);
-  const state = !ctx.addOns ? 'no-addons' : gap <= 0 ? 'no-gap' : 'addons';
+  // No gap first: a hospital with no add-ons and no loss at the median has no gap to explain.
+  const state = gap <= 0 ? 'no-gap' : !ctx.addOns ? 'no-addons' : 'addons';
   return { codes: gaps.length, below, medianGap: round2(gap), medianAddOn: round2(addOn), ratio: state === 'addons' ? addOn / gap : null, state };
 }
