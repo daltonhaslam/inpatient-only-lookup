@@ -11,8 +11,11 @@ export const pct = (x, { digits = 1, trim = false } = {}) => {
   return `${trim ? Number(fixed) : fixed}%`;
 };
 
-/** The per-year caveat, in Methods and in the hospital CSV's total rows. year: the counts' data year. */
-export const ceiling = (year) => `A ceiling, not a forecast: it counts every ${year} case in those MS-DRGs, not only the removed procedure, and not only the cases that could have been outpatient.`;
+/**
+ * The per-year caveat, in Methods, the per-year fold and the hospital CSV's total rows (plain text).
+ * year: the counts' data year; drgs: the family's MS-DRGs ("163–165"), or none for "those MS-DRGs".
+ */
+export const ceiling = (year, drgs) => `A ceiling, not a forecast: it counts every ${year} case in ${drgs ? `MS-DRG ${drgs}` : 'those MS-DRGs'}, not only the removed procedure, and not only the cases that could have been outpatient.`;
 
 /** Why a per-year count cell is empty (perYearTable's trad.suppressed, and ma.reason: either key). */
 export const EMPTY = {

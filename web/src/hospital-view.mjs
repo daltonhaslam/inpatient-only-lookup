@@ -105,7 +105,10 @@ function bar(name, ccn, h) {
  * (a new view) starts clean; nothing is saved.
  */
 export function createView({ list, record, ccn, data, meta }) {
-  const ctx = hospitalContext({ hospital: record, volume: record.v, meta: list.meta });
+  // year: the counts' data year, for the per-year fold and the CSV (hospital-data.mjs hospitalList).
+  const year = list.meta.volume_year;
+  if (!Number.isInteger(year)) throw new Error('the hospital list has no meta.volume_year');
+  const ctx = { ...hospitalContext({ hospital: record, volume: record.v, meta: list.meta }), year };
   const name = shortName({ ccn, name: record.name });
   const items = data.items.map((item) => hospitalItem(item, ctx));
   const byCode = Object.fromEntries(items.map((item) => [item.code, item]));

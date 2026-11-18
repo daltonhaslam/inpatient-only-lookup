@@ -94,6 +94,17 @@ test('SCH and MDH payment, cited to 42 CFR 412.92(d) and 412.108(c); downloads k
   for (const words of ['higher of the federal rate or a hospital-specific rate', 'federal rate plus 75% of any difference', 'This page shows the federal rate']) assert.ok(text.includes(words), words);
 });
 
+test('the hospital sections and the patient-share section are built independently', () => {
+  const noHospital = hospitalMethods(tablesFrom({ hospitals: null, volume: null }), rates);
+  assert.ok(noHospital.includes('id="m-share-h"'));
+  for (const id of ['m-hosp-h', 'm-left-h', 'm-ma-h', 'm-year-h']) assert.ok(!noHospital.includes(`id="${id}"`), id);
+  const noShares = hospitalMethods(tablesFrom({ ascNew: null, shares: null }), rates);
+  for (const id of ['m-hosp-h', 'm-left-h', 'm-ma-h', 'm-year-h']) assert.ok(noShares.includes(`id="${id}"`), id);
+  assert.ok(!noShares.includes('id="m-share-h"'));
+  assert.deepEqual(methodsSources(tablesFrom({ hospitals: null, volume: null })).map((s) => s.id), [aMeta.source.id]);
+  assert.deepEqual(methodsSources(tablesFrom({ ascNew: null, shares: null })).map((s) => s.id), [hMeta.source.id, vMeta.source.id]);
+});
+
 test('the sources table gains the new files, each once', () => {
   const rows = methodsSources(tablesFrom());
   const ids = rows.map((s) => s.id);

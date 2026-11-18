@@ -1,12 +1,12 @@
 // The two folded sections a compared card gains after a hospital is picked: "The split by DRG"
-// (base, IME, DSH and total per DRG, to the cent) and "Per year at <hospital>" (the add-ons on its 2024
+// (base, IME, DSH and total per DRG, to the cent) and "Per year at <hospital>" (the add-ons on its
 // cases in those DRGs, with counts anyone can change). Pure: strings in, HTML strings out; the hospital
 // bundle's DOM code (hospital-picker.mjs) applies yearUpdate() to the card when a count changes.
 // Every string from data or from a typed count goes through esc(); figures come from cents().
 import { esc, fr, cfr, scroller } from './views.mjs';
 import { cents, drgList, whenLabel } from './stake-card.mjs';
 import { splitRows, perYearTable, count } from './hospital-math.mjs';
-import { EMPTY, roughMoney } from './hospital-words.mjs';
+import { EMPTY, roughMoney, ceiling } from './hospital-words.mjs';
 
 const PAYERS = { trad: 'traditional Medicare', ma: 'Medicare Advantage' };
 
@@ -17,7 +17,7 @@ const SPLIT_NOTE = {
   addOns: (name) => `Base is operating plus capital payment with ${esc(name)}’s wage index and capital GAF; IME and DSH each include their capital part. Uncompensated care is left out: it is a fixed yearly amount, settled at cost report, not lost per case (${cfr('412.106', '42 CFR 412.106(i)')}). Outliers are left out too. ${ROUNDING}`,
   none: (name) => `With ${esc(name)}’s wage index and capital GAF. This hospital gets no IME or DSH. Outliers are left out. ${ROUNDING}`,
 };
-const YEAR_LEAD = (drgs) => `A ceiling, not a forecast: this counts every 2024 case in MS-DRG ${esc(drgs)}, not only removed procedures. Change any count and the row, total and heading follow; your counts are not saved.`;
+const YEAR_LEAD = (year, drgs) => `${esc(ceiling(year, drgs))} Change any count and the row, total and heading follow; your counts are not saved.`;
 const YEAR_NOTES = {
   teaching: (name, ratio) => [
     `IME is paid on traditional Medicare and Medicare Advantage cases, DSH on traditional Medicare only: MA cases carry operating IME only (${cfr('412.105', '42 CFR 412.105(g)')}).`,
@@ -25,7 +25,7 @@ const YEAR_NOTES = {
     `Direct GME is not counted: it follows the Medicare and MA share of inpatient days, so it falls slightly and later (${cfr('413.76', '42 CFR 413.76')}). Medicaid GME is separate and state-run; commercial payers pay no add-on.`,
   ],
   other: () => [`DSH is paid on traditional Medicare cases only. Medicare Advantage cases carry no add-on at a hospital without operating IME (${cfr('412.105', '42 CFR 412.105(g)')}), and commercial payers pay none.`],
-  source: 'Traditional counts: CMS’s Medicare Inpatient Hospitals by Provider and Service, 2024. CMS does not publish a count under 11.',
+  source: (year) => `Traditional counts: CMS’s Medicare Inpatient Hospitals by Provider and Service, ${esc(year)}. CMS does not publish a count under 11.`,
 };
 
 /**
@@ -102,7 +102,7 @@ export function yearUpdate(item, ctx, edits = {}) {
     table,
     cells,
     total: table.total === null ? 'no counts' : cents(table.total),
-    headline: table.total !== null ? `up to about ${roughMoney(table.total)}, a ceiling` : published ? 'no counts entered' : 'no 2024 counts published',
+    headline: table.total !== null ? `up to about ${roughMoney(table.total)}, a ceiling` : published ? 'no counts entered' : `no ${ctx.year} counts published`,
   };
 }
 
@@ -141,10 +141,10 @@ ${line(item, row, 'trad', up, `Traditional Medicare${perCase(row, 'trad', what)}
 ${line(item, row, 'ma', up, `Medicare Advantage${perCase(row, 'ma', 'operating IME only')}`)}</tbody>`;
   }).join('');
   const table = `<table class="hyr"><caption class="sr" id="${capId}">IME and DSH a year on ${esc(name)}’s cases in MS-DRG ${esc(drgs)}</caption>
-<thead><tr><th scope="col">${teaching ? 'MS-DRG and payer' : 'MS-DRG'}</th><th scope="col">Cases (2024)</th><th scope="col" class="num">A year</th></tr></thead>${teaching ? body : `<tbody>${body}</tbody>`}
+<thead><tr><th scope="col">${teaching ? 'MS-DRG and payer' : 'MS-DRG'}</th><th scope="col">Cases (${esc(ctx.year)})</th><th scope="col" class="num">A year</th></tr></thead>${teaching ? body : `<tbody>${body}</tbody>`}
 <tfoot><tr><th scope="row" colspan="2">Total, a ceiling</th><td class="num" data-year-total>${esc(up.total)}</td></tr></tfoot></table>`;
-  const notes = [...(teaching ? YEAR_NOTES.teaching(name, ctx.maRatio) : YEAR_NOTES.other()), YEAR_NOTES.source];
-  const lead = `<p class="hfold__lead">${YEAR_LEAD(drgs)}</p>`;
+  const notes = [...(teaching ? YEAR_NOTES.teaching(name, ctx.maRatio) : YEAR_NOTES.other()), YEAR_NOTES.source(ctx.year)];
+  const lead = `<p class="hfold__lead">${YEAR_LEAD(ctx.year, drgs)}</p>`;
   return fold('year', open, `Per year at ${esc(name)} <span class="hfold__sub">· <span data-year-head>${esc(up.headline)}</span></span>`,
     `${lead}${scroller(capId, table)}<ul class="hfold__notes">${notes.map((n) => `<li>${n}</li>`).join('')}</ul>`);
 }

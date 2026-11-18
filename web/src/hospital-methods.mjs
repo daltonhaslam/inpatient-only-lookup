@@ -14,7 +14,8 @@ const pct = (x) => percent(x, { trim: true });
 const code = (name) => `<code>${esc(name)}</code>`;
 
 /**
- * What the sections read, from the raw tables: the four derived tables' meta, the quotes (E27-MA, the
+ * What the sections read, from the raw tables: the four derived tables' meta (hospitals and volume, or
+ * ascNew and shares, may be null when the build has no hospital view or no patient share), the quotes (E27-MA, the
  * 618, 64629, the OPPS labor share) and the Federal Register document they come from. Throws if a quote
  * or that document is missing, so the build fails rather than printing a hole.
  */
@@ -25,16 +26,19 @@ export function methodsTables({ hospitals, volume, ascNew, shares, citations, so
     return c;
   };
   const quotes = { ma: quote('E27-MA'), asc618: quote('ASC27-618'), asc64629: quote('ASC27-64629'), labor: quote('OPPS27-labor-share') };
-  // The page says Maryland is the one exclusion; another one must change the wording, not hide in it.
-  const { in_file: inFile, offered, maryland } = hospitals.meta.counts;
-  if (inFile - offered !== maryland) throw new Error(`hospitals.json leaves out ${inFile - offered} hospitals, ${maryland} of them Maryland: Methods says Maryland is the only exclusion`);
+  if (hospitals) {
+    // The page says Maryland is the one exclusion; another one must change the wording, not hide in it.
+    const { in_file: inFile, offered, maryland } = hospitals.meta.counts;
+    if (inFile - offered !== maryland) throw new Error(`hospitals.json leaves out ${inFile - offered} hospitals, ${maryland} of them Maryland: Methods says Maryland is the only exclusion`);
+  }
   const rule = sources.sources.find((s) => s.id === quotes.asc618.source);
   if (!rule || !rule.doc) throw new Error(`sources.json has no Federal Register document ${quotes.asc618.source}`);
-  return { hospitals: hospitals.meta, volume: volume.meta, ascNew: ascNew.meta, shares: shares.meta, quotes, rule };
+  const meta = (doc) => (doc ? doc.meta : null);
+  return { hospitals: meta(hospitals), volume: meta(volume), ascNew: meta(ascNew), shares: meta(shares), quotes, rule };
 }
 
 /** Rows for the Methods sources table that the hospital view and the patient share add: {id, label, landing, file}. */
-export const methodsSources = (t) => [t.hospitals.source, t.volume.source, t.ascNew.source];
+export const methodsSources = (t) => [...(t.hospitals ? [t.hospitals.source, t.volume.source] : []), ...(t.ascNew ? [t.ascNew.source] : [])];
 
 /** The MUP file's count column "by" its CCN and MS-DRG columns. */
 const mupKeys = (v) => `${code(v.columns.count)} by ${code(v.columns.ccn)} and ${code(v.columns.drg)}`;
@@ -69,14 +73,16 @@ function factorTable(t, r) {
  * meta.rates: operating, capital and the table names).
  */
 export function hospitalMethods(t, r) {
+  return [t.hospitals && hospitalSections(t, r), t.shares && shareSection(t)].filter(Boolean).join('\n\n');
+}
+
+/** At a hospital's rates, what it leaves out, Medicare Advantage and the per-year ceiling. */
+function hospitalSections(t, r) {
   const h = t.hospitals;
   const v = t.volume;
-  const d = t.shares.deductibles;
-  const a = t.ascNew;
-  const { quotes, rule } = t;
+  const { quotes } = t;
   const counts = h.counts;
   const opps = h.opps_labor_share;
-  const extra = a.also_added.map(esc).join(', ');
   return `<section class="block" aria-labelledby="m-hosp-h">
 <h2 id="m-hosp-h">At a hospital’s rates</h2>
 <p>Pick a hospital on the <a href="/revenue-at-stake/">Revenue at stake</a> page and every compared card is recomputed in your browser at that hospital’s FY 2027 inpatient and CY 2027 outpatient rates. The national figures are the same formula with each factor at its national value: wage index and GAF of 1, no IME or DSH.</p>
@@ -116,9 +122,16 @@ ${factorTable(t, r)}
 <h2 id="m-year-h">Per year: a ceiling</h2>
 <p>Each card’s per-year fold multiplies the add-on per case by the hospital’s ${v.data_year} traditional Medicare discharges in each MS-DRG of the family (${mupKeys(v)}). ${ceiling(v.data_year)} CMS publishes no count under ${num(v.suppressed_below)}, so an empty cell reads “under ${num(v.suppressed_below)} or none”, and you can fill it in. ${num(v.counts.hospitals)} hospitals have counts.</p>
 <p>Medicare Advantage counts are estimates: the traditional count × the hospital’s MA cases per traditional case (${code(h.columns.ime_caseta44)} ÷ ${code(h.columns.caseta44)} in the impact file), rounded to a whole case. That assumes the hospital’s MA cases have the same MS-DRG mix as its traditional Medicare cases. Teaching hospitals only: elsewhere an MA case carries no add-on. Any count can be changed on the page. Your counts are not saved; they leave your browser only in the hospital CSV you download.</p>
-</section>
+</section>`;
+}
 
-<section class="block" aria-labelledby="m-share-h">
+/** The national patient's share and CMS's 2027 ASC additions. */
+function shareSection(t) {
+  const d = t.shares.deductibles;
+  const a = t.ascNew;
+  const { quotes, rule } = t;
+  const extra = a.also_added.map(esc).join(', ');
+  return `<section class="block" aria-labelledby="m-share-h">
 <h2 id="m-share-h">The patient’s share, national</h2>
 <p>The code page of each of the ${num(t.shares.counts.compared)} compared codes, and the lookup’s answer for a code CMS adds to the surgery-center list for 2027 once it is off the inpatient-only list, show what a Medicare patient pays for the procedure, national:</p>
 <ul class="plain">

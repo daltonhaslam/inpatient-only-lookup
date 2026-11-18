@@ -18,7 +18,6 @@ export const HOSPITAL_CSV_HEADER = ['row_type', 'ccn', 'hospital', 'code', 'fami
 export const hospitalCsvName = (ccn) => `revenue-at-stake-${ccn}.csv`;
 
 const PAYER = { trad: 'traditional_medicare', ma: 'medicare_advantage' };
-const CEILING = ceiling(2024);   // the counts' data year, as the folds and count_source cms_2024 name it
 const familyOrder = (item, i) => (i === 0 ? 'primary' : alternativeLabel(item.ip.families[i]));
 
 /** A row from named cells; every other column is empty. */
@@ -26,23 +25,26 @@ const row = (cells) => HOSPITAL_CSV_HEADER.map((name) => blank(cells[name]));
 
 /**
  * Where a per-year count came from, and what the note says: 'typed' (a number, or a cleared or invalid
- * box: then no count), 'cms_2024' (traditional, as published), 'estimate' (MA, traditional × the
- * hospital's MA ratio), or 'none' (CMS published nothing to count or scale).
+ * box: then no count), 'cms_<year>' (traditional, as CMS published it for the counts' data year),
+ * 'estimate' (MA, traditional × the hospital's MA ratio; with no count when the traditional count it
+ * scales was cleared or mistyped), or 'none' (CMS published nothing to count or scale).
  */
-function source(payer, cell, typed, ratio) {
+function source(payer, cell, typed, ctx) {
   if (typed !== undefined) {
     if (count(typed) !== null) return ['typed', 'your count'];
     if (String(typed).trim() === '') return ['typed', 'cleared'];
     return ['typed', 'not a whole number; not counted'];
   }
-  if (cell.count === null) return ['none', payer === 'trad' ? EMPTY.suppressed : EMPTY[cell.reason] || ''];
-  if (payer === 'trad') return ['cms_2024', ''];
-  return ['estimate', `estimate: ${ratio.toFixed(2)} MA cases per traditional case (CMS impact file), same MS-DRG mix assumed`];
+  if (payer === 'trad') return cell.count === null ? ['none', EMPTY.suppressed] : [`cms_${ctx.year}`, ''];
+  if (cell.count !== null) return ['estimate', `estimate: ${ctx.maRatio.toFixed(2)} MA cases per traditional case (CMS impact file), same MS-DRG mix assumed`];
+  // No reason means CMS published a traditional count and a ratio: the reader's traditional count is empty.
+  if (!cell.reason) return ['estimate', 'no estimate: no traditional count to scale (yours is cleared or not a whole number)'];
+  return ['none', EMPTY[cell.reason]];
 }
 
 /**
  * Every row of the file, header first. items: prepare()'s national items (the hospital's amounts are
- * computed here from ctx, unrounded, and rounded once); ctx: hospitalContext(); edits: Map code ->
+ * computed here from ctx, unrounded, and rounded once); ctx: the view's hospitalContext() plus year; edits: Map code ->
  * {DRG: {trad, ma}}, the text typed into each card's per-year table.
  */
 export function hospitalCsvRows({ items, ctx, ccn, name, edits = new Map() }) {
@@ -62,14 +64,14 @@ export function hospitalCsvRows({ items, ctx, ccn, name, edits = new Map() }) {
     const table = perYearTable(item, ctx, typed);
     const lines = table.rows.flatMap((r) => ['trad', 'ma'].filter((payer) => r[payer]).map((payer) => {
       const cell = r[payer];
-      const [from, why] = source(payer, cell, typed[r.drg]?.[payer], ctx.maRatio);
+      const [from, why] = source(payer, cell, typed[r.drg]?.[payer], ctx);
       return row({
         ...who, row_type: 'per_year', code: item.code, family_order: familyOrder(item, r.family), drg: r.drg, payer: PAYER[payer],
         cases: cell.count, count_source: from, add_on_per_case: cell.perCase, add_on_per_year: cell.perYear,
         note: [payer === 'ma' ? 'operating IME only' : '', why].filter(Boolean).join('; '),
       });
     }));
-    return [...lines, row({ ...who, row_type: 'per_year_total', code: item.code, add_on_per_year: table.total, note: table.total === null ? `No counts. ${CEILING}` : CEILING })];
+    return [...lines, row({ ...who, row_type: 'per_year_total', code: item.code, add_on_per_year: table.total, note: table.total === null ? `No counts. ${ceiling(ctx.year)}` : ceiling(ctx.year) })];
   });
   return [HOSPITAL_CSV_HEADER, ...perCase, ...perYear];
 }

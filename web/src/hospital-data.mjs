@@ -32,19 +32,20 @@ export function drgSeverity(title) {
 }
 
 /**
- * {meta: {rates, drg_weights, drg_sev, opps_labor_share, maryland, source}, states: {code: name},
+ * {meta: {rates, drg_weights, drg_sev, opps_labor_share, maryland, source, volume_year}, states: {code: name},
  *  h: [[ccn, name or null, state, teaching 0|1|2]], md: [[ccn, name]]}, in CCN order.
  * model: the normalized crosswalk (stake-data.mjs normalize), for drg_sev: {DRG: severity} from the
- * MS-DRG titles of the DRGs the crosswalk prices (CMS's public titles; no CPT text).
+ * MS-DRG titles of the DRGs the crosswalk prices (CMS's public titles; no CPT text). volumeMeta:
+ * drg-volume.json meta, for volume_year (the counts' data year, which the folds and the CSV name).
  */
-export function hospitalList(doc, model) {
+export function hospitalList(doc, model, volumeMeta) {
   const { meta } = doc;
   const rows = Object.entries(doc.hospitals).sort(([a], [b]) => a.localeCompare(b));
   const used = new Set([...rows.map(([, h]) => h.state), 'MD']);
   const missing = [...used].filter((code) => !STATES[code]);
   if (missing.length) throw new Error(`hospitals.json has state codes with no name in web/src/hospital-data.mjs: ${missing.join(', ')}`);
   return {
-    meta: { rates: meta.rates, drg_weights: meta.drg_weights, drg_sev: drgSeverities(model), opps_labor_share: meta.opps_labor_share, maryland: meta.maryland, source: meta.source },
+    meta: { rates: meta.rates, drg_weights: meta.drg_weights, drg_sev: drgSeverities(model), opps_labor_share: meta.opps_labor_share, maryland: meta.maryland, source: meta.source, volume_year: volumeMeta.data_year },
     states: Object.fromEntries([...used].sort().map((code) => [code, STATES[code]])),
     h: rows.map(([ccn, h]) => [ccn, h.name, h.state, TEACHING.indexOf(teaching(h))]),
     md: Object.entries(doc.maryland).sort(([a], [b]) => a.localeCompare(b)).map(([ccn, h]) => [ccn, h.name]),
@@ -79,7 +80,7 @@ export function uncoveredDrgs(model, hospitalsMeta, volumeMeta) {
   };
 }
 
-/** One hospital's file: its hospitals.json factors and v: {DRG: 2024 discharges} for the crosswalk's DRGs. */
+/** One hospital's file: its hospitals.json factors and v: {DRG: discharges in the counts' data year} for the crosswalk's DRGs. */
 export function hospitalRecord(hospital, volume = {}, drgs = []) {
   const record = Object.fromEntries(FACTORS.map((key) => [key, hospital[key]]));
   const priced = new Set(drgs);

@@ -7,6 +7,7 @@ import { layout } from './pages.mjs';
 import { safeProfile } from './stake-data.mjs';
 import { packShare, shareHtml } from './patient-share.mjs';
 import { hospitalMethods, methodsSources } from './hospital-methods.mjs';
+import { pct } from './hospital-words.mjs';
 import { BADGE, card, money, moneyRange, cents, drgList, dxCode, statusText, noCompareText, yearLines, alternativeLabel } from './stake-card.mjs';
 
 export const ROOT = '/revenue-at-stake/';
@@ -252,8 +253,9 @@ export function methodsPage(ctx) {
   const tiers = meta.counts.tiers;
   const drg165 = stake.items.flatMap((item) => (item.ip ? item.ip.families : [])).flatMap((f) => f.drgs).find((d) => d.drg === '165');
   const formula = drg165 ? ` For example, DRG 165 (major chest procedures without CC/MCC) is its relative weight, ${drg165.weight.toFixed(4)}, × ${cents(r.combined)}.` : '';
-  const hospital = ctx.methods;   // the hospital view's tables (build.mjs), or null without the picker
-  const files = [...meta.sources, ...(hospital ? methodsSources(hospital) : [])].map((s) => `<tr><td>${out(s.landing, esc(s.label))}</td><td>${esc(s.file).replace(/; /g, '<br>')}</td></tr>`).join('');
+  // The Methods tables (build.mjs): hospital is the hospital tables' meta, or null without the picker.
+  const hospital = ctx.methods && ctx.methods.hospitals;
+  const files = [...meta.sources, ...(ctx.methods ? methodsSources(ctx.methods) : [])].map((s) => `<tr><td>${out(s.landing, esc(s.label))}</td><td>${esc(s.file).replace(/; /g, '<br>')}</td></tr>`).join('');
   const body = `${subnav('methods')}
 <nav class="crumbs" aria-label="Breadcrumb"><a href="${ROOT}">Revenue at stake</a> <span aria-hidden="true">/</span> <span>Methods</span></nav>
 <h1>Revenue at stake: methods</h1>
@@ -280,10 +282,10 @@ ${draft()}
 <section class="block" aria-labelledby="m-nat-h">
 <h2 id="m-nat-h">National, unadjusted</h2>
 <p>Every dollar figure here is a national amount with no hospital-specific adjustment: ${esc(r.adjusters)}. A hospital’s own inpatient payment is usually higher. Its wage index adjusts the labor share of the operating amount, and teaching (IME) and disproportionate-share (DSH) add-ons raise it further. Published hand-worked examples, such as a figure of about $20,000 for a lobectomy, may include those adjustments. The figures here include none of them.${formula}</p>
-<p>Outpatient payments are wage-adjusted too (60% of the rate), but get no IME or DSH add-on. ${stake.xlsx ? 'The Excel download has an Inputs tab where you can enter your own wage index, IME and DSH; every amount recalculates.' : ''}</p>${hospital ? `
+<p>Outpatient payments are wage-adjusted too${hospital ? ` (${pct(hospital.opps_labor_share, { trim: true })} of the rate)` : ''}, but get no IME or DSH add-on. ${stake.xlsx ? 'The Excel download has an Inputs tab where you can enter your own wage index, IME and DSH; every amount recalculates.' : ''}</p>${hospital ? `
 <p>Pick a hospital on the <a href="${ROOT}">Revenue at stake</a> page to see every card at that hospital’s rates; how is below.</p>` : ''}
 </section>
-${hospital ? `\n${hospitalMethods(hospital, r)}\n` : ''}
+${ctx.methods ? `\n${hospitalMethods(ctx.methods, r)}\n` : ''}
 <section class="block" aria-labelledby="m-tier-h">
 <h2 id="m-tier-h">Tiers and review status</h2>
 <p>Each mapped code gets a tier, computed from the mapping passes, never set by hand.</p>
@@ -344,7 +346,7 @@ ${captionedScroller('m-files-cap', 'CMS sources and the files read from each', '
 <section class="block" aria-labelledby="m-upd-h">
 <h2 id="m-upd-h">Updates and downloads</h2>
 <p>Built ${formatDate(meta.built)}. Rebuilt each October for the new fiscal year’s inpatient weights, rates and grouper version, and each January for the new calendar year’s outpatient rates and the next removals from the list. Coder reviews are added between those updates; a status changes only when they are.</p>
-<p>${stake.xlsx ? '<a href="/data/revenue-at-stake.xlsx" download>Download Excel</a> (live formulas off an Inputs tab) or ' : ''}<a href="/data/revenue-at-stake.csv" download>download the CSV</a>: one row per code and DRG family, plain values${hospital ? ', with the national patient’s share at the end of each row' : ''}. No AMA content: codes and this site’s labels only. Codes keep their leading zeros (MDC 04, MS-DRG 038, a CCN) when the CSV is opened with Excel’s text import; double-clicking it strips them. ${out(SITE.repo, 'The code and the mappings')} are public under the MIT license.</p>${hospital ? `
+<p>${stake.xlsx ? '<a href="/data/revenue-at-stake.xlsx" download>Download Excel</a> (live formulas off an Inputs tab) or ' : ''}<a href="/data/revenue-at-stake.csv" download>download the CSV</a>: one row per code and DRG family, plain values${ctx.shares ? ', with the national patient’s share at the end of each row' : ''}. No AMA content: codes and this site’s labels only. Codes keep their leading zeros (MDC 04, MS-DRG 038, a CCN) when the CSV is opened with Excel’s text import; double-clicking it strips them. ${out(SITE.repo, 'The code and the mappings')} are public under the MIT license.</p>${hospital ? `
 <p>After you pick a hospital, “Download for” that hospital builds its CSV in your browser: a row per code and MS-DRG at its rates (outpatient, base, IME, DSH, total and the gap), then the per-year rows with the counts shown, yours included where you changed them. Codes and MS-DRG numbers only.</p>` : ''}
 </section>`;
   return layout(ctx, {

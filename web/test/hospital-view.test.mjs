@@ -18,7 +18,7 @@ const hospitals = read('pipeline/derived/hospitals.json');
 const volume = read('pipeline/derived/drg-volume.json');
 const model = normalize(read('pipeline/derived/crosswalk.json'));
 // What the browser has: the shipped list, one hospital's file, and the cards' model.
-const list = JSON.parse(JSON.stringify(hospitalList(hospitals, model)));
+const list = JSON.parse(JSON.stringify(hospitalList(hospitals, model, volume.meta)));
 const doc = JSON.parse(JSON.stringify(clientModel(model, [], [])));
 const data = prepare(doc);
 const recordOf = (ccn) => JSON.parse(JSON.stringify(hospitalRecord(hospitals.hospitals[ccn], volume.volume[ccn], volume.meta.drgs)));

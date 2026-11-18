@@ -322,7 +322,7 @@ async function hospitalAssets(model) {
   mkdirSync(join(out, dir), { recursive: true });
   for (const [ccn, text] of records) writeFileSync(join(out, dir, `${ccn}.json`), text);
   const assets = {
-    list: hashed('data', 'hospitals', 'json', JSON.stringify(hospitalList(hospitals, model))),
+    list: hashed('data', 'hospitals', 'json', JSON.stringify(hospitalList(hospitals, model, volume.meta))),
     dir: `/${dir}`,
     view: hashed('assets', 'hospital', 'js', await bundleEntry('hospital-picker.mjs', 'esm')),
     css: hashed('assets', 'hospital', 'css', readFileSync(join(here, 'src/hospital.css'), 'utf8')),
@@ -406,9 +406,10 @@ async function main() {
   const script = await bundleEntry('client.mjs', 'iife', { __SHARES__: JSON.stringify(shares && shares.lookup) });
   const tables = ctx.stake ? await hospitalAssets(ctx.stake.model) : null;
   const hospitals = tables && tables.assets;
-  // The Methods page's hospital, per-year and patient-share sections: only when both are built.
-  ctx.methods = tables && shares ? methodsTables({
-    hospitals: tables.hospitals, volume: tables.volume, ascNew: shares.ascNew, shares: shares.doc,
+  // The Methods page's hospital sections (with the hospital tables) and patient-share section (with the
+  // share tables), each built when its own tables are.
+  ctx.methods = tables || shares ? methodsTables({
+    hospitals: tables && tables.hospitals, volume: tables && tables.volume, ascNew: shares && shares.ascNew, shares: shares && shares.doc,
     citations: read('pipeline/citations.json'), sources: read('pipeline/sources.json'),
   }) : null;
   const stakeScript = ctx.stake ? await bundleEntry('stake-client.mjs', 'iife', { __HOSPITAL_ASSETS__: JSON.stringify(hospitals) }) : null;

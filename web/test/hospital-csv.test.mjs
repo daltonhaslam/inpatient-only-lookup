@@ -18,7 +18,7 @@ const read = (path) => JSON.parse(readFileSync(join(root, path), 'utf8'));
 const hospitals = read('pipeline/derived/hospitals.json');
 const volume = read('pipeline/derived/drg-volume.json');
 const model = normalize(read('pipeline/derived/crosswalk.json'));
-const list = JSON.parse(JSON.stringify(hospitalList(hospitals, model)));
+const list = JSON.parse(JSON.stringify(hospitalList(hospitals, model, volume.meta)));
 const doc = JSON.parse(JSON.stringify(clientModel(model, [], [])));
 const data = prepare(doc);
 const recordOf = (ccn) => JSON.parse(JSON.stringify(hospitalRecord(hospitals.hospitals[ccn], volume.volume[ccn], volume.meta.drgs)));
@@ -80,7 +80,7 @@ describe('hospital CSV', () => {
     const view = viewOf('380009');
     const rows = view.csvRows();
     const trad = one(rows, 'per_year', '32480', '165', 'traditional_medicare');
-    assert.equal(trad.count_source, 'cms_2024');
+    assert.equal(trad.count_source, `cms_${volume.meta.data_year}`);
     assert.equal(trad.cases, volume.volume['380009']['165']);
     assert.equal(trad.add_on_per_case, 6067.07);
     const ma = one(rows, 'per_year', '32480', '165', 'medicare_advantage');
@@ -108,7 +108,27 @@ describe('hospital CSV', () => {
     assert.ok(!rows.flat().includes('2.5'), 'a typed value is never echoed');
     // Another card's counts are untouched.
     const other = compared.find((item) => item.code !== '32480' && item.ip.families.some((f) => f.drgs.some((d) => d.drg === '165')));
-    if (other) assert.equal(one(rows, 'per_year', other.code, '165', 'traditional_medicare').count_source, 'cms_2024');
+    if (other) assert.equal(one(rows, 'per_year', other.code, '165', 'traditional_medicare').count_source, `cms_${volume.meta.data_year}`);
+  });
+
+  test('the data year comes from the data: another year shows in count_source and the ceiling note', () => {
+    const later = { ...list, meta: { ...list.meta, volume_year: 2025 } };
+    const rows = createView({ list: later, record: recordOf('380009'), ccn: '380009', data, meta: doc.meta }).csvRows();
+    assert.equal(one(rows, 'per_year', '32480', '165', 'traditional_medicare').count_source, 'cms_2025');
+    assert.equal(one(rows, 'per_year_total', '32480', '').note, ceiling(2025));
+    assert.ok(!rows.flat().some((cell) => typeof cell === 'string' && cell.includes('2024')), 'no 2024 left in the words of a 2025 file');
+    const none = { ...list, meta: { ...list.meta, volume_year: undefined } };
+    assert.throws(() => createView({ list: none, record: recordOf('380009'), ccn: '380009', data, meta: doc.meta }), /volume_year/);
+  });
+
+  test('an MA estimate with no traditional count to scale because the count was cleared says so, not "CMS published nothing"', () => {
+    const view = viewOf('380009');
+    view.count('32480', '165:trad', '');
+    const ma = one(view.csvRows(), 'per_year', '32480', '165', 'medicare_advantage');
+    assert.deepEqual([ma.cases, ma.count_source], ['', 'estimate']);
+    assert.match(ma.note, /no traditional count to scale/);
+    view.count('32480', '165:trad', 'x');
+    assert.match(one(view.csvRows(), 'per_year', '32480', '165', 'medicare_advantage').note, /no traditional count to scale/);
   });
 
   test('Review Focus 3: a suppressed DRG reads "under 11 or none", no count; the total still adds up', () => {
