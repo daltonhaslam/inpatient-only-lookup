@@ -842,8 +842,186 @@ if (!hasStake) {
     await measure('OHSU picked');
     await cardFor(page, '32480');
     await measure('OHSU 32480');
+    await openFolds(page, '32480');
+    await measure('OHSU 32480, folds open');
+    // The fold tables fit the card at 400 px (a three-DRG family), so no figure hides behind a scroll.
+    const tables = await page.evaluate(() => [...document.querySelectorAll('[data-stake-card="32480"] .hfold .scroll')].map((el) => el.scrollWidth - el.clientWidth));
+    assert(tables.every((d) => d <= 1), `fold tables scroll sideways at 400 px: ${tables.join(', ')}`);
+    await cardFor(page, '19305');
+    await openFolds(page, '19305');
+    await measure('OHSU 19305 (two families), folds open');
     assert(wide.length === 0, wide.join('\n'));
   }, { viewport: { width: 400, height: 860 } });
+
+  // ---- the hospital view: folds, counts, lede, color modes -------------------------------------
+  async function openFolds(page, code) {
+    for (const kind of ['split', 'year']) {
+      const fold = page.locator(`[data-stake-card="${code}"] [data-fold="${kind}"]`);
+      if (await fold.count() && !(await fold.evaluate((d) => d.open))) await fold.locator('> summary').click();
+    }
+  }
+  const foldText = async (page, code, kind) => (await page.locator(`[data-stake-card="${code}"] [data-fold="${kind}"]`).textContent()).replace(/\s+/g, ' ');
+
+  await check('hospital: the split by DRG and per year folds, to the cent', async (page) => {
+    await openStake(page, '?h=380009&q=32480');
+    await page.waitForSelector('.hsum');
+    eq(await page.locator('[data-stake-card="32480"] details.hfold[open]').count(), 0, 'folds start closed');
+    await openFolds(page, '32480');
+    const split = await foldText(page, '32480', 'split');
+    for (const part of ['MS-DRG 165 without CC/MCC', '$16,049.53', '$22,116.60', '$51,459.44', 'Uncompensated care is left out']) has(split, part, 'split');
+    const year = await foldText(page, '32480', 'year');
+    for (const part of ['Per year at Ohsu Hospital And Clinics · up to about $1 million, a ceiling', '$14,116.45 a case: IME + DSH', '$4,632.08 a case: operating IME only', '$1,015,760.07', 'A ceiling, not a forecast', 'not saved']) has(year, part, 'per year');
+    noJunk(split + year, 'folds');
+    // The summary is a button-like disclosure: keyboard toggles it.
+    await page.locator('[data-stake-card="32480"] [data-fold="split"] > summary').focus();
+    await page.keyboard.press('Enter');
+    eq(await page.locator('[data-stake-card="32480"] [data-fold="split"]').evaluate((d) => d.open), false, 'Enter closes the split');
+  });
+
+  await check('hospital: editing counts updates the row, the MA estimate, the total and the heading, and keeps focus', async (page) => {
+    await openStake(page, '?h=380009&q=32480');
+    await page.waitForSelector('.hsum');
+    await openFolds(page, '32480');
+    const card = page.locator('[data-stake-card="32480"]');
+    const box = card.locator('[data-count="165:trad"]');
+    await box.click();
+    await page.keyboard.press('ControlOrMeta+a');
+    await page.keyboard.type('10');
+    eq(await card.locator('[data-py="165:trad"]').textContent(), '$60,670.69', '10 traditional cases of DRG 165');
+    eq(await card.locator('[data-count="165:ma"]').inputValue(), '11', 'MA estimate follows the traditional count');
+    eq(await card.locator('[data-py="165:ma"]').textContent(), '$50,952.86', 'MA row');
+    eq(await card.locator('[data-year-total]').textContent(), '$1,005,060.92', 'total');
+    eq(await card.locator('[data-year-head]').textContent(), 'up to about $1 million, a ceiling', 'heading');
+    eq(await page.evaluate(() => document.activeElement.dataset.count), '165:trad', 'focus stays in the box');
+    await waitText(page.locator('[data-hpick-status]'), (t) => t === '32480, per year at Ohsu Hospital And Clinics: up to about $1 million, a ceiling.', 'one announcement');
+    // Clearing 163 and 164 moves the heading.
+    for (const key of ['163:trad', '164:trad']) await card.locator(`[data-count="${key}"]`).fill('');
+    eq(await card.locator('[data-year-head]').textContent(), 'up to about $112,000, a ceiling', 'heading after clearing');
+    // Not a whole number: flagged in words and to assistive tech, never drawn raw.
+    await card.locator('[data-count="163:ma"]').fill('2.5');
+    eq(await card.locator('[data-count="163:ma"]').getAttribute('aria-invalid'), 'true', 'aria-invalid');
+    eq(await card.locator('[data-why="163:ma"]').textContent(), 'not a whole number', 'note');
+    eq(await card.locator('[data-py="163:ma"]').textContent(), 'no count', 'no figure for a bad count');
+    await card.locator('[data-count="163:ma"]').fill('<b>x</b>');
+    eq(await card.locator('b', { hasText: /^x$/ }).count(), 0, 'typed markup never becomes markup');
+    // A redraw (a filter change) keeps the counts and the open folds.
+    await page.locator('#sf-compared').check();
+    await countLine(page, (t) => t === '1 code.', 'count after the filter');
+    eq(await page.locator('[data-stake-card="32480"] [data-count="165:trad"]').inputValue(), '10', 'typed count kept');
+    eq(await page.locator('[data-stake-card="32480"] details.hfold[open]').count(), 2, 'folds stay open');
+  });
+
+  await check('hospital: Review Focus 3, suppressed counts read "under 11 or none", stay editable, and totals still work', async (page) => {
+    await openStake(page, '?h=010001&q=32480');
+    await page.waitForSelector('.hsum');
+    await openFolds(page, '32480');
+    const card = page.locator('[data-stake-card="32480"]');
+    eq(await card.locator('[data-count="164:trad"]').inputValue(), '', 'suppressed cell is empty');
+    eq(await card.locator('[data-why="164:trad"]').textContent(), 'under 11 or none', 'suppressed note');
+    const before = await card.locator('[data-year-total]').textContent();
+    await card.locator('[data-count="164:trad"]').fill('20');
+    assert((await card.locator('[data-py="164:trad"]').textContent()).startsWith('$'), 'typed count gives a figure');
+    assert((await card.locator('[data-year-total]').textContent()) !== before, 'total moves');
+    eq(await card.locator('[data-why="164:trad"]').textContent(), 'under 11 or none', 'still says CMS published none');
+
+    await page.locator('[data-hpick-change]').click();
+    await pickHospital(page, '010006', '010006');
+    await openFolds(page, '32480');
+    eq(await page.locator('[data-stake-card="32480"] [data-year-head]').textContent(), 'no 2024 counts published', 'no counts for the family');
+    noJunk(await foldText(page, '32480', 'year'), 'no-count fold');
+  });
+
+  await check('hospital: the lede names the hospital’s rates after a pick and reverts on clear', async (page) => {
+    await openStake(page);
+    const lede = page.locator('.stake-head .lede');
+    const national = await lede.innerHTML();
+    has(national, 'national and unadjusted', 'national lede');
+    await pickHospital(page, 'ohsu', '380009');
+    has(await lede.textContent(), 'at Ohsu Hospital And Clinics’s rates: wage index, IME and DSH', 'hospital lede');
+    await page.locator('[data-hpick-change]').click();
+    await pickHospital(page, 'arizona spine', '030107');
+    has(await lede.textContent(), 'at Arizona Spine And Joint Hospital’s rates: wage index (it gets no IME or DSH)', 'no add-on lede');
+    eq(await page.locator('[data-fold="year"]').count(), 0, 'no per-year fold without add-ons');
+    await page.locator('[data-hpick-clear]').click();
+    await page.waitForFunction(() => !document.querySelector('.hsum'));
+    eq(await lede.innerHTML(), national, 'lede back to the server’s words');
+  });
+
+  await check('hospital dark mode: folds, inputs and the add-on segment use the dark palette', async (page) => {
+    await openStake(page, '?h=380009&q=32480');
+    await page.waitForSelector('.hsum');
+    await openFolds(page, '32480');
+    const style = (selector, prop) => page.locator(selector).first().evaluate((el, p) => getComputedStyle(el)[p], prop);
+    const bodyBg = await style('body', 'backgroundColor');
+    eq(await style('[data-count="163:trad"]', 'backgroundColor'), bodyBg, 'input sits on the dark page');
+    eq(await style('[data-count="163:trad"]', 'color'), await style('body', 'color'), 'input text is the page text');
+    eq(await style('[data-stake-card="32480"] .sbar__add', 'backgroundColor'), 'rgb(116, 214, 195)', 'add-on segment uses the dark step');
+    await page.mouse.move(0, 0);
+    eq(await style('[data-fold="year"] > summary', 'color'), 'rgb(116, 214, 195)', 'fold summary in the brand ink');
+  }, { colorScheme: 'dark' });
+
+  await check('hospital forced colors: the add-on segment, the count boxes and the fold markers stay visible', async (page) => {
+    await openStake(page, '?h=380009&q=32480');
+    await page.waitForSelector('.hsum');
+    await openFolds(page, '32480');
+    const canvas = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    const seg = await page.locator('[data-stake-card="32480"] .sbar__add').evaluate((el) => getComputedStyle(el).backgroundColor);
+    assert(seg !== canvas && seg !== 'rgba(0, 0, 0, 0)', `add-on segment ${seg} on ${canvas}`);
+    const box = await page.locator('[data-count="163:trad"]').evaluate((el) => { const s = getComputedStyle(el); return { w: s.borderTopWidth, c: s.borderTopColor }; });
+    assert(parseFloat(box.w) >= 1 && box.c !== canvas && box.c !== 'rgba(0, 0, 0, 0)', `count box border ${box.w} ${box.c}`);
+    const marker = await page.locator('[data-fold="year"] > summary').evaluate((el) => { const s = getComputedStyle(el); return `${s.display} ${s.listStyleType}`; });
+    eq(marker, 'list-item disclosure-open', 'native disclosure marker');
+    const markerColor = await page.locator('[data-fold="year"] > summary').evaluate((el) => getComputedStyle(el, '::marker').color);
+    assert(markerColor !== canvas, `marker color ${markerColor}`);
+  }, { forcedColors: 'active' });
+
+  for (const scheme of ['light', 'dark']) {
+    await check(`hospital axe (${scheme}): folds open, a one-family and a two-family card`, async (page) => {
+      const report = [];
+      for (const code of ['32480', '19305']) {
+        await openStake(page, `?h=380009&q=${code}`);
+        await page.waitForSelector('.hsum');
+        await openFolds(page, code);
+        await page.evaluate(axeSource());
+        const results = await page.evaluate(() => window.axe.run(document));
+        for (const v of results.violations.filter((x) => x.impact === 'serious' || x.impact === 'critical')) {
+          report.push(`${code} [${v.impact}] ${v.id}: ${v.help}\n      ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join('\n      ')}`);
+        }
+      }
+      assert(report.length === 0, `${report.length} violations\n  ${report.join('\n  ')}`);
+    }, { colorScheme: scheme });
+  }
+
+  // ---- the ASC patient-share line --------------------------------------------------------------
+  await check('code page: the patient-share line and the link to see the card at your hospital', async (page) => {
+    await open(page, '/code/32480/');
+    const share = (await page.locator('.stake-block__share').textContent()).replace(/\s+/g, ' ');
+    eq(share, 'Patient’s share, national: about $317 at a surgery center, $717 in the hospital outpatient department, plus the $292 Part B deductible in either. Most Medigap plans pay the share; Medicare Advantage plans set their own.', 'share line');
+    const link = page.locator('.stake-block__more a', { hasText: 'See this at your hospital' });
+    eq(await link.getAttribute('href'), '/revenue-at-stake/?q=32480', 'link');
+    await link.click();
+    await page.waitForSelector('[data-stake-card="32480"]');
+    eq(await page.locator('#hp-q').count(), 1, 'lands on the picker');
+    await open(page, '/code/0202T/');
+    has(await page.locator('.stake-block__share').textContent(), 'more at a surgery center', 'ASC-higher line leads with it');
+  });
+
+  await check('lookup: a 2027 ASC addition gets the share line once it is off the list, loaded only then', async (page) => {
+    const asked = [];
+    page.on('request', (request) => { if (/\/data\/shares\./.test(request.url())) asked.push(request.url()); });
+    await open(page, '/?q=32480');
+    await page.waitForSelector('[data-results] .verdict');
+    eq(await page.locator('.facts__share').count(), 0, 'no line while it is still on the list');
+    await page.waitForTimeout(300);
+    eq(asked.length, 0, 'no shares file before an answer needs it');
+    await setDate(page, '2027-03-01');
+    const line = await waitText(page.locator('[data-results] .facts__share dd'), (t) => t.startsWith('About'), 'share line');
+    eq(line, 'About $317 at a surgery center, $717 in the hospital outpatient department, plus the $292 Part B deductible in either. Most Medigap plans pay the share; Medicare Advantage plans set their own.', 'lookup line');
+    eq(asked.length, 1, 'one fetch');
+    await page.fill('[data-q]', '27447');
+    await waitText(page.locator('[data-results] .verdict__code'), (t) => t === '27447', 'another code');
+    eq(await page.locator('.facts__share').count(), 0, 'no line for a code CMS did not add for 2027');
+  });
 }
 
 // ---- accessibility ------------------------------------------------------------------------

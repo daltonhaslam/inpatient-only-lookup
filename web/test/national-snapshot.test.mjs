@@ -22,10 +22,17 @@ const web = join(here, '..');
 const SNAPSHOT = join(here, 'national-snapshot.json');
 const sha = (text) => createHash('sha256').update(text).digest('hex');
 
-/** The two differences national mode may have from the base build, and nothing else. */
+/**
+ * The differences national mode may have from the base build, and nothing else: bundle hashes, the empty
+ * picker mount, and on a compared code's page the two deliberate additions to its Revenue at stake block
+ * (Task 4): the patient-share line and the "See this at your hospital" link. Stripping exactly those keeps
+ * the code-page hash pinned, so anything else that changes on 1,861 pages still fails here.
+ */
 export const normalize = (html) => html
   .replace(/\/assets\/(app|stake|site)\.[0-9a-f]{10}\.(js|css)/g, '/assets/$1.$2')
-  .replace(/\n<div class="hpick" data-hospital-pick><\/div>/g, '');
+  .replace(/\n<div class="hpick" data-hospital-pick><\/div>/g, '')
+  .replace(/\n<p class="stake-block__share"><strong>Patient’s share, national:<\/strong> [^\n]*<\/p>(?=\n<p class="stake-block__more">)/, '')
+  .replace(/(<p class="stake-block__more">)<a href="\/revenue-at-stake\/\?q=[0-9A-Z]{5}">See this at your hospital →<\/a> <span aria-hidden="true">\/<\/span> /, '$1');
 
 function build() {
   const dir = mkdtempSync(join(tmpdir(), 'iol-national-'));

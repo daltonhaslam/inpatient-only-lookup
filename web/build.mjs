@@ -15,6 +15,7 @@ import * as pages from './src/pages.mjs';
 import * as stake from './src/stake.mjs';
 import { normalize, credits, clientModel, removalMismatches } from './src/stake-data.mjs';
 import { hospitalList, hospitalRecord } from './src/hospital-data.mjs';
+import { sharesFile } from './src/patient-share.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -302,6 +303,26 @@ async function hospitalAssets(model) {
   };
 }
 
+/**
+ * The ASC patient-share tables: doc (patient-shares.json, for the code pages' line) and lookup ({url,
+ * from}: the small file the lookup loads when an answer needs it, holding CMS's 2027 ASC additions, and
+ * the date they leave the list; client.mjs gets it through esbuild define). null, with a warning, when
+ * the derived tables are absent; the share line is then left out.
+ */
+function patientShares(ctx) {
+  const paths = ['pipeline/derived/patient-shares.json', 'pipeline/derived/asc-new-2027.json'];
+  if (!paths.every((path) => existsSync(join(root, path)))) {
+    console.warn('No patient-shares.json or asc-new-2027.json: building without the patient-share line.');
+    return null;
+  }
+  const [doc, ascNew] = paths.map(read);
+  const file = sharesFile(doc, ascNew);
+  // Every code in the file must leave the list on one date, the date the lookup starts showing the line.
+  const dates = new Set(Object.keys(file.c).map((code) => (ctx.data.codes[code] ? lookup(ctx.data, code, ctx.data.dosMax).removed : null)));
+  if (dates.size !== 1 || dates.has(null)) throw new Error(`asc-new-2027.json codes do not all leave the inpatient-only list on one date: ${[...dates].join(', ')}`);
+  return { doc, lookup: { url: hashed('data', 'shares', 'json', JSON.stringify(file)), from: [...dates][0] } };
+}
+
 const FONTS = [
   ['Archivo', '@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2', '100 900'],
   ['Besley', '@fontsource-variable/besley/files/besley-latin-wght-normal.woff2', '400 900'],
@@ -340,8 +361,11 @@ async function main() {
       return `@font-face{font-family:'${family} Fallback';font-weight:${weight};src:local('${local}');size-adjust:${size}%;ascent-override:${scaled(ascent)};descent-override:${scaled(descent)};line-gap-override:0%}`;
     })).join('\n');
   const css = hashed('assets', 'site', 'css', `${fontCss}\n${readFileSync(join(here, 'src/styles.css'), 'utf8')}`);
+  const shares = patientShares(ctx);
+  ctx.shares = shares && shares.doc;
   const script = await bundle({
     entryPoints: [join(here, 'src/client.mjs')], bundle: true, minify: true, format: 'iife', target: 'es2020', write: false, legalComments: 'none',
+    define: { __SHARES__: JSON.stringify(shares && shares.lookup) },
   });
   const hospitals = ctx.stake ? await hospitalAssets(ctx.stake.model) : null;
   const stakeScript = ctx.stake ? await bundle({

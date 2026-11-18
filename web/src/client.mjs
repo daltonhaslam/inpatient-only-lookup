@@ -4,6 +4,7 @@ import {
   isDate, isFullDate, formatDate, todayISO, clampDate, outsideRangeNote, unreadDateNote, printable, dayNumber, fromDayNumber, normalizeCode, isCode, periodIndex,
   stateAt, lookup, expandOther, countsAt, exemptCodes, buildIndex, search, extractCodes, num, csv, isScheduled,
 } from './engine.mjs';
+import { lookupShare } from './patient-share.mjs';
 import { esc, chip, CHIP, verdict, verdictParts, eventList, codeRow, answer, axis, pct, scheduledNote, captionedScroller } from './views.mjs';
 
 // Vercel Web Analytics: never send what someone searched for or which date they chose.
@@ -15,8 +16,12 @@ const $$ = (selector, rootNode = document) => [...rootNode.querySelectorAll(sele
 const params = () => new URLSearchParams(window.location.search);
 
 const BULK_LIMIT = 500;
+// The ASC patient-share file for CMS's 2027 ASC additions ({url, from}, put into this bundle by build.mjs;
+// null when the build had none). Loaded only when a lookup answer needs it: one of those codes, off the list.
+const SHARES = typeof __SHARES__ === 'undefined' ? null : __SHARES__;
 
 const state = {
+  shares: null, sharesLoading: null,
   data: null, other: null, otherLoading: null, otherFailed: false, index: null,
   date: null, today: null, period: null,   // period: index of the Addendum B in force on `date`
   query: '', bulk: [], bulkDropped: 0,
@@ -96,6 +101,24 @@ function loadOther() {
       // A throw while redrawing must not become an unhandled rejection.
       .then(() => { drawVerdicts(); drawBulk(); announce(); }).catch(() => {});
   }
+}
+
+/**
+ * The patient-share line for a lookup answer (HTML from patient-share.mjs, or ''). A code removed on the
+ * additions' date, looked up on or after it, loads the shares file once; the answer redraws when it lands.
+ */
+function shareFor(code) {
+  const { data, date } = state;
+  if (!SHARES || !data.codes[code]) return '';
+  const result = lookup(data, code, date);
+  if (result.state !== 'off' || result.removed !== SHARES.from || date < SHARES.from) return '';
+  if (state.shares) return lookupShare(state.shares, code, result.state, date, result.removed);
+  state.sharesLoading ||= fetch(SHARES.url)
+    .then((response) => { if (!response.ok) throw new Error(String(response.status)); return response.json(); })
+    .then((file) => { state.shares = file; drawVerdicts(); })
+    // No line without the file; a later answer tries again.
+    .catch(() => { state.sharesLoading = null; });
+  return '';
 }
 
 // ---- drawing ------------------------------------------------------------------------------
@@ -207,6 +230,8 @@ function drawVerdicts() {
   for (const host of $$('[data-verdict-host]')) {
     const code = host.dataset.verdictHost;
     const options = { title: host.dataset.title || 'h2', heading: host.dataset.heading || 'h3', link: host.dataset.link === '1' };
+    // The lookup's answers only; a code's own page has the line in its Revenue at stake block.
+    if (options.link) options.share = shareFor(code);
     const body = $('[data-verdict-body]', host);
     if (!data.codes[code] && !other && state.otherFailed) {
       setHtml(host, `<p class="results__none">Couldn’t load the list of codes that were never inpatient only, so ${esc(code)} can’t be checked right now. Check your connection and try again.</p>`);

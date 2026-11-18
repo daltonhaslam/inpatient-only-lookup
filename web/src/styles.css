@@ -334,6 +334,7 @@ td a[target] { white-space: nowrap; }
 .steps li::marker { color: var(--ink-2); font-weight: 600; }
 .credits { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.3rem 1.4rem; }
 .stake-block__lede { max-width: var(--measure); color: var(--ink-2); }
+.stake-block__share { margin-top: 1.1rem; max-width: var(--measure); padding-left: 0.8rem; border-left: 3px solid var(--rule); }
 .stake-block__more { margin-top: 0.9rem; font-size: 0.95rem; }
 
 .scard {

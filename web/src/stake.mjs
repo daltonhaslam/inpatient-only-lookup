@@ -5,6 +5,7 @@ import { formatDate, num, plural, csv as toCsv } from './engine.mjs';
 import { esc, out, cfr, scroller, captionedScroller } from './views.mjs';
 import { layout } from './pages.mjs';
 import { safeProfile } from './stake-data.mjs';
+import { packShare, shareHtml } from './patient-share.mjs';
 import { BADGE, card, money, moneyRange, cents, drgList, dxCode, statusText, noCompareText, yearLines, alternativeLabel } from './stake-card.mjs';
 
 export const ROOT = '/revenue-at-stake/';
@@ -350,15 +351,23 @@ ${captionedScroller('m-files-cap', 'CMS sources and the files read from each', '
 
 // ---- the block on each code page ----------------------------------------------------------
 
+/**
+ * The Revenue at stake block on a removed code's page. A compared code also gets the national ASC
+ * patient-share line (ctx.shares: patient-shares.json) and, when the build has the hospital picker, a
+ * link to the same card at a hospital's rates. The page itself stays national.
+ */
 export function codeBlock(ctx, code) {
   const stake = ctx.stake;
   const item = stake.model.codes[code];
   if (!item) return '';
+  const compare = item.kind === 'compare';
+  const share = compare && ctx.shares ? packShare(ctx.shares.codes[code]) : null;
+  const local = compare && ctx.assets && ctx.assets.hospitals ? `<a href="${ROOT}?q=${esc(code)}">See this at your hospital →</a> <span aria-hidden="true">/</span> ` : '';
   return `<section class="block stake-block" aria-labelledby="stake-h" data-stake-code="${esc(code)}">
 <h2 id="stake-h">Revenue at stake</h2>
-<p class="stake-block__lede">Left the list ${formatDate(item.removed)}. ${item.kind === 'compare' ? 'What Medicare pays for it as a hospital outpatient, next to the inpatient MS-DRG family the same operation would group to.' : 'Why there is no payment comparison for it:'}</p>
+<p class="stake-block__lede">Left the list ${formatDate(item.removed)}. ${compare ? 'What Medicare pays for it as a hospital outpatient, next to the inpatient MS-DRG family the same operation would group to.' : 'Why there is no payment comparison for it:'}</p>
 ${card(item, stake.model.meta, { title: false })}
-<p class="stake-block__more"><a href="${ROOT}">All ${num(stake.items.length)} removed codes</a> <span aria-hidden="true">/</span> <a href="${ROOT}methods/">How the numbers are built</a></p>
+${share ? `<p class="stake-block__share"><strong>Patient’s share, national:</strong> ${shareHtml(share, ctx.shares.meta.deductibles)}</p>\n` : ''}<p class="stake-block__more">${local}<a href="${ROOT}">All ${num(stake.items.length)} removed codes</a> <span aria-hidden="true">/</span> <a href="${ROOT}methods/">How the numbers are built</a></p>
 </section>`;
 }
 

@@ -183,9 +183,10 @@ export const scheduledNote = (period) => `Scheduled. This comes from the ${esc(p
  *   state     'ipo' | 'off' | 'gone', for the panel's class
  *   body      the code's name, the answer, and the facts behind it (changes with the date)
  *   timeline  the code's status across time (only its marker moves with the date)
- * title/heading are the tags for the code's name and for the answer.
+ * title/heading are the tags for the code's name and for the answer. share: the ASC patient-share line
+ * (patient-share.mjs lookupShare, HTML of fixed words and figures), shown as a last fact when given.
  */
-export function verdictParts(data, code, date, today, other = null, { title = 'h2', heading = 'h3' } = {}) {
+export function verdictParts(data, code, date, today, other = null, { title = 'h2', heading = 'h3', share = '' } = {}) {
   const result = lookup(data, code, date, other);
   if (result.kind === 'pending') return { state: 'gone', body: `<p class="verdict__wait">Checking ${esc(code)}…</p>`, timeline: '' };
   const reply = answer(data, result, today);
@@ -219,7 +220,7 @@ ${cautions}
 <div><dt>In CMS’s file</dt><dd>${status}</dd></div>
 <div><dt>Medical review</dt><dd>${exemptionText(data, result)}</dd></div>
 <div><dt>What applies</dt><dd>${appliesText(result)}</dd></div>
-</dl>`,
+${share ? `<div class="facts__share"><dt>Patient’s share, national</dt><dd>${share}</dd></div>\n` : ''}</dl>`,
   };
 }
 
