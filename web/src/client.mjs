@@ -5,6 +5,7 @@ import {
   stateAt, lookup, expandOther, countsAt, exemptCodes, buildIndex, search, extractCodes, num, csv, isScheduled,
 } from './engine.mjs';
 import { lookupShare } from './patient-share.mjs';
+import { lazyJson } from './fetch.mjs';
 import { esc, chip, CHIP, verdict, verdictParts, eventList, codeRow, answer, axis, pct, scheduledNote, captionedScroller } from './views.mjs';
 
 // Vercel Web Analytics: never send what someone searched for or which date they chose.
@@ -21,8 +22,7 @@ const BULK_LIMIT = 500;
 const SHARES = typeof __SHARES__ === 'undefined' ? null : __SHARES__;
 
 const state = {
-  shares: null, sharesLoading: null,
-  data: null, other: null, otherLoading: null, otherFailed: false, index: null,
+  data: null, other: null, index: null,
   date: null, today: null, period: null,   // period: index of the Addendum B in force on `date`
   query: '', bulk: [], bulkDropped: 0,
   cells: [],         // the whole-list squares, resolved once: {node, record, state}
@@ -91,35 +91,34 @@ function persist(now = false) {
   if (now) save(); else persistTimer = setTimeout(save, 250);
 }
 
+// The never-listed codes: loaded when a code outside the list's history is asked about, and tried again
+// on the next ask after a failure.
+let others = null;
 function loadOther() {
-  if (!state.otherLoading) {
-    state.otherFailed = false;
-    state.otherLoading = fetch(document.body.dataset.other)
-      .then((response) => { if (!response.ok) throw new Error(String(response.status)); return response.json(); })
-      .then((packed) => { state.other = expandOther(packed); })
-      .catch(() => { state.otherLoading = null; state.otherFailed = true; })
-      // A throw while redrawing must not become an unhandled rejection.
-      .then(() => { drawVerdicts(); drawBulk(); announce(); }).catch(() => {});
-  }
+  others ||= lazyJson(document.body.dataset.other, {
+    retry: true,
+    settled: () => {
+      if (others.data && !state.other) state.other = expandOther(others.data);
+      drawVerdicts(); drawBulk(); announce();
+    },
+  });
+  others.load();
 }
+const otherFailed = () => Boolean(others && others.failed);
+
+// The 2027 ASC additions' patient shares: loaded once, when an answer needs them (a failure stands until
+// a reload; the answer stands without the line).
+const shares = SHARES && lazyJson(SHARES.url, { settled: () => drawVerdicts() });
 
 /**
- * The patient-share line for a lookup answer (HTML from patient-share.mjs, or ''). A code removed on the
- * additions' date, looked up on or after it, loads the shares file once; the answer redraws when it lands.
+ * The patient-share line for a lookup answer (HTML from patient-share.mjs, or ''), given the answer's own
+ * lookup() result. Only a code that left the list on the additions' date can have one; lookupShare checks
+ * the rest. The answer redraws when the file lands.
  */
-function shareFor(code) {
-  const { data, date } = state;
-  if (!SHARES || !data.codes[code]) return '';
-  const result = lookup(data, code, date);
-  if (result.state !== 'off' || result.removed !== SHARES.from || date < SHARES.from) return '';
-  if (state.shares) return lookupShare(state.shares, code, result.state, date, result.removed);
-  // One try per page load: a failed fetch leaves sharesLoading set, so a redraw never retries it.
-  // No line without the file; the rest of the answer stands.
-  state.sharesLoading ||= fetch(SHARES.url)
-    .then((response) => { if (!response.ok) throw new Error(String(response.status)); return response.json(); })
-    .then((file) => { state.shares = file; drawVerdicts(); })
-    .catch(() => {});
-  return '';
+function shareFor(code, result) {
+  if (!shares || result.removed !== SHARES.from) return '';
+  if (!shares.data) { shares.load(); return ''; }
+  return lookupShare(shares.data, code, result.state, state.date, result.removed);
 }
 
 // ---- drawing ------------------------------------------------------------------------------
@@ -231,10 +230,10 @@ function drawVerdicts() {
   for (const host of $$('[data-verdict-host]')) {
     const code = host.dataset.verdictHost;
     const options = { title: host.dataset.title || 'h2', heading: host.dataset.heading || 'h3', link: host.dataset.link === '1' };
-    // The lookup's answers only; a code's own page has the line in its Revenue at stake block.
-    if (options.link) options.share = shareFor(code);
+    // data-share: the lookup's answers (a code's own page has the line in its Revenue at stake block).
+    if (host.dataset.share === '1') options.share = (result) => shareFor(code, result);
     const body = $('[data-verdict-body]', host);
-    if (!data.codes[code] && !other && state.otherFailed) {
+    if (!data.codes[code] && !other && otherFailed()) {
       setHtml(host, `<p class="results__none">Couldn’t load the list of codes that were never inpatient only, so ${esc(code)} can’t be checked right now. Check your connection and try again.</p>`);
       continue;
     }
@@ -290,7 +289,7 @@ function drawExempt() {
 
 function showVerdict(host, code, before) {
   if (!state.data.codes[code] && !state.other) loadOther();
-  host.innerHTML = `${before}<div data-verdict-host="${esc(code)}" data-link="1"></div>`;
+  host.innerHTML = `${before}<div data-verdict-host="${esc(code)}" data-link="1" data-share="1"></div>`;
   drawVerdicts();
   drawControls();
 }
@@ -348,7 +347,7 @@ function drawBulk() {
   const host = $('[data-bulk-out]');
   if (!host || !state.bulk.length) return;
   if (!state.other) {
-    setHtml(host, state.otherFailed
+    setHtml(host, otherFailed()
       ? '<p class="results__none">Couldn’t load the list of codes that were never inpatient only. Check your connection and try again.</p>'
       : '<p>Checking…</p>');
     return;

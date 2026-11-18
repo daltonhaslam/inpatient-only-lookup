@@ -22,11 +22,12 @@ export function packShare(entry) {
 /**
  * The line after "Patient’s share, national:", as HTML (only money() figures and fixed words, so
  * nothing needs escaping). It leads with the surgery center when the patient pays more there.
- * deductibles: patient-shares.json meta.deductibles (part_b).
+ * deductibles: patient-shares.json meta.deductibles (part_b). capital: start with a capital letter.
  */
-export function shareHtml([asc, opps, ascMore, capped], deductibles) {
+export function shareHtml([asc, opps, ascMore, capped], deductibles, { capital = false } = {}) {
   const hospital = `${money(opps)} in the hospital outpatient department${capped ? ' (capped at the inpatient deductible)' : ''}`;
-  const lead = ascMore ? `<strong>more at a surgery center</strong>, about ${money(asc)}, than the ${hospital}` : `about ${money(asc)} at a surgery center, ${hospital}`;
+  const [more, about] = capital ? ['More', 'About'] : ['more', 'about'];
+  const lead = ascMore ? `<strong>${more} at a surgery center</strong>, about ${money(asc)}, than the ${hospital}` : `${about} ${money(asc)} at a surgery center, ${hospital}`;
   return `${lead}, plus the ${money(deductibles.part_b)} Part B deductible in either. Most Medigap plans pay the share; Medicare Advantage plans set their own.`;
 }
 
@@ -45,11 +46,11 @@ export function sharesFile(shares, ascNew) {
 
 /**
  * The lookup answer's share line for a code on a date, or '': only for a code in the file, only once it
- * is off the list (state 'off', on or after the date it was removed). It stands after its own label, so
- * it starts with a capital.
+ * is off the list (state 'off', on or after the date it was removed), starting with a capital (it
+ * stands under its own label).
  */
 export function lookupShare(file, code, state, date, removed) {
   const packed = file && file.c[code];
   if (!packed || state !== 'off' || !removed || date < removed) return '';
-  return shareHtml(packed, file.d).replace(/^(<strong>)?([a-z])/, (_, tag = '', c) => tag + c.toUpperCase());
+  return shareHtml(packed, file.d, { capital: true });
 }

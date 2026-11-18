@@ -10,13 +10,13 @@ import { field } from './hospital-field.mjs';
 import { hospitalIndex, findHospitals, optionName, pickerMessage } from './hospital-pick.mjs';
 import { createView, hospitalLede } from './hospital-view.mjs';
 import { CCN } from './stake-engine.mjs';
+import { fetchJson } from './fetch.mjs';
+import { announcer } from './announce.mjs';
 
 const TEACHING = ['', 'Capital IME only', 'Teaching'];
 
 const optionHtml = (h, i) => `<li role="option" id="hp-o-${esc(h.ccn)}" aria-selected="false" data-i="${i}">`
   + `<span class="hpick__oname">${esc(optionName(h))}</span><span class="hpick__ometa">${esc([h.state, h.ccn, TEACHING[h.teaching]].filter(Boolean).join(' · '))}</span></li>`;
-
-const json = (url) => fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`${r.status} ${url}`))));
 
 /** Resolves when the hospital view's stylesheet has loaded (added once, on first use) or failed to. */
 function styles(url) {
@@ -67,7 +67,7 @@ function folds(results, current, say) {
     }
     set('[data-year-total]', up.total);
     set('[data-year-head]', up.headline);
-    say(`${card.dataset.stakeCard}, per year at ${view.name}: ${up.headline}.`, 900);
+    say(`${card.dataset.stakeCard}, per year at ${view.name}: ${up.headline}.`);
   });
   // toggle does not bubble: listen in the capture phase.
   results.addEventListener('toggle', (event) => {
@@ -82,10 +82,10 @@ function folds(results, current, say) {
 /**
  * Take over the picker in mount (already holding hospital-field.mjs SHELL and field()).
  * assets: {list, dir, css} URLs from the build. data, meta: the page's prepare()d items and browser meta.
- * onPick(view, {initial}): show this hospital (the page swaps the cards and calls show()).
- * onClear(): back to national. onInvalid({keepUrl}): an ?h= that named no offered hospital, or (keepUrl)
+ * onPick(view, {initial, ui}): show this hospital (the page swaps the cards and calls ui.show()).
+ * onClear(ui): back to national. onInvalid({keepUrl}): an ?h= that named no offered hospital, or (keepUrl)
  * one whose files could not be fetched. results: the cards' container, where the picked hospital's
- * per-year counts are typed and its folds opened (folds() below). Returns {show, say, start(ccn)}.
+ * per-year counts are typed and its folds opened (folds() below). Returns ui: {show, say, start(ccn)}.
  */
 export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInvalid, results }) {
   const body = mount.querySelector('[data-hpick-body]');
@@ -98,13 +98,12 @@ export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInv
   let active = -1;
   let token = 0;
   let picked = null;   // the view on screen, if any
-  let said = 0;
 
   const $ = (selector) => body.querySelector(selector);
-  const say = (text, wait = 150) => { clearTimeout(said); said = setTimeout(() => { status.textContent = text; }, wait); };
+  const say = announcer(status);
   const note = (text) => { const el = $('#hp-note'); if (el) el.textContent = text; };
   const loadList = () => {
-    listPromise ||= Promise.all([json(assets.list), css])
+    listPromise ||= Promise.all([fetchJson(assets.list), css])
       .then(([list]) => { index = hospitalIndex(list); maryland = list.meta.maryland; return list; })
       .catch((error) => { listPromise = null; throw error; });
     return listPromise;
@@ -140,7 +139,7 @@ export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInv
     active = -1;
     const message = pickerMessage(result, input.value, maryland);
     note(message.note);
-    if (message.spoken) say(message.spoken, 400);
+    if (message.spoken) say(message.spoken);
   }
 
   /**
@@ -153,9 +152,9 @@ export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInv
       const list = await loadList();
       if (!CCN.test(ccn) || !index.byCcn.has(ccn)) { if (initial) onInvalid({}); return; }
       if (!initial) note(`Loading ${optionName(index.byCcn.get(ccn))}…`);
-      const record = await json(`${assets.dir}/${ccn}.json`);
+      const record = await fetchJson(`${assets.dir}/${ccn}.json`);
       if (mine !== token) return;
-      await onPick(createView({ list, record, ccn, data, meta }), { initial });
+      await onPick(createView({ list, record, ccn, data, meta }), { initial, ui });
     } catch {
       if (mine !== token) return;
       if (initial) onInvalid({ keepUrl: true });
@@ -214,14 +213,15 @@ export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInv
     if (option) choose(Number(option.dataset.i));
     else if (event.target.closest('[data-hpick-change]')) { body.innerHTML = field(picked.name); $('#hp-q').focus(); }
     else if (event.target.closest('[data-hpick-cancel]')) show(picked, { focus: true });
-    else if (event.target.closest('[data-hpick-clear]')) { token += 1; onClear(); }
+    else if (event.target.closest('[data-hpick-clear]')) { token += 1; onClear(ui); }
   });
   body.addEventListener('focusout', (event) => {
     if (event.target.id === 'hp-q' && !body.contains(event.relatedTarget)) close();
   });
 
+  const ui = { show, say, start: (ccn) => load(ccn, true) };
   if (results) folds(results, () => picked, say);
   loadList().catch(() => {});
   if ($('#hp-q') && $('#hp-q').value) typed();   // they typed while this bundle loaded
-  return { show, say, start: (ccn) => load(ccn, true) };
+  return ui;
 }

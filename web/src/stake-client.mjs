@@ -6,6 +6,8 @@ import { esc } from './views.mjs';
 import { card, STATUS } from './stake-card.mjs';
 import { prepare, filterCodes, outsideCrosswalk, stateFromParams, hospitalParam, queryString, countText, PAGE_SIZE, TIERS, DEFAULTS } from './stake-engine.mjs';
 import { SHELL, field } from './hospital-field.mjs';
+import { announcer } from './announce.mjs';
+import { fetchJson } from './fetch.mjs';
 
 // The hospital view's file URLs, put into this bundle by build.mjs (null: no picker in this build).
 const HOSPITAL = typeof __HOSPITAL_ASSETS__ === 'undefined' ? null : __HOSPITAL_ASSETS__;
@@ -89,7 +91,7 @@ export function start(model) {
   const more = $('[data-more]', host);
   const count = $('#sf-count', host);
   const box = $('#sf-q', host);
-  let announce = 0;
+  const say = announcer(count);   // the count line: said once typing settles
 
   const writeUrl = () => {
     const text = queryString(state, view ? view.ccn : pending);
@@ -118,8 +120,7 @@ export function start(model) {
     writeUrl();
     const miss = !matches.length && outsideCrosswalk(data, state.q);
     const text = miss ? `${miss.code} is not in this crosswalk.` : countText(matches.length, shown);
-    clearTimeout(announce);
-    announce = setTimeout(() => { count.textContent = text; }, 250);   // one announcement after typing settles
+    say(text);
   };
 
   host.addEventListener('input', (event) => {
@@ -136,8 +137,7 @@ export function start(model) {
       draw(from);
       const first = results.querySelectorAll('[data-stake-card]')[from];
       if (first) { first.tabIndex = -1; first.focus(); }   // keyboard users continue from the first new card
-      clearTimeout(announce);
-      count.textContent = countText(matches.length, shown);
+      say.now(countText(matches.length, shown));
     } else if (event.target.closest('[data-reset]')) {
       Object.assign(state, DEFAULTS);
       host.querySelectorAll('[data-f]').forEach((field) => {
@@ -149,7 +149,7 @@ export function start(model) {
   });
 
   update();
-  count.textContent = countText(matches.length, shown);
+  say.now(countText(matches.length, shown));
 
   const mount = HOSPITAL && $('[data-hospital-pick]');
   if (!mount) return;
@@ -157,35 +157,34 @@ export function start(model) {
   // load on first use (focus, a tap, or an ?h= in the address), so the national page carries none of it.
   mount.innerHTML = SHELL;
   $('[data-hpick-body]', mount).innerHTML = field(null);
-  let picker = null;   // the import of the picker bundle, once started
-  let ui = null;       // the picker, once it has taken over the box
+  // The picker, once its bundle has loaded and taken over the box: a promise of its {show, say, start},
+  // or of null when the bundle failed to load (the next focus or tap tries again).
+  let picker = null;
   const attach = () => {
     picker ||= import(HOSPITAL.view).then((mod) => mod.attachPicker(mount, HOSPITAL, {
       data, meta: model.meta, results,
       // One hospital's view, computed once: swap the strip and the cards together, then say so once.
-      onPick: (next, { initial }) => transition(() => { view = next; pending = ''; ui.show(next); update(); })
+      onPick: (next, { initial, ui }) => transition(() => { view = next; pending = ''; ui.show(next); update(); })
         .then(() => {
           if (!initial) $('[data-hpick-change]', mount)?.focus();
           ui.say(next.announce);
         }),
-      onClear: () => transition(() => { view = null; ui.show(null); update(); })
+      onClear: (ui) => transition(() => { view = null; ui.show(null); update(); })
         .then(() => { $('#hp-q', mount)?.focus(); ui.say('Showing national rates.'); }),
       // An ?h= that names no hospital the picker offers (Maryland, unknown): national, clean URL.
       onInvalid: ({ keepUrl = false }) => { if (!keepUrl) { pending = ''; writeUrl(); } },
-    })).then((ready) => { ui = ready; return ready; })
-      .catch((error) => { picker = null; throw error; });
+    })).catch(() => { picker = null; return null; });
     return picker;
   };
-  for (const type of ['focusin', 'pointerdown']) mount.addEventListener(type, () => { attach().catch(() => {}); });
-  if (pending) attach().then((ready) => ready.start(pending)).catch(() => { /* national stays; the URL keeps h for a reload */ });
+  for (const type of ['focusin', 'pointerdown']) mount.addEventListener(type, attach);
+  // A failed load keeps national, and the h in the URL for a reload.
+  if (pending) attach().then((ui) => ui && ui.start(pending));
 }
 
 async function load() {
   const source = document.body.dataset.stake;
   if (!source) return;
-  const response = await fetch(source);
-  if (!response.ok) throw new Error(String(response.status));
-  start(await response.json());
+  start(await fetchJson(source));
 }
 
 load().catch(() => {
