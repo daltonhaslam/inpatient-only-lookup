@@ -3,6 +3,7 @@
 //   BUILD_DATE=2026-11-11 node build.mjs   build as of a fixed date (for reproducible output)
 //   CROSSWALK_JSON=/path/to/crosswalk.json node build.mjs   Revenue at stake from another crosswalk
 //     (default pipeline/derived/crosswalk.json; without one the section is left out with a warning)
+//   OUT_DIR=/tmp/site node build.mjs   build somewhere other than ../docs (the national snapshot test does)
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync, rmSync, copyFileSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -16,7 +17,7 @@ import { normalize, credits, clientModel, removalMismatches } from './src/stake-
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
-const out = join(root, 'docs');
+const out = process.env.OUT_DIR ? resolve(process.env.OUT_DIR) : join(root, 'docs');
 const read = (path) => JSON.parse(readFileSync(join(root, path), 'utf8'));
 const sha = (content) => createHash('sha256').update(content).digest('hex').slice(0, 10);
 
