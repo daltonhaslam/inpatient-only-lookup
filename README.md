@@ -170,8 +170,8 @@ python3 pipeline/crosswalk/mapper.py check data/crosswalk/passes/a/m01.json
 
 `pipeline/crosswalk/verify_workbook.py` recomputes the workbook with an independent evaluator: the national
 amounts against `crosswalk.json` to the cent, your own wage index, OHSU (CCN 380009) against the anchors in
-`facts.json` including a per-year row, a hospital with no add-ons, and a Maryland CCN. Five evaluations take about
-five minutes. Make the virtual environment outside the repository (nothing ignores it here):
+`facts.json` including a per-year row, a hospital with no add-ons, and a Maryland CCN. The five evaluations run in parallel, about
+a minute in all. Make the virtual environment outside the repository (nothing ignores it here):
 
 ```bash
 python3 -m venv ~/.venvs/iol-verify && ~/.venvs/iol-verify/bin/pip install formulas openpyxl
