@@ -90,12 +90,12 @@ def hospitals_table(t):
     return {
         "meta": {
             "source": source_meta("ipps-2027-impact"),
-            "columns": dict([("name", "Name"), ("type", "Provider Type")] + list(xs.IMPACT_FACTORS)),
+            "columns": dict(xs.IMPACT_ID_COLUMNS, **dict(xs.IMPACT_FACTORS)),
             "state": "from the CCN's first two digits",
             "counts": {"offered": len(offered), "teaching": sum(1 for row in offered.values() if row["tchop"] > 0),
                        "in_file": len(t.impact), "teaching_in_file": sum(1 for row in t.impact.values() if row["tchop"] > 0),
                        "maryland": len(maryland)},
-            "maryland": MARYLAND_REASON,
+            "maryland": MARYLAND_REASON, "maryland_prefix": MARYLAND,
             "provider_types": {str(code): label for code, label in sorted(xs.PROVIDER_TYPES.items())},
             "opps_labor_share": labor["value"], "opps_labor_share_cite": labor["cite"],
         },
@@ -118,7 +118,8 @@ def volume_table(doc, t, offered):
             dropped[ccn] = "Maryland (all-payer model)" if ccn.startswith(MARYLAND) else "not in the FY 2027 impact file"
     return {
         "meta": {
-            "source": source_meta("mup-inp-2024"), "data_year": 2024, "column": "Tot_Dschrgs",
+            "source": source_meta("mup-inp-2024"), "data_year": 2024, "column": xs.MUP_KEYS["count"],
+            "columns": xs.MUP_KEYS,
             "suppressed_below": xs.MUP_SUPPRESSED_BELOW,
             "missing": "CMS does not publish counts under 11: a hospital or DRG with no count had under 11 discharges or none",
             "drgs": drgs,

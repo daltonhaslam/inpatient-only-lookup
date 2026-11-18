@@ -55,7 +55,11 @@ CCN_RE = re.compile(r"^\d{6}$")
 IMPACT_COLUMNS = {"wi": "FY 2027 Wage Index", "gaf": "GAF", "tchop": "TCHOP", "tchcp": "TCHCP", "dshopp": "DSHOPP",
                   "dshcpp": "DSHCPP", "caseta44": "CASETA44", "ime_caseta44": "IME_CASETA44"}
 IMPACT_FACTORS = tuple((key, IMPACT_COLUMNS[key]) for key in PAYMENT_FACTORS + ("caseta44", "ime_caseta44"))
+# The impact file's identifying columns, as header patterns; IMPACT_ID_COLUMNS has their names.
+IMPACT_ID_PATTERNS = {"ccn": r"^Provider Number$", "name": r"^Name$", "type": r"^Provider Type$"}
+IMPACT_ID_COLUMNS = {key: pattern.strip("^$") for key, pattern in IMPACT_ID_PATTERNS.items()}
 MUP_COLUMNS = ("Rndrng_Prvdr_CCN", "Rndrng_Prvdr_State_Abrvtn", "DRG_Cd", "Tot_Dschrgs")
+MUP_KEYS = dict(zip(("ccn", "state", "drg", "count"), MUP_COLUMNS))      # by what each holds (drg-volume meta)
 MUP_SUPPRESSED_BELOW = 11
 
 
@@ -83,7 +87,7 @@ def load_impact():
     Maryland included. Factors are the file's numbers as written; name is None where CMS leaves
     it blank ("unknown", three rows), ime_caseta44 where CMS leaves that blank (no MA cases with
     IME); type is the Provider Type code (PROVIDER_TYPES)."""
-    columns = {"ccn": r"^Provider Number$", "name": r"^Name$", "type": r"^Provider Type$"}
+    columns = dict(IMPACT_ID_PATTERNS)
     columns.update({key: "^%s$" % re.escape(label) for key, label in IMPACT_FACTORS})
     hospitals = {}
     for row in read_table(SOURCE_OF["load_impact"], IMPACT_MEMBER, columns, prefer_spreadsheet=False):
