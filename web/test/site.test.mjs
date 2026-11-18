@@ -147,7 +147,7 @@ describe('accessibility markup', () => {
 });
 
 describe('links', () => {
-  const ALLOWED_HOSTS = new Set(['www.govinfo.gov', 'www.ecfr.gov', 'www.cms.gov', 'docs.google.com', 'github.com', 'www.linkedin.com', 'paidandpenalized.org']);
+  const ALLOWED_HOSTS = new Set(['www.govinfo.gov', 'www.ecfr.gov', 'www.cms.gov', 'data.cms.gov', 'www.medicare.gov', 'docs.google.com', 'github.com', 'www.linkedin.com', 'paidandpenalized.org']);
 
   test('internal links resolve', () => {
     none(collect(({ html }) => {
