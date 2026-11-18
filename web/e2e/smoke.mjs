@@ -1056,7 +1056,7 @@ if (!hasStake) {
   await check('code page: the patient-share line and the link to see the card at your hospital', async (page) => {
     await open(page, '/code/32480/');
     const share = (await page.locator('.stake-block__share').textContent()).replace(/\s+/g, ' ');
-    eq(share, 'Patient’s share, national: about $317 at a surgery center, $717 in the hospital outpatient department, plus the $292 Part B deductible in either. Most Medigap plans pay the share; Medicare Advantage plans set their own.', 'share line');
+    eq(share, 'Patient’s share, national: about $317 at a surgery center, $717 in the hospital outpatient department, plus the $292 Part B deductible in either. Most Medigap plans pay the coinsurance; Medicare Advantage plans set their own.', 'share line');
     const link = page.locator('.stake-block__more a', { hasText: 'See this at your hospital' });
     eq(await link.getAttribute('href'), '/revenue-at-stake/?q=32480', 'link');
     await link.click();
@@ -1076,7 +1076,7 @@ if (!hasStake) {
     eq(asked.length, 0, 'no shares file before an answer needs it');
     await setDate(page, '2027-03-01');
     const line = await waitText(page.locator('[data-results] .facts__share dd'), (t) => t.startsWith('About'), 'share line');
-    eq(line, 'About $317 at a surgery center, $717 in the hospital outpatient department, plus the $292 Part B deductible in either. Most Medigap plans pay the share; Medicare Advantage plans set their own.', 'lookup line');
+    eq(line, 'About $317 at a surgery center, $717 in the hospital outpatient department, plus the $292 Part B deductible in either. Most Medigap plans pay the coinsurance; Medicare Advantage plans set their own.', 'lookup line');
     eq(asked.length, 1, 'one fetch');
     await page.fill('[data-q]', '27447');
     await waitText(page.locator('[data-results] .verdict__code'), (t) => t === '27447', 'another code');

@@ -28,6 +28,9 @@ export function methodsTables({ hospitals, volume, ascNew, shares, citations, so
     return c;
   };
   const quotes = { ma: quote('E27-MA'), asc618: quote('ASC27-618'), asc64629: quote('ASC27-64629'), labor: quote('OPPS27-labor-share') };
+  // The page says Maryland is the one exclusion; another one must change the wording, not hide in it.
+  const { in_file: inFile, offered, maryland } = hospitals.meta.counts;
+  if (inFile - offered !== maryland) throw new Error(`hospitals.json leaves out ${inFile - offered} hospitals, ${maryland} of them Maryland: Methods says Maryland is the only exclusion`);
   const rule = sources.sources.find((s) => s.id === quotes.asc618.source);
   if (!rule || !rule.doc) throw new Error(`sources.json has no Federal Register document ${quotes.asc618.source}`);
   return { hospitals: hospitals.meta, volume: volume.meta, ascNew: ascNew.meta, shares: shares.meta, quotes, rule };
@@ -81,7 +84,7 @@ export function hospitalMethods(t, r) {
 <li><strong>Operating base</strong> = MS-DRG weight × ${cents(r.operating)} × (labor share × wage index + 1 − labor share). The labor share is ${pct(h.rates.labor_share)} when the wage index is above 1, else ${pct(h.rates.labor_share_le1)}.</li>
 <li><strong>Capital base</strong> = MS-DRG weight × ${cents(r.capital)} × GAF.</li>
 <li><strong>IME</strong> = operating base × the operating IME factor + capital base × the capital IME factor.</li>
-<li><strong>DSH</strong> = operating base × the operating DSH factor + capital base × the capital DSH factor. CMS’s operating factor already pays only the empirically justified 25% of DSH; the other 75% goes to uncompensated care payments, which are left out (below).</li>
+<li><strong>DSH</strong> = operating base × the operating DSH factor + capital base × the capital DSH factor. CMS’s operating factor already pays only the empirically justified 25% of DSH; the other 75%, adjusted for the change in the uninsured rate, funds uncompensated care payments, which are left out (below).</li>
 <li><strong>Total</strong> = operating base + capital base + IME + DSH.</li>
 <li><strong>Outpatient</strong> = the APC’s national rate × (${pct(opps)} × wage index + ${pct(1 - opps)}). Outpatient payment carries no IME or DSH, at a hospital or a surgery center. The surgery-center rate stays national: its wage rules differ.</li>
 <li><strong>Rounding.</strong> Every figure is computed unrounded and rounded to the cent once, so a part can differ from its total by a cent. A per-year figure is the count × the unrounded per-case amount, rounded once.</li>
@@ -97,7 +100,7 @@ ${factorTable(t, r)}
 <li><strong>Uncompensated care payments.</strong> Paid with each claim during the year as an interim amount, but settled at cost report to a fixed yearly total (${cfr('412.106', '42 CFR 412.106(i)')}), so a case billed outpatient does not lose it.</li>
 <li><strong>Outliers.</strong> Extra payment for an unusually costly case is not modelled.</li>
 <li><strong>Quality adjustments.</strong> The value-based purchasing, readmissions reduction and hospital-acquired condition reduction programs change a hospital’s payments by percentages the cards do not apply.</li>
-<li><strong>Sole community and Medicare-dependent hospitals</strong> can be paid on a hospital-specific rate when it is higher. The cards show the federal rate.</li>
+<li><strong>Sole community and Medicare-dependent hospitals.</strong> SCHs are paid the higher of the federal rate or a hospital-specific rate (${cfr('412.92', '42 CFR 412.92(d)')}); MDHs get the federal rate plus 75% of any difference (${cfr('412.108', '42 CFR 412.108(c)')}, which as written covers cost-reporting periods beginning before January 1, 2027 unless Congress extends it). This page shows the federal rate.</li>
 <li><strong>Direct GME</strong> is not a per-case payment. It follows the Medicare and Medicare Advantage share of a hospital’s inpatient days (${cfr('413.76', '42 CFR 413.76')}), so cases moving outpatient lower it slightly, and later. It is described here, not counted.</li>
 </ul>
 </section>
@@ -123,7 +126,7 @@ ${factorTable(t, r)}
 <li><strong>In the hospital outpatient department:</strong> ${esc(t.shares.opps_share)}: ${money(d.part_a_inpatient)} in ${d.year}.</li>
 <li><strong>Plus the Part B deductible</strong> in either: ${money(d.part_b)} in ${d.year}.</li>
 </ul>
-<p>Deductibles: ${out(d.url, esc(d.source))}. Most Medigap plans pay the share; Medicare Advantage plans set their own. This is not advice for a patient. For what a procedure costs a patient, see medicare.gov’s ${out(PRICE_LOOKUP, 'Procedure Price Lookup')}.</p>
+<p>Deductibles: ${out(d.url, esc(d.source))}. Most Medigap plans pay the coinsurance; Medicare Advantage plans set their own. This is not advice for a patient. For what a procedure costs a patient, see medicare.gov’s ${out(PRICE_LOOKUP, 'Procedure Price Lookup')}.</p>
 <p>The 2027 additions are CMS’s own list, the file ${fr(a.cite)} points to: ${num(a.ipo_removed_2027)} codes removed from the inpatient-only list for 2027 (FR Doc. ${esc(rule.doc)}, ${fr(quotes.asc618.cite)}), plus ${extra}, added on commenters’ recommendation (${fr(quotes.asc64629.cite)}), for ${num(a.count)} in all. The build fails unless the removals on it number the rule’s ${num(a.ipo_removed_2027)}, the only other code is ${extra}, every code is on the CY 2027 Addendum AA, and none was on the CY 2026 list or is new to HCPCS. A code with no separate surgery-center payment, ${extra} among them, gets no line.</p>
 </section>`;
 }

@@ -268,6 +268,7 @@ describe('revenue at stake', { skip }, () => {
       assert.ok(html.includes(`href="${source.landing}"`) && textOf(html).includes(source.file), `methods sources lack ${source.id}`);
     }
     assert.ok(html.includes('Download for'), 'the hospital CSV is described with the downloads');
+    assert.ok(html.includes('text import'), 'how to keep leading zeros');
   });
 
   test('methods page cites every source file, the guardrail and the years', () => {

@@ -26,12 +26,12 @@ describe('packShare', () => {
 describe('shareHtml', () => {
   test('32480: both shares in whole dollars and the Part B deductible from the file', () => {
     const t = text(shareHtml(packShare(shares.codes['32480']), deductibles));
-    assert.equal(t, 'about $317 at a surgery center, $717 in the hospital outpatient department, plus the $292 Part B deductible in either. Most Medigap plans pay the share; Medicare Advantage plans set their own.');
+    assert.equal(t, 'about $317 at a surgery center, $717 in the hospital outpatient department, plus the $292 Part B deductible in either. Most Medigap plans pay the coinsurance; Medicare Advantage plans set their own.');
   });
   test('ASC higher: the line leads with it, and names the hospital cap', () => {
     const html = shareHtml(packShare(shares.codes['0202T']), deductibles);
     const t = text(html);
-    assert.equal(t, 'more at a surgery center, about $4,674, than the $1,776 in the hospital outpatient department (capped at the inpatient deductible), plus the $292 Part B deductible in either. Most Medigap plans pay the share; Medicare Advantage plans set their own.');
+    assert.equal(t, 'more at a surgery center, about $4,674, than the $1,776 in the hospital outpatient department (capped at the inpatient deductible), plus the $292 Part B deductible in either. Most Medigap plans pay the coinsurance; Medicare Advantage plans set their own.');
     assert.match(html, /^<strong>more at a surgery center<\/strong>/);
   });
   test('capped but the ASC is still lower: the cap is named, the order is normal', () => {

@@ -80,6 +80,17 @@ test('the data years read as calendars: FY 2027 inpatient, CY 2027 outpatient, 2
   for (const words of ['FY 2027', 'CY 2027', '2024']) assert.ok(text.includes(words), words);
 });
 
+test('the Maryland sentence holds only while Maryland is the one exclusion: another one fails the build', () => {
+  const hospitals = read('pipeline/derived/hospitals.json');
+  hospitals.meta = { ...hospitals.meta, counts: { ...hospitals.meta.counts, offered: hospitals.meta.counts.offered - 1 } };
+  assert.throws(() => tablesFrom({ hospitals }), /Maryland/);
+});
+
+test('SCH and MDH payment, cited to 42 CFR 412.92(d) and 412.108(c); downloads keep leading zeros through a text import', () => {
+  for (const section of ['412.92', '412.108']) assert.ok(CFR[section] && html.includes(CFR[section]), section);
+  for (const words of ['higher of the federal rate or a hospital-specific rate', 'federal rate plus 75% of any difference', 'This page shows the federal rate']) assert.ok(text.includes(words), words);
+});
+
 test('the sources table gains the new files, each once', () => {
   const rows = methodsSources(tablesFrom());
   const ids = rows.map((s) => s.id);

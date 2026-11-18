@@ -28,7 +28,7 @@ export function shareHtml([asc, opps, ascMore, capped], deductibles, { capital =
   const hospital = `${money(opps)} in the hospital outpatient department${capped ? ' (capped at the inpatient deductible)' : ''}`;
   const [more, about] = capital ? ['More', 'About'] : ['more', 'about'];
   const lead = ascMore ? `<strong>${more} at a surgery center</strong>, about ${money(asc)}, than the ${hospital}` : `${about} ${money(asc)} at a surgery center, ${hospital}`;
-  return `${lead}, plus the ${money(deductibles.part_b)} Part B deductible in either. Most Medigap plans pay the share; Medicare Advantage plans set their own.`;
+  return `${lead}, plus the ${money(deductibles.part_b)} Part B deductible in either. Most Medigap plans pay the coinsurance; Medicare Advantage plans set their own.`;
 }
 
 /**
