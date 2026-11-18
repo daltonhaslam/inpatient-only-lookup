@@ -88,6 +88,24 @@ export function paramsFromState(state) {
   return p.toString();
 }
 
+/** A CMS certification number as the hospital picker writes it: six digits. */
+export const CCN = /^\d{6}$/;
+
+/**
+ * The picked hospital from a query string: its CCN when h is given once and is exactly six digits, else
+ * ''. Whether that CCN is a hospital the picker offers is checked against the shipped list before
+ * anything is fetched.
+ */
+export function hospitalParam(search) {
+  const h = new URLSearchParams(search).getAll('h');
+  return h.length === 1 && CCN.test(h[0]) ? h[0] : '';
+}
+
+/** The page's query string: the hospital first (only when one is picked), then the filters. */
+export function queryString(state, h = '') {
+  return [CCN.test(h) ? `h=${h}` : '', paramsFromState(state)].filter(Boolean).join('&');
+}
+
 /** "12 codes" / "1 code" / "No codes", and how many are showing. */
 export function countText(total, shown) {
   if (!total) return 'No codes match.';
