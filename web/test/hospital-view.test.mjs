@@ -2,27 +2,12 @@
 // hospital mode, run against the real derived tables the way the browser gets them.
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { normalize, clientModel } from '../src/stake-data.mjs';
-import { prepare } from '../src/stake-engine.mjs';
+import { hospitals, volume, model, list, doc, data, recordOf, viewOf } from './hospital-fixture.mjs';
 import { card, gapParts } from '../src/stake-card.mjs';
-import { hospitalList, hospitalRecord, uncoveredDrgs } from '../src/hospital-data.mjs';
+import { uncoveredDrgs } from '../src/hospital-data.mjs';
 import { hospitalIndex, findHospitals } from '../src/hospital-pick.mjs';
-import { createView, facts, summaryHtml, hospitalLede, LEDE_NATIONAL, LEDE_HOSPITAL } from '../src/hospital-view.mjs';
+import { facts, summaryHtml, hospitalLede, LEDE_NATIONAL, LEDE_HOSPITAL } from '../src/hospital-view.mjs';
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const read = (path) => JSON.parse(readFileSync(join(root, path), 'utf8'));
-const hospitals = read('pipeline/derived/hospitals.json');
-const volume = read('pipeline/derived/drg-volume.json');
-const model = normalize(read('pipeline/derived/crosswalk.json'));
-// What the browser has: the shipped list, one hospital's file, and the cards' model.
-const list = JSON.parse(JSON.stringify(hospitalList(hospitals, model, volume.meta)));
-const doc = JSON.parse(JSON.stringify(clientModel(model, [], [])));
-const data = prepare(doc);
-const recordOf = (ccn) => JSON.parse(JSON.stringify(hospitalRecord(hospitals.hospitals[ccn], volume.volume[ccn], volume.meta.drgs)));
-const viewOf = (ccn) => createView({ list, record: recordOf(ccn), ccn, data, meta: doc.meta });
 const text = (html) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
 describe('the files the build ships', () => {
@@ -107,7 +92,7 @@ describe('summary strip', () => {
   });
   test('the name is escaped everywhere it appears', () => {
     const record = { ...recordOf('380009'), name: '<img src=x onerror=alert(1)>' };
-    const view = createView({ list, record, ccn: '380009', data, meta: doc.meta });
+    const view = viewOf('380009', record);
     for (const html of [view.summaryHtml, view.barHtml, view.card(view.data.byCode['32480'])]) {
       assert.ok(!html.includes('<img'), html.slice(0, 200));
       assert.ok(html.includes('&lt;img'));
@@ -148,7 +133,7 @@ describe('cards in hospital mode', () => {
   });
   test('an add-on that rounds to $0 draws no segment and no legend, like the Includes line', () => {
     const record = { ...recordOf('380009'), tchop: 1e-5, tchcp: 0, dshopp: 0, dshcpp: 0 };
-    const view = createView({ list, record, ccn: '380009', data, meta: doc.meta });
+    const view = viewOf('380009', record);
     const item = view.data.byCode['32480'];
     assert.ok(item.addOn && item.addOn.high > 0 && item.addOn.high < 0.5, 'a real but sub-$0.50 add-on');
     const html = view.card(item);

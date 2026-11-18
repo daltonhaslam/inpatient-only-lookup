@@ -2,17 +2,12 @@
 // traced to its CMS file and column, every figure read from the derived tables (never retyped).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { methodsTables, hospitalMethods, methodsSources } from '../src/hospital-methods.mjs';
 import { cents, money } from '../src/stake-card.mjs';
 import { pct, ceiling } from '../src/hospital-words.mjs';
-import { normalize } from '../src/stake-data.mjs';
+import { read, model } from './hospital-fixture.mjs';
 import { CFR } from '../src/site.mjs';
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const read = (path) => JSON.parse(readFileSync(join(root, path), 'utf8'));
 const tablesFrom = (over = {}) => methodsTables({
   hospitals: read('pipeline/derived/hospitals.json'),
   volume: read('pipeline/derived/drg-volume.json'),
@@ -22,7 +17,7 @@ const tablesFrom = (over = {}) => methodsTables({
   sources: read('pipeline/sources.json'),
   ...over,
 });
-const rates = normalize(read('pipeline/derived/crosswalk.json')).meta.rates;
+const { rates } = model.meta;
 // The expected values, built from the same tables the page reads (never retyped here either).
 const hMeta = read('pipeline/derived/hospitals.json').meta;
 const vMeta = read('pipeline/derived/drg-volume.json').meta;

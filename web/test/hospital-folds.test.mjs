@@ -2,26 +2,11 @@
 // editable counts, run against the real derived tables the way the browser gets them.
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { normalize, clientModel } from '../src/stake-data.mjs';
-import { prepare } from '../src/stake-engine.mjs';
-import { hospitalList, hospitalRecord, drgSeverity } from '../src/hospital-data.mjs';
-import { createView } from '../src/hospital-view.mjs';
+import { hospitals, list, data, recordOf, viewOf } from './hospital-fixture.mjs';
+import { drgSeverity } from '../src/hospital-data.mjs';
 import { drgLabel, yearUpdate, addOnName } from '../src/hospital-folds.mjs';
 import { ceiling } from '../src/hospital-words.mjs';
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const read = (path) => JSON.parse(readFileSync(join(root, path), 'utf8'));
-const hospitals = read('pipeline/derived/hospitals.json');
-const volume = read('pipeline/derived/drg-volume.json');
-const model = normalize(read('pipeline/derived/crosswalk.json'));
-const list = JSON.parse(JSON.stringify(hospitalList(hospitals, model, volume.meta)));
-const doc = JSON.parse(JSON.stringify(clientModel(model, [], [])));
-const data = prepare(doc);
-const recordOf = (ccn) => JSON.parse(JSON.stringify(hospitalRecord(hospitals.hospitals[ccn], volume.volume[ccn], volume.meta.drgs)));
-const viewOf = (ccn, record = recordOf(ccn)) => createView({ list, record, ccn, data, meta: doc.meta });
 const text = (html) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 const folds = (view, code) => {
   const html = view.card(view.data.byCode[code]);
@@ -54,7 +39,7 @@ describe('DRG severity labels', () => {
 describe('per year lead', () => {
   test('the ceiling caveat comes from hospital-words ceiling() with the shipped data year and the family\'s DRGs', () => {
     const later = { ...list, meta: { ...list.meta, volume_year: 2025 } };
-    const view = createView({ list: later, record: recordOf('380009'), ccn: '380009', data, meta: doc.meta });
+    const view = viewOf('380009', recordOf('380009'), later);
     const html = view.card(view.data.byCode['32480']);
     assert.ok(html.includes(ceiling(2025, '163–165')), 'lead');
     assert.ok(!html.includes('2024'), 'no 2024 left in a 2025 view');

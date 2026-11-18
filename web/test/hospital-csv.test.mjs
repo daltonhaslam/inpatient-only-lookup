@@ -2,27 +2,11 @@
 // view, with the counts someone typed. Run against the real derived tables the way the browser gets them.
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { normalize, clientModel } from '../src/stake-data.mjs';
-import { prepare } from '../src/stake-engine.mjs';
-import { hospitalList, hospitalRecord } from '../src/hospital-data.mjs';
-import { createView } from '../src/hospital-view.mjs';
+import { volume, list, data, recordOf, viewOf } from './hospital-fixture.mjs';
 import { HOSPITAL_CSV_HEADER, hospitalCsvName } from '../src/hospital-csv.mjs';
 import { csv } from '../src/engine.mjs';
 import { ceiling } from '../src/hospital-words.mjs';
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const read = (path) => JSON.parse(readFileSync(join(root, path), 'utf8'));
-const hospitals = read('pipeline/derived/hospitals.json');
-const volume = read('pipeline/derived/drg-volume.json');
-const model = normalize(read('pipeline/derived/crosswalk.json'));
-const list = JSON.parse(JSON.stringify(hospitalList(hospitals, model, volume.meta)));
-const doc = JSON.parse(JSON.stringify(clientModel(model, [], [])));
-const data = prepare(doc);
-const recordOf = (ccn) => JSON.parse(JSON.stringify(hospitalRecord(hospitals.hospitals[ccn], volume.volume[ccn], volume.meta.drgs)));
-const viewOf = (ccn, record = recordOf(ccn)) => createView({ list, record, ccn, data, meta: doc.meta });
 
 const col = (name) => HOSPITAL_CSV_HEADER.indexOf(name);
 const pick = (rows, type, code, drg, payer = '') => rows.filter((r) => r[col('row_type')] === type && r[col('code')] === code && r[col('drg')] === drg && r[col('payer')] === payer);
@@ -113,12 +97,12 @@ describe('hospital CSV', () => {
 
   test('the data year comes from the data: another year shows in count_source and the ceiling note', () => {
     const later = { ...list, meta: { ...list.meta, volume_year: 2025 } };
-    const rows = createView({ list: later, record: recordOf('380009'), ccn: '380009', data, meta: doc.meta }).csvRows();
+    const rows = viewOf('380009', recordOf('380009'), later).csvRows();
     assert.equal(one(rows, 'per_year', '32480', '165', 'traditional_medicare').count_source, 'cms_2025');
     assert.equal(one(rows, 'per_year_total', '32480', '').note, ceiling(2025));
     assert.ok(!rows.flat().some((cell) => typeof cell === 'string' && cell.includes('2024')), 'no 2024 left in the words of a 2025 file');
     const none = { ...list, meta: { ...list.meta, volume_year: undefined } };
-    assert.throws(() => createView({ list: none, record: recordOf('380009'), ccn: '380009', data, meta: doc.meta }), /volume_year/);
+    assert.throws(() => viewOf('380009', recordOf('380009'), none), /volume_year/);
   });
 
   test('an MA estimate with no traditional count to scale because the count was cleared says so, not "CMS published nothing"', () => {

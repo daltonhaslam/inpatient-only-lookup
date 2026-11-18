@@ -14,6 +14,7 @@ import fetch
 import parse
 from crosswalk import build, checks, exposure, exposure_checks
 from crosswalk.price import NATIONAL, hospital_drg_payment
+from hospital_fixture import RATES
 
 RAW_PRESENT = fetch.RAW.is_dir() and any(fetch.RAW.iterdir())
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "crosswalk"
@@ -22,7 +23,6 @@ FACTS = {"deductibles": {"year": 2027, "part_a_inpatient": 1776, "part_b": 292, 
          "asc_additions_2027": {"count": 2, "also_added": ["64629"], "cite": "c"},
          "expected": {"hospitals_offered": [1, 2], "teaching_in_file": 2,
                       "shares": {"11111": {"asc_share": 316.996, "opps_share": 716.99, "asc_more": False}}}}
-RATES = {"operating": 6848.00, "capital": 539.95, "labor_share": 0.66, "operating_wi_le1": 6848.00, "labor_share_le1": 0.62}
 
 
 def tables(**changes):

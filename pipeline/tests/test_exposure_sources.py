@@ -8,13 +8,11 @@ import unittest
 import fetch
 import parse
 from crosswalk import exposure_sources as xs
+from hospital_fixture import OHSU
 from crosswalk import sources
 
 RAW_PRESENT = fetch.RAW.is_dir() and any(fetch.RAW.iterdir())
 
-OHSU = {"name": "Ohsu Hospital And Clinics", "state": "OR", "wi": 1.1907, "gaf": 1.126962466,
-        "tchop": 0.31139, "tchcp": 0.22928, "dshopp": 0.07045, "dshcpp": 0.10036,
-        "caseta44": 4098.35, "ime_caseta44": 4552.82, "type": 7}
 
 
 class StateOfCcn(unittest.TestCase):

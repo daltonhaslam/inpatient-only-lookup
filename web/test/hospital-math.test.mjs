@@ -2,11 +2,11 @@
 // drg-volume.json), so these tests prove the pipeline + math chain, not hand-typed factors.
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { normalize, clientModel } from '../src/stake-data.mjs';
+import { clientModel } from '../src/stake-data.mjs';
+import { read, hospitals, model } from './hospital-fixture.mjs';
 import { prepare } from '../src/stake-engine.mjs';
 import {
   NATIONAL, round2, teaching, count, drgPayment, outpatientRate, hospitalContext, hospitalItem,
@@ -15,11 +15,8 @@ import {
 import { fractionWord } from '../src/hospital-words.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const derived = (name) => JSON.parse(readFileSync(join(here, '../../pipeline/derived', name), 'utf8'));
-const crosswalk = derived('crosswalk.json');
-const hospitals = derived('hospitals.json');
-const volume = derived('drg-volume.json').volume;
-const model = normalize(crosswalk);
+const crosswalk = read('pipeline/derived/crosswalk.json');
+const { volume } = read('pipeline/derived/drg-volume.json');
 const { items, byCode } = prepare(clientModel(model, []));   // exactly what the browser draws cards from
 // The hospital view's only constants: hospitals.json meta (rates, DRG weights, OPPS labor share).
 const env = { meta: hospitals.meta };
@@ -178,6 +175,17 @@ describe('national mode: no drift, by even a cent, on any item (Review Focus 5)'
     const { labor_share: _drop, ...short } = RATES;
     assert.throws(() => hospitalContext({ meta: { ...hospitals.meta, rates: short }, hospital: NATIONAL }), /meta\.rates\.labor_share is missing/);
     assert.throws(() => hospitalContext({ meta: { ...hospitals.meta, opps_labor_share: undefined }, hospital: NATIONAL }), /opps_labor_share/);
+    // The formula reads every rate the shipped meta carries: dropping any one of them throws.
+    for (const key of Object.keys(RATES)) {
+      const { [key]: _gone, ...rest } = RATES;
+      assert.throws(() => hospitalContext({ meta: { ...hospitals.meta, rates: rest }, hospital: NATIONAL }), new RegExp(`meta\\.rates\\.${key} is missing`), key);
+    }
+  });
+  test('NATIONAL has exactly price.py\'s payment factors, and the shipped meta names a column for each', () => {
+    const factors = JSON.parse(execFileSync('python3', ['-I', '-c', 'import json, sys; sys.path.insert(0, sys.argv[1]); from crosswalk.price import PAYMENT_FACTORS; print(json.dumps(PAYMENT_FACTORS))',
+      join(here, '../../pipeline')], { encoding: 'utf8' }));
+    assert.deepEqual(Object.keys(NATIONAL).sort(), [...factors].sort());
+    for (const key of factors) assert.ok(hospitals.meta.columns[key], `hospitals.json meta.columns.${key}`);
   });
 });
 
