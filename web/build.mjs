@@ -14,6 +14,7 @@ import { todayISO, isDate, monthYear, formatDate, clampDate, periodIndex, siAt, 
 import * as pages from './src/pages.mjs';
 import * as stake from './src/stake.mjs';
 import { normalize, credits, clientModel, removalMismatches } from './src/stake-data.mjs';
+import { hospitalList, hospitalRecord } from './src/hospital-data.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -273,6 +274,34 @@ function stakeData(ctx) {
   return { ...stake.stakeContext(model, credits(reviews, model, resolutions), ctx.data.groups, { xlsx: existsSync(xlsx) }), xlsxPath: xlsx };
 }
 
+/**
+ * The hospital view's files, loaded only after someone uses the picker: the list (with the math's
+ * constants), one file per hospital under a directory named for the hash of all of them, and the
+ * picker's own bundle and stylesheet. Their URLs go into the stake bundle at build time, so the national page's HTML
+ * does not change. null (no picker) when the derived hospital tables are absent.
+ */
+async function hospitalAssets() {
+  const paths = ['pipeline/derived/hospitals.json', 'pipeline/derived/drg-volume.json'];
+  if (!paths.every((path) => existsSync(join(root, path)))) {
+    console.warn('No hospitals.json or drg-volume.json: building Revenue at stake without the hospital picker.');
+    return null;
+  }
+  const [hospitals, volume] = paths.map(read);
+  const records = Object.keys(hospitals.hospitals).sort()
+    .map((ccn) => [ccn, JSON.stringify(hospitalRecord(hospitals.hospitals[ccn], volume.volume[ccn], volume.meta.drgs))]);
+  const dir = `data/h.${sha(records.map(([ccn, text]) => `${ccn}\n${text}`).join('\n'))}`;
+  for (const [ccn, text] of records) write(`${dir}/${ccn}.json`, text);
+  const view = await bundle({
+    entryPoints: [join(here, 'src/hospital-picker.mjs')], bundle: true, minify: true, format: 'esm', target: 'es2020', write: false, legalComments: 'none',
+  });
+  return {
+    list: hashed('data', 'hospitals', 'json', JSON.stringify(hospitalList(hospitals))),
+    dir: `/${dir}`,
+    view: hashed('assets', 'hospital', 'js', view.outputFiles[0].contents),
+    css: hashed('assets', 'hospital', 'css', readFileSync(join(here, 'src/hospital.css'), 'utf8')),
+  };
+}
+
 const FONTS = [
   ['Archivo', '@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2', '100 900'],
   ['Besley', '@fontsource-variable/besley/files/besley-latin-wght-normal.woff2', '400 900'],
@@ -314,8 +343,10 @@ async function main() {
   const script = await bundle({
     entryPoints: [join(here, 'src/client.mjs')], bundle: true, minify: true, format: 'iife', target: 'es2020', write: false, legalComments: 'none',
   });
+  const hospitals = ctx.stake ? await hospitalAssets() : null;
   const stakeScript = ctx.stake ? await bundle({
     entryPoints: [join(here, 'src/stake-client.mjs')], bundle: true, minify: true, format: 'iife', target: 'es2020', write: false, legalComments: 'none',
+    define: { __HOSPITAL_ASSETS__: JSON.stringify(hospitals) },
   }) : null;
   ctx.assets = {
     css,
@@ -323,6 +354,7 @@ async function main() {
     stakeJs: stakeScript ? hashed('assets', 'stake', 'js', stakeScript.outputFiles[0].contents) : null,
     data: hashed('data', 'ipo', 'json', JSON.stringify(ctx.data)),
     other: hashed('data', 'other', 'json', JSON.stringify(packOther())),
+    hospitals,
     stake: ctx.stake ? hashed('data', 'stake', 'json', JSON.stringify(clientModel(ctx.stake.model, ctx.stake.groups, ctx.codes))) : null,
     preload: faces.map((f) => `<link rel="preload" href="${f.url}" as="font" type="font/woff2" crossorigin>`).join('\n'),
   };

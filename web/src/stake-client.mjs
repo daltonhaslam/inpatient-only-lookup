@@ -4,9 +4,22 @@
 import { num } from './engine.mjs';
 import { esc } from './views.mjs';
 import { card, STATUS } from './stake-card.mjs';
-import { prepare, filterCodes, outsideCrosswalk, stateFromParams, paramsFromState, countText, PAGE_SIZE, TIERS, DEFAULTS } from './stake-engine.mjs';
+import { prepare, filterCodes, outsideCrosswalk, stateFromParams, hospitalParam, queryString, countText, PAGE_SIZE, TIERS, DEFAULTS } from './stake-engine.mjs';
+import { SHELL, field } from './hospital-field.mjs';
+
+// The hospital view's file URLs, put into this bundle by build.mjs (null: no picker in this build).
+const HOSPITAL = typeof __HOSPITAL_ASSETS__ === 'undefined' ? null : __HOSPITAL_ASSETS__;
 
 const $ = (selector, root = document) => root.querySelector(selector);
+
+/** Run a DOM change as a view transition where the browser has them and motion is welcome; else at once. */
+function transition(change) {
+  if (!document.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    change();
+    return Promise.resolve();
+  }
+  return document.startViewTransition(change).updateCallbackDone;
+}
 
 const option = (value, text, current) => `<option value="${esc(value)}"${value === current ? ' selected' : ''}>${esc(text)}</option>`;
 const select = (id, label, options, current, hint) => `<label class="sfilter__field" for="${id}"><span>${label}</span><select id="${id}" data-f="${id.replace('sf-', '')}"${hint ? ` aria-describedby="${hint}"` : ''}>${options.map(([v, t]) => option(v, t, current)).join('')}</select></label>`;
@@ -63,6 +76,10 @@ export function start(model) {
   if (!host) return;
   const data = prepare(model);
   const state = stateFromParams(window.location.search, data);
+  // The picked hospital: its view (hospital-view.mjs createView), or null for national. pending: a
+  // six-digit ?h= still being checked against the list, kept in the URL until then.
+  let view = null;
+  let pending = hospitalParam(window.location.search);
   let matches = [];
   let shown = 0;
 
@@ -75,14 +92,14 @@ export function start(model) {
   let announce = 0;
 
   const writeUrl = () => {
-    const text = paramsFromState(state);
+    const text = queryString(state, view ? view.ccn : pending);
     try { window.history.replaceState(null, '', `${window.location.pathname}${text ? `?${text}` : ''}${window.location.hash}`); } catch { /* the page still works without a remembered state */ }
   };
 
   // Cards are drawn in slices of PAGE_SIZE; the results node is rebuilt only when the filters change.
   const draw = (from) => {
     const slice = matches.slice(from, from + PAGE_SIZE);
-    const html = slice.map((item) => card(item, model.meta, { detail: false })).join('');
+    const html = slice.map((item) => (view ? view.card(item) : card(item, model.meta, { detail: false }))).join('');
     if (from === 0) {
       const miss = matches.length ? null : outsideCrosswalk(data, state.q);
       results.innerHTML = matches.length ? html : (miss ? missing(miss) : empty());
@@ -96,7 +113,7 @@ export function start(model) {
   };
 
   const update = () => {
-    matches = filterCodes(data, state);
+    matches = filterCodes(view ? view.data : data, state);
     draw(0);
     writeUrl();
     const miss = !matches.length && outsideCrosswalk(data, state.q);
@@ -133,6 +150,34 @@ export function start(model) {
 
   update();
   count.textContent = countText(matches.length, shown);
+
+  const mount = HOSPITAL && $('[data-hospital-pick]');
+  if (!mount) return;
+  // The empty picker draws now; the code that makes it work, the hospital list and each hospital's file
+  // load on first use (focus, a tap, or an ?h= in the address), so the national page carries none of it.
+  mount.innerHTML = SHELL;
+  $('[data-hpick-body]', mount).innerHTML = field(null);
+  let picker = null;   // the import of the picker bundle, once started
+  let ui = null;       // the picker, once it has taken over the box
+  const attach = () => {
+    picker ||= import(HOSPITAL.view).then((mod) => mod.attachPicker(mount, HOSPITAL, {
+      data, meta: model.meta,
+      // One hospital's view, computed once: swap the strip and the cards together, then say so once.
+      onPick: (next, { initial }) => transition(() => { view = next; pending = ''; ui.show(next); update(); })
+        .then(() => {
+          if (!initial) $('[data-hpick-change]', mount)?.focus();
+          ui.say(next.announce);
+        }),
+      onClear: () => transition(() => { view = null; ui.show(null); update(); })
+        .then(() => { $('#hp-q', mount)?.focus(); ui.say('Showing national rates.'); }),
+      // An ?h= that names no hospital the picker offers (Maryland, unknown): national, clean URL.
+      onInvalid: ({ keepUrl = false }) => { if (!keepUrl) { pending = ''; writeUrl(); } },
+    })).then((ready) => { ui = ready; return ready; })
+      .catch((error) => { picker = null; throw error; });
+    return picker;
+  };
+  for (const type of ['focusin', 'pointerdown']) mount.addEventListener(type, () => { attach().catch(() => {}); });
+  if (pending) attach().then((ready) => ready.start(pending)).catch(() => { /* national stays; the URL keeps h for a reload */ });
 }
 
 async function load() {

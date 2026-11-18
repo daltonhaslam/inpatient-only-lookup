@@ -116,6 +116,9 @@ function helpCallout(stake) {
 </aside>`;
 }
 
+/** Where stake-client.mjs puts the hospital picker and, after a pick, the summary strip. Empty without JS. */
+export const PICK_MOUNT = '<div class="hpick" data-hospital-pick></div>';
+
 export function mainPage(ctx) {
   const stake = ctx.stake;
   const { meta } = stake.model;
@@ -123,7 +126,7 @@ export function mainPage(ctx) {
 <section class="stake-head" aria-labelledby="stake-h1">
 <h1 id="stake-h1">Revenue at stake</h1>
 <p class="lede">${coverageSentence(stake)} For those ${num(stake.summary.compared)}: what outpatient pays next to the inpatient MS-DRG family the same operation would group to, national and unadjusted, from CMS’s ${esc(meta.years.outpatient)} and ${esc(meta.years.inpatient)} final rules.</p>
-${draft()}
+${draft()}${ctx.assets.hospitals ? `\n${PICK_MOUNT}` : ''}
 ${helpCallout(stake)}
 ${downloads(stake)}
 ${years(meta)}

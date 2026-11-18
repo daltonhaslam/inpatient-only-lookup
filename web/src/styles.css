@@ -472,3 +472,12 @@ td a[target] { white-space: nowrap; }
 .stake-tablewrap { max-width: none; margin-top: 1.6rem; }
 .stake-tablewrap > summary { font-weight: 600; }
 .stake-tablewrap > h2 { margin-top: 1rem; }
+
+/* ---- revenue at stake: the hospital picker's empty box (stake-client.mjs draws it). The rest of the
+   hospital view's styles load with the picker, on first use: web/src/hospital.css. ---- */
+@media (scripting: enabled) { .hpick:empty { min-height: 5.2rem; } }   /* hold the picker's place until it draws */
+.hpick { margin-top: 1.3rem; max-width: 46rem; }
+.hpick__box { position: relative; }
+.hpick__field input { font-size: 1.15rem; }
+.hpick__note { margin-top: 0.45rem; font-size: 0.9rem; color: var(--ink-2); max-width: var(--measure); }
+.hpick__note:empty { display: none; }
