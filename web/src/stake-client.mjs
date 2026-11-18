@@ -12,6 +12,15 @@ import { fetchJson } from './fetch.mjs';
 // The hospital view's file URLs, put into this bundle by build.mjs (null: no picker in this build).
 const HOSPITAL = typeof __HOSPITAL_ASSETS__ === 'undefined' ? null : __HOSPITAL_ASSETS__;
 
+// A landing on ?h=<CCN> will show a hospital's bar and summary where the empty picker is. Reserve their
+// height now, at script start, so the page below does not jump when they arrive (styles.css .hpick-h).
+// Dropped when that hospital turns out not to be shown (an unknown CCN, a failed load) or on Back to
+// national. A Maryland CCN (state code 21) is never shown, so it reserves nothing.
+const RESERVE = 'hpick-h';
+const reserve = (on) => document.documentElement.classList.toggle(RESERVE, on);
+const landing = HOSPITAL ? hospitalParam(window.location.search) : '';
+if (landing && !landing.startsWith('21')) reserve(true);
+
 const $ = (selector, root = document) => root.querySelector(selector);
 
 /** Run a DOM change as a view transition where the browser has them and motion is welcome; else at once. */
@@ -169,16 +178,16 @@ export function start(model) {
           if (!initial) $('[data-hpick-change]', mount)?.focus();
           ui.say(next.announce);
         }),
-      onClear: (ui) => transition(() => { view = null; ui.show(null); update(); })
+      onClear: (ui) => transition(() => { view = null; reserve(false); ui.show(null); update(); })
         .then(() => { $('#hp-q', mount)?.focus(); ui.say('Showing national rates.'); }),
       // An ?h= that names no hospital the picker offers (Maryland, unknown): national, clean URL.
-      onInvalid: ({ keepUrl = false }) => { if (!keepUrl) { pending = ''; writeUrl(); } },
+      onInvalid: ({ keepUrl = false }) => { reserve(false); if (!keepUrl) { pending = ''; writeUrl(); } },
     })).catch(() => { picker = null; return null; });
     return picker;
   };
   for (const type of ['focusin', 'pointerdown']) mount.addEventListener(type, attach);
   // A failed load keeps national, and the h in the URL for a reload.
-  if (pending) attach().then((ui) => ui && ui.start(pending));
+  if (pending) attach().then((ui) => (ui ? ui.start(pending) : reserve(false)));
 }
 
 async function load() {
@@ -191,4 +200,5 @@ load().catch(() => {
   // The tables below stand on their own; drop the picker's reserved space, which would stay blank.
   const mount = $('[data-hospital-pick]');
   if (mount && !mount.firstChild) mount.remove();
+  reserve(false);
 });

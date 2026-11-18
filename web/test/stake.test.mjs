@@ -192,7 +192,7 @@ describe('revenue at stake', { skip }, () => {
     const html = read('revenue-at-stake/index.html');
     const lede = /<section class="stake-head"[\s\S]*?<p class="lede">([\s\S]*?)<\/p>/.exec(html)[1];
     assert.equal(lede.split(LEDE_NATIONAL).length - 1, 1, lede);
-    assert.notEqual(hospitalLede(lede, 'X', true), lede, 'the swap changes it');
+    assert.notEqual(hospitalLede(lede), lede, 'the swap changes it');
   });
 
   test('main page: badge, guardrail, years, progress, downloads, a row per code', () => {

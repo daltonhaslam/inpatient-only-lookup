@@ -479,6 +479,12 @@ td a[target] { white-space: nowrap; }
 /* Hold the picker's place until it draws (no layout shift). stake-client.mjs removes the empty mount if its
    data fails to load; only a script that never runs at all leaves the band. */
 @media (scripting: enabled) { .hpick:empty { min-height: 4.25rem; } }
+/* On an ?h= landing (stake-client.mjs sets .hpick-h at script start) hold about the height the hospital's bar
+   and summary will take, so nothing below jumps when they arrive. Set a little under the shortest summary
+   (two numbers) at each layout: one column of numbers on a phone, two, then three. */
+.hpick-h .hpick { min-height: 37.5rem; }
+@media (min-width: 30rem) { .hpick-h .hpick { min-height: 26rem; } }
+@media (min-width: 46rem) { .hpick-h .hpick { min-height: 23rem; } }
 .hpick { margin-top: 1.3rem; max-width: 46rem; }
 .hpick__box { position: relative; }
 .hpick__field input { font-size: 1.15rem; }

@@ -35,7 +35,7 @@ button.hpick__btn:hover { background: none; color: var(--ink); text-decoration-t
 .hsum__lead { font: 600 clamp(1.2rem, 1.05rem + 0.6vw, 1.45rem)/1.32 var(--serif); letter-spacing: -0.005em; text-wrap: balance; max-width: 44ch; }
 .hsum__nums { margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr)); gap: 0.9rem 2rem; }
 .hsum__nums div { display: flex; flex-direction: column; }
-.hsum__nums dd { order: -1; margin: 0; font: 650 1.75rem/1.15 var(--serif); font-variant-numeric: tabular-nums lining-nums; }
+.hsum__nums dd { order: -1; margin: 0; font: 650 1.75rem/1.15 var(--serif); font-variant-numeric: lining-nums; }   /* Besley's tabular figures ignore the weight axis: proportional ones render at 650 */
 .hsum__nums dt { margin-top: 0.2rem; font-size: 0.92rem; color: var(--ink-2); line-height: 1.4; }
 .hsum__note { margin-top: 0.9rem; font-size: 0.86rem; color: var(--ink-2); max-width: var(--measure); }
 .scard__addon { display: block; margin-top: 0.3rem; font-size: 0.95rem; }
@@ -55,6 +55,18 @@ button.hpick__btn:hover { background: none; color: var(--ink); text-decoration-t
 .hfold__notes { padding-left: 1.1rem; }
 .hfold__notes li + li { margin-top: 0.3rem; }
 .hfold .scroll + .scroll { margin-top: 1rem; }
+/* A fold table wider than the card (six DRGs at 400 px) shows a soft edge shadow on the side that scrolls:
+   the shadows stay fixed while paper-colored covers ride with the content (background-attachment local)
+   and hide each shadow once that edge is reached. */
+.hfold .scroll {
+  --edge: rgb(20 34 31 / 0.22);
+  background:
+    linear-gradient(to right, var(--paper) 40%, transparent) left / 1.5rem 100% no-repeat local,
+    linear-gradient(to left, var(--paper) 40%, transparent) right / 1.5rem 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, var(--edge), transparent) left / 0.75rem 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, var(--edge), transparent) right / 0.75rem 100% no-repeat scroll;
+}
+@media (prefers-color-scheme: dark) { .hfold .scroll { --edge: rgb(232 240 237 / 0.22); } }
 .hfold table { font-size: 0.95rem; font-variant-numeric: tabular-nums lining-nums; }
 .hfold th, .hfold td { padding: 0.45rem 1.1rem 0.45rem 0; vertical-align: baseline; }
 .hfold th:last-child, .hfold td:last-child { padding-right: 0.2rem; }

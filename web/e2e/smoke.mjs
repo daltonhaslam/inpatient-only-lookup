@@ -944,10 +944,10 @@ if (!hasStake) {
     const national = await lede.innerHTML();
     has(national, 'national and unadjusted', 'national lede');
     await pickHospital(page, 'ohsu', '380009');
-    has(await lede.textContent(), 'at Ohsu Hospital And Clinics’s rates: wage index, IME and DSH', 'hospital lede');
+    has(await lede.textContent(), 'at this hospital’s rates', 'hospital lede');
     await page.locator('[data-hpick-change]').click();
     await pickHospital(page, 'arizona spine', '030107');
-    has(await lede.textContent(), 'at Arizona Spine And Joint Hospital’s rates: wage index (it gets no IME or DSH)', 'no add-on lede');
+    has(await lede.textContent(), 'at this hospital’s rates', 'no add-on lede');
     eq(await page.locator('[data-fold="year"]').count(), 0, 'no per-year fold without add-ons');
     await page.locator('[data-hpick-clear]').click();
     await page.waitForFunction(() => !document.querySelector('.hsum'));
@@ -1053,6 +1053,32 @@ if (!hasStake) {
       ignore404 = false;
     }
   });
+
+  // Layout shift, measured the way Core Web Vitals counts it (shifts without recent input), with the page's
+  // data held back 500 ms so the national page paints first.
+  async function layoutShift(context, path, ready) {
+    await context.addInitScript(() => {
+      window.__cls = 0;
+      new PerformanceObserver((list) => { for (const e of list.getEntries()) if (!e.hadRecentInput) window.__cls += e.value; })
+        .observe({ type: 'layout-shift', buffered: true });
+    });
+    const page = await context.newPage();
+    await page.route(/\/data\/stake\./, async (route) => { await new Promise((r) => setTimeout(r, 500)); await route.continue(); });
+    await page.goto(base + path);
+    await page.waitForSelector(ready, { timeout: 15000 });
+    await page.waitForTimeout(800);
+    const cls = await page.evaluate(() => window.__cls);
+    await page.close();
+    return cls;
+  }
+  for (const width of [400, 1280]) {
+    await check(`hospital ${width}px: an ?h= landing barely shifts (CLS < 0.1) and the national landing not at all`, async (_page, context) => {
+      const hospital = await layoutShift(context, '/revenue-at-stake/?h=380009', '.hsum');
+      assert(hospital < 0.1, `CLS ${hospital.toFixed(3)} on ?h=380009`);
+      const national = await layoutShift(context, '/revenue-at-stake/', '[data-results] [data-stake-card]');
+      assert(national < 0.001, `CLS ${national.toFixed(3)} on the national landing`);
+    }, { viewport: { width, height: 860 } });
+  }
 
   await check('hospital: a file that arrives but cannot be computed says so, not "check the connection"', async (page) => {
     await page.route(/\/data\/h\.[0-9a-f]{10}\/380009\.json/, (route) => route.fulfill({ status: 200, contentType: 'application/json', body: 'null' }));

@@ -10,7 +10,7 @@ import { prepare } from '../src/stake-engine.mjs';
 import { card, gapParts } from '../src/stake-card.mjs';
 import { hospitalList, hospitalRecord, uncoveredDrgs } from '../src/hospital-data.mjs';
 import { hospitalIndex, findHospitals } from '../src/hospital-pick.mjs';
-import { createView, facts, summaryHtml, hospitalLede } from '../src/hospital-view.mjs';
+import { createView, facts, summaryHtml, hospitalLede, LEDE_NATIONAL, LEDE_HOSPITAL } from '../src/hospital-view.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (path) => JSON.parse(readFileSync(join(root, path), 'utf8'));
@@ -196,12 +196,11 @@ describe('gap sentence parts', () => {
 
 describe('the lede after a pick', () => {
   const lede = 'For those 849: what outpatient pays next to the inpatient MS-DRG family the same operation would group to, national and unadjusted, from CMS’s CY 2027 and FY 2027 final rules.';
-  test('names the hospital’s rates where the national lede says national and unadjusted', () => {
-    assert.equal(hospitalLede(lede, 'Ohsu Hospital And Clinics', true), lede.replace('national and unadjusted', 'at Ohsu Hospital And Clinics’s rates: wage index, IME and DSH'));
-    assert.ok(hospitalLede(lede, 'X', false).includes('at X’s rates: wage index (it gets no IME or DSH)'));
+  test('says the rates are the hospital’s where the national lede says national and unadjusted', () => {
+    assert.equal(hospitalLede(lede), lede.replace('national and unadjusted', 'at this hospital’s rates'));
   });
-  test('escapes the name, and leaves a lede without the phrase alone', () => {
-    assert.ok(hospitalLede(lede, '<b>$&</b>', true).includes('at &lt;b&gt;$&amp;&lt;/b&gt;’s rates'));
-    assert.equal(hospitalLede('Something else.', 'X', true), 'Something else.');
+  test('the swap is about the same length, so the lede keeps its lines (no layout shift)', () => {
+    assert.ok(Math.abs(LEDE_HOSPITAL.length - LEDE_NATIONAL.length) <= 2, `${LEDE_HOSPITAL} vs ${LEDE_NATIONAL}`);
+    assert.equal(hospitalLede('Something else.'), 'Something else.');
   });
 });

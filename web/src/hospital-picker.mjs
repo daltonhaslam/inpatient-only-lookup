@@ -153,7 +153,7 @@ export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInv
     try {
       list = await loadList();
       if (!CCN.test(ccn) || !index.byCcn.has(ccn)) { if (initial) onInvalid({}); return; }
-      if (!initial) note(`Loading ${optionName(index.byCcn.get(ccn))}…`);
+      note(`Loading ${optionName(index.byCcn.get(ccn))}…`);   // also on an ?h= landing, in the reserved space
       record = await fetchJson(`${assets.dir}/${ccn}.json`);
     } catch {
       // The network: worth another try.
@@ -191,7 +191,7 @@ export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInv
   function show(view, { focus = false } = {}) {
     picked = view;
     body.innerHTML = view ? view.barHtml + view.summaryHtml : field(null);
-    if (lede) lede.innerHTML = view ? hospitalLede(nationalLede, view.name, view.ctx.addOns) : nationalLede;
+    if (lede) lede.innerHTML = view ? hospitalLede(nationalLede) : nationalLede;
     if (focus) $(view ? '[data-hpick-change]' : '#hp-q').focus();
   }
 

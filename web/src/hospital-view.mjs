@@ -65,11 +65,13 @@ export function summaryHtml(s, name) {
  */
 export const LEDE_NATIONAL = 'national and unadjusted';
 
-/** The page's lede with the picked hospital's rates named in place of LEDE_NATIONAL. html: the lede as the server wrote it. */
-export function hospitalLede(html, name, addOns) {
-  const rates = addOns ? 'wage index, IME and DSH' : 'wage index (it gets no IME or DSH)';
-  return html.replace(LEDE_NATIONAL, () => `at ${esc(name)}’s rates: ${rates}`);
-}
+/**
+ * The page's lede after a pick: LEDE_NATIONAL becomes LEDE_HOSPITAL. About the same length, so the lede
+ * keeps its lines and nothing below it moves (the hospital's name and factors are in the bar just below).
+ * html: the lede as the server wrote it.
+ */
+export const LEDE_HOSPITAL = 'at this hospital’s rates';
+export const hospitalLede = (html) => html.replace(LEDE_NATIONAL, LEDE_HOSPITAL);
 
 /**
  * The words a hospital's card says around its figures (stake-card.mjs NATIONAL_CARD has the national
