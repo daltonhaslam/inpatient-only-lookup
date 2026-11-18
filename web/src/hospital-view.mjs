@@ -1,0 +1,87 @@
+// The Revenue at stake hospital view: everything drawn after a hospital is picked. The build bundles
+// this file on its own (assets/hospital.*.js) and the page imports it on first use, with the hospital
+// list and the hospital's file, so the national page never loads it.
+// Pure: strings in, HTML strings out. Every string from data goes through esc(), the hospital's name
+// included (it comes from CMS's file, but is treated as untrusted).
+import { esc } from './views.mjs';
+import { num } from './engine.mjs';
+import { card, money } from './stake-card.mjs';
+import { hospitalContext, hospitalItem, summary as summarize } from './hospital-math.mjs';
+import { fractionWord } from './hospital-words.mjs';
+import { shortName } from './hospital-pick.mjs';
+
+const pct = (x) => `${(x * 100).toFixed(1)}%`;
+
+/**
+ * "Teaching · IME 31.1% · DSH 7.0% · wage index 1.19". IME and DSH are CMS's operating factors
+ * (TCHOP, DSHOPP); the capital ones apply too, and the summary's note says so.
+ */
+export function facts(h) {
+  const teach = h.tchop > 0 ? `Teaching · IME ${pct(h.tchop)}` : h.tchcp > 0 ? 'Capital IME only' : 'Not a teaching hospital';
+  const dsh = h.dshopp > 0 ? `DSH ${pct(h.dshopp)}` : h.dshcpp > 0 ? 'Capital DSH only' : 'No DSH';
+  return `${teach} · ${dsh} · wage index ${h.wi.toFixed(2)}`;
+}
+
+/**
+ * The summary in plain words, from hospital-math summary(): {lead, tiles: [[value, label]]}, or null
+ * when there is nothing to compare. A hospital with no IME or DSH is told so in words, never "$0".
+ */
+export function summaryText(s, name) {
+  if (!s || s.state === 'empty') return null;
+  const loss = [money(s.medianGap), 'typical loss per case if billed outpatient (median, against the lowest DRG in the family)'];
+  const below = [`${num(s.below)} of ${num(s.codes)}`, `removed procedures pay ${name} less outpatient than even the lowest DRG`];
+  if (s.state === 'no-gap') {
+    return {
+      lead: `At ${name}, a typical removed procedure pays at least as much outpatient as the lowest DRG in its family.`,
+      tiles: [[money(Math.abs(s.medianGap)), `typical ${s.medianGap < 0 ? 'gain' : 'difference'} per case if billed outpatient (median, against the lowest DRG in the family)`], below],
+    };
+  }
+  if (s.state === 'no-addons') {
+    return { lead: `${name} gets no teaching or DSH add-ons, so what a removed procedure loses when billed outpatient is base payment only.`, tiles: [loss, below] };
+  }
+  return {
+    lead: `At ${name}, ${fractionWord(s.ratio)} of what a removed procedure loses when billed outpatient is teaching and DSH add-ons.`,
+    tiles: [loss, [money(s.medianAddOn), 'typical IME and DSH in that lowest DRG (median)'], below],
+  };
+}
+
+/** The summary strip: the lead sentence, its numbers and what they leave out. '' with nothing to compare. */
+export function summaryHtml(s, name) {
+  const text = summaryText(s, name);
+  if (!text) return '';
+  return `<div class="hsum">
+<p class="hsum__lead">${esc(text.lead)}</p>
+<dl class="hsum__nums">${text.tiles.map(([value, label]) => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl>
+<p class="hsum__note">Medians over the ${num(s.codes)} removed procedures with a comparison. The IME and DSH percentages above are CMS’s operating factors; the capital ones are applied too. Uncompensated care, outliers and quality adjustments are left out (<a href="/revenue-at-stake/methods/">Methods</a>).</p>
+</div>`;
+}
+
+/** The one-line "Rates for <name> (<CCN>) · facts" bar with Change and Back to national. */
+function bar(name, ccn, h) {
+  return `<div class="hpick__on">
+<p class="hpick__who"><span class="hpick__label">Rates for</span> <strong class="hpick__name">${esc(name)} <span class="nw">(${esc(ccn)})</span></strong> <span class="hpick__facts">${facts(h).split(' · ').map((part) => `<span class="nw">${esc(part)}</span>`).join(' · ')}</span></p>
+<p class="hpick__acts"><button type="button" class="hpick__btn" data-hpick-change>Change hospital</button><button type="button" class="hpick__btn" data-hpick-clear>Back to national</button></p>
+</div>`;
+}
+
+/**
+ * One picked hospital, computed once: the cards' items rewritten for it (data: prepare()'s data with
+ * those items, same search index), the summary, and the HTML the page swaps in. list: the shipped
+ * hospital list; record: the hospital's file; meta: the browser model's meta (years) for card().
+ * Per-card state that later folds keep (typed counts) belongs on the view, keyed by code.
+ */
+export function createView({ list, record, ccn, data, meta }) {
+  const ctx = hospitalContext({ hospital: record, volume: record.v, meta: list.meta });
+  const name = shortName({ ccn, name: record.name });
+  const items = data.items.map((item) => hospitalItem(item, ctx));
+  const s = summarize(data.items, ctx);
+  return {
+    ccn, name, ctx, summary: s,
+    data: { ...data, items, byCode: Object.fromEntries(items.map((item) => [item.code, item])) },
+    summaryHtml: summaryHtml(s, name),
+    barHtml: bar(name, ccn, record),
+    // Said once, through the picker's polite status line.
+    announce: [`Showing ${name}’s rates.`, summaryText(s, name)?.lead].filter(Boolean).join(' '),
+    card: (item) => card(item, meta, { detail: false, hospital: { name } }),
+  };
+}

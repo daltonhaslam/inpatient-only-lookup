@@ -77,15 +77,22 @@ export function mappingSummary(item) {
   return `${pcs} | ${lead}${families.length > 1 ? `; +${families.length - 1} more` : ''}`;
 }
 
-/** One sentence: what outpatient pays against the inpatient family. Reads as exposure, not advice. */
-export function gapText(item) {
+/**
+ * One sentence: what outpatient pays against the inpatient family. Reads as exposure, not advice.
+ * who: a picked hospital's name, for the conditional "If billed outpatient, <who> is paid ..." form.
+ */
+export function gapText(item, who) {
   const d = item.diff;
   const what = item.ip.families.length > 1 ? 'the inpatient DRG families' : 'the inpatient DRG family';
   if (!d) return `No national outpatient rate for ${siText(item.op.si)}, so no difference is shown.`;
-  if (d.high <= 0) return `Outpatient pays ${moneyRange(-d.high, -d.low)} less than ${what}.`;
-  if (d.low >= 0) return `Outpatient pays ${moneyRange(d.low, d.high)} more than ${what}.`;
-  return `Outpatient pays from ${money(-d.low)} less to ${money(d.high)} more than ${what}.`;
+  const lead = who ? `If billed outpatient, ${who} is paid` : 'Outpatient pays';
+  if (d.high <= 0) return `${lead} ${moneyRange(-d.high, -d.low)} less than ${what}.`;
+  if (d.low >= 0) return `${lead} ${moneyRange(d.low, d.high)} more than ${what}.`;
+  return `${lead} from ${money(-d.low)} less to ${money(d.high)} more than ${what}.`;
 }
+
+/** "Includes $6,067–$14,116 in IME and DSH", or '' when the family carries none (no add-ons, or both ends round to $0). */
+export const addOnText = (addOn) => (addOn && (whole(addOn.low) !== '0' || whole(addOn.high) !== '0') ? `Includes ${moneyRange(addOn.low, addOn.high)} in IME and DSH` : '');
 
 const NO_COMPARE = {
   packaged: 'Packaged: no separate outpatient payment, so there is nothing to compare. Medicare pays for it inside the payment for the main procedure.',
@@ -95,20 +102,27 @@ const NO_COMPARE = {
 };
 export const noCompareText = (item) => NO_COMPARE[item.kind];
 
-function opLine(item) {
+function opLine(item, hospital) {
   const op = item.op;
   if (op.rate === null) return `<span class="scard__amt">No national rate</span><span class="scard__what">${esc(siText(op.si).replace(/^s/, 'S'))}</span>`;
-  return `<span class="scard__amt">${money(op.rate)}</span><span class="scard__what">APC ${esc(op.apc)}${op.apcTitle ? ` ${esc(op.apcTitle)}` : ''}</span>${op.asc !== null ? `<span class="scard__asc">Surgery center (ASC): ${money(op.asc)}</span>` : ''}`;
+  const apc = `<span class="scard__what">APC ${esc(op.apc)}${op.apcTitle ? ` ${esc(op.apcTitle)}` : ''}</span>`;
+  if (!hospital) return `<span class="scard__amt">${money(op.rate)}</span>${apc}${op.asc !== null ? `<span class="scard__asc">Surgery center (ASC): ${money(op.asc)}</span>` : ''}`;
+  // A hospital's rate is wage-adjusted; the surgery-center rate stays national (ASC wage rules differ).
+  const national = op.national !== undefined ? `<span class="scard__cond">With its wage index; national rate ${money(op.national)}</span>` : '';
+  return `<span class="scard__amt">${money(op.rate)}</span>${apc}${national}${op.asc !== null ? `<span class="scard__asc">Surgery center (ASC), national: ${money(op.asc)}</span>` : ''}`
+    + (item.addOn ? '<span class="scard__asc">No teaching or DSH add-on in either outpatient setting.</span>' : '');
 }
 
-function familyLine(f, many) {
+function familyLine(f, many, hospital) {
   const basis = basisText(f.basis);
   const code = f.dx ? ` (${esc(dxCode(f.dx.code))})` : '';
   const lines = many
     ? whenParts(f).map((p) => (p.kind === 'dx' ? `If the principal diagnosis is ${esc(p.text)}${code}` : `If coded as: ${esc(p.text)}`))
     : [`Principal diagnosis: ${esc(f.condition)}${code}`];
   if (basis) lines.push(esc(basis.charAt(0).toUpperCase() + basis.slice(1)));
+  const addOn = hospital ? addOnText(f.addOn) : '';
   return `<div class="scard__fam"><span class="scard__amt">${moneyRange(f.low, f.high)}</span><span class="scard__what">MS-DRG ${esc(drgList(f.drgs))} ${esc(f.name)}</span>`
+    + (addOn ? `<span class="scard__addon">${addOn.replace(/\$[\d,]+(–\$[\d,]+)?/, (range) => `<b class="nw">${range}</b>`)}</span>` : '')
     + lines.map((line) => `<span class="scard__cond">${line}</span>`).join('')
     + `${f.caveat ? `<span class="scard__caveat">${esc(f.caveat)}</span>` : ''}</div>`;
 }
@@ -117,13 +131,23 @@ function familyLine(f, many) {
 // would change every card's markup for no visible gain.
 const pct = (n) => `${(n * 100).toFixed(2)}%`;
 
-/** Bars on one dollar scale: hollow for outpatient, filled for each inpatient range. Decorative; the text says it all. */
-function scaleBar(item) {
+/**
+ * Bars on one dollar scale: hollow for outpatient, filled for each inpatient range. Decorative; the text
+ * says it all. With a hospital's add-ons, the top of each inpatient range is drawn darker for the top
+ * DRG's IME and DSH: the dollars above that DRG's base payment (never left of the range's low end).
+ */
+function scaleBar(item, hospital) {
   const top = Math.max(item.op.rate || 0, item.ip.high);
   const lane = (name, bar) => `<div class="sbar__lane"><span class="sbar__name">${esc(name)}</span><span class="sbar__track">${bar}</span></div>`;
   const lanes = [lane('Outpatient', item.op.rate !== null ? `<i class="sbar__op" style="width:${pct(item.op.rate / top)}"></i>` : '')];
+  const darker = (f) => {
+    if (!hospital || !f.addOn || !(f.addOn.high > 0)) return '';
+    const from = Math.max(f.high - f.addOn.high, f.low);
+    return `<i class="sbar__add" style="left:${pct(from / top)};width:${pct((f.high - from) / top)}"></i>`;
+  };
   for (const f of item.ip.families) {
-    lanes.push(lane(item.ip.families.length > 1 ? `Inpatient, ${whenLabel(f)}` : 'Inpatient', `<i class="sbar__ip" style="left:${pct(f.low / top)};width:${pct(Math.max(f.high - f.low, top * 0.006) / top)}"></i>`));
+    const name = item.ip.families.length > 1 ? `Inpatient, ${whenLabel(f)}` : 'Inpatient';
+    lanes.push(lane(darker(f) ? `${name} (darker: IME and DSH)` : name, `<i class="sbar__ip" style="left:${pct(f.low / top)};width:${pct(Math.max(f.high - f.low, top * 0.006) / top)}"></i>${darker(f)}`));
   }
   return `<div class="sbar" aria-hidden="true">${lanes.join('')}<div class="sbar__axis"><span>$0</span><span>${money(top)}</span></div></div>`;
 }
@@ -174,8 +198,16 @@ ${stale}
 </details>`;
 }
 
-/** The full card. title: render the code and label (off on the code's own page, where the h1 says it). detail: include Show the work (off in the browser, which links to the code page instead). */
-export function card(item, meta, { title = true, detail = true } = {}) {
+/**
+ * The full card. title: render the code and label (off on the code's own page, where the h1 says it).
+ * detail: include Show the work (off in the browser, which links to the code page instead).
+ * hospital: {name} when a hospital is picked and item comes from hospital-math.mjs hospitalItem(); the
+ * card then says whose rates these are, shows the IME and DSH inside the inpatient amount and draws it
+ * darker on the bar; Show the work (national DRG amounts) is never drawn beside it, only linked as
+ * national. folds: HTML for the hospital's folded sections (split by DRG, per year), placed before the fine print.
+ * A code with no comparison draws the same with or without a hospital.
+ */
+export function card(item, meta, { title = true, detail = true, hospital = null, folds = '' } = {}) {
   const head = title ? `<p class="scard__title"><span class="scard__code">${esc(item.code)}</span> <span class="scard__label">${esc(item.label)}</span></p>` : '';
   if (item.kind !== 'compare') {
     return `<article class="scard scard--none" data-stake-card="${esc(item.code)}" data-kind="${esc(item.kind)}">
@@ -184,18 +216,19 @@ ${item.kind === 'pending' || item.kind === 'unmapped' ? `<dl class="scard__pay">
 </article>`;
   }
   const many = item.ip.families.length > 1;
+  const who = hospital ? hospital.name : null;
   const tier = item.tier ? `<p class="scard__tier"><strong>Tier ${item.tier.n}.</strong> ${esc(item.tier.why)}</p>` : '';
   return `<article class="scard scard--t${item.tier ? item.tier.n : 0}" data-stake-card="${esc(item.code)}" data-kind="compare">
 ${head}<p class="scard__status">${statusBadge(item.review)}</p>
-<p class="scard__gap">${esc(gapText(item)).replace(/\$[\d,]+–\$[\d,]+/g, (range) => `<span class="nw">${range}</span>`)}</p>
+<p class="scard__gap">${esc(gapText(item, who)).replace(/\$[\d,]+–\$[\d,]+/g, (range) => `<span class="nw">${range}</span>`)}</p>
 <dl class="scard__pay">
-<div class="scard__op"><dt>Outpatient <span>${esc(meta.years.outpatient)} OPPS</span></dt><dd>${opLine(item)}</dd></div>
-<div class="scard__ip"><dt>Inpatient <span>${esc(meta.years.inpatient)} IPPS</span></dt><dd>${item.ip.families.map((f) => familyLine(f, many)).join('')}</dd></div>
+<div class="scard__op"><dt>Outpatient <span>${esc(meta.years.outpatient)} OPPS</span></dt><dd>${opLine(item, hospital)}</dd></div>
+<div class="scard__ip"><dt>Inpatient <span>${esc(meta.years.inpatient)} IPPS</span></dt><dd>${item.ip.families.map((f) => familyLine(f, many, hospital)).join('')}</dd></div>
 </dl>
-${scaleBar(item)}
-${tier}
-<p class="scard__fine">National, unadjusted: no wage index, IME or DSH. <span class="scard__draft">${esc(BADGE)}</span></p>
-${detail ? work(item, meta) : `<p class="scard__more"><a href="/code/${esc(item.code)}/#stake-h">Show the work for ${esc(item.code)}</a></p>`}
+${scaleBar(item, hospital)}
+${tier}${folds}
+<p class="scard__fine">${who ? esc(item.addOn ? `${who} rates: wage index, IME and DSH (operating and capital).` : `${who} rates: wage index. This hospital gets no IME or DSH.`) : 'National, unadjusted: no wage index, IME or DSH.'} <span class="scard__draft">${esc(BADGE)}</span></p>
+${detail && !who ? work(item, meta) : `<p class="scard__more"><a href="/code/${esc(item.code)}/#stake-h">Show the ${who ? 'national ' : ''}work for ${esc(item.code)}</a></p>`}
 <p class="scard__act">${out(agreeHref(item.code, item.map.fp, mappingSummary(item)), 'Agree', 'btn')}${out(wrongHref(item.code, item.map.fp, mappingSummary(item)), 'Something’s wrong', 'btn btn--quiet')} <a class="scard__batch" href="/revenue-at-stake/help-review/">Review a batch of 10 →</a></p>
 </article>`;
 }

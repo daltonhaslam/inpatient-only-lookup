@@ -1,0 +1,48 @@
+// Build-time: the hospital files Revenue at stake loads on first use, from the committed
+// pipeline/derived/hospitals.json and drg-volume.json. Nothing here reaches the national page.
+//   hospitalList: one small list for the picker (search, labels, the Maryland reason) plus the
+//     constants the math needs (hospitals.json meta: rates, drg_weights, opps_labor_share).
+//   hospitalRecord: one hospital's factors and its 2024 counts, for data/h.<hash>/<ccn>.json.
+import { teaching } from './hospital-math.mjs';
+
+// USPS names for the state codes hospitals.json writes (from each CCN's first two digits), so a
+// search can say "oregon" as well as "OR".
+const STATES = {
+  AK: 'Alaska', AL: 'Alabama', AR: 'Arkansas', AS: 'American Samoa', AZ: 'Arizona', CA: 'California', CO: 'Colorado',
+  CT: 'Connecticut', DC: 'District of Columbia', DE: 'Delaware', FL: 'Florida', GA: 'Georgia', GU: 'Guam', HI: 'Hawaii',
+  IA: 'Iowa', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana',
+  MA: 'Massachusetts', MD: 'Maryland', ME: 'Maine', MI: 'Michigan', MN: 'Minnesota', MO: 'Missouri', MP: 'Northern Mariana Islands',
+  MS: 'Mississippi', MT: 'Montana', NC: 'North Carolina', ND: 'North Dakota', NE: 'Nebraska', NH: 'New Hampshire',
+  NJ: 'New Jersey', NM: 'New Mexico', NV: 'Nevada', NY: 'New York', OH: 'Ohio', OK: 'Oklahoma', OR: 'Oregon',
+  PA: 'Pennsylvania', PR: 'Puerto Rico', RI: 'Rhode Island', SC: 'South Carolina', SD: 'South Dakota', TN: 'Tennessee',
+  TX: 'Texas', UT: 'Utah', VA: 'Virginia', VI: 'Virgin Islands', VT: 'Vermont', WA: 'Washington', WI: 'Wisconsin',
+  WV: 'West Virginia', WY: 'Wyoming',
+};
+const TEACHING = { none: 0, 'capital-only': 1, teaching: 2 };
+const FACTORS = ['name', 'state', 'wi', 'gaf', 'tchop', 'tchcp', 'dshopp', 'dshcpp', 'caseta44', 'ime_caseta44'];
+
+/**
+ * {meta: {rates, drg_weights, opps_labor_share, maryland, source}, states: {code: name},
+ *  h: [[ccn, name or null, state, teaching 0|1|2]], md: [[ccn, name]]}, in CCN order.
+ */
+export function hospitalList(doc) {
+  const { meta } = doc;
+  const rows = Object.entries(doc.hospitals).sort(([a], [b]) => a.localeCompare(b));
+  const used = new Set([...rows.map(([, h]) => h.state), 'MD']);
+  const missing = [...used].filter((code) => !STATES[code]);
+  if (missing.length) throw new Error(`hospitals.json has state codes with no name in web/src/hospital-data.mjs: ${missing.join(', ')}`);
+  return {
+    meta: { rates: meta.rates, drg_weights: meta.drg_weights, opps_labor_share: meta.opps_labor_share, maryland: meta.maryland, source: meta.source },
+    states: Object.fromEntries([...used].sort().map((code) => [code, STATES[code]])),
+    h: rows.map(([ccn, h]) => [ccn, h.name, h.state, TEACHING[teaching(h)]]),
+    md: Object.entries(doc.maryland).sort(([a], [b]) => a.localeCompare(b)).map(([ccn, h]) => [ccn, h.name]),
+  };
+}
+
+/** One hospital's file: its hospitals.json factors and v: {DRG: 2024 discharges} for the crosswalk's DRGs. */
+export function hospitalRecord(hospital, volume = {}, drgs = []) {
+  const record = Object.fromEntries(FACTORS.map((key) => [key, hospital[key]]));
+  const priced = new Set(drgs);
+  record.v = Object.fromEntries(Object.entries(volume).filter(([drg]) => priced.has(drg)));
+  return record;
+}
