@@ -475,7 +475,7 @@ td a[target] { white-space: nowrap; }
 
 /* ---- revenue at stake: the hospital picker's empty box (stake-client.mjs draws it). The rest of the
    hospital view's styles load with the picker, on first use: web/src/hospital.css. ---- */
-@media (scripting: enabled) { .hpick:empty { min-height: 5.2rem; } }   /* hold the picker's place until it draws */
+@media (scripting: enabled) { .hpick:empty { min-height: 4.25rem; } }   /* hold the picker's place until it draws */
 .hpick { margin-top: 1.3rem; max-width: 46rem; }
 .hpick__box { position: relative; }
 .hpick__field input { font-size: 1.15rem; }
