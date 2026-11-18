@@ -58,25 +58,26 @@ button.hpick__btn:hover { background: none; color: var(--ink); text-decoration-t
 .hfold table { font-size: 0.95rem; font-variant-numeric: tabular-nums lining-nums; }
 .hfold th, .hfold td { padding: 0.45rem 1.1rem 0.45rem 0; vertical-align: baseline; }
 .hfold th:last-child, .hfold td:last-child { padding-right: 0.2rem; }
-.hfold .num { text-align: right; white-space: nowrap; }
-.hfold tbody th { font-weight: 600; white-space: normal; min-width: 7.5rem; }
+.hfold .num { text-align: right; }
+.hfold td.num { white-space: nowrap; }
+/* Headers wrap here (the site's tables keep them on one line), so the folds fit a phone. */
+.hfold thead th, .hfold tbody th { white-space: normal; }
+.hfold thead th { vertical-align: bottom; }
+.hfold tbody th { font-weight: 600; }
 .hfold__cap { caption-side: top; text-align: left; font-weight: 600; font-size: 0.92rem; padding-bottom: 0.35rem; }
-.hfold thead th, .hfold thead th.num { white-space: normal; vertical-align: bottom; }
-.hfold .hsplit thead th { min-width: 6rem; }
-.hsplit tbody th { min-width: 0; }
+.hsplit thead th { min-width: 6rem; }
 .hsplit tfoot th, .hsplit tfoot td { font-weight: 650; border-top: 1.5px solid var(--ink); border-bottom: 0; }
 .hyr { width: 100%; max-width: 38rem; }
-.hyr tbody th[scope='row'] { font-weight: 500; min-width: 0; }
+.hyr tbody th[scope='row'] { font-weight: 500; }
 .hyr__drg th { padding: 0.8rem 0 0.15rem; border-bottom: 0; font-weight: 650; }
 .hyr__drg + tr > * { border-top: 0; }
 @media (max-width: 30rem) {
   .hfold table { font-size: 0.88rem; }
   .hfold th, .hfold td { padding-right: 0.6rem; }
-  .hfold .hsplit thead th { min-width: 4.5rem; }
+  .hsplit thead th { min-width: 4.5rem; }
   .hyr__n { width: 4.2em; }
 }
 .hyr__sub { display: block; font-weight: 400; font-size: 0.82rem; color: var(--ink-2); line-height: 1.3; }
-.hyr__count { white-space: nowrap; }
 .hyr__n {
   width: 5.5em; min-height: 2.5rem; padding: 0.3rem 0.5rem; text-align: right;
   font: 600 1rem/1.2 var(--sans); font-variant-numeric: tabular-nums lining-nums;
@@ -85,7 +86,7 @@ button.hpick__btn:hover { background: none; color: var(--ink); text-decoration-t
 .hyr__n:hover { border-color: var(--ink); }
 .hyr__n:focus-visible { border-color: var(--on-ink); outline: 3px solid var(--focus); outline-offset: 2px; }
 .hyr__n[aria-invalid='true'] { border-color: var(--ex-ink); border-style: dashed; }
-.hyr__why { display: block; margin-top: 0.15rem; font-size: 0.8rem; line-height: 1.3; color: var(--ink-2); white-space: normal; }
+.hyr__why { display: block; margin-top: 0.15rem; font-size: 0.8rem; line-height: 1.3; color: var(--ink-2); }
 .hyr__why:empty { display: none; }
 .hyr__n[aria-invalid='true'] + .hyr__why { color: var(--ex-ink); font-weight: 600; }
 .hyr tfoot th, .hyr tfoot td { font-weight: 650; border-top: 1.5px solid var(--ink); border-bottom: 0; }

@@ -289,3 +289,24 @@ describe('CSV download', () => {
     assert.equal(new Set(body.map((r) => r[0])).size, 1861);
   });
 });
+
+describe('vercel.json cache rules', () => {
+  // Vercel reads each source as a path-to-regexp pattern; ours use only literal text, escaped dots and
+  // regex groups, so a plain RegExp reads them the same way.
+  const rules = JSON.parse(readFileSync(join(repo, 'vercel.json'), 'utf8')).headers
+    .filter((rule) => rule.headers.some((h) => h.key === 'Cache-Control' && h.value.includes('immutable')))
+    .map((rule) => new RegExp(`^${rule.source}$`));
+  const immutable = (url) => rules.some((re) => re.test(url));
+  test('every content-hashed file the build emits is cached as immutable', () => {
+    const hashed = files.map((f) => `/${relative(docs, f)}`).filter((url) => /\.[0-9a-f]{10}[./]/.test(url));
+    assert.ok(hashed.some((url) => url.startsWith('/data/shares.')), 'the shares file is among them');
+    assert.ok(hashed.some((url) => url.startsWith('/data/h.')), 'the per-hospital files are among them');
+    const missed = hashed.filter((url) => !immutable(url));
+    assert.deepEqual(missed.slice(0, 5), [], `${missed.length} hashed files without the immutable rule`);
+  });
+  test('files whose names do not change with their content are not', () => {
+    for (const url of ['/data/revenue-at-stake.csv', '/data/revenue-at-stake.xlsx', '/data/inpatient-only-history.csv', '/index.html', '/code/32480/index.html']) {
+      assert.equal(immutable(url), false, url);
+    }
+  });
+});

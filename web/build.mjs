@@ -291,16 +291,25 @@ async function hospitalAssets(model) {
   const records = Object.keys(hospitals.hospitals).sort()
     .map((ccn) => [ccn, JSON.stringify(hospitalRecord(hospitals.hospitals[ccn], volume.volume[ccn], volume.meta.drgs))]);
   const dir = `data/h.${sha(records.map(([ccn, text]) => `${ccn}\n${text}`).join('\n'))}`;
-  for (const [ccn, text] of records) write(`${dir}/${ccn}.json`, text);
-  const view = await bundle({
-    entryPoints: [join(here, 'src/hospital-picker.mjs')], bundle: true, minify: true, format: 'esm', target: 'es2020', write: false, legalComments: 'none',
-  });
+  mkdirSync(join(out, dir), { recursive: true });
+  for (const [ccn, text] of records) writeFileSync(join(out, dir, `${ccn}.json`), text);
   return {
     list: hashed('data', 'hospitals', 'json', JSON.stringify(hospitalList(hospitals, model))),
     dir: `/${dir}`,
-    view: hashed('assets', 'hospital', 'js', view.outputFiles[0].contents),
+    view: hashed('assets', 'hospital', 'js', await bundleEntry('hospital-picker.mjs', 'esm')),
     css: hashed('assets', 'hospital', 'css', readFileSync(join(here, 'src/hospital.css'), 'utf8')),
   };
+}
+
+/**
+ * One minified browser bundle of src/<file>, as bytes. define: build-time constants (the lazy files'
+ * hashed URLs), baked in so the pages' HTML need not change when those files do.
+ */
+async function bundleEntry(file, format, define = {}) {
+  const result = await bundle({
+    entryPoints: [join(here, 'src', file)], bundle: true, minify: true, format, target: 'es2020', write: false, legalComments: 'none', define,
+  });
+  return result.outputFiles[0].contents;
 }
 
 /**
@@ -363,19 +372,13 @@ async function main() {
   const css = hashed('assets', 'site', 'css', `${fontCss}\n${readFileSync(join(here, 'src/styles.css'), 'utf8')}`);
   const shares = patientShares(ctx);
   ctx.shares = shares && shares.doc;
-  const script = await bundle({
-    entryPoints: [join(here, 'src/client.mjs')], bundle: true, minify: true, format: 'iife', target: 'es2020', write: false, legalComments: 'none',
-    define: { __SHARES__: JSON.stringify(shares && shares.lookup) },
-  });
+  const script = await bundleEntry('client.mjs', 'iife', { __SHARES__: JSON.stringify(shares && shares.lookup) });
   const hospitals = ctx.stake ? await hospitalAssets(ctx.stake.model) : null;
-  const stakeScript = ctx.stake ? await bundle({
-    entryPoints: [join(here, 'src/stake-client.mjs')], bundle: true, minify: true, format: 'iife', target: 'es2020', write: false, legalComments: 'none',
-    define: { __HOSPITAL_ASSETS__: JSON.stringify(hospitals) },
-  }) : null;
+  const stakeScript = ctx.stake ? await bundleEntry('stake-client.mjs', 'iife', { __HOSPITAL_ASSETS__: JSON.stringify(hospitals) }) : null;
   ctx.assets = {
     css,
-    js: hashed('assets', 'app', 'js', script.outputFiles[0].contents),
-    stakeJs: stakeScript ? hashed('assets', 'stake', 'js', stakeScript.outputFiles[0].contents) : null,
+    js: hashed('assets', 'app', 'js', script),
+    stakeJs: stakeScript ? hashed('assets', 'stake', 'js', stakeScript) : null,
     data: hashed('data', 'ipo', 'json', JSON.stringify(ctx.data)),
     other: hashed('data', 'other', 'json', JSON.stringify(packOther())),
     hospitals,
