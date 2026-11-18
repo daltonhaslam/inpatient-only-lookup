@@ -82,13 +82,13 @@ function countCell(item, row, payer, up) {
   const why = id(item.code, row.drg, payer);
   const label = `MS-DRG ${row.drg}, ${PAYERS[payer]} cases${payer === 'ma' ? ' (estimate)' : ''}`;
   return `<td class="hyr__count"><input class="hyr__n" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" enterkeyhint="done" maxlength="7" size="6"`
-    + ` value="${esc(up.values[key])}" data-count="${key}" aria-label="${esc(label)}" aria-describedby="${why}"${up.invalid[key] ? ' aria-invalid="true"' : ''}>`
-    + `<span class="hyr__why" id="${why}" data-why="${key}">${esc(up.notes[key])}</span></td>`;
+    + ` value="${esc(up.values[key])}" data-count="${esc(key)}" aria-label="${esc(label)}" aria-describedby="${why}"${up.invalid[key] ? ' aria-invalid="true"' : ''}>`
+    + `<span class="hyr__why" id="${why}" data-why="${esc(key)}">${esc(up.notes[key])}</span></td>`;
 }
 
 // Each row's add-on per case sits under its name, so the table is three columns and fits a 400 px phone.
 const perCase = (row, payer, what) => `<span class="hyr__sub">${cents(row[payer].perCase)} a case: ${what}</span>`;
-const line = (item, row, payer, up, label) => `<tr><th scope="row">${label}</th>${countCell(item, row, payer, up)}<td class="num" data-py="${row.drg}:${payer}">${esc(up.cells[`${row.drg}:${payer}`])}</td></tr>`;
+const line = (item, row, payer, up, label) => `<tr><th scope="row">${label}</th>${countCell(item, row, payer, up)}<td class="num" data-py="${esc(`${row.drg}:${payer}`)}">${esc(up.cells[`${row.drg}:${payer}`])}</td></tr>`;
 
 /** Per year at the hospital: '' for a hospital with no add-ons (there is nothing a year to count). */
 function yearFold(item, ctx, { name, sev, edits, open }) {
