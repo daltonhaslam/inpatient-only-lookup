@@ -33,11 +33,14 @@ export function shareHtml([asc, opps, ascMore, capped], deductibles, { capital =
 
 /**
  * The lookup's file: {d: {part_b}, c: {code: packShare()}} for the codes CMS adds to the ASC list for
- * 2027 (asc-new-2027.json) that have both shares.
+ * 2027 (asc-new-2027.json) that leave the inpatient-only list for 2027 (its ipo_removed flag) and have
+ * both shares. An addition that was never on the list (also_added: 64629) gets no line, rate or not:
+ * the lookup shows the line from the date a code leaves the list.
  */
 export function sharesFile(shares, ascNew) {
   const c = {};
   for (const code of Object.keys(ascNew.codes).sort()) {
+    if (ascNew.codes[code].ipo_removed !== true) continue;
     const packed = packShare(shares.codes[code]);
     if (packed) c[code] = packed;
   }

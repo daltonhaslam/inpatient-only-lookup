@@ -61,6 +61,9 @@ test('the patient share: the deductibles from patient-shares.json with the fact 
   assert.ok(text.includes(money(deductibles.part_a_inpatient)) && text.includes(money(deductibles.part_b)));
   assert.ok(html.includes(deductibles.url), 'fact sheet link');
   for (const words of [String(aMeta.ipo_removed_2027), `FR Doc. ${rule.doc}`, ...aMeta.also_added, '20%']) assert.ok(text.includes(words), words);
+  // As patient-share.mjs sharesFile() does it: the lookup's line is for the removals only.
+  assert.ok(text.includes(`only for the ${aMeta.ipo_removed_2027} removals, from the date they leave the list`), 'removals only');
+  assert.ok(text.includes(`${aMeta.also_added.join(', ')}, not a removal, gets none`), 'the extra code gets none');
   for (const cite of [cites['ASC27-618'].cite, cites['ASC27-64629'].cite, aMeta.cite]) assert.ok(html.includes(frLink(cite)), cite);
   assert.equal(html.split('https://www.medicare.gov/procedure-price-lookup').length - 1, 1);
 });

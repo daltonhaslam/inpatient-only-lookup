@@ -316,6 +316,24 @@ describe('MA cases: teaching hospitals only, operating IME only', () => {
   });
 });
 
+describe('each per-year cell says where its count came from (source), once for the folds and the CSV', () => {
+  const ctx = hospitalContext({ ...env, hospital: hospitals.hospitals[OHSU], volume: { 163: 15, 164: 34 } });
+  const cell = (table, drg, payer) => table.rows.find((r) => r.drg === drg)[payer].source;
+  test('untyped: CMS count, MA estimate, nothing published', () => {
+    const table = perYearTable(byCode['32480'], ctx);
+    assert.deepEqual([cell(table, '163', 'trad'), cell(table, '163', 'ma'), cell(table, '165', 'trad'), cell(table, '165', 'ma')], ['cms', 'estimate', 'none', 'none']);
+  });
+  test('typed: a whole number, a cleared box, anything else; an MA estimate with nothing to scale', () => {
+    const table = perYearTable(byCode['32480'], ctx, { 163: { trad: '10', ma: '' }, 164: { trad: '2.5' }, 165: { trad: 7, ma: 'x' } });
+    assert.deepEqual([cell(table, '163', 'trad'), cell(table, '163', 'ma'), cell(table, '164', 'trad'), cell(table, '164', 'ma'), cell(table, '165', 'trad'), cell(table, '165', 'ma')],
+      ['typed', 'cleared', 'invalid', 'unscaled', 'typed', 'invalid']);
+  });
+  test('no MA ratio: the untyped MA cell is "none" with its reason', () => {
+    const table = perYearTable(byCode['32480'], at(NO_MA_RATIO), { 163: { trad: 20 } });
+    for (const row of table.rows) assert.deepEqual([row.ma.source, row.ma.reason], ['none', 'no-ma-ratio']);
+  });
+});
+
 describe('two-family and no-comparison codes (Review Focus 4)', () => {
   const twoFamily = compared.filter((item) => item.ip.families.length > 1);
   test('two-family codes keep their structure, with hospital amounts in each family', () => {

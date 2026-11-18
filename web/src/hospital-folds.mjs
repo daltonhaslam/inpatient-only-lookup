@@ -68,9 +68,6 @@ function splitFold(item, ctx, { name, sev, open }) {
   return fold('split', open, `The split by DRG <span class="hfold__sub">· ${sub}</span>`, `${tables}<p class="hfold__note">${note}</p>`);
 }
 
-/** Why a count is invalid: something typed that count() does not read as a whole number. */
-const invalidRaw = (raw) => raw !== undefined && String(raw).trim() !== '' && count(raw) === null;
-
 /**
  * Everything the per-year fold shows that changes with the counts: {table (perYearTable), cells, total,
  * headline (after "Per year at <hospital> ·")}. cells: {"<DRG>:trad" | "<DRG>:ma": {text (the row's
@@ -86,13 +83,15 @@ export function yearUpdate(item, ctx, edits = {}) {
     for (const payer of ['trad', 'ma']) {
       const cell = row[payer];
       if (!cell) continue;
-      const invalid = invalidRaw(typed[payer]);
+      // The note under the box, from perYearTable's source. A traditional cell CMS published no count for
+      // keeps saying so after a count is typed in.
+      const invalid = cell.source === 'invalid';
       cells[`${row.drg}:${payer}`] = {
         text: cell.perYear === null ? 'no count' : cents(cell.perYear),
         value: typed[payer] !== undefined ? String(typed[payer]) : cell.count === null ? '' : String(cell.count),
         note: invalid ? 'not a whole number'
           : payer === 'trad' ? (cell.suppressed ? EMPTY.suppressed : '')
-            : cell.estimated ? 'estimate' : (EMPTY[cell.reason] || ''),
+            : cell.source === 'estimate' ? 'estimate' : cell.source === 'none' ? EMPTY[cell.reason] : '',
         invalid,
       };
     }

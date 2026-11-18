@@ -62,13 +62,27 @@ describe('shareHtml', () => {
 
 describe('the lookup file', () => {
   const file = sharesFile(shares, ascNew);
-  test('only the 2027 ASC additions that have shares (64629 and the packaged codes have none)', () => {
-    const expected = Object.keys(ascNew.codes).filter((code) => packShare(shares.codes[code]));
+  test('only the 2027 ASC additions that leave the list and have shares (64629 and the packaged codes have none)', () => {
+    const expected = Object.keys(ascNew.codes).filter((code) => ascNew.codes[code].ipo_removed && packShare(shares.codes[code]));
     assert.deepEqual(Object.keys(file.c).sort(), expected.sort());
     assert.ok(!('64629' in file.c));
     assert.deepEqual(file.c['32480'], [316.996, 716.99, 0, 0]);
     assert.equal(file.d.part_b, deductibles.part_b);
     assert.ok(JSON.stringify(file).length < 20000, `${JSON.stringify(file).length} bytes`);
+  });
+  test('an addition that never left the inpatient-only list gets no line, even with an ASC rate', () => {
+    // A future non-IPO addition with a rate (fixture: a compared code that has both shares, added with
+    // ipo_removed false), and 64629 given a rate: neither is in the file, so the build's one-removal-date
+    // check (build.mjs patientShares) never sees them.
+    const extra = Object.keys(shares.codes).find((code) => !(code in ascNew.codes) && packShare(shares.codes[code]));
+    assert.ok(extra, 'a compared code outside the 2027 additions');
+    const fixture = { ...ascNew, codes: { ...ascNew.codes, [extra]: { pi: 'G2', ipo_removed: false } } };
+    const rated = { ...shares, codes: { ...shares.codes, 64629: shares.codes['32480'] } };
+    const out = sharesFile(rated, fixture);
+    assert.ok(!(extra in out.c), extra);
+    assert.ok(!('64629' in out.c), '64629');
+    assert.deepEqual(Object.keys(out.c).sort(), Object.keys(file.c).sort());
+    assert.ok(Object.keys(out.c).every((code) => fixture.codes[code].ipo_removed === true));
   });
   test('lookupShare: the line once the code is off the list, not before, and never for a code not added', () => {
     assert.equal(lookupShare(file, '32480', 'off', '2027-03-01', '2027-01-01').startsWith('About $317'), true);

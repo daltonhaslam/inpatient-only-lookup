@@ -152,17 +152,29 @@ export function splitRows(item, ctx) {
   }));
 }
 
+/** A typed count's kind (see perYearTable's source): 'typed', 'cleared' or 'invalid'; null when not typed. */
+const typedSource = (raw) => {
+  if (raw === undefined) return null;
+  if (count(raw) !== null) return 'typed';
+  return String(raw).trim() === '' ? 'cleared' : 'invalid';
+};
+
 /**
  * The per-year table: one row per DRG in the code's families (each DRG once, in family order; family
  * is the index of the first family it is in), with
- *   trad: {count, suppressed, perCase, perYear}: count is the 2024 traditional Medicare discharges
- *     (null when CMS publishes none: under 11 or none; suppressed says so even after an edit);
- *     add-on per case = IME + DSH.
+ *   trad: {count, suppressed, source, perCase, perYear}: count is the 2024 traditional Medicare
+ *     discharges (null when CMS publishes none: under 11 or none; suppressed says so even after an
+ *     edit); add-on per case = IME + DSH.
  *   ma: null unless the hospital is a teaching hospital (operating IME > 0); else {count, estimated,
- *     reason, perCase, perYear}: count = round(traditional × MA ratio) unless typed; add-on per case =
- *     operating IME only (42 CFR 412.105(g); no capital IME or DSH on MA claims). reason is set only
- *     when the count is null and was not typed: 'no-ma-ratio' when CMS's file has no IME_CASETA44
+ *     reason, source, perCase, perYear}: count = round(traditional × MA ratio) unless typed; add-on per
+ *     case = operating IME only (42 CFR 412.105(g); no capital IME or DSH on MA claims). reason is set
+ *     only when the count is null and was not typed: 'no-ma-ratio' when CMS's file has no IME_CASETA44
  *     (no estimate), else 'suppressed' when CMS published no traditional count to scale; else null.
+ *   source: where the cell's count came from, the one classification the folds and the hospital CSV
+ *     each word their own way: a typed box is 'typed' (a whole number), 'cleared' (empty) or 'invalid'
+ *     (anything else: no count); else 'cms' (traditional, as published), 'estimate' (MA, with a count),
+ *     'unscaled' (MA: the reader's traditional count it scales is cleared or invalid), or 'none' (CMS
+ *     published nothing to count or scale: suppressed, or the MA reason).
  * edits: {DRG: {trad, ma}}, the counts someone typed (see count(): a whole number or its digits; ""
  * or anything else is a cleared cell). An edited traditional count moves the MA estimate with it.
  * total: round(the unrounded sum of every count × per case), or null when no row has a count.
@@ -182,13 +194,15 @@ export function perYearTable(item, ctx, edits = {}) {
     const edit = edits[drg] || {};
     const cms = count(ctx.volume[drg]);
     const trad = edit.trad !== undefined ? count(edit.trad) : cms;
-    const row = { drg, family, trad: { count: trad, suppressed: cms === null, perCase: round2(p.addons), perYear: add(trad, p.addons) }, ma: null };
+    const tradSource = typedSource(edit.trad) ?? (cms === null ? 'none' : 'cms');
+    const row = { drg, family, trad: { count: trad, suppressed: cms === null, source: tradSource, perCase: round2(p.addons), perYear: add(trad, p.addons) }, ma: null };
     if (ctx.teaching === 'teaching') {
       const typed = edit.ma !== undefined;
       const ma = typed ? count(edit.ma) : trad !== null && ctx.maRatio !== null ? Math.round(trad * ctx.maRatio) : null;
       // Why an untyped MA cell is empty: no ratio to estimate with, or no traditional count to scale.
       const reason = ma !== null || typed ? null : ctx.maRatio === null ? 'no-ma-ratio' : cms === null ? 'suppressed' : null;
-      row.ma = { count: ma, estimated: !typed && ma !== null, reason, perCase: round2(p.imeOperating), perYear: add(ma, p.imeOperating) };
+      const source = typedSource(edit.ma) ?? (ma !== null ? 'estimate' : reason ? 'none' : 'unscaled');
+      row.ma = { count: ma, estimated: source === 'estimate', reason, source, perCase: round2(p.imeOperating), perYear: add(ma, p.imeOperating) };
     }
     return row;
   });

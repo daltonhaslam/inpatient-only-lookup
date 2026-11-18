@@ -7,7 +7,7 @@
 // for a hospital with add-ons, the per-year rows of each code (a row per DRG and payer, then the code's
 // per_year_total). Codes and DRG numbers only: no procedure labels, so no CPT descriptor can ride along.
 import { alternativeLabel } from './stake-card.mjs';
-import { splitRows, perYearTable, count, round2 } from './hospital-math.mjs';
+import { splitRows, perYearTable, round2 } from './hospital-math.mjs';
 import { EMPTY, ceiling, MA_MIX } from './hospital-words.mjs';
 import { blank } from './engine.mjs';
 
@@ -24,22 +24,22 @@ const familyOrder = (item, i) => (i === 0 ? 'primary' : alternativeLabel(item.ip
 const row = (cells) => HOSPITAL_CSV_HEADER.map((name) => blank(cells[name]));
 
 /**
- * Where a per-year count came from, and what the note says: 'typed' (a number, or a cleared or invalid
- * box: then no count), 'cms_<year>' (traditional, as CMS published it for the counts' data year),
- * 'estimate' (MA, traditional × the hospital's MA ratio; with no count when the traditional count it
- * scales was cleared or mistyped), or 'none' (CMS published nothing to count or scale).
+ * The count_source and note of a per-year cell, from perYearTable's source: 'typed' (a number, or a
+ * cleared or invalid box: then no count), 'cms_<year>' (traditional, as CMS published it for the counts'
+ * data year), 'estimate' (MA, traditional × the hospital's MA ratio; with no count when the traditional
+ * count it scales was cleared or mistyped), or 'none' (CMS published nothing to count or scale).
  */
-function source(payer, cell, typed, ctx) {
-  if (typed !== undefined) {
-    if (count(typed) !== null) return ['typed', 'your count'];
-    if (String(typed).trim() === '') return ['typed', 'cleared'];
-    return ['typed', 'not a whole number; not counted'];
+function source(payer, cell, ctx) {
+  switch (cell.source) {
+    case 'typed': return ['typed', 'your count'];
+    case 'cleared': return ['typed', 'cleared'];
+    case 'invalid': return ['typed', 'not a whole number; not counted'];
+    case 'cms': return [`cms_${ctx.year}`, ''];
+    case 'estimate': return ['estimate', `estimate: ${ctx.maRatio.toFixed(2)} MA cases per traditional case (CMS impact file). ${MA_MIX}`];
+    case 'unscaled': return ['estimate', 'no estimate: no traditional count to scale (yours is cleared or not a whole number)'];
+    case 'none': return ['none', EMPTY[payer === 'trad' ? 'suppressed' : cell.reason]];
+    default: throw new Error(`unknown per-year count source: ${cell.source}`);
   }
-  if (payer === 'trad') return cell.count === null ? ['none', EMPTY.suppressed] : [`cms_${ctx.year}`, ''];
-  if (cell.count !== null) return ['estimate', `estimate: ${ctx.maRatio.toFixed(2)} MA cases per traditional case (CMS impact file). ${MA_MIX}`];
-  // No reason means CMS published a traditional count and a ratio: the reader's traditional count is empty.
-  if (!cell.reason) return ['estimate', 'no estimate: no traditional count to scale (yours is cleared or not a whole number)'];
-  return ['none', EMPTY[cell.reason]];
 }
 
 /**
@@ -64,7 +64,7 @@ export function hospitalCsvRows({ items, ctx, ccn, name, edits = new Map() }) {
     const table = perYearTable(item, ctx, typed);
     const lines = table.rows.flatMap((r) => ['trad', 'ma'].filter((payer) => r[payer]).map((payer) => {
       const cell = r[payer];
-      const [from, why] = source(payer, cell, typed[r.drg]?.[payer], ctx);
+      const [from, why] = source(payer, cell, ctx);
       return row({
         ...who, row_type: 'per_year', code: item.code, family_order: familyOrder(item, r.family), drg: r.drg, payer: PAYER[payer],
         cases: cell.count, count_source: from, add_on_per_case: cell.perCase, add_on_per_year: cell.perYear,

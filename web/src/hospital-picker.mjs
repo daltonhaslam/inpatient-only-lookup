@@ -168,10 +168,12 @@ export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInv
       await onPick(createView({ list, record, ccn, data, meta }), { initial, ui });
     } catch (error) {
       // The files arrived but the view could not be built or shown: a fault in the data or the code, not
-      // the connection. National stays (the URL keeps h), and the page says so plainly.
+      // the connection. The page stays as it was before the pick (onPick rolls back to the picker's box;
+      // on a landing, national, the URL keeping h), and the note says so plainly.
       console.error(`Revenue at stake: the hospital view for ${ccn} could not be shown.`, error);
       if (mine !== token) return;
       if (initial) onInvalid({ keepUrl: true });
+      else $('#hp-q')?.focus();
       note(`Could not show ${optionName(index.byCcn.get(ccn))}’s rates: something in its data could not be computed. This is not a connection problem; trying again will not help.`);
     }
   }
@@ -188,12 +190,15 @@ export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInv
   const lede = document.querySelector('.stake-head .lede');
   const nationalLede = lede ? lede.innerHTML : '';
 
-  /** Draw the picked hospital's bar and summary, or the empty picker for national. */
-  function show(view, { focus = false } = {}) {
+  /**
+   * Draw the picked hospital's bar and summary, or the empty picker for national. find: the picker's box
+   * instead (offering to keep the hospital, if any), as it was while a pick was being made.
+   */
+  function show(view, { focus = false, find = false } = {}) {
     picked = view;
-    body.innerHTML = view ? view.barHtml + view.summaryHtml : field(null);
+    body.innerHTML = view && !find ? view.barHtml + view.summaryHtml : field(view ? view.name : null);
     if (lede) lede.innerHTML = view ? hospitalLede(nationalLede) : nationalLede;
-    if (focus) $(view ? '[data-hpick-change]' : '#hp-q').focus();
+    if (focus) $(view && !find ? '[data-hpick-change]' : '#hp-q').focus();
   }
 
   const typed = () => {

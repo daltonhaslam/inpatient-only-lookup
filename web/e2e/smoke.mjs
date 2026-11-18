@@ -1146,6 +1146,72 @@ if (!hasStake) {
     assert(logged.length === 1 && logged[0].includes('the hospital view for 380009 could not be shown'), `console: ${logged.join(' | ')}`);
   });
 
+  const reserved = (page) => page.evaluate(() => document.documentElement.classList.contains('hpick-h'));
+  await check('hospital: an ?h= landing drops its reserved height once shown, so Change hospital leaves no blank band', async (page) => {
+    await openStake(page, '?h=380009');
+    await page.waitForSelector('.hsum');
+    eq(await reserved(page), false, 'reservation dropped once the hospital shows');
+    await page.locator('[data-hpick-change]').click();
+    await page.waitForSelector('#hp-q');
+    const tall = await page.locator('[data-hospital-pick]').evaluate((el) => el.getBoundingClientRect().height);
+    assert(tall < 200, `the picker's box sits in a ${Math.round(tall)}px band after Change hospital`);
+  });
+
+  await check('hospital: an ?h= landing overtaken by a pick that fails still drops its reserved height', async (page) => {
+    let release;
+    const held = new Promise((resolve) => { release = resolve; });
+    await page.route(/\/data\/h\.[0-9a-f]{10}\/380009\.json/, async (route) => { await held; await route.continue(); });
+    await page.route(/\/data\/h\.[0-9a-f]{10}\/030107\.json/, (route) => route.fulfill({ status: 404, body: '' }));
+    ignore404 = true;
+    try {
+      await openStake(page, '?h=380009');
+      await waitText(page.locator('#hp-note'), (t) => t.startsWith('Loading'), 'landing loading');
+      eq(await reserved(page), true, 'reserved while the landing loads');
+      await page.locator('#hp-q').fill('arizona spine');
+      await page.locator('#hp-o-030107').click();
+      await waitText(page.locator('#hp-note'), (t) => t.startsWith('Could not load'), 'the overtaking pick fails');
+      release();
+      await page.waitForFunction(() => !document.documentElement.classList.contains('hpick-h'));
+      eq(await page.locator('.hsum').count(), 0, 'the overtaken landing is not shown');
+    } finally {
+      release();
+      ignore404 = false;
+    }
+  });
+
+  await check('hospital: a view that fails while drawing rolls back to the page before the pick, with a live note', async (page) => {
+    await openStake(page, '?q=32480');
+    // Break the cards' redraw for hospital cards only: the hospital's view is built, then update() throws.
+    await page.evaluate(() => {
+      const results = document.querySelector('[data-results]');
+      const { get, set } = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+      Object.defineProperty(results, 'innerHTML', {
+        configurable: true,
+        get() { return get.call(this); },
+        set(html) { if (window.__breakCards && html.includes('If billed outpatient')) throw new Error('test: card draw failed'); set.call(this, html); },
+      });
+      window.__breakCards = true;
+    });
+    const before = problems.length;
+    await page.locator('#hp-q').fill('ohsu');
+    await page.locator('#hp-o-380009').click();
+    const note = await waitText(page.locator('#hp-note'), (t) => t.startsWith('Could not show'), 'compute-failure note in a live box');
+    has(note, 'This is not a connection problem', 'the note');
+    eq(await page.locator('.hsum, .hpick__on').count(), 0, 'no hospital bar or summary');
+    has(await page.locator('[data-stake-card="32480"]').textContent(), 'Outpatient pays', 'cards stay national');
+    eq(new URL(page.url()).searchParams.get('h'), null, 'no h in the URL');
+    eq(await page.evaluate(() => document.activeElement.id), 'hp-q', 'focus back in the picker box');
+    const logged = problems.splice(before);   // the one console.error this check expects
+    assert(logged.length === 1 && logged[0].includes('the hospital view for 380009 could not be shown'), `console: ${logged.join(' | ')}`);
+    // The view committed nothing: a typed search still draws national cards, and a later pick works.
+    await page.locator('#sf-q').fill('19305');
+    await countLine(page, (t) => t === '1 code.', 'count after the rollback');
+    has(await page.locator('[data-stake-card="19305"]').textContent(), 'Outpatient pays', 'still national after a redraw');
+    await page.evaluate(() => { window.__breakCards = false; });
+    await pickHospital(page, 'ohsu', '380009');
+    has(await page.locator('[data-stake-card="19305"]').textContent(), 'If billed outpatient, Ohsu Hospital And Clinics', 'a later pick works');
+  });
+
   await check('stake: if the page data fails to load, the picker leaves no blank band', async (page) => {
     await page.route(/\/data\/stake\./, (route) => route.fulfill({ status: 404, body: '' }));
     ignore404 = true;

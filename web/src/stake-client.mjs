@@ -14,8 +14,10 @@ const HOSPITAL = typeof __HOSPITAL_ASSETS__ === 'undefined' ? null : __HOSPITAL_
 
 // A landing on ?h=<CCN> will show a hospital's bar and summary where the empty picker is. Reserve their
 // height now, at script start, so the page below does not jump when they arrive (styles.css .hpick-h).
-// Dropped when that hospital turns out not to be shown (an unknown CCN, a failed load) or on Back to
-// national. A Maryland CCN (HOSPITAL.maryland, its state code) is never shown, so it reserves nothing.
+// Dropped once the landing resolves: in the same change that shows the hospital (its bar and summary
+// then hold the space), or when it is not shown (an unknown CCN, a failed load, a later pick or Back to
+// national won). Left on, "Change hospital" would sit above a blank band. A Maryland CCN
+// (HOSPITAL.maryland, its state code) is never shown, so it reserves nothing.
 const RESERVE = 'hpick-h';
 const reserve = (on) => document.documentElement.classList.toggle(RESERVE, on);
 const landing = HOSPITAL ? hospitalParam(window.location.search) : '';
@@ -23,13 +25,18 @@ if (landing && !landing.startsWith(HOSPITAL.maryland)) reserve(true);
 
 const $ = (selector, root = document) => root.querySelector(selector);
 
-/** Run a DOM change as a view transition where the browser has them and motion is welcome; else at once. */
+/** Run a DOM change as a view transition where the browser has them and motion is welcome; else at once. A change that throws rejects the promise returned. */
 function transition(change) {
   if (!document.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    change();
+    try { change(); } catch (error) { return Promise.reject(error); }
     return Promise.resolve();
   }
-  return document.startViewTransition(change).updateCallbackDone;
+  const view = document.startViewTransition(change);
+  // A change that throws rejects all three promises; the caller handles updateCallbackDone's, so the
+  // other two must not surface as unhandled rejections.
+  view.ready.catch(() => {});
+  view.finished.catch(() => {});
+  return view.updateCallbackDone;
 }
 
 const option = (value, text, current) => `<option value="${esc(value)}"${value === current ? ' selected' : ''}>${esc(text)}</option>`;
@@ -172,12 +179,30 @@ export function start(model) {
   const attach = () => {
     picker ||= import(HOSPITAL.view).then((mod) => mod.attachPicker(mount, HOSPITAL, {
       data, meta: model.meta, results,
-      // One hospital's view, computed once: swap the strip and the cards together, then say so once.
-      onPick: (next, { initial, ui }) => transition(() => { view = next; pending = ''; ui.show(next); update(); })
-        .then(() => {
+      // One hospital's view, computed once: swap the strip and the cards together, then say so once. The
+      // pick is committed only when both drew; if either throws, the page goes back to what it showed
+      // before (the picker's box, whose note line then says what went wrong) and the error reaches the
+      // picker. The URL keeps a landing's h until the pick is committed.
+      onPick: (next, { initial, ui }) => {
+        const prev = view;
+        return transition(() => {
+          try {
+            view = next;
+            ui.show(next);
+            update();
+          } catch (error) {
+            view = prev;
+            ui.show(prev, { find: true });
+            update();
+            throw error;
+          }
+          pending = '';
+          reserve(false);
+        }).then(() => {
           if (!initial) $('[data-hpick-change]', mount)?.focus();
           ui.say(next.announce);
-        }),
+        });
+      },
       onClear: (ui) => transition(() => { view = null; reserve(false); ui.show(null); update(); })
         .then(() => { $('#hp-q', mount)?.focus(); ui.say('Showing national rates.'); }),
       // An ?h= that names no hospital the picker offers (Maryland, unknown): national, clean URL.
@@ -186,8 +211,9 @@ export function start(model) {
     return picker;
   };
   for (const type of ['focusin', 'pointerdown']) mount.addEventListener(type, attach);
-  // A failed load keeps national, and the h in the URL for a reload.
-  if (pending) attach().then((ui) => (ui ? ui.start(pending) : reserve(false)));
+  // A failed load keeps national, and the h in the URL for a reload. However the landing ends (shown, not
+  // shown, or overtaken by a pick of someone's own), its reserved height goes.
+  if (pending) attach().then((ui) => ui?.start(pending)).finally(() => reserve(false));
 }
 
 async function load() {
