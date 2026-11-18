@@ -61,6 +61,8 @@ describe('split by DRG', () => {
     assert.ok(t.includes('Total $51,459.44 $28,837.33 $22,116.60'), t);
     assert.ok(t.includes('Uncompensated care is left out'), t);
     assert.ok(t.includes('412.106(i)'));
+    // Spec § Rounding: parts and total are each rounded from unrounded values, and the fold says so.
+    assert.ok(t.includes('Parts are rounded separately, so they can differ from the total by a cent.'), t);
     assert.ok(!/NaN|undefined|null/.test(t));
   });
   test('a hospital with no add-ons: operating and capital only, no $0 columns', () => {
@@ -183,8 +185,10 @@ describe('per year', () => {
   });
   test('the fold remembers it was open', () => {
     const view = viewOf('380009');
-    view.toggle('32480', 'year', true);
+    assert.equal(view.toggle('32480', 'year', true), true);
     assert.match(folds(view, '32480'), /<details class="hfold" data-fold="year"[^>]* open>/);
+    // A redrawn card's open fold fires toggle again: nothing changes, the drawn card is kept.
+    assert.equal(view.toggle('32480', 'year', true), false);
     view.toggle('32480', 'year', false);
     assert.doesNotMatch(folds(view, '32480'), / open>/);
   });

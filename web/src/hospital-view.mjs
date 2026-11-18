@@ -59,12 +59,16 @@ export function summaryHtml(s, name) {
 }
 
 /**
- * The page's lede with the picked hospital's rates named where it says "national and unadjusted"
- * (stake.mjs mainPage). html: the lede as the server wrote it; unchanged if the phrase is not there.
+ * The words in the server's lede (stake.mjs mainPage) that a pick replaces. The national page's HTML must
+ * stay byte-identical, so the lede has no element of its own to swap; stake.test.mjs fails if the built
+ * lede stops containing this phrase exactly once.
  */
+export const LEDE_NATIONAL = 'national and unadjusted';
+
+/** The page's lede with the picked hospital's rates named in place of LEDE_NATIONAL. html: the lede as the server wrote it. */
 export function hospitalLede(html, name, addOns) {
   const rates = addOns ? 'wage index, IME and DSH' : 'wage index (it gets no IME or DSH)';
-  return html.replace('national and unadjusted', () => `at ${esc(name)}’s rates: ${rates}`);
+  return html.replace(LEDE_NATIONAL, () => `at ${esc(name)}’s rates: ${rates}`);
 }
 
 /**
@@ -140,10 +144,17 @@ export function createView({ list, record, ccn, data, meta }) {
       drawn.delete(code);
       return yearUpdate(item, ctx, typed);
     },
-    /** Remember whether a card's fold (kind 'split' or 'year') is open, for the next redraw. */
+    /**
+     * Remember whether a card's fold (kind 'split' or 'year') is open, for the next redraw. A redrawn card
+     * whose fold was already open fires a toggle too; that one changes nothing and keeps the drawn card.
+     * Returns whether anything changed.
+     */
     toggle(code, kind, isOpen) {
-      if (isOpen) open.add(`${code}:${kind}`); else open.delete(`${code}:${kind}`);
+      const key = `${code}:${kind}`;
+      if (open.has(key) === isOpen) return false;
+      if (isOpen) open.add(key); else open.delete(key);
       drawn.delete(code);
+      return true;
     },
   };
 }

@@ -22,12 +22,16 @@ function entry([ccn, name, state, teaching], states) {
   return { ccn, name, state, teaching, words: nameWords, joined: nameWords.join(' '), stateWords: [state.toLowerCase(), ...words(states[state])] };
 }
 
-/** The list, ready to search: {all, byCcn, maryland: Map(ccn -> entry)}. */
+/**
+ * The list, ready to search: {all, byCcn, maryland: Map(ccn -> entry), states: Map(a state's code or
+ * full name in lower case -> its code)}.
+ */
 export function hospitalIndex(list) {
   const states = list.states || {};
   const all = list.h.map((row) => entry(row, states));
   const maryland = list.md.map(([ccn, name]) => entry([ccn, name, 'MD', 0], states));
-  return { all, byCcn: new Map(all.map((h) => [h.ccn, h])), maryland: new Map(maryland.map((h) => [h.ccn, h])) };
+  const byState = new Map(Object.entries(states).flatMap(([code, name]) => [[code.toLowerCase(), code], [words(name).join(' '), code]]));
+  return { all, byCcn: new Map(all.map((h) => [h.ccn, h])), maryland: new Map(maryland.map((h) => [h.ccn, h])), states: byState };
 }
 
 /** 0: a whole word of the name, the CCN, or the state; null when the token matches none of them. */
@@ -54,20 +58,23 @@ const byName = (a, b) => (a.name || `~${a.ccn}`).localeCompare(b.name || `~${b.c
 
 /**
  * Hospitals for a query: by CCN (whole or its first digits), by the starts of words in the name, by
- * state code or state name, in any mix; every word of the query must match. {matches (at most LIMIT),
- * total, maryland: true when a Maryland hospital would have matched}.
+ * state code or state name, in any mix; every word of the query must match. A query that is exactly a
+ * state ("ME", "in", "oregon") lists that state's hospitals first, ahead of names that merely start
+ * with it ("Medical", "Institute"). {matches (at most LIMIT), total, maryland: true when a Maryland
+ * hospital would have matched}.
  */
 export function findHospitals(index, query) {
   const tokens = words(query);
   if (!tokens.length) return { matches: [], total: 0, maryland: false };
+  const state = index.states ? index.states.get(tokens.join(' ')) : undefined;
   const hits = [];
   for (const h of index.all) {
-    const r = rank(h, tokens);
+    const r = h.state === state ? -1 : rank(h, tokens);
     if (r !== null) hits.push([r, h]);
   }
   hits.sort((a, b) => a[0] - b[0] || byName(a[1], b[1]));
-  let maryland = false;
-  for (const h of index.maryland.values()) if (rank(h, tokens) !== null) { maryland = true; break; }
+  let maryland = state === 'MD';
+  if (!state) for (const h of index.maryland.values()) if (rank(h, tokens) !== null) { maryland = true; break; }
   return { matches: hits.slice(0, LIMIT).map(([, h]) => h), total: hits.length, maryland };
 }
 

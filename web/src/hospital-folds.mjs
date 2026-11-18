@@ -11,9 +11,11 @@ import { EMPTY, roughMoney } from './hospital-words.mjs';
 const PAYERS = { trad: 'traditional Medicare', ma: 'Medicare Advantage' };
 
 // The folds' fixed prose (HTML). Names and ratios are filled in by the functions below, through esc().
+// Spec § Rounding: each figure is rounded once from unrounded parts, so the parts need not add to the total.
+const ROUNDING = 'Parts are rounded separately, so they can differ from the total by a cent.';
 const SPLIT_NOTE = {
-  addOns: (name) => `Base is operating plus capital payment with ${esc(name)}’s wage index and capital GAF; IME and DSH each include their capital part. Uncompensated care is left out: it is a fixed yearly amount, settled at cost report, not lost per case (${cfr('412.106', '42 CFR 412.106(i)')}). Outliers are left out too.`,
-  none: (name) => `With ${esc(name)}’s wage index and capital GAF. This hospital gets no IME or DSH. Outliers are left out.`,
+  addOns: (name) => `Base is operating plus capital payment with ${esc(name)}’s wage index and capital GAF; IME and DSH each include their capital part. Uncompensated care is left out: it is a fixed yearly amount, settled at cost report, not lost per case (${cfr('412.106', '42 CFR 412.106(i)')}). Outliers are left out too. ${ROUNDING}`,
+  none: (name) => `With ${esc(name)}’s wage index and capital GAF. This hospital gets no IME or DSH. Outliers are left out. ${ROUNDING}`,
 };
 const YEAR_LEAD = (drgs) => `A ceiling, not a forecast: this counts every 2024 case in MS-DRG ${esc(drgs)}, not only removed procedures. Change any count and the row, total and heading follow; your counts are not saved.`;
 const YEAR_NOTES = {
@@ -50,7 +52,7 @@ function fold(kind, open, summary, body) {
 function splitFold(item, ctx, { name, sev, open }) {
   const families = splitRows(item, ctx);
   const many = families.length > 1;
-  // A column per DRG, adding down to its total like a ledger: three DRGs fit a 400 px phone.
+  // A column per DRG, its parts above its total: three DRGs fit a 400 px phone.
   const parts = ctx.addOns ? [['Base', 'base'], ['IME', 'ime'], ['DSH', 'dsh']] : [['Operating', 'operating'], ['Capital', 'capital']];
   const tables = families.map((family, i) => {
     const source = item.ip.families[i];

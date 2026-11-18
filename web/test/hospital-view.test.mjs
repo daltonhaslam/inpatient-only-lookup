@@ -7,8 +7,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { normalize, clientModel } from '../src/stake-data.mjs';
 import { prepare } from '../src/stake-engine.mjs';
-import { card } from '../src/stake-card.mjs';
-import { hospitalList, hospitalRecord } from '../src/hospital-data.mjs';
+import { card, gapParts } from '../src/stake-card.mjs';
+import { hospitalList, hospitalRecord, uncoveredDrgs } from '../src/hospital-data.mjs';
 import { hospitalIndex, findHospitals } from '../src/hospital-pick.mjs';
 import { createView, facts, summaryHtml, hospitalLede } from '../src/hospital-view.mjs';
 
@@ -46,10 +46,28 @@ describe('the files the build ships', () => {
     assert.ok(Object.keys(r.v).every((drg) => volume.meta.drgs.includes(drg)));
     assert.deepEqual(recordOf('400001').v, {}, 'Puerto Rico: no published counts');
   });
+  test('the build checks the hospital tables cover every DRG the crosswalk prices', () => {
+    const none = { 'hospitals.json meta.drg_weights': [], 'drg-volume.json meta.drgs': [] };
+    assert.deepEqual(uncoveredDrgs(model, hospitals.meta, volume.meta), none);
+    const weights = { ...hospitals.meta.drg_weights };
+    delete weights['165'];
+    assert.deepEqual(uncoveredDrgs(model, { drg_weights: weights }, { drgs: volume.meta.drgs.filter((d) => d !== '163') }),
+      { 'hospitals.json meta.drg_weights': ['165'], 'drg-volume.json meta.drgs': ['163'] });
+  });
   test('the list finds OHSU by name, state and CCN', () => {
     const index = hospitalIndex(list);
     for (const q of ['ohsu', '380009', 'ohsu or', 'ohsu oregon']) assert.equal(findHospitals(index, q).matches[0].ccn, '380009', q);
     assert.equal(findHospitals(index, 'meritus').maryland, true);
+  });
+  test('a query that is a state (its code or its name) lists that state’s hospitals first, not names that start with it', () => {
+    const index = hospitalIndex(list);
+    for (const [q, state] of [['ME', 'ME'], ['in', 'IN'], ['OR', 'OR'], ['oregon', 'OR'], ['indiana', 'IN']]) {
+      const { matches } = findHospitals(index, q);
+      assert.equal(matches.length, 8, q);
+      assert.deepEqual([...new Set(matches.map((h) => h.state))], [state], `${q}: ${matches.map((h) => `${h.name} ${h.state}`).join('; ')}`);
+    }
+    // A name word still finds names: "medical" is no state.
+    assert.ok(findHospitals(index, 'medical').matches.every((h) => h.words.some((w) => w.startsWith('medical'))));
   });
 });
 
@@ -161,6 +179,18 @@ describe('cards in hospital mode', () => {
     assert.equal(view.data.items.length, data.items.length);
     assert.equal(view.data.byCode['32480'].op.rate, 3995.14);
     assert.equal(view.data.index, data.index);
+  });
+});
+
+describe('gap sentence parts', () => {
+  const fam = (n) => ({ families: Array.from({ length: n }, () => ({})) });
+  const item = (diff, n = 1) => ({ diff, op: { si: 'J1' }, ip: fam(n) });
+  test('less, more, mixed and no rate; the range stands alone so the card keeps it on one line', () => {
+    assert.deepEqual(gapParts(item({ low: -47464.3, high: -18121.46 }), 'If billed outpatient, X is paid'), ['If billed outpatient, X is paid ', '$18,121–$47,464', ' less than the inpatient DRG family.']);
+    assert.deepEqual(gapParts(item({ low: 100, high: 200 }, 2)), ['Outpatient pays ', '$100–$200', ' more than the inpatient DRG families.']);
+    assert.deepEqual(gapParts(item({ low: -50, high: 75 })), ['Outpatient pays from $50 less to $75 more than the inpatient DRG family.']);
+    assert.equal(gapParts(item(null)).length, 1);
+    assert.match(gapParts(item(null))[0], /^No national outpatient rate for status indicator J1/);
   });
 });
 

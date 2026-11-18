@@ -106,9 +106,11 @@ function loadOther() {
 }
 const otherFailed = () => Boolean(others && others.failed);
 
-// The 2027 ASC additions' patient shares: loaded once, when an answer needs them (a failure stands until
-// a reload; the answer stands without the line).
-const shares = SHARES && lazyJson(SHARES.url, { settled: () => drawVerdicts() });
+// The 2027 ASC additions' patient shares: loaded when an answer first needs them, at most one load at a
+// time. After a failure, the next code asked about tries again (like the never-listed codes); redraws of
+// the same answer (a date change) do not. The answer stands without the line meanwhile.
+const shares = SHARES && lazyJson(SHARES.url, { retry: true, settled: () => drawVerdicts() });
+let sharesAsked = null;   // the code whose answer last started a load
 
 /**
  * The patient-share line for a lookup answer (HTML from patient-share.mjs, or ''), given the answer's own
@@ -117,8 +119,9 @@ const shares = SHARES && lazyJson(SHARES.url, { settled: () => drawVerdicts() })
  */
 function shareFor(code, result) {
   if (!shares || result.removed !== SHARES.from) return '';
-  if (!shares.data) { shares.load(); return ''; }
-  return lookupShare(shares.data, code, result.state, state.date, result.removed);
+  if (shares.data) return lookupShare(shares.data, code, result.state, state.date, result.removed);
+  if (!shares.failed || sharesAsked !== code) { sharesAsked = code; shares.load(); }
+  return '';
 }
 
 // ---- drawing ------------------------------------------------------------------------------

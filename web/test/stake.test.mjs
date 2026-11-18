@@ -12,6 +12,7 @@ import { normalize, clientModel, hydrate, removalMismatches } from '../src/stake
 import { card, alternativeLabel } from '../src/stake-card.mjs';
 import { CSV_HEADER, csvRows } from '../src/stake.mjs';
 import { out } from '../src/views.mjs';
+import { LEDE_NATIONAL, hospitalLede } from '../src/hospital-view.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '..', '..');
@@ -185,6 +186,13 @@ describe('revenue at stake', { skip }, () => {
     }
     assert.match(textOf(html), /\d+ of \d+/);
     assert.ok(textOf(html).includes('Agreements under the same name count as one reviewer.'), 'help page does not say how reviewers are counted');
+  });
+
+  test('main page: the lede holds the phrase a hospital pick replaces, exactly once (hospital-view.mjs LEDE_NATIONAL)', () => {
+    const html = read('revenue-at-stake/index.html');
+    const lede = /<section class="stake-head"[\s\S]*?<p class="lede">([\s\S]*?)<\/p>/.exec(html)[1];
+    assert.equal(lede.split(LEDE_NATIONAL).length - 1, 1, lede);
+    assert.notEqual(hospitalLede(lede, 'X', true), lede, 'the swap changes it');
   });
 
   test('main page: badge, guardrail, years, progress, downloads, a row per code', () => {

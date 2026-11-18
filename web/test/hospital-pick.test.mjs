@@ -61,8 +61,13 @@ describe('picker search', () => {
     assert.deepEqual(ccns(findHospitals(index, 'oregon providence')).sort(), ['380004', '380061']);
   });
   test('names that start with the query rank first, then by name', () => {
-    // "or": Orcas Island's name starts with it; the Oregon hospitals match by state.
-    assert.deepEqual(ccns(findHospitals(index, 'or')), ['500001', '380009', '380004', '380061']);
+    // "st": St Vincent's St Clair starts with it; Providence St Vincent has it as a later word.
+    assert.deepEqual(ccns(findHospitals(index, 'st')), ['010130', '380061']);
+  });
+  test('a query that is exactly a state lists that state first (code review M3 #1)', () => {
+    // "or" is Oregon: its hospitals come before Orcas Island, whose name only starts with it.
+    assert.deepEqual(ccns(findHospitals(index, 'or')), ['380009', '380004', '380061', '500001']);
+    assert.deepEqual(ccns(findHospitals(index, 'oregon')), ['380009', '380004', '380061']);
   });
   test('a hospital with no name in CMS\'s file is found by CCN and labeled by it', () => {
     const [h] = findHospitals(index, '090012').matches;

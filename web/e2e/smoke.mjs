@@ -1030,9 +1030,10 @@ if (!hasStake) {
     eq(await page.locator('.facts__share').count(), 0, 'no line for a code CMS did not add for 2027');
   });
 
-  await check('lookup: a failed shares file is tried once per page load, and the answer still stands', async (page) => {
+  await check('lookup: a failed shares file is not retried on redraws, is retried on the next code asked, and the answer stands', async (page) => {
     let asked = 0;
-    await page.route(/\/data\/shares\./, (route) => { asked += 1; route.fulfill({ status: 404, body: '' }); });
+    let fail = true;
+    await page.route(/\/data\/shares\./, (route) => { asked += 1; if (fail) route.fulfill({ status: 404, body: '' }); else route.continue(); });
     ignore404 = true;   // the browser logs the failed load as a console error
     try {
       await open(page, '/?q=32480&dos=2027-03-01');
@@ -1042,11 +1043,28 @@ if (!hasStake) {
         await waitText(answer(page), (t) => t.includes(`March ${Number(day.slice(-2))}, 2027`), `answer on ${day}`);
       }
       await page.waitForTimeout(300);
-      eq(asked, 1, 'one try');
+      eq(asked, 1, 'one try for the same answer');
       eq(await page.locator('.facts__share').count(), 0, 'no line without the file');
+      fail = false;
+      await page.fill('[data-q]', '11004');   // another of CMS's 2027 ASC additions
+      await waitText(page.locator('[data-results] .facts__share dd'), (t) => t.startsWith('About'), 'line after the retry');
+      eq(asked, 2, 'the next code asked tries again');
     } finally {
       ignore404 = false;
     }
+  });
+
+  await check('hospital: a file that arrives but cannot be computed says so, not "check the connection"', async (page) => {
+    await page.route(/\/data\/h\.[0-9a-f]{10}\/380009\.json/, (route) => route.fulfill({ status: 200, contentType: 'application/json', body: 'null' }));
+    await openStake(page);
+    const before = problems.length;
+    await page.locator('#hp-q').fill('ohsu');
+    await page.locator('#hp-o-380009').click();
+    const note = await waitText(page.locator('#hp-note'), (t) => t.startsWith('Could not show'), 'compute-failure note');
+    has(note, 'This is not a connection problem', 'distinct from a network failure');
+    eq(await page.locator('.hsum').count(), 0, 'national stays');
+    const logged = problems.splice(before);   // the one console.error this check expects
+    assert(logged.length === 1 && logged[0].includes('the hospital view for 380009 could not be shown'), `console: ${logged.join(' | ')}`);
   });
 
   await check('stake: if the page data fails to load, the picker leaves no blank band', async (page) => {

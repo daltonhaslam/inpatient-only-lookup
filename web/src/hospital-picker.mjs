@@ -68,7 +68,8 @@ function folds(results, current, say) {
     set(card.querySelector('[data-year-head]'), up.headline);
     say(`${card.dataset.stakeCard}, per year at ${view.name}: ${up.headline}.`);
   });
-  // toggle does not bubble: listen in the capture phase.
+  // toggle does not bubble: listen in the capture phase. A redraw of an open fold fires one too; the
+  // view ignores a toggle that changes nothing, so its drawn card is kept.
   results.addEventListener('toggle', (event) => {
     const fold = event.target;
     const view = current();
@@ -147,17 +148,30 @@ export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInv
    */
   async function load(ccn, initial) {
     const mine = ++token;
+    let list;
+    let record;
     try {
-      const list = await loadList();
+      list = await loadList();
       if (!CCN.test(ccn) || !index.byCcn.has(ccn)) { if (initial) onInvalid({}); return; }
       if (!initial) note(`Loading ${optionName(index.byCcn.get(ccn))}…`);
-      const record = await fetchJson(`${assets.dir}/${ccn}.json`);
-      if (mine !== token) return;
-      await onPick(createView({ list, record, ccn, data, meta }), { initial, ui });
+      record = await fetchJson(`${assets.dir}/${ccn}.json`);
     } catch {
+      // The network: worth another try.
       if (mine !== token) return;
       if (initial) onInvalid({ keepUrl: true });
       else note('Could not load that hospital’s rates. Check the connection and pick it again.');
+      return;
+    }
+    if (mine !== token) return;
+    try {
+      await onPick(createView({ list, record, ccn, data, meta }), { initial, ui });
+    } catch (error) {
+      // The files arrived but the view could not be built or shown: a fault in the data or the code, not
+      // the connection. National stays (the URL keeps h), and the page says so plainly.
+      console.error(`Revenue at stake: the hospital view for ${ccn} could not be shown.`, error);
+      if (mine !== token) return;
+      if (initial) onInvalid({ keepUrl: true });
+      note(`Could not show ${optionName(index.byCcn.get(ccn))}’s rates: something in its data could not be computed. This is not a connection problem; trying again will not help.`);
     }
   }
 

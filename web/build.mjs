@@ -5,8 +5,9 @@
 //     (default pipeline/derived/crosswalk.json; without one the section is left out with a warning)
 //   OUT_DIR=/tmp/site node build.mjs   build somewhere other than ../docs (the national snapshot test does)
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync, rmSync, copyFileSync, existsSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { mkdirSync, readFileSync, writeFileSync, rmSync, copyFileSync, existsSync, realpathSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build as bundle } from 'esbuild';
 import { SITE } from './src/site.mjs';
@@ -14,12 +15,31 @@ import { todayISO, isDate, monthYear, formatDate, clampDate, periodIndex, siAt, 
 import * as pages from './src/pages.mjs';
 import * as stake from './src/stake.mjs';
 import { normalize, credits, clientModel, removalMismatches } from './src/stake-data.mjs';
-import { hospitalList, hospitalRecord } from './src/hospital-data.mjs';
+import { hospitalList, hospitalRecord, uncoveredDrgs } from './src/hospital-data.mjs';
 import { sharesFile } from './src/patient-share.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
-const out = process.env.OUT_DIR ? resolve(process.env.OUT_DIR) : join(root, 'docs');
+const DOCS = join(root, 'docs');
+// A directory the build made before; any other existing OUT_DIR outside the temp dir is refused.
+const MARKER = '.iol-build-output';
+const out = process.env.OUT_DIR ? safeOutDir(resolve(process.env.OUT_DIR)) : DOCS;
+
+/**
+ * The build empties its output directory first, so an OUT_DIR is checked before anything is deleted: never
+ * the repo, web/ or a parent of them; only a new directory, one under the system temp dir, or one this
+ * build wrote before (it holds MARKER).
+ */
+function safeOutDir(dir) {
+  const real = (path) => (existsSync(path) ? realpathSync(path) : path);
+  const target = real(dir);
+  const inside = (parent, child) => child === parent || child.startsWith(`${parent}${sep}`);
+  if ([real(root), real(here)].some((guarded) => inside(target, guarded))) throw new Error(`Refusing OUT_DIR=${dir}: it is the repository, web/ or a parent of them.`);
+  if (target !== real(DOCS) && existsSync(target) && !inside(real(tmpdir()), target) && !existsSync(join(target, MARKER))) {
+    throw new Error(`Refusing OUT_DIR=${dir}: it already exists and does not look like a build output (no ${MARKER}, not under ${tmpdir()}). Use a new or empty-to-be directory.`);
+  }
+  return dir;
+}
 const read = (path) => JSON.parse(readFileSync(join(root, path), 'utf8'));
 const sha = (content) => createHash('sha256').update(content).digest('hex').slice(0, 10);
 
@@ -288,6 +308,11 @@ async function hospitalAssets(model) {
     return null;
   }
   const [hospitals, volume] = paths.map(read);
+  // The tables must cover every DRG this crosswalk prices (it can be another one, CROSSWALK_JSON), or a
+  // card would throw for a missing weight, or show "under 11 or none" for a count that was never looked up.
+  for (const [table, missing] of Object.entries(uncoveredDrgs(model, hospitals.meta, volume.meta))) {
+    if (missing.length) throw new Error(`${table} lacks ${missing.length} MS-DRG(s) the crosswalk prices: ${missing.slice(0, 10).join(', ')}. Rebuild the derived tables: python3 pipeline/crosswalk/build.py`);
+  }
   const records = Object.keys(hospitals.hospitals).sort()
     .map((ccn) => [ccn, JSON.stringify(hospitalRecord(hospitals.hospitals[ccn], volume.volume[ccn], volume.meta.drgs))]);
   const dir = `data/h.${sha(records.map(([ccn, text]) => `${ccn}\n${text}`).join('\n'))}`;
@@ -359,6 +384,7 @@ async function main() {
 
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });
+  if (out !== DOCS) writeFileSync(join(out, MARKER), 'Inpatient Only Lookup build output (web/build.mjs). The next build with this OUT_DIR empties this directory.\n');
 
   const faces = FONTS.map(([family, path, weights]) => {
     const bytes = readFileSync(join(here, 'node_modules', path));

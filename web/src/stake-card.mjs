@@ -90,7 +90,6 @@ export function gapParts(item, lead = 'Outpatient pays') {
   if (d.low >= 0) return [`${lead} `, moneyRange(d.low, d.high), ` more than ${what}.`];
   return [`${lead} from ${money(-d.low)} less to ${money(d.high)} more than ${what}.`];
 }
-export const gapText = (item, lead) => gapParts(item, lead).join('');
 
 /**
  * A family's IME and DSH as "$6,067–$14,116" (the card says "Includes <range> in IME and DSH"), or ''

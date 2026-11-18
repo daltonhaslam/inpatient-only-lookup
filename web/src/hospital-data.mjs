@@ -64,6 +64,21 @@ function drgSeverities(model) {
   return Object.fromEntries(Object.entries(sev).sort(([a], [b]) => a.localeCompare(b)));
 }
 
+/**
+ * The MS-DRGs a crosswalk (normalized model) prices that the hospital tables do not cover, by table:
+ * {'hospitals.json meta.drg_weights': [...], 'drg-volume.json meta.drgs': [...]}; both empty when they
+ * match. The build fails on any: a card would throw for a missing weight, or read "under 11 or none" for
+ * a count that was never looked up.
+ */
+export function uncoveredDrgs(model, hospitalsMeta, volumeMeta) {
+  const priced = [...new Set(Object.values(model.codes).flatMap((item) => (item.ip ? item.ip.families.flatMap((f) => f.drgs.map((d) => d.drg)) : [])))].sort();
+  const counted = new Set(volumeMeta.drgs);
+  return {
+    'hospitals.json meta.drg_weights': priced.filter((drg) => !Number.isFinite(hospitalsMeta.drg_weights[drg])),
+    'drg-volume.json meta.drgs': priced.filter((drg) => !counted.has(drg)),
+  };
+}
+
 /** One hospital's file: its hospitals.json factors and v: {DRG: 2024 discharges} for the crosswalk's DRGs. */
 export function hospitalRecord(hospital, volume = {}, drgs = []) {
   const record = Object.fromEntries(FACTORS.map((key) => [key, hospital[key]]));
