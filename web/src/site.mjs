@@ -45,5 +45,8 @@ export const STATUS = {
 
 export const CFR = {
   '412.3': 'https://www.ecfr.gov/current/title-42/section-412.3',
+  '412.105': 'https://www.ecfr.gov/current/title-42/section-412.105',
+  '412.106': 'https://www.ecfr.gov/current/title-42/section-412.106',
+  '413.76': 'https://www.ecfr.gov/current/title-42/section-413.76',
   '419.22': 'https://www.ecfr.gov/current/title-42/section-419.22',
 };

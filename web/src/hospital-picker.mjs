@@ -7,16 +7,17 @@
 // built only from a CCN that is six digits and in the shipped list.
 import { esc } from './views.mjs';
 import { field } from './hospital-field.mjs';
-import { hospitalIndex, findHospitals, optionName, pickerMessage } from './hospital-pick.mjs';
+import { hospitalIndex, findHospitals, optionName, pickerMessage, TEACHING, TEACHING_LABEL } from './hospital-pick.mjs';
 import { createView, hospitalLede } from './hospital-view.mjs';
 import { CCN } from './stake-engine.mjs';
 import { fetchJson } from './fetch.mjs';
 import { announcer } from './announce.mjs';
 
-const TEACHING = ['', 'Capital IME only', 'Teaching'];
+// The option's meta line: state, CCN and, for a teaching hospital, its kind (nothing for the others).
+const teachingTag = (code) => (code ? TEACHING_LABEL[TEACHING[code]] : '');
 
 const optionHtml = (h, i) => `<li role="option" id="hp-o-${esc(h.ccn)}" aria-selected="false" data-i="${i}">`
-  + `<span class="hpick__oname">${esc(optionName(h))}</span><span class="hpick__ometa">${esc([h.state, h.ccn, TEACHING[h.teaching]].filter(Boolean).join(' · '))}</span></li>`;
+  + `<span class="hpick__oname">${esc(optionName(h))}</span><span class="hpick__ometa">${esc([h.state, h.ccn, teachingTag(h.teaching)].filter(Boolean).join(' · '))}</span></li>`;
 
 /** Resolves when the hospital view's stylesheet has loaded (added once, on first use) or failed to. */
 function styles(url) {
@@ -28,11 +29,12 @@ function styles(url) {
   return ready;
 }
 
-/** Restart a short highlight on a figure that just changed (CSS runs it only when motion is welcome). */
+const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
+/** A brief tint on a figure that just changed with a typed count; none when less motion is asked for. */
 function flash(el) {
-  el.classList.remove('hyr--new');
-  void el.offsetWidth;   // restart the animation
-  el.classList.add('hyr--new');
+  if (calm.matches) return;
+  const tint = getComputedStyle(el).getPropertyValue('--panel').trim();   // the theme's panel color, light or dark
+  el.animate([{ backgroundColor: tint }, { backgroundColor: 'transparent' }], { duration: 900, easing: 'ease-out' });
 }
 
 /**
@@ -50,23 +52,20 @@ function folds(results, current, say) {
     if (!view || !card) return;
     const up = view.count(card.dataset.stakeCard, input.dataset.count, input.value);
     if (!up) return;
-    const set = (selector, text) => {
-      const el = card.querySelector(selector);
+    const set = (el, text) => {
       if (el && el.textContent !== text) { el.textContent = text; flash(el); }
     };
-    for (const [key, text] of Object.entries(up.cells)) set(`[data-py="${key}"]`, text);
-    for (const [key, text] of Object.entries(up.notes)) {
-      const why = card.querySelector(`[data-why="${key}"]`);
-      if (why) why.textContent = text;
+    for (const [key, cell] of Object.entries(up.cells)) {
+      const row = card.querySelector(`[data-cell="${key}"]`);
+      if (!row) continue;
+      const box = row.querySelector('[data-count]');
+      if (box !== input && box.value !== cell.value) { box.value = cell.value; flash(box); }
+      if (cell.invalid) box.setAttribute('aria-invalid', 'true'); else box.removeAttribute('aria-invalid');
+      row.querySelector('.hyr__why').textContent = cell.note;
+      set(row.querySelector('.hyr__year'), cell.text);
     }
-    for (const [key, value] of Object.entries(up.values)) {
-      const box = card.querySelector(`[data-count="${key}"]`);
-      if (!box) continue;
-      if (box !== input && box.value !== value) { box.value = value; flash(box); }
-      if (up.invalid[key]) box.setAttribute('aria-invalid', 'true'); else box.removeAttribute('aria-invalid');
-    }
-    set('[data-year-total]', up.total);
-    set('[data-year-head]', up.headline);
+    set(card.querySelector('[data-year-total]'), up.total);
+    set(card.querySelector('[data-year-head]'), up.headline);
     say(`${card.dataset.stakeCard}, per year at ${view.name}: ${up.headline}.`);
   });
   // toggle does not bubble: listen in the capture phase.

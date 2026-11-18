@@ -3,14 +3,28 @@
 // cases in those DRGs, with counts anyone can change). Pure: strings in, HTML strings out; the hospital
 // bundle's DOM code (hospital-picker.mjs) applies yearUpdate() to the card when a count changes.
 // Every string from data or from a typed count goes through esc(); figures come from cents().
-import { esc, out, fr, scroller } from './views.mjs';
+import { esc, fr, cfr, scroller } from './views.mjs';
 import { cents, drgList, whenLabel } from './stake-card.mjs';
 import { splitRows, perYearTable, count } from './hospital-math.mjs';
 import { EMPTY, roughMoney } from './hospital-words.mjs';
 
-const ECFR = (section) => `https://www.ecfr.gov/current/title-42/section-${section}`;
-const cite = (section, text) => out(ECFR(section), esc(text));
 const PAYERS = { trad: 'traditional Medicare', ma: 'Medicare Advantage' };
+
+// The folds' fixed prose (HTML). Names and ratios are filled in by the functions below, through esc().
+const SPLIT_NOTE = {
+  addOns: (name) => `Base is operating plus capital payment with ${esc(name)}’s wage index and capital GAF; IME and DSH each include their capital part. Uncompensated care is left out: it is a fixed yearly amount, settled at cost report, not lost per case (${cfr('412.106', '42 CFR 412.106(i)')}). Outliers are left out too.`,
+  none: (name) => `With ${esc(name)}’s wage index and capital GAF. This hospital gets no IME or DSH. Outliers are left out.`,
+};
+const YEAR_LEAD = (drgs) => `A ceiling, not a forecast: this counts every 2024 case in MS-DRG ${esc(drgs)}, not only removed procedures. Change any count and the row, total and heading follow; your counts are not saved.`;
+const YEAR_NOTES = {
+  teaching: (name, ratio) => [
+    `IME is paid on traditional Medicare and Medicare Advantage cases, DSH on traditional Medicare only: MA cases carry operating IME only (${cfr('412.105', '42 CFR 412.105(g)')}).`,
+    `MA plans must follow the 2-midnight rule and may not treat a removal from the inpatient-only list as requiring outpatient care (${fr('91 FR 70572')}); the risk is that they default removed procedures to outpatient anyway, so MA cases count here. MA counts are estimates: they assume ${esc(name)}’s MA cases have the same DRG mix as its traditional Medicare cases${ratio === null ? '' : ` (${esc(ratio.toFixed(2))} MA cases per traditional case in CMS’s impact file)`}.`,
+    `Direct GME is not counted: it follows the Medicare and MA share of inpatient days, so it falls slightly and later (${cfr('413.76', '42 CFR 413.76')}). Medicaid GME is separate and state-run; commercial payers pay no add-on.`,
+  ],
+  other: () => [`DSH is paid on traditional Medicare cases only. Medicare Advantage cases carry no add-on at a hospital without operating IME (${cfr('412.105', '42 CFR 412.105(g)')}), and commercial payers pay none.`],
+  source: 'Traditional counts: CMS’s Medicare Inpatient Hospitals by Provider and Service, 2024. CMS does not publish a count under 11.',
+};
 
 /**
  * What a traditional Medicare case's add-on is made of at this hospital, from its nonzero factors:
@@ -47,9 +61,7 @@ function splitFold(item, ctx, { name, sev, open }) {
 <thead><tr><td></td>${family.rows.map((r) => `<th scope="col" class="num">MS-DRG ${esc(drgLabel(r.drg, sev))}</th>`).join('')}</tr></thead>
 <tbody>${parts.map(([label, key]) => row(label, key)).join('')}</tbody><tfoot>${row('Total', 'total')}</tfoot></table>`);
   }).join('');
-  const note = ctx.addOns
-    ? `Base is operating plus capital payment with ${esc(name)}’s wage index and capital GAF; IME and DSH each include their capital part. Uncompensated care is left out: it is a fixed yearly amount, settled at cost report, not lost per case (${cite('412.106', '42 CFR 412.106(i)')}). Outliers are left out too.`
-    : `With ${esc(name)}’s wage index and capital GAF. This hospital gets no IME or DSH. Outliers are left out.`;
+  const note = (ctx.addOns ? SPLIT_NOTE.addOns : SPLIT_NOTE.none)(name);
   const sub = ctx.addOns ? 'base, IME, DSH' : 'operating and capital, no IME or DSH';
   return fold('split', open, `The split by DRG <span class="hfold__sub">· ${sub}</span>`, `${tables}<p class="hfold__note">${note}</p>`);
 }
@@ -58,47 +70,56 @@ function splitFold(item, ctx, { name, sev, open }) {
 const invalidRaw = (raw) => raw !== undefined && String(raw).trim() !== '' && count(raw) === null;
 
 /**
- * Everything the per-year fold shows that changes with the counts, keyed "<DRG>:trad" / "<DRG>:ma":
- * {cells: per-year text, values: what each count box holds (the typed text, or the CMS count or MA
- * estimate), notes: the line under a box, invalid: a typed value that is not a whole number, total,
- * headline (after "Per year at <hospital> ·")}. edits: {DRG: {trad, ma}}, the text typed (see count()).
+ * Everything the per-year fold shows that changes with the counts: {table (perYearTable), cells, total,
+ * headline (after "Per year at <hospital> ·")}. cells: {"<DRG>:trad" | "<DRG>:ma": {text (the row's
+ * figure a year), value (what its count box holds: the typed text, else the CMS count or MA estimate),
+ * note (the line under the box), invalid (typed, but not a whole number)}}. edits: {DRG: {trad, ma}},
+ * the text typed (see count()).
  */
 export function yearUpdate(item, ctx, edits = {}) {
   const table = perYearTable(item, ctx, edits);
-  const up = { table, cells: {}, values: {}, notes: {}, invalid: {} };
+  const cells = {};
   for (const row of table.rows) {
     const typed = edits[row.drg] || {};
     for (const payer of ['trad', 'ma']) {
       const cell = row[payer];
       if (!cell) continue;
-      const key = `${row.drg}:${payer}`;
-      const bad = invalidRaw(typed[payer]);
-      up.invalid[key] = bad;
-      up.values[key] = typed[payer] !== undefined ? String(typed[payer]) : cell.count === null ? '' : String(cell.count);
-      up.cells[key] = cell.perYear === null ? 'no count' : cents(cell.perYear);
-      up.notes[key] = bad ? 'not a whole number'
-        : payer === 'trad' ? (cell.suppressed ? EMPTY.suppressed : '')
-          : cell.estimated ? 'estimate' : (EMPTY[cell.reason] || '');
+      const invalid = invalidRaw(typed[payer]);
+      cells[`${row.drg}:${payer}`] = {
+        text: cell.perYear === null ? 'no count' : cents(cell.perYear),
+        value: typed[payer] !== undefined ? String(typed[payer]) : cell.count === null ? '' : String(cell.count),
+        note: invalid ? 'not a whole number'
+          : payer === 'trad' ? (cell.suppressed ? EMPTY.suppressed : '')
+            : cell.estimated ? 'estimate' : (EMPTY[cell.reason] || ''),
+        invalid,
+      };
     }
   }
-  up.total = table.total === null ? 'no counts' : cents(table.total);
   const published = table.rows.some((row) => count(ctx.volume[row.drg]) !== null);
-  up.headline = table.total !== null ? `up to about ${roughMoney(table.total)}, a ceiling` : published ? 'no counts entered' : 'no 2024 counts published';
-  return up;
+  return {
+    table,
+    cells,
+    total: table.total === null ? 'no counts' : cents(table.total),
+    headline: table.total !== null ? `up to about ${roughMoney(table.total)}, a ceiling` : published ? 'no counts entered' : 'no 2024 counts published',
+  };
 }
 
-function countCell(item, row, payer, up) {
+function countCell(item, row, payer, cell) {
   const key = `${row.drg}:${payer}`;
   const why = id(item.code, row.drg, payer);
   const label = `MS-DRG ${row.drg}, ${PAYERS[payer]} cases${payer === 'ma' ? ' (estimate)' : ''}`;
   return `<td class="hyr__count"><input class="hyr__n" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" enterkeyhint="done" maxlength="7" size="6"`
-    + ` value="${esc(up.values[key])}" data-count="${esc(key)}" aria-label="${esc(label)}" aria-describedby="${why}"${up.invalid[key] ? ' aria-invalid="true"' : ''}>`
-    + `<span class="hyr__why" id="${why}" data-why="${esc(key)}">${esc(up.notes[key])}</span></td>`;
+    + ` value="${esc(cell.value)}" data-count="${esc(key)}" aria-label="${esc(label)}" aria-describedby="${why}"${cell.invalid ? ' aria-invalid="true"' : ''}>`
+    + `<span class="hyr__why" id="${why}">${esc(cell.note)}</span></td>`;
 }
 
 // Each row's add-on per case sits under its name, so the table is three columns and fits a 400 px phone.
 const perCase = (row, payer, what) => `<span class="hyr__sub">${cents(row[payer].perCase)} a case: ${what}</span>`;
-const line = (item, row, payer, up, label) => `<tr><th scope="row">${label}</th>${countCell(item, row, payer, up)}<td class="num" data-py="${esc(`${row.drg}:${payer}`)}">${esc(up.cells[`${row.drg}:${payer}`])}</td></tr>`;
+// A row's parts that follow its count carry data-cell="<DRG>:<payer>" (the box, its note and its figure).
+const line = (item, row, payer, up, label) => {
+  const cell = up.cells[`${row.drg}:${payer}`];
+  return `<tr data-cell="${esc(`${row.drg}:${payer}`)}"><th scope="row">${label}</th>${countCell(item, row, payer, cell)}<td class="num hyr__year">${esc(cell.text)}</td></tr>`;
+};
 
 /** Per year at the hospital: '' for a hospital with no add-ons (there is nothing a year to count). */
 function yearFold(item, ctx, { name, sev, edits, open }) {
@@ -120,14 +141,8 @@ ${line(item, row, 'ma', up, `Medicare Advantage${perCase(row, 'ma', 'operating I
   const table = `<table class="hyr"><caption class="sr" id="${capId}">IME and DSH a year on ${esc(name)}’s cases in MS-DRG ${esc(drgs)}</caption>
 <thead><tr><th scope="col">${teaching ? 'MS-DRG and payer' : 'MS-DRG'}</th><th scope="col">Cases (2024)</th><th scope="col" class="num">A year</th></tr></thead>${teaching ? body : `<tbody>${body}</tbody>`}
 <tfoot><tr><th scope="row" colspan="2">Total, a ceiling</th><td class="num" data-year-total>${esc(up.total)}</td></tr></tfoot></table>`;
-  const ratio = ctx.maRatio === null ? '' : ` (${ctx.maRatio.toFixed(2)} MA cases per traditional case in CMS’s impact file)`;
-  const notes = teaching
-    ? [`IME is paid on traditional Medicare and Medicare Advantage cases, DSH on traditional Medicare only: MA cases carry operating IME only (${cite('412.105', '42 CFR 412.105(g)')}).`,
-      `MA plans must follow the 2-midnight rule and may not treat a removal from the inpatient-only list as requiring outpatient care (${fr('91 FR 70572')}); the risk is that they default removed procedures to outpatient anyway, so MA cases count here. MA counts are estimates: they assume ${esc(name)}’s MA cases have the same DRG mix as its traditional Medicare cases${esc(ratio)}.`,
-      `Direct GME is not counted: it follows the Medicare and MA share of inpatient days, so it falls slightly and later (${cite('413.76', '42 CFR 413.76')}). Medicaid GME is separate and state-run; commercial payers pay no add-on.`]
-    : [`DSH is paid on traditional Medicare cases only. Medicare Advantage cases carry no add-on at a hospital without operating IME (${cite('412.105', '42 CFR 412.105(g)')}), and commercial payers pay none.`];
-  notes.push('Traditional counts: CMS’s Medicare Inpatient Hospitals by Provider and Service, 2024. CMS does not publish a count under 11.');
-  const lead = `<p class="hfold__lead">A ceiling, not a forecast: this counts every 2024 case in MS-DRG ${esc(drgs)}, not only removed procedures. Change any count and the row, total and heading follow; your counts are not saved.</p>`;
+  const notes = [...(teaching ? YEAR_NOTES.teaching(name, ctx.maRatio) : YEAR_NOTES.other()), YEAR_NOTES.source];
+  const lead = `<p class="hfold__lead">${YEAR_LEAD(drgs)}</p>`;
   return fold('year', open, `Per year at ${esc(name)} <span class="hfold__sub">· <span data-year-head>${esc(up.headline)}</span></span>`,
     `${lead}${scroller(capId, table)}<ul class="hfold__notes">${notes.map((n) => `<li>${n}</li>`).join('')}</ul>`);
 }

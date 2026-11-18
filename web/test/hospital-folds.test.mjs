@@ -99,12 +99,12 @@ describe('per year', () => {
   test('editing a count: the row, the MA estimate, the total and the headline follow; 10 cases of 165 = $60,670.69', () => {
     const view = viewOf('380009');
     const up = view.count('32480', '165:trad', '10');
-    assert.equal(up.cells['165:trad'], '$60,670.69');
-    assert.equal(up.values['165:ma'], String(Math.round(10 * (hospitals.hospitals['380009'].ime_caseta44 / hospitals.hospitals['380009'].caseta44))));
+    assert.equal(up.cells['165:trad'].text, '$60,670.69');
+    assert.equal(up.cells['165:ma'].value, String(Math.round(10 * (hospitals.hospitals['380009'].ime_caseta44 / hospitals.hospitals['380009'].caseta44))));
     const exact = 211746.79 + 183219.40 + 268964.15 + 229507.04 + 60670.69 + 11 * 4632.08;
     assert.ok(Math.abs(Number(up.total.replace(/[$,]/g, '')) - exact) < 0.05, up.total);
     assert.match(up.headline, /^up to about \$\d/);
-    assert.equal(up.invalid['165:trad'], false);
+    assert.equal(up.cells['165:trad'].invalid, false);
     // The card redrawn later (a filter change) keeps the typed count.
     assert.equal(inputValue(fold(folds(view, '32480'), 'year'), '165:trad'), '10');
   });
@@ -112,14 +112,14 @@ describe('per year', () => {
     const view = viewOf('380009');
     for (const bad of ['2.5', '-1', '1e3', 'abc']) {
       const up = view.count('32480', '163:trad', bad);
-      assert.equal(up.invalid['163:trad'], true, bad);
-      assert.equal(up.notes['163:trad'], 'not a whole number', bad);
-      assert.equal(up.cells['163:trad'], 'no count', bad);
+      assert.equal(up.cells['163:trad'].invalid, true, bad);
+      assert.equal(up.cells['163:trad'].note, 'not a whole number', bad);
+      assert.equal(up.cells['163:trad'].text, 'no count', bad);
     }
     const cleared = view.count('32480', '163:trad', '');
-    assert.equal(cleared.invalid['163:trad'], false);
-    assert.equal(cleared.cells['163:trad'], 'no count');
-    assert.equal(view.count('32480', '163:trad', ' 7 ').invalid['163:trad'], false);
+    assert.equal(cleared.cells['163:trad'].invalid, false);
+    assert.equal(cleared.cells['163:trad'].text, 'no count');
+    assert.equal(view.count('32480', '163:trad', ' 7 ').cells['163:trad'].invalid, false);
   });
   test('Review Focus 3: a suppressed DRG reads "under 11 or none", stays editable, and the total still works', () => {
     const view = viewOf('010001');
@@ -129,8 +129,8 @@ describe('per year', () => {
     assert.ok(t.includes('under 11 or none'), t);
     assert.ok(/up to about \$/.test(t), 'the published DRG still gives a total');
     const up = view.count('32480', '164:trad', '5');
-    assert.notEqual(up.cells['164:trad'], 'no count');
-    assert.equal(up.notes['164:trad'], 'under 11 or none', 'still says CMS published none');
+    assert.notEqual(up.cells['164:trad'].text, 'no count');
+    assert.equal(up.cells['164:trad'].note, 'under 11 or none', 'still says CMS published none');
   });
   test('Review Focus 3: no counts for the whole family says so, never $0', () => {
     const view = viewOf('010006');
@@ -192,9 +192,9 @@ describe('per year', () => {
     const view = viewOf('380009');
     const item = view.data.byCode['32480'];
     const up = yearUpdate(item, view.ctx, {});
-    assert.equal(up.cells['163:trad'], '$211,746.79');
-    assert.equal(up.values['163:ma'], '17');
-    assert.equal(up.notes['163:ma'], 'estimate');
+    assert.equal(up.cells['163:trad'].text, '$211,746.79');
+    assert.equal(up.cells['163:ma'].value, '17');
+    assert.equal(up.cells['163:ma'].note, 'estimate');
     assert.equal(up.total, '$1,015,760.07');
   });
 });

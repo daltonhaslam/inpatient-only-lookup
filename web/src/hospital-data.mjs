@@ -4,6 +4,7 @@
 //     constants the math needs (hospitals.json meta: rates, drg_weights, opps_labor_share).
 //   hospitalRecord: one hospital's factors and its 2024 counts, for data/h.<hash>/<ccn>.json.
 import { teaching } from './hospital-math.mjs';
+import { TEACHING } from './hospital-pick.mjs';
 
 // USPS names for the state codes hospitals.json writes (from each CCN's first two digits), so a
 // search can say "oregon" as well as "OR".
@@ -18,7 +19,6 @@ const STATES = {
   TX: 'Texas', UT: 'Utah', VA: 'Virginia', VI: 'Virgin Islands', VT: 'Vermont', WA: 'Washington', WI: 'Wisconsin',
   WV: 'West Virginia', WY: 'Wyoming',
 };
-const TEACHING = { none: 0, 'capital-only': 1, teaching: 2 };
 const FACTORS = ['name', 'state', 'wi', 'gaf', 'tchop', 'tchcp', 'dshopp', 'dshcpp', 'caseta44', 'ime_caseta44'];
 
 /**
@@ -46,7 +46,7 @@ export function hospitalList(doc, model) {
   return {
     meta: { rates: meta.rates, drg_weights: meta.drg_weights, drg_sev: drgSeverities(model), opps_labor_share: meta.opps_labor_share, maryland: meta.maryland, source: meta.source },
     states: Object.fromEntries([...used].sort().map((code) => [code, STATES[code]])),
-    h: rows.map(([ccn, h]) => [ccn, h.name, h.state, TEACHING[teaching(h)]]),
+    h: rows.map(([ccn, h]) => [ccn, h.name, h.state, TEACHING.indexOf(teaching(h))]),
     md: Object.entries(doc.maryland).sort(([a], [b]) => a.localeCompare(b)).map(([ccn, h]) => [ccn, h.name]),
   };
 }

@@ -91,9 +91,6 @@ button.hpick__btn:hover { background: none; color: var(--ink); text-decoration-t
 .hyr__n[aria-invalid='true'] + .hyr__why { color: var(--ex-ink); font-weight: 600; }
 .hyr tfoot th, .hyr tfoot td { font-weight: 650; border-top: 1.5px solid var(--ink); border-bottom: 0; }
 .hyr tfoot td { font-size: 1.05rem; }
-/* A figure that just changed with a typed count: a brief tint, only when motion is welcome. */
-@media (prefers-reduced-motion: no-preference) { .hyr--new { animation: hyr-new 0.9s ease-out; } }
-@keyframes hyr-new { from { background-color: var(--panel); } }
 ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation-duration: 0.22s; }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }

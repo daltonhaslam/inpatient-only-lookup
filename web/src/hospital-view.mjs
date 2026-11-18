@@ -6,9 +6,9 @@
 import { esc } from './views.mjs';
 import { num } from './engine.mjs';
 import { card, money } from './stake-card.mjs';
-import { hospitalContext, hospitalItem, summary as summarize } from './hospital-math.mjs';
+import { hospitalContext, hospitalItem, summary as summarize, teaching } from './hospital-math.mjs';
 import { fractionWord } from './hospital-words.mjs';
-import { shortName } from './hospital-pick.mjs';
+import { shortName, TEACHING_LABEL } from './hospital-pick.mjs';
 import { foldsHtml, yearUpdate } from './hospital-folds.mjs';
 
 const pct = (x) => `${(x * 100).toFixed(1)}%`;
@@ -18,7 +18,8 @@ const pct = (x) => `${(x * 100).toFixed(1)}%`;
  * (TCHOP, DSHOPP); the capital ones apply too, and the summary's note says so.
  */
 export function facts(h) {
-  const teach = h.tchop > 0 ? `Teaching · IME ${pct(h.tchop)}` : h.tchcp > 0 ? 'Capital IME only' : 'Not a teaching hospital';
+  const kind = teaching(h);
+  const teach = kind === 'teaching' ? `${TEACHING_LABEL.teaching} · IME ${pct(h.tchop)}` : TEACHING_LABEL[kind];
   const dsh = h.dshopp > 0 ? `DSH ${pct(h.dshopp)}` : h.dshcpp > 0 ? 'Capital DSH only' : 'No DSH';
   return `${teach} · ${dsh} · wage index ${h.wi.toFixed(2)}`;
 }
@@ -66,6 +67,22 @@ export function hospitalLede(html, name, addOns) {
   return html.replace('national and unadjusted', () => `at ${esc(name)}’s rates: ${rates}`);
 }
 
+/**
+ * The words a hospital's card says around its figures (stake-card.mjs NATIONAL_CARD has the national
+ * ones): whose rates, the national rate beside the wage-adjusted one, the surgery center kept national
+ * (ASC wage rules differ), and a link to the code page's national work in place of Show the work.
+ */
+function cardVariant(item, name) {
+  return {
+    gapLead: `If billed outpatient, ${name} is paid`,
+    ascLabel: 'Surgery center (ASC), national',
+    rateNote: item.op.national !== undefined ? `With its wage index; national rate ${money(item.op.national)}` : '',
+    opNote: item.addOn ? 'No teaching or DSH add-on in either outpatient setting.' : '',
+    fine: item.addOn ? `${name} rates: wage index, IME and DSH (operating and capital).` : `${name} rates: wage index. This hospital gets no IME or DSH.`,
+    workLink: `Show the national work for ${item.code}`,
+  };
+}
+
 /** The one-line "Rates for <name> (<CCN>) · facts" bar with Change and Back to national. */
 function bar(name, ccn, h) {
   return `<div class="hpick__on">
@@ -92,6 +109,10 @@ export function createView({ list, record, ccn, data, meta }) {
   const edits = new Map();   // code -> {DRG: {trad, ma}}: the text typed
   const open = new Set();    // "<code>:split" and "<code>:year"
   const folds = (item) => foldsHtml(item, ctx, { name, sev, edits: edits.get(item.code), open: (kind) => open.has(`${item.code}:${kind}`) });
+  // Each card's HTML, drawn once and kept until its counts or folds change: a search keystroke redraws
+  // up to 50 cards, and their folds need not be rebuilt each time.
+  const drawn = new Map();
+  const draw = (item) => card(item, meta, { detail: false, variant: cardVariant(item, name), folds: folds(item) });
   return {
     ccn, name, ctx, summary: s,
     data: { ...data, items, byCode },
@@ -99,7 +120,10 @@ export function createView({ list, record, ccn, data, meta }) {
     barHtml: bar(name, ccn, record),
     // Said once, through the picker's polite status line.
     announce: [`Showing ${name}’s rates.`, summaryText(s, name)?.lead].filter(Boolean).join(' '),
-    card: (item) => card(item, meta, { detail: false, hospital: { name }, folds: folds(item) }),
+    card(item) {
+      if (!drawn.has(item.code)) drawn.set(item.code, draw(item));
+      return drawn.get(item.code);
+    },
     /**
      * A count typed into a card's per-year table. key: "<DRG>:trad" or "<DRG>:ma"; raw: the box's text.
      * Returns yearUpdate() for that card only (never the summary or another card), or null for a key
@@ -113,11 +137,13 @@ export function createView({ list, record, ccn, data, meta }) {
       if (!inCard || !(payer === 'trad' || (payer === 'ma' && ctx.teaching === 'teaching'))) return null;
       const typed = { ...edits.get(code), [drg]: { ...edits.get(code)?.[drg], [payer]: String(raw) } };
       edits.set(code, typed);
+      drawn.delete(code);
       return yearUpdate(item, ctx, typed);
     },
     /** Remember whether a card's fold (kind 'split' or 'year') is open, for the next redraw. */
     toggle(code, kind, isOpen) {
       if (isOpen) open.add(`${code}:${kind}`); else open.delete(`${code}:${kind}`);
+      drawn.delete(code);
     },
   };
 }

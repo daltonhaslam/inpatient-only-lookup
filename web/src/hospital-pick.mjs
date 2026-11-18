@@ -3,7 +3,14 @@
 // Teaching: 0 none, 1 capital IME only, 2 teaching (operating IME). Maryland hospitals are listed only
 // so a search for one can say why it is not offered.
 
-import { num } from './engine.mjs';
+import { num, plural } from './engine.mjs';
+
+/**
+ * The teaching code the list ships for each hospital (index into TEACHING; hospital-math.mjs teaching()
+ * gives the word) and how the picker and the facts line say it. One source for all three.
+ */
+export const TEACHING = ['none', 'capital-only', 'teaching'];
+export const TEACHING_LABEL = { none: 'Not a teaching hospital', 'capital-only': 'Capital IME only', teaching: 'Teaching' };
 
 /** How many options the list shows at once. */
 export const LIMIT = 8;
@@ -11,7 +18,8 @@ export const LIMIT = 8;
 const words = (text) => String(text || '').toLowerCase().replace(/['’]/g, '').split(/[^a-z0-9]+/).filter(Boolean);
 
 function entry([ccn, name, state, teaching], states) {
-  return { ccn, name, state, teaching, words: words(name), stateWords: [state.toLowerCase(), ...words(states[state])] };
+  const nameWords = words(name);
+  return { ccn, name, state, teaching, words: nameWords, joined: nameWords.join(' '), stateWords: [state.toLowerCase(), ...words(states[state])] };
 }
 
 /** The list, ready to search: {all, byCcn, maryland: Map(ccn -> entry)}. */
@@ -38,7 +46,7 @@ function rank(h, tokens) {
     if (r === null) return null;
     worst = Math.max(worst, r);
   }
-  if (worst === 0 && h.words.join(' ').startsWith(tokens.join(' '))) return 0;
+  if (worst === 0 && h.joined.startsWith(tokens.join(' '))) return 0;
   return worst + 1;
 }
 
@@ -58,7 +66,8 @@ export function findHospitals(index, query) {
     if (r !== null) hits.push([r, h]);
   }
   hits.sort((a, b) => a[0] - b[0] || byName(a[1], b[1]));
-  const maryland = [...index.maryland.values()].some((h) => rank(h, tokens) !== null);
+  let maryland = false;
+  for (const h of index.maryland.values()) if (rank(h, tokens) !== null) { maryland = true; break; }
   return { matches: hits.slice(0, LIMIT).map(([, h]) => h), total: hits.length, maryland };
 }
 
@@ -80,6 +89,6 @@ export function pickerMessage(result, query, maryland) {
     return { note: none, spoken: none };
   }
   const more = total > matches.length ? `${num(total)} hospitals match; keep typing to narrow the list.` : '';
-  const count = total > matches.length ? `${matches.length} of ${num(total)} hospitals` : `${num(total)} ${total === 1 ? 'hospital' : 'hospitals'}`;
+  const count = total > matches.length ? `${matches.length} of ${num(total)} hospitals` : plural(total, 'hospital');
   return { note: [md, more].filter(Boolean).join(' '), spoken: [`${count}. Use the arrow keys to choose.`, md].filter(Boolean).join(' ') };
 }

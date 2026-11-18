@@ -894,9 +894,9 @@ if (!hasStake) {
     await box.click();
     await page.keyboard.press('ControlOrMeta+a');
     await page.keyboard.type('10');
-    eq(await card.locator('[data-py="165:trad"]').textContent(), '$60,670.69', '10 traditional cases of DRG 165');
+    eq(await card.locator('[data-cell="165:trad"] .hyr__year').textContent(), '$60,670.69', '10 traditional cases of DRG 165');
     eq(await card.locator('[data-count="165:ma"]').inputValue(), '11', 'MA estimate follows the traditional count');
-    eq(await card.locator('[data-py="165:ma"]').textContent(), '$50,952.86', 'MA row');
+    eq(await card.locator('[data-cell="165:ma"] .hyr__year').textContent(), '$50,952.86', 'MA row');
     eq(await card.locator('[data-year-total]').textContent(), '$1,005,060.92', 'total');
     eq(await card.locator('[data-year-head]').textContent(), 'up to about $1 million, a ceiling', 'heading');
     eq(await page.evaluate(() => document.activeElement.dataset.count), '165:trad', 'focus stays in the box');
@@ -907,8 +907,8 @@ if (!hasStake) {
     // Not a whole number: flagged in words and to assistive tech, never drawn raw.
     await card.locator('[data-count="163:ma"]').fill('2.5');
     eq(await card.locator('[data-count="163:ma"]').getAttribute('aria-invalid'), 'true', 'aria-invalid');
-    eq(await card.locator('[data-why="163:ma"]').textContent(), 'not a whole number', 'note');
-    eq(await card.locator('[data-py="163:ma"]').textContent(), 'no count', 'no figure for a bad count');
+    eq(await card.locator('[data-cell="163:ma"] .hyr__why').textContent(), 'not a whole number', 'note');
+    eq(await card.locator('[data-cell="163:ma"] .hyr__year').textContent(), 'no count', 'no figure for a bad count');
     await card.locator('[data-count="163:ma"]').fill('<b>x</b>');
     eq(await card.locator('b', { hasText: /^x$/ }).count(), 0, 'typed markup never becomes markup');
     // A redraw (a filter change) keeps the counts and the open folds.
@@ -924,12 +924,12 @@ if (!hasStake) {
     await openFolds(page, '32480');
     const card = page.locator('[data-stake-card="32480"]');
     eq(await card.locator('[data-count="164:trad"]').inputValue(), '', 'suppressed cell is empty');
-    eq(await card.locator('[data-why="164:trad"]').textContent(), 'under 11 or none', 'suppressed note');
+    eq(await card.locator('[data-cell="164:trad"] .hyr__why').textContent(), 'under 11 or none', 'suppressed note');
     const before = await card.locator('[data-year-total]').textContent();
     await card.locator('[data-count="164:trad"]').fill('20');
-    assert((await card.locator('[data-py="164:trad"]').textContent()).startsWith('$'), 'typed count gives a figure');
+    assert((await card.locator('[data-cell="164:trad"] .hyr__year').textContent()).startsWith('$'), 'typed count gives a figure');
     assert((await card.locator('[data-year-total]').textContent()) !== before, 'total moves');
-    eq(await card.locator('[data-why="164:trad"]').textContent(), 'under 11 or none', 'still says CMS published none');
+    eq(await card.locator('[data-cell="164:trad"] .hyr__why').textContent(), 'under 11 or none', 'still says CMS published none');
 
     await page.locator('[data-hpick-change]').click();
     await pickHospital(page, '010006', '010006');
