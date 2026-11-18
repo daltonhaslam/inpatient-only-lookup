@@ -9,9 +9,10 @@ import { fileURLToPath } from 'node:url';
 import { normalize, clientModel } from '../src/stake-data.mjs';
 import { prepare } from '../src/stake-engine.mjs';
 import {
-  NATIONAL, round2, teaching, drgWeights, drgPayment, outpatientRate, hospitalContext, hospitalItem,
-  splitRows, perYearTable, summary, fractionWord, roughMoney,
+  NATIONAL, round2, teaching, drgPayment, outpatientRate, hospitalContext, hospitalItem,
+  splitRows, perYearTable, summary,
 } from '../src/hospital-math.mjs';
+import { fractionWord } from '../src/hospital-words.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const derived = (name) => JSON.parse(readFileSync(join(here, '../../pipeline/derived', name), 'utf8'));
@@ -20,7 +21,7 @@ const hospitals = derived('hospitals.json');
 const volume = derived('drg-volume.json').volume;
 const model = normalize(crosswalk);
 const { items, byCode } = prepare(clientModel(model, []));   // exactly what the browser draws cards from
-const env = { rates: crosswalk.meta.rates, weights: drgWeights(model), oppsLaborShare: hospitals.meta.opps_labor_share };
+const env = { rates: crosswalk.meta.rates, weights: hospitals.meta.drg_weights, oppsLaborShare: hospitals.meta.opps_labor_share };
 const at = (ccn) => hospitalContext({ ...env, hospital: hospitals.hospitals[ccn], volume: volume[ccn] });
 
 const OHSU = '380009';
@@ -158,15 +159,16 @@ describe('national mode: no drift, by even a cent, on any item (Review Focus 5)'
     assert.equal(compared.length, 849);
     assert.ok(drgRows > 2800, `${drgRows} DRG rows`);
   });
-  test('drgWeights: one weight per DRG, and weight × the combined rate is the national amount', () => {
+  test('hospitals.json meta.drg_weights: every crosswalk DRG row has its weight, and weight × the combined rate is the national amount', () => {
     assert.equal(Object.keys(env.weights).length, 282);
     for (const item of Object.values(model.codes)) for (const f of item.ip ? item.ip.families : []) for (const d of f.drgs) {
+      assert.equal(env.weights[d.drg], d.weight, `DRG ${d.drg} weight`);
       assert.equal(round2(d.weight * crosswalk.meta.rates.combined), d.amount, `DRG ${d.drg}`);
     }
   });
-  test('drgWeights fails on two weights for one DRG', () => {
-    const drgs = (weight) => ({ ip: { families: [{ drgs: [{ drg: '163', weight }] }] } });
-    assert.throws(() => drgWeights({ codes: { a: drgs(1), b: drgs(2) } }), /163/);
+  test('a DRG with no weight throws rather than drawing NaN', () => {
+    const ctx = hospitalContext({ ...env, weights: {}, hospital: hospitals.hospitals[OHSU], volume: undefined });
+    assert.throws(() => hospitalItem(byCode['32480'], ctx), /MS-DRG 16\d has no weight/);
   });
 });
 
@@ -186,7 +188,7 @@ describe('a hospital with no IME and no DSH (Review Focus 1)', () => {
   test('the summary says no add-ons, with the gap as base payment only, and no NaN', () => {
     const s = summary(compared, ctx);
     assert.equal(s.state, 'no-addons');
-    assert.equal(s.word, null);
+    assert.equal(s.ratio, null);
     assert.equal(s.medianAddOn, 0);
     assert.ok(s.medianGap > 0);
     assertFinite(s);
@@ -326,9 +328,9 @@ describe('the summary strip', () => {
     assert.equal(s.below, 822);
     assert.equal(s.medianGap, 10477.94);
     assert.equal(s.medianAddOn, 5156.10);
-    assert.equal(s.word, 'about half');
     assert.equal(s.state, 'addons');
     assert.ok(Math.abs(s.ratio - 5156.10 / 10477.94) < 1e-3);
+    assert.equal(fractionWord(s.ratio), 'about half');
   });
   test('two-family codes use the lowest DRG across every family', () => {
     const item = compared.find((i) => i.ip.families.length > 1 && i.ip.families[0].low !== i.ip.low);
@@ -340,21 +342,10 @@ describe('the summary strip', () => {
   test('items without a comparison are skipped; nothing to compare gives an empty state, not NaN', () => {
     assert.equal(summary(noCompare, ohsu).codes, 0);
     const empty = summary([], ohsu);
-    assert.deepEqual([empty.state, empty.word, empty.medianGap], ['empty', null, null]);
+    assert.deepEqual([empty.state, empty.ratio, empty.medianGap], ['empty', null, null]);
     assertFinite(empty);
   });
   test('national (no hospital): null', () => assert.equal(summary(compared, null), null));
-});
-
-describe('fractionWord: the nearest named fraction, cutoffs at the midpoints', () => {
-  const cases = [
-    [0, 'a small part'], [0.19, 'a small part'], [0.2, 'about a quarter'], [0.29, 'about a quarter'], [0.3, 'about a third'],
-    [0.41, 'about a third'], [0.42, 'about half'], [0.492, 'about half'], [0.58, 'about half'], [0.59, 'about two thirds'],
-    [0.7, 'about two thirds'], [0.71, 'about three quarters'], [0.87, 'about three quarters'], [0.875, 'nearly all'],
-    [0.99, 'nearly all'], [1, 'all'], [1.4, 'all'],
-  ];
-  for (const [ratio, word] of cases) test(`${ratio} -> ${word}`, () => assert.equal(fractionWord(ratio), word));
-  test('not a number: null', () => assert.equal(fractionWord(NaN), null));
 });
 
 describe('round2 matches Python round(x, 2)', () => {
@@ -368,12 +359,6 @@ describe('round2 matches Python round(x, 2)', () => {
     assert.equal(round2(-47464.304), -47464.3);
     assert.ok(Object.is(round2(-0.001), 0), "a rounded-away negative is 0, never −0");
   });
-});
-
-describe('roughMoney: the per-year fold headline', () => {
-  for (const [n, text] of [[1_134_000, '$1.1 million'], [2_000_000, '$2 million'], [60_670.69, '$61,000'], [9_499, '$9,500'], [480, '$480'], [0, '$0']]) {
-    test(`${n} -> ${text}`, () => assert.equal(roughMoney(n), text));
-  }
 });
 
 test('the hospital record carries only finite factors (sanity on the derived table)', () => {

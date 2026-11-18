@@ -1,17 +1,17 @@
 // The Revenue at stake hospital view's math: one hospital's FY 2027 IPPS payment for each MS-DRG
 // (wage index, capital GAF, IME, DSH), its CY 2027 OPPS payment, the card's amounts rewritten for it,
-// the split by DRG, the per-year table and the summary strip. Pure: no DOM, no fetch.
+// the split by DRG, the per-year table and the summary strip. Pure: no DOM, no fetch, no wording
+// (hospital-words.mjs has that).
 //
 // The formula is pipeline/crosswalk/price.py's (hospital_drg_payment, hospital_outpatient, per_year),
 // with the same order of operations so the doubles agree exactly (web/test/hospital-math.test.mjs
-// runs price.py to prove it). Rates are crosswalk.json meta.rates, the OPPS labor share is
-// hospitals.json meta.opps_labor_share, and a hospital is one hospitals.json record: none retyped here.
+// runs price.py to prove it). Rates are crosswalk.json meta.rates; DRG weights and the OPPS labor
+// share are hospitals.json meta.drg_weights and meta.opps_labor_share; a hospital is one
+// hospitals.json record: none retyped here.
 //
 // Rounding: everything is computed unrounded; each figure returned for display is rounded to the cent
 // once, and every sum, gap and per-year value is taken from unrounded parts.
-import { num } from './engine.mjs';
 
-const ADDON_FACTORS = ['tchop', 'tchcp', 'dshopp', 'dshcpp'];
 const RATES = ['operating', 'operating_wi_le1', 'capital', 'labor_share', 'labor_share_le1'];
 
 /** No adjustment: what the national figures assume (wage index and GAF 1, no add-ons). price.py NATIONAL. */
@@ -36,20 +36,6 @@ export function round2(x) {
 export function teaching(hospital) {
   if (hospital.tchop > 0) return 'teaching';
   return hospital.tchcp > 0 ? 'capital-only' : 'none';
-}
-
-/** {drg: Table 5 weight} from a normalize()d crosswalk model (the browser model drops weights). */
-export function drgWeights(model) {
-  const weights = {};
-  for (const item of Object.values(model.codes)) {
-    for (const family of item.ip ? item.ip.families : []) {
-      for (const { drg, weight } of family.drgs) {
-        if (drg in weights && weights[drg] !== weight) throw new Error(`MS-DRG ${drg} has two weights: ${weights[drg]} and ${weight}`);
-        weights[drg] = weight;
-      }
-    }
-  }
-  return weights;
 }
 
 /**
@@ -84,20 +70,20 @@ const count = (value) => (typeof value === 'number' && Number.isFinite(value) &&
 /**
  * Everything the functions below need for one hospital. hospital: a hospitals.json record (or
  * NATIONAL); volume: that hospital's drg-volume.json entry ({DRG: 2024 discharges}), or undefined when
- * it has none; rates: crosswalk.json meta.rates; weights: drgWeights(); oppsLaborShare:
- * hospitals.json meta.opps_labor_share. Throws on a missing rate rather than drawing NaN.
+ * it has none; rates: crosswalk.json meta.rates; weights: hospitals.json meta.drg_weights;
+ * oppsLaborShare: hospitals.json meta.opps_labor_share. Throws on a missing rate rather than drawing NaN.
  */
 export function hospitalContext({ hospital, volume, rates, weights, oppsLaborShare }) {
   for (const key of RATES) if (!Number.isFinite(rates[key])) throw new Error(`meta.rates.${key} is missing`);
   if (!Number.isFinite(oppsLaborShare)) throw new Error('the OPPS labor share is missing');
   const paid = new Map();
-  const kind = teaching(hospital);
   return {
     hospital,
-    teaching: kind,
-    addOns: ADDON_FACTORS.some((key) => hospital[key] > 0),
-    // MA discharges per traditional one (IME_CASETA44 ÷ CASETA44); only where MA cases carry an add-on.
-    maRatio: kind === 'teaching' && count(hospital.ime_caseta44) !== null && hospital.caseta44 > 0 ? hospital.ime_caseta44 / hospital.caseta44 : null,
+    teaching: teaching(hospital),
+    addOns: ['tchop', 'tchcp', 'dshopp', 'dshcpp'].some((key) => hospital[key] > 0),
+    // MA discharges per traditional one (IME_CASETA44 ÷ CASETA44); only where MA cases carry an add-on
+    // (operating IME, TCHOP > 0: a "teaching" hospital).
+    maRatio: hospital.tchop > 0 && Number.isFinite(hospital.ime_caseta44) && hospital.caseta44 > 0 ? hospital.ime_caseta44 / hospital.caseta44 : null,
     volume: volume || {},
     payment(drg) {
       if (!paid.has(drg)) {
@@ -110,7 +96,7 @@ export function hospitalContext({ hospital, volume, rates, weights, oppsLaborSha
   };
 }
 
-const compares = (item) => item.kind === 'compare' && Boolean(item.ip);
+const compares = (item) => item.kind === 'compare';
 const range = (values) => ({ low: Math.min(...values), high: Math.max(...values) });
 const rounded = ({ low, high }) => ({ low: round2(low), high: round2(high) });
 
@@ -124,17 +110,12 @@ const rounded = ({ low, high }) => ({ low: round2(low), high: round2(high) });
  */
 export function hospitalItem(item, ctx) {
   if (!ctx || !compares(item)) return item;
-  const all = { totals: [], addons: [] };
-  const families = item.ip.families.map((family) => {
-    const paid = family.drgs.map((d) => ctx.payment(d.drg));
-    const totals = range(paid.map((p) => p.total));
-    const addons = range(paid.map((p) => p.addons));
-    all.totals.push(totals.low, totals.high);
-    all.addons.push(addons.low, addons.high);
-    return { ...family, ...rounded(totals), addOn: ctx.addOns ? rounded(addons) : null };
-  });
-  const ip = range(all.totals);
-  const out = { ...item, ip: { ...item.ip, ...rounded(ip), families }, addOn: ctx.addOns ? rounded(range(all.addons)) : null };
+  const paidBy = item.ip.families.map((family) => family.drgs.map((d) => ctx.payment(d.drg)));
+  const addOn = (paid) => (ctx.addOns ? rounded(range(paid.map((p) => p.addons))) : null);
+  const families = item.ip.families.map((family, i) => ({ ...family, ...rounded(range(paidBy[i].map((p) => p.total))), addOn: addOn(paidBy[i]) }));
+  const all = paidBy.flat();
+  const ip = range(all.map((p) => p.total));
+  const out = { ...item, ip: { ...item.ip, ...rounded(ip), families }, addOn: addOn(all) };
   if (item.op.rate !== null) {
     const op = ctx.outpatient(item.op.rate);
     out.op = { ...item.op, rate: round2(op), national: item.op.rate };
@@ -143,7 +124,10 @@ export function hospitalItem(item, ctx) {
   return out;
 }
 
-/** "The split by DRG": per family, a row per DRG with base, IME, DSH and total (cents). [] with no comparison. */
+/**
+ * "The split by DRG": per family, a row per DRG with every drgPayment() figure and base (operating +
+ * capital), each rounded to the cent. [] with no comparison.
+ */
 export function splitRows(item, ctx) {
   if (!ctx || !compares(item)) return [];
   return item.ip.families.map((family) => ({
@@ -152,17 +136,11 @@ export function splitRows(item, ctx) {
     rows: family.drgs.map(({ drg }) => {
       const p = ctx.payment(drg);
       const row = { drg, base: round2(p.operating + p.capital) };
-      for (const key of ['operating', 'capital', 'imeOperating', 'imeCapital', 'ime', 'dshOperating', 'dshCapital', 'dsh', 'addons', 'total']) row[key] = round2(p[key]);
+      for (const [key, value] of Object.entries(p)) row[key] = round2(value);
       return row;
     }),
   }));
 }
-
-/** Reasons a count cell is empty, for the view's labels. */
-export const EMPTY = {
-  suppressed: 'under 11 or none',
-  'no-ma-ratio': 'no MA count in CMS’s file',
-};
 
 /**
  * The per-year table: one row per DRG in the code's families (each DRG once, in family order; family
@@ -182,12 +160,10 @@ export function perYearTable(item, ctx, edits = {}) {
   if (!ctx || !compares(item)) return { rows: [], total: null };
   const first = new Map();
   item.ip.families.forEach((family, i) => family.drgs.forEach(({ drg }) => { if (!first.has(drg)) first.set(drg, i); }));
-  let sum = 0;
-  let counted = false;
+  let sum = null;
   const add = (n, perCase) => {
     if (n === null) return null;
-    sum += n * perCase;
-    counted = true;
+    sum = (sum ?? 0) + n * perCase;
     return round2(n * perCase);
   };
   const rows = [...first].map(([drg, family]) => {
@@ -203,20 +179,7 @@ export function perYearTable(item, ctx, edits = {}) {
     }
     return row;
   });
-  return { rows, total: counted ? round2(sum) : null };
-}
-
-/**
- * The fraction of the gap that is add-ons, as a word for the lead sentence ("At <hospital>, <word> of
- * what a removed procedure loses ... is teaching and DSH add-ons"): the nearest of a quarter, a third,
- * half, two thirds and three quarters, with the cutoffs at the midpoints between them (7/24, 5/12,
- * 7/12, 17/24, 7/8); under a fifth is "a small part", from 7/8 "nearly all", and from 1 "all".
- */
-const LADDER = [[1, 'all'], [7 / 8, 'nearly all'], [17 / 24, 'about three quarters'], [7 / 12, 'about two thirds'],
-  [5 / 12, 'about half'], [7 / 24, 'about a third'], [1 / 5, 'about a quarter'], [-Infinity, 'a small part']];
-export function fractionWord(ratio) {
-  if (!Number.isFinite(ratio)) return null;
-  return LADDER.find(([from]) => ratio >= from)[1];
+  return { rows, total: sum === null ? null : round2(sum) };
 }
 
 function median(values) {
@@ -230,9 +193,10 @@ function median(values) {
  * the lowest DRG's payment less the outpatient payment (positive = outpatient pays less); for a code
  * with several families, the lowest DRG across all of them, so the gap is never overstated.
  * {codes, below (codes where outpatient pays less than even the lowest DRG), medianGap, medianAddOn
- * (the median of that lowest DRG's IME + DSH), ratio, word, state}. Medians are of unrounded values,
- * rounded once. state: 'addons' (word set), 'no-addons' (the gap is base payment only), 'no-gap' (at the
- * median outpatient pays at least the lowest DRG) or 'empty' (no compared codes). null with no hospital.
+ * (the median of that lowest DRG's IME + DSH), ratio (median add-on ÷ median gap, unrounded), state}.
+ * Medians are of unrounded values, rounded once. state: 'addons' (ratio set), 'no-addons' (the gap is
+ * base payment only), 'no-gap' (at the median outpatient pays at least the lowest DRG) or 'empty' (no
+ * compared codes). null with no hospital.
  */
 export function summary(items, ctx) {
   if (!ctx) return null;
@@ -247,17 +211,9 @@ export function summary(items, ctx) {
     addOns.push(lowest.addons);
     if (op < lowest.total) below += 1;
   }
-  if (!gaps.length) return { codes: 0, below: 0, medianGap: null, medianAddOn: null, ratio: null, word: null, state: 'empty' };
+  if (!gaps.length) return { codes: 0, below: 0, medianGap: null, medianAddOn: null, ratio: null, state: 'empty' };
   const gap = median(gaps);
   const addOn = median(addOns);
   const state = !ctx.addOns ? 'no-addons' : gap <= 0 ? 'no-gap' : 'addons';
-  const ratio = state === 'addons' ? addOn / gap : null;
-  return { codes: gaps.length, below, medianGap: round2(gap), medianAddOn: round2(addOn), ratio, word: ratio === null ? null : fractionWord(ratio), state };
-}
-
-/** A per-year ceiling in round figures: "$1.1 million", "$61,000", "$9,500", "$480". */
-export function roughMoney(n) {
-  const step = n >= 10_000 ? 1000 : n >= 1000 ? 100 : 1;
-  const r = Math.round(n / step) * step;
-  return r >= 1_000_000 ? `$${Number((n / 1_000_000).toFixed(1))} million` : `$${num(r)}`;
+  return { codes: gaps.length, below, medianGap: round2(gap), medianAddOn: round2(addOn), ratio: state === 'addons' ? addOn / gap : null, state };
 }
