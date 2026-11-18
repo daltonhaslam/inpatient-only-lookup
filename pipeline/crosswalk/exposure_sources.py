@@ -15,6 +15,7 @@ import re
 
 import history
 import parse
+from crosswalk.price import PAYMENT_FACTORS
 from crosswalk.sources import addendum_rows, at_least, cached, money, read_table, source_path
 
 SOURCE_OF = {
@@ -49,11 +50,11 @@ PROVIDER_TYPES = {0: "IPPS", 7: "Rural referral center", 8: "Indian Health Servi
                   17: "Sole community hospital and rural referral center", 21: "Essential access community hospital",
                   22: "Essential access community hospital and rural referral center"}
 CCN_RE = re.compile(r"^\d{6}$")
-# Each hospital factor: (key in the table, impact-file column). PAYMENT_FACTORS are the ones the
-# per-case payment uses (price.hospital_drg_payment); the case counts give the MA ratio.
-PAYMENT_FACTORS = (("wi", "FY 2027 Wage Index"), ("gaf", "GAF"), ("tchop", "TCHOP"), ("tchcp", "TCHCP"),
-                   ("dshopp", "DSHOPP"), ("dshcpp", "DSHCPP"))
-IMPACT_FACTORS = PAYMENT_FACTORS + (("caseta44", "CASETA44"), ("ime_caseta44", "IME_CASETA44"))
+# Each hospital factor: (key in the table, impact-file column): the ones the per-case payment
+# uses (price.PAYMENT_FACTORS), then the case counts that give the MA ratio.
+IMPACT_COLUMNS = {"wi": "FY 2027 Wage Index", "gaf": "GAF", "tchop": "TCHOP", "tchcp": "TCHCP", "dshopp": "DSHOPP",
+                  "dshcpp": "DSHCPP", "caseta44": "CASETA44", "ime_caseta44": "IME_CASETA44"}
+IMPACT_FACTORS = tuple((key, IMPACT_COLUMNS[key]) for key in PAYMENT_FACTORS + ("caseta44", "ime_caseta44"))
 MUP_COLUMNS = ("Rndrng_Prvdr_CCN", "Rndrng_Prvdr_State_Abrvtn", "DRG_Cd", "Tot_Dschrgs")
 MUP_SUPPRESSED_BELOW = 11
 

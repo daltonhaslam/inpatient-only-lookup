@@ -6,7 +6,6 @@ from writing crosswalk.json and every derived table. Never print descriptor text
 """
 import collections
 
-import parse
 from crosswalk import checks, exposure
 from crosswalk import exposure_sources as xs
 from crosswalk.exposure import ASC_NEW, COINSURANCE, HOSPITALS, MARYLAND, SHARES, VOLUME
@@ -23,15 +22,17 @@ NEW_HCPCS = ("NI", "NP", "NC")
 
 def run_all(report, doc, removed):
     """Read the pinned files, assemble the derived tables and check them into report. Returns
-    {file name: table}, or {} when a file could not be read (a FAIL line says why)."""
+    {file name: table}, or {} when reading or checking raised (a FAIL line names the error)."""
+    step = "read"
     try:
         t = exposure.load_tables()
         tables = exposure.assemble(doc, removed, t)
-    except (parse.ParseError, OSError) as error:
-        # A changed or missing hospital/ASC file must still leave a report that says so.
-        report.check("hospital and patient-share sources read", [str(error)], "the pinned files exposure.py reads")
+        step = "check"
+        run(report, doc, tables, removed, t)
+    except Exception as error:      # noqa: BLE001 - any error must still leave a report that says so
+        report.check("hospital and patient-share tables %s" % step, ["%s: %s" % (type(error).__name__, error)],
+                     "the pinned files exposure.py reads and the checks on its tables")
         return {}
-    run(report, doc, tables, removed, t)
     return tables
 
 
@@ -79,12 +80,9 @@ def _states(report, table, t):
     """The state from the CCN agrees with the state CMS gives in the 2024 discharge file."""
     problems = []
     for ccn, row in list(table["hospitals"].items()) + list(table["maryland"].items()):
-        state = row["state"]
-        if state != xs.state_of(ccn):
-            problems.append("%s: state %s, CCN gives %s" % (ccn, state, xs.state_of(ccn)))
         listed = t.mup_states.get(ccn)
-        if listed and listed != state:
-            problems.append("%s: CCN gives %s, 2024 discharge file says %s" % (ccn, state, listed))
+        if listed and listed != row["state"]:
+            problems.append("%s: CCN gives %s, 2024 discharge file says %s" % (ccn, row["state"], listed))
     both = sum(1 for ccn in table["hospitals"] if ccn in t.mup_states)
     report.check("hospital states", problems,
                  "from the CCN; agree with the 2024 discharge file for the %d hospitals in both" % both)
@@ -173,9 +171,9 @@ def _asc_new(report, table, removed, t):
     problems = []
     if len(ipo) != fact["count"]:
         problems.append("%d IPO removals on the list, the rule states %d" % (len(ipo), fact["count"]))
-    if not set(extra) <= set(fact["also_added"]):
-        problems.append("%d codes on the list beyond the IPO removals (only %s accepted): %s" % (
-            len(extra), ", ".join(fact["also_added"]), ", ".join(extra[:EXAMPLES])))
+    if extra != sorted(fact["also_added"]):
+        problems.append("codes on the list beyond the IPO removals are %s; the rule adds exactly %s" % (
+            ", ".join(extra[:EXAMPLES]) or "none", ", ".join(fact["also_added"])))
     on_aa = {code for code in t.asc_2027 if removed.get(code) == "2027-01-01"}
     if on_aa != ipo:
         problems.append("2027 IPO removals on Addendum AA but not on the list: %s; on the list but not on AA: %s" % (
@@ -210,18 +208,23 @@ def _shares(report, doc, table, t):
     cap = t.facts["deductibles"]["part_a_inpatient"]
     compared = compared_codes(doc)
     codes = sorted(set(compared) | set(t.additions))
-    rows, problems = table["codes"], []
-    if sorted(rows) != codes:
-        problems.append("codes are not the compared codes plus the CY 2027 ASC additions")
-    for code in codes:
-        if rows.get(code) != patient_share(code, t):
-            problems.append("%s: shares do not recompute" % code)
+    rows = table["codes"]
+    problems = ["%s: missing from the table" % code for code in codes if code not in rows]
+    problems += ["%s: neither compared nor a CY 2027 ASC addition" % code for code in sorted(set(rows) - set(codes))]
+    problems += ["%s: shares do not recompute" % code for code in codes
+                 if code in rows and rows[code] != patient_share(code, t)]
     report.check("patient shares recompute", problems, (
         "%d codes; ASC share 20%% of the CY 2027 ASC rate, hospital share Addendum B copayment capped at $%s; "
         "the ASC costs the patient more for %d") % (len(codes), format(cap, ","),
                                                    sum(1 for r in rows.values() if r["asc_more"])))
+    # Hand-checked anchors (facts.json expected.shares), independent of patient_share's formula.
+    anchors = t.facts["expected"]["shares"]
+    report.check("patient-share anchors", [
+        "%s: %s, expected %s" % (code, {key: (rows.get(code) or {}).get(key) for key in want}, want)
+        for code, want in sorted(anchors.items())
+        if {key: (rows.get(code) or {}).get(key) for key in want} != want], ", ".join(sorted(anchors)))
     report.info("compared codes without an ASC rate", "%d of %d" % (
-        sum(1 for code in compared if rows[code]["asc_rate"] is None), len(compared)))
+        sum(1 for code in compared if code in rows and rows[code]["asc_rate"] is None), len(compared)))
     report.info("hospital outpatient shares capped", "%d codes' copayment is above $%s" % (
         sum(1 for r in rows.values() if r["opps_capped"]), format(cap, ",")))
     _copay_vs_rate(report, codes, t)
@@ -246,7 +249,7 @@ def _copay_vs_rate(report, codes, t):
 
 
 def _descriptors(report, tables, t):
-    codes = set(tables[SHARES]["codes"]) | set(t.additions)
+    codes = tables[SHARES]["codes"]      # the compared codes and the CY 2027 ASC additions
     texts = [item for name, table in sorted(tables.items()) for item in checks.strings(table, name)]
     checks.no_descriptor_text(report, "no CPT descriptor text in the hospital and patient-share tables",
                               texts, codes, "the hospital and patient-share tables")

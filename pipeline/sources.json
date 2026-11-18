@@ -641,7 +641,7 @@
    "url": "https://www.cms.gov/files/zip/2026-nfrm-addendum-aa-bb-dd1-dd2-ee-ff.zip",
    "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/ambulatory-surgical-center-asc/asc-regulations-and-notices/cms-1834-fc",
    "sha256": "03c2e1570905d0e264ce0ae2d3252e47d59121b46365b8d70a3d59e02a34b822",
-   "note": "CY2026 ASC final-rule Addenda AA, BB, DD1, DD2, EE, FF (CMS-1834-FC). Read only for the codes on the CY2026 ASC covered procedures list, to find the codes the CY2027 rule adds (asc-2027-aa minus this, less comment indicator NI). Carries CPT short descriptors, so keep in gitignored data/raw/."
+   "note": "CY2026 ASC final-rule Addenda AA, BB, DD1, DD2, EE, FF (CMS-1834-FC). Read only for the codes on the CY2026 ASC covered procedures list: the build checks that none of the CY2027 additions (asc-2027-additions) was already on it, and prints the CY2027-minus-CY2026 file difference for comparison. Carries CPT short descriptors, so keep in gitignored data/raw/."
   },
   {
    "id": "asc-2027-additions",

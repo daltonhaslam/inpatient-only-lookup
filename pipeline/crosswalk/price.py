@@ -9,7 +9,8 @@ hospital_drg_payment and hospital_outpatient are the same payments at one hospit
 capital GAF, IME and DSH from the FY 2027 impact file): the reference the browser's hospital view
 and the build's checks are held to.
 """
-from crosswalk.exposure_sources import PAYMENT_FACTORS
+# The hospital factors hospital_drg_payment reads (keys of an impact-file row, exposure_sources).
+PAYMENT_FACTORS = ("wi", "gaf", "tchop", "tchcp", "dshopp", "dshcpp")
 
 
 def drg_payment(drg, ref):
@@ -21,7 +22,7 @@ def drg_payment(drg, ref):
 
 
 # A hospital with no adjustment: what the national figure assumes (wage index and GAF 1, no add-ons).
-NATIONAL = {**dict.fromkeys((key for key, _ in PAYMENT_FACTORS), 0.0), "wi": 1.0, "gaf": 1.0}
+NATIONAL = {**dict.fromkeys(PAYMENT_FACTORS, 0.0), "wi": 1.0, "gaf": 1.0}
 
 
 def hospital_drg_payment(weight, hospital, rates):

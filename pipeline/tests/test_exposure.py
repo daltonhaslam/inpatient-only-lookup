@@ -20,7 +20,8 @@ FIXTURE = Path(__file__).resolve().parent / "fixtures" / "crosswalk"
 FACTS = {"deductibles": {"year": 2027, "part_a_inpatient": 1776, "part_b": 292, "source": "s", "url": "u"},
          "opps_labor_share": {"value": 0.6, "cite": "c"},
          "asc_additions_2027": {"count": 2, "also_added": ["64629"], "cite": "c"},
-         "expected": {"hospitals_offered": [1, 2], "teaching_in_file": 2}}
+         "expected": {"hospitals_offered": [1, 2], "teaching_in_file": 2,
+                      "shares": {"11111": {"asc_share": 316.996, "opps_share": 716.99, "asc_more": False}}}}
 RATES = {"operating": 6848.00, "capital": 539.95, "labor_share": 0.66, "operating_wi_le1": 6848.00, "labor_share_le1": 0.62}
 
 
@@ -100,6 +101,44 @@ class PatientShare(unittest.TestCase):
         report = checks.Report()
         exposure_checks._shares(report, doc, table, t)
         self.assertIn("11111: shares do not recompute", "\n".join(report.lines))
+        self.assertIn("FAIL patient-share anchors", "\n".join(report.lines))
+
+    def test_a_formula_error_fails_the_hand_checked_anchors(self):
+        t = tables(opps={})
+        doc = {"codes": {"11111": {"difference": {}}}}
+        with mock.patch.object(exposure, "source_meta", return_value={}), \
+                mock.patch.object(exposure, "COINSURANCE", 0.25):
+            table = exposure.shares_table(doc, t)
+            report = checks.Report()
+            exposure_checks._shares(report, doc, table, t)
+        lines = "\n".join(report.lines)
+        self.assertIn("ok patient shares recompute", lines)      # the producer agrees with itself
+        self.assertIn("FAIL patient-share anchors", lines)
+
+    def test_a_missing_code_is_reported_not_raised(self):
+        t = tables(opps={})
+        doc = {"codes": {"11111": {"difference": {}}, "33333": {"difference": {}}}}
+        with mock.patch.object(exposure, "source_meta", return_value={}):
+            table = exposure.shares_table(doc, t)
+        del table["codes"]["33333"]
+        report = checks.Report()
+        exposure_checks._shares(report, doc, table, t)
+        self.assertIn("33333: missing from the table", "\n".join(report.lines))
+
+
+class RunAll(unittest.TestCase):
+    def test_any_error_while_checking_is_a_fail_line_and_no_tables(self):
+        def broken(*args):
+            raise KeyError("expected")
+
+        report = checks.Report()
+        with mock.patch.object(exposure, "load_tables", return_value=None), \
+                mock.patch.object(exposure, "assemble", return_value={"hospitals.json": {}}), \
+                mock.patch.object(exposure_checks, "run", broken):
+            self.assertEqual(exposure_checks.run_all(report, {}, {}), {})
+        self.assertEqual(report.failures, 1)
+        self.assertIn("FAIL hospital and patient-share tables check:", report.lines[0])
+        self.assertIn("KeyError: 'expected'", "\n".join(report.lines))
 
     def test_no_rate_and_no_copay_give_none_not_zero(self):
         self.assertEqual(exposure.patient_share("64629", tables()), {
@@ -108,13 +147,15 @@ class PatientShare(unittest.TestCase):
 
 
 class AscAdditionsCheck(unittest.TestCase):
-    def test_the_stated_count_passes(self):
-        self.assertEqual(asc_report(tables()).failures, 0)
-
-    def test_64629_on_top_passes(self):
+    def test_the_stated_count_plus_64629_passes(self):
         report = asc_report(tables(additions={"11111": "G2", "22222": "G2", "64629": "N1"}))
         self.assertEqual(report.failures, 0, report.lines)
         self.assertIn("+ 64629", report.lines[0])
+
+    def test_a_list_without_64629_fails(self):
+        report = asc_report(tables())
+        self.assertEqual(report.failures, 1)
+        self.assertIn("beyond the IPO removals are none; the rule adds exactly 64629", "\n".join(report.lines))
 
     def test_any_other_extra_code_fails(self):
         report = asc_report(tables(additions={"11111": "G2", "22222": "G2", "99999": "A2"}))
@@ -283,7 +324,7 @@ class TablesFailClosed(unittest.TestCase):
             with mock.patch.object(exposure, "load_tables", broken), mock.patch("sys.stdout"):
                 self.assertEqual(build.main(args), 1)
             text = checks_file.read_text()
-            self.assertIn("FAIL hospital and patient-share sources read:", text)
+            self.assertIn("FAIL hospital and patient-share tables read:", text)
             self.assertIn("impact file: no header with columns", text)
             self.assertFalse((Path(tmp) / "crosswalk.json").exists())
             self.assertFalse(any((Path(tmp) / name).exists() for name in exposure.TABLES))

@@ -35,6 +35,10 @@
    "apc": {"apc": "5183", "rate": 3584.95, "at_hospital": 3995.14},
    "per_year": {"drg": "165", "count": 10, "addons": 60670.69},
    "volume_2024": {"163": 15, "164": 34, "165": 11}
+  },
+  "shares": {
+   "32480": {"asc_share": 316.996, "opps_share": 716.99, "asc_more": false},
+   "53448": {"asc_share": 4115.24, "opps_share": 1776, "opps_capped": true, "asc_more": true}
   }
  }
 }
