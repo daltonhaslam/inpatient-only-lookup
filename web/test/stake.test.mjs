@@ -259,6 +259,17 @@ describe('revenue at stake', { skip }, () => {
     for (const code of withCard.slice(0, 20)) assert.ok(read(`code/${code}/index.html`).includes('Review a batch of 10 →'), code);
   });
 
+  test('methods page: with the hospital picker built, the hospital, left-out, MA, per-year and patient-share sections and their sources', () => {
+    const html = read('revenue-at-stake/methods/index.html');
+    if (!read('revenue-at-stake/index.html').includes('data-hospital-pick')) return;
+    for (const id of ['m-hosp-h', 'm-left-h', 'm-ma-h', 'm-year-h', 'm-share-h', 'm-factors-cap']) assert.ok(html.includes(`id="${id}"`), id);
+    for (const id of ['hospitals', 'drg-volume', 'asc-new-2027']) {
+      const { source } = JSON.parse(readFileSync(join(repo, `pipeline/derived/${id}.json`), 'utf8')).meta;
+      assert.ok(html.includes(`href="${source.landing}"`) && textOf(html).includes(source.file), `methods sources lack ${source.id}`);
+    }
+    assert.ok(html.includes('Download for'), 'the hospital CSV is described with the downloads');
+  });
+
   test('methods page cites every source file, the guardrail and the years', () => {
     const html = read('revenue-at-stake/methods/index.html');
     const text = textOf(html);

@@ -6,6 +6,7 @@ import { esc, out, cfr, scroller, captionedScroller } from './views.mjs';
 import { layout } from './pages.mjs';
 import { safeProfile } from './stake-data.mjs';
 import { packShare, shareHtml } from './patient-share.mjs';
+import { hospitalMethods, methodsSources } from './hospital-methods.mjs';
 import { BADGE, card, money, moneyRange, cents, drgList, dxCode, statusText, noCompareText, yearLines, alternativeLabel } from './stake-card.mjs';
 
 export const ROOT = '/revenue-at-stake/';
@@ -251,7 +252,8 @@ export function methodsPage(ctx) {
   const tiers = meta.counts.tiers;
   const drg165 = stake.items.flatMap((item) => (item.ip ? item.ip.families : [])).flatMap((f) => f.drgs).find((d) => d.drg === '165');
   const formula = drg165 ? ` For example, DRG 165 (major chest procedures without CC/MCC) is its relative weight, ${drg165.weight.toFixed(4)}, × ${cents(r.combined)}.` : '';
-  const files = meta.sources.map((s) => `<tr><td>${out(s.landing, esc(s.label))}</td><td>${esc(s.file).replace(/; /g, '<br>')}</td></tr>`).join('');
+  const hospital = ctx.methods;   // the hospital view's tables (build.mjs), or null without the picker
+  const files = [...meta.sources, ...(hospital ? methodsSources(hospital) : [])].map((s) => `<tr><td>${out(s.landing, esc(s.label))}</td><td>${esc(s.file).replace(/; /g, '<br>')}</td></tr>`).join('');
   const body = `${subnav('methods')}
 <nav class="crumbs" aria-label="Breadcrumb"><a href="${ROOT}">Revenue at stake</a> <span aria-hidden="true">/</span> <span>Methods</span></nav>
 <h1>Revenue at stake: methods</h1>
@@ -278,9 +280,10 @@ ${draft()}
 <section class="block" aria-labelledby="m-nat-h">
 <h2 id="m-nat-h">National, unadjusted</h2>
 <p>Every dollar figure here is a national amount with no hospital-specific adjustment: ${esc(r.adjusters)}. A hospital’s own inpatient payment is usually higher. Its wage index adjusts the labor share of the operating amount, and teaching (IME) and disproportionate-share (DSH) add-ons raise it further. Published hand-worked examples, such as a figure of about $20,000 for a lobectomy, may include those adjustments. The figures here include none of them.${formula}</p>
-<p>Outpatient payments are wage-adjusted too (60% of the rate), but get no IME or DSH add-on. ${stake.xlsx ? 'The Excel download has an Inputs tab where you can enter your own wage index, IME and DSH; every amount recalculates.' : ''}</p>
+<p>Outpatient payments are wage-adjusted too (60% of the rate), but get no IME or DSH add-on. ${stake.xlsx ? 'The Excel download has an Inputs tab where you can enter your own wage index, IME and DSH; every amount recalculates.' : ''}</p>${hospital ? `
+<p>Pick a hospital on the <a href="${ROOT}">Revenue at stake</a> page to see every card at that hospital’s rates; how is below.</p>` : ''}
 </section>
-
+${hospital ? `\n${hospitalMethods(hospital, r)}\n` : ''}
 <section class="block" aria-labelledby="m-tier-h">
 <h2 id="m-tier-h">Tiers and review status</h2>
 <p>Each mapped code gets a tier, computed from the mapping passes, never set by hand.</p>
@@ -302,7 +305,7 @@ ${guardrail()}
 <li>The range is the whole MS-DRG family. Where a real case lands depends on its secondary diagnoses (CC/MCC), which this cannot know.</li>
 <li>The expected principal diagnosis is one typical choice, with an alternative only where it changes the family. Real cases vary.</li>
 <li>Outliers, transfers, post-acute transfer reductions, new-technology add-on payments and device credits are not modelled.</li>
-<li>Fee-for-service Medicare only. Medicare Advantage and other payers pay on their own contracts.</li>
+<li>Fee-for-service Medicare only. Medicare Advantage and other payers pay on their own contracts.${hospital ? ' The per-year view counts MA cases only for the operating IME Medicare pays on them (see Medicare Advantage, above).' : ''}</li>
 <li>Labels are this site’s own plain-language names, not CPT descriptors, and may be less specific than the code.</li>
 </ul>
 </section>
@@ -341,7 +344,8 @@ ${captionedScroller('m-files-cap', 'CMS sources and the files read from each', '
 <section class="block" aria-labelledby="m-upd-h">
 <h2 id="m-upd-h">Updates and downloads</h2>
 <p>Built ${formatDate(meta.built)}. Rebuilt each October for the new fiscal year’s inpatient weights, rates and grouper version, and each January for the new calendar year’s outpatient rates and the next removals from the list. Coder reviews are added between those updates; a status changes only when they are.</p>
-<p>${stake.xlsx ? '<a href="/data/revenue-at-stake.xlsx" download>Download Excel</a> (live formulas off an Inputs tab) or ' : ''}<a href="/data/revenue-at-stake.csv" download>download the CSV</a>: one row per code and DRG family, plain values. No AMA content: codes and this site’s labels only. ${out(SITE.repo, 'The code and the mappings')} are public under the MIT license.</p>
+<p>${stake.xlsx ? '<a href="/data/revenue-at-stake.xlsx" download>Download Excel</a> (live formulas off an Inputs tab) or ' : ''}<a href="/data/revenue-at-stake.csv" download>download the CSV</a>: one row per code and DRG family, plain values${hospital ? ', with the national patient’s share at the end of each row' : ''}. No AMA content: codes and this site’s labels only. ${out(SITE.repo, 'The code and the mappings')} are public under the MIT license.</p>${hospital ? `
+<p>After you pick a hospital, “Download for” that hospital builds its CSV in your browser: a row per code and MS-DRG at its rates (outpatient, base, IME, DSH, total and the gap), then the per-year rows with the counts shown, yours included where you changed them. Codes and MS-DRG numbers only.</p>` : ''}
 </section>`;
   return layout(ctx, {
     path: `${ROOT}methods/`, page: 'stake-methods', title: 'Revenue at stake: methods and sources', body,

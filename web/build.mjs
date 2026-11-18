@@ -17,6 +17,7 @@ import * as stake from './src/stake.mjs';
 import { normalize, credits, clientModel, removalMismatches } from './src/stake-data.mjs';
 import { hospitalList, hospitalRecord, uncoveredDrgs } from './src/hospital-data.mjs';
 import { sharesFile } from './src/patient-share.mjs';
+import { methodsTables } from './src/hospital-methods.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -300,7 +301,8 @@ function stakeData(ctx) {
  * The hospital view's files, loaded only after someone uses the picker: the list (with the math's
  * constants), one file per hospital under a directory named for the hash of all of them, and the
  * picker's own bundle and stylesheet. Their URLs go into the stake bundle at build time, so the national page's HTML
- * does not change. null (no picker) when the derived hospital tables are absent.
+ * does not change. Returns {assets (those URLs), hospitals, volume (the two tables, for Methods)}, or null
+ * (no picker) when the derived hospital tables are absent.
  */
 async function hospitalAssets(model) {
   const paths = ['pipeline/derived/hospitals.json', 'pipeline/derived/drg-volume.json'];
@@ -319,12 +321,13 @@ async function hospitalAssets(model) {
   const dir = `data/h.${sha(records.map(([ccn, text]) => `${ccn}\n${text}`).join('\n'))}`;
   mkdirSync(join(out, dir), { recursive: true });
   for (const [ccn, text] of records) writeFileSync(join(out, dir, `${ccn}.json`), text);
-  return {
+  const assets = {
     list: hashed('data', 'hospitals', 'json', JSON.stringify(hospitalList(hospitals, model))),
     dir: `/${dir}`,
     view: hashed('assets', 'hospital', 'js', await bundleEntry('hospital-picker.mjs', 'esm')),
     css: hashed('assets', 'hospital', 'css', readFileSync(join(here, 'src/hospital.css'), 'utf8')),
   };
+  return { assets, hospitals, volume };
 }
 
 /**
@@ -339,7 +342,8 @@ async function bundleEntry(file, format, define = {}) {
 }
 
 /**
- * The ASC patient-share tables: doc (patient-shares.json, for the code pages' line) and lookup ({url,
+ * The ASC patient-share tables: doc (patient-shares.json, for the code pages' line), ascNew
+ * (asc-new-2027.json, for Methods) and lookup ({url,
  * from}: the small file the lookup loads when an answer needs it, holding CMS's 2027 ASC additions, and
  * the date they leave the list; client.mjs gets it through esbuild define). null, with a warning, when
  * the derived tables are absent; the share line is then left out.
@@ -355,7 +359,7 @@ function patientShares(ctx) {
   // Every code in the file must leave the list on one date, the date the lookup starts showing the line.
   const dates = new Set(Object.keys(file.c).map((code) => (ctx.data.codes[code] ? lookup(ctx.data, code, ctx.data.dosMax).removed : null)));
   if (dates.size !== 1 || dates.has(null)) throw new Error(`asc-new-2027.json codes do not all leave the inpatient-only list on one date: ${[...dates].join(', ')}`);
-  return { doc, lookup: { url: hashed('data', 'shares', 'json', JSON.stringify(file)), from: [...dates][0] } };
+  return { doc, ascNew, lookup: { url: hashed('data', 'shares', 'json', JSON.stringify(file)), from: [...dates][0] } };
 }
 
 const FONTS = [
@@ -400,7 +404,13 @@ async function main() {
   const shares = patientShares(ctx);
   ctx.shares = shares && shares.doc;
   const script = await bundleEntry('client.mjs', 'iife', { __SHARES__: JSON.stringify(shares && shares.lookup) });
-  const hospitals = ctx.stake ? await hospitalAssets(ctx.stake.model) : null;
+  const tables = ctx.stake ? await hospitalAssets(ctx.stake.model) : null;
+  const hospitals = tables && tables.assets;
+  // The Methods page's hospital, per-year and patient-share sections: only when both are built.
+  ctx.methods = tables && shares ? methodsTables({
+    hospitals: tables.hospitals, volume: tables.volume, ascNew: shares.ascNew, shares: shares.doc,
+    citations: read('pipeline/citations.json'), sources: read('pipeline/sources.json'),
+  }) : null;
   const stakeScript = ctx.stake ? await bundleEntry('stake-client.mjs', 'iife', { __HOSPITAL_ASSETS__: JSON.stringify(hospitals) }) : null;
   ctx.assets = {
     css,
