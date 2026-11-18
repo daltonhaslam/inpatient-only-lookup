@@ -728,7 +728,11 @@ if (!hasStake) {
       'Surgery center (ASC), national: $1,585', '$22,117–$51,459', 'Includes $6,067–$14,116 in IME and DSH', 'No teaching or DSH add-on in either outpatient setting.',
       'Ohsu Hospital And Clinics rates: wage index, IME and DSH (operating and capital).']) has(text, part, '32480 card');
     assert(!text.includes('National, unadjusted'), 'no national fine print on a hospital card');
-    eq(await page.locator('[data-stake-card="32480"] .sbar__add').count(), 1, 'darker add-on part of the bar');
+    eq(await page.locator('[data-stake-card="32480"] .sbar__add').count(), 1, 'add-on end segment of the bar');
+    const legend = await page.locator('[data-stake-card="32480"] .sbar__keyed').textContent();
+    eq(legend, '(IME and DSH)', 'bar legend: a swatch and words true in every color mode');
+    const key = await page.locator('[data-stake-card="32480"] .sbar__key').evaluate((el) => getComputedStyle(el).backgroundColor);
+    eq(key, await page.locator('[data-stake-card="32480"] .sbar__add').evaluate((el) => getComputedStyle(el).backgroundColor), 'swatch matches the segment');
     has(page.url(), 'h=380009&q=32480', 'URL keeps the hospital and the search');
     await page.reload();
     await page.waitForSelector('.hsum');

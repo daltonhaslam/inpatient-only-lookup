@@ -133,21 +133,25 @@ const pct = (n) => `${(n * 100).toFixed(2)}%`;
 
 /**
  * Bars on one dollar scale: hollow for outpatient, filled for each inpatient range. Decorative; the text
- * says it all. With a hospital's add-ons, the top of each inpatient range is drawn darker for the top
- * DRG's IME and DSH: the dollars above that DRG's base payment (never left of the range's low end).
+ * says it all. With a hospital's add-ons (exactly when the card says "Includes $A–$B"), the top of each
+ * inpatient range gets an end segment in its own color for the top DRG's IME and DSH: the dollars above
+ * that DRG's base payment (never left of the range's low end). Its legend is a swatch of that color, not
+ * a word like "darker", which is not true in dark mode or forced colors.
  */
 function scaleBar(item, hospital) {
   const top = Math.max(item.op.rate || 0, item.ip.high);
-  const lane = (name, bar) => `<div class="sbar__lane"><span class="sbar__name">${esc(name)}</span><span class="sbar__track">${bar}</span></div>`;
+  const lane = (name, bar, key = '') => `<div class="sbar__lane"><span class="sbar__name">${esc(name)}${key}</span><span class="sbar__track">${bar}</span></div>`;
   const lanes = [lane('Outpatient', item.op.rate !== null ? `<i class="sbar__op" style="width:${pct(item.op.rate / top)}"></i>` : '')];
-  const darker = (f) => {
-    if (!hospital || !f.addOn || !(f.addOn.high > 0)) return '';
+  const addOnPart = (f) => {
+    if (!hospital || !addOnText(f.addOn)) return '';
     const from = Math.max(f.high - f.addOn.high, f.low);
     return `<i class="sbar__add" style="left:${pct(from / top)};width:${pct((f.high - from) / top)}"></i>`;
   };
   for (const f of item.ip.families) {
     const name = item.ip.families.length > 1 ? `Inpatient, ${whenLabel(f)}` : 'Inpatient';
-    lanes.push(lane(darker(f) ? `${name} (darker: IME and DSH)` : name, `<i class="sbar__ip" style="left:${pct(f.low / top)};width:${pct(Math.max(f.high - f.low, top * 0.006) / top)}"></i>${darker(f)}`));
+    const add = addOnPart(f);
+    lanes.push(lane(name, `<i class="sbar__ip" style="left:${pct(f.low / top)};width:${pct(Math.max(f.high - f.low, top * 0.006) / top)}"></i>${add}`,
+      add ? ' <span class="sbar__keyed">(<i class="sbar__key"></i>IME and DSH)</span>' : ''));
   }
   return `<div class="sbar" aria-hidden="true">${lanes.join('')}<div class="sbar__axis"><span>$0</span><span>${money(top)}</span></div></div>`;
 }
@@ -203,7 +207,7 @@ ${stale}
  * detail: include Show the work (off in the browser, which links to the code page instead).
  * hospital: {name} when a hospital is picked and item comes from hospital-math.mjs hospitalItem(); the
  * card then says whose rates these are, shows the IME and DSH inside the inpatient amount and draws it
- * darker on the bar; Show the work (national DRG amounts) is never drawn beside it, only linked as
+ * as the bar's end segment; Show the work (national DRG amounts) is never drawn beside it, only linked as
  * national. folds: HTML for the hospital's folded sections (split by DRG, per year), placed before the fine print.
  * A code with no comparison draws the same with or without a hospital.
  */

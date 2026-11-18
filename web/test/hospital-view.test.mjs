@@ -112,6 +112,9 @@ describe('cards in hospital mode', () => {
     assert.ok(t.includes('Ohsu Hospital And Clinics rates: wage index, IME and DSH (operating and capital).'));
     assert.ok(!t.includes('National, unadjusted'));
     assert.match(html, /class="sbar__add"/);
+    // The legend is a swatch of the segment's own color, never a word that dark mode or forced colors make false.
+    assert.match(html, /<span class="sbar__keyed">\(<i class="sbar__key"><\/i>IME and DSH\)<\/span>/);
+    assert.ok(!/darker|lighter/i.test(html), 'no light/dark word in the legend');
     assert.ok(t.includes('Show the national work for 32480'));
     assert.ok(!html.includes('scard__work'), 'no national DRG table beside hospital figures');
   });
@@ -124,6 +127,16 @@ describe('cards in hospital mode', () => {
     assert.ok(!t.includes('No teaching or DSH add-on in either outpatient setting'));
     assert.ok(t.includes('Arizona Spine And Joint Hospital rates: wage index. This hospital gets no IME or DSH.'));
     assert.ok(!/\$0–\$0|NaN/.test(t));
+  });
+  test('an add-on that rounds to $0 draws no segment and no legend, like the Includes line', () => {
+    const record = { ...recordOf('380009'), tchop: 1e-5, tchcp: 0, dshopp: 0, dshcpp: 0 };
+    const view = createView({ list, record, ccn: '380009', data, meta: doc.meta });
+    const item = view.data.byCode['32480'];
+    assert.ok(item.addOn && item.addOn.high > 0 && item.addOn.high < 0.5, 'a real but sub-$0.50 add-on');
+    const html = view.card(item);
+    assert.ok(!html.includes('Includes'));
+    assert.ok(!html.includes('sbar__add'));
+    assert.ok(!html.includes('sbar__key'));
   });
   test('Review Focus 4: a code with no comparison draws exactly as nationally', () => {
     const view = viewOf('380009');

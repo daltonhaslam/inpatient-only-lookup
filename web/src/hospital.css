@@ -41,14 +41,16 @@ button.hpick__btn:hover { background: none; color: var(--ink); text-decoration-t
 .scard__addon { display: block; margin-top: 0.3rem; font-size: 0.95rem; }
 .scard__addon b { font-weight: 650; font-variant-numeric: tabular-nums; }
 .sbar__add { position: absolute; top: 0; bottom: 0; background: var(--add); border-radius: 0 2px 2px 0; box-shadow: inset 2px 0 0 var(--paper); min-width: 3px; }
+.sbar__key { display: inline-block; width: 0.9em; height: 0.6em; margin-right: 0.3em; border-radius: 1px; background: var(--add); }   /* the end segment's legend */
 ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation-duration: 0.22s; }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
 @media (forced-colors: active) {
-  .sbar__add { forced-color-adjust: none; background: Highlight; box-shadow: inset 2px 0 0 Canvas; }
+  .sbar__add, .sbar__key { forced-color-adjust: none; background: Highlight; }
+  .sbar__add { box-shadow: inset 2px 0 0 Canvas; }
   .hpick__list [aria-selected='true'] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
   .hpick__list [aria-selected='true'] .hpick__ometa { color: HighlightText; }
   button.hpick__btn { color: LinkText; }
 }
-@media print { .hpick__find, .hpick__acts, .hsum__note a { display: none; } .sbar__add { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
+@media print { .hpick__find, .hpick__acts, .hsum__note a { display: none; } .sbar__add, .sbar__key { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
