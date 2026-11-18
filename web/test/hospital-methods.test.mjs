@@ -5,7 +5,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { methodsTables, hospitalMethods, methodsSources, IMPACT_CCN, MUP_KEYS } from '../src/hospital-methods.mjs';
+import { methodsTables, hospitalMethods, methodsSources } from '../src/hospital-methods.mjs';
+import { cents, money } from '../src/stake-card.mjs';
+import { pct, ceiling } from '../src/hospital-words.mjs';
 import { normalize } from '../src/stake-data.mjs';
 import { CFR } from '../src/site.mjs';
 
@@ -21,22 +23,24 @@ const tablesFrom = (over = {}) => methodsTables({
   ...over,
 });
 const rates = normalize(read('pipeline/derived/crosswalk.json')).meta.rates;
+// The expected values, built from the same tables the page reads (never retyped here either).
+const hMeta = read('pipeline/derived/hospitals.json').meta;
+const vMeta = read('pipeline/derived/drg-volume.json').meta;
+const aMeta = read('pipeline/derived/asc-new-2027.json').meta;
+const { deductibles } = read('pipeline/derived/patient-shares.json').meta;
+const cites = read('pipeline/citations.json').citations;
+const rule = read('pipeline/sources.json').sources.find((s) => s.id === cites['ASC27-618'].source);
+const share = (x) => pct(x, { trim: true });
+const frLink = (cite) => { const [vol, , page] = cite.split(' '); return `https://www.govinfo.gov/link/fr/${vol}/${page}`; };
 const html = hospitalMethods(tablesFrom(), rates);
 const text = html.replace(/<span class="sr">[\s\S]*?<\/span>/g, '').replace(/<[^>]+>/g, ' ').replace(/&#39;/g, '\'').replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/\s+/g, ' ');
 
 test('every hospital factor is traced to the impact file and its column, and the counts to the MUP file', () => {
-  const { columns } = read('pipeline/derived/hospitals.json').meta;
-  for (const column of [...Object.values(columns), IMPACT_CCN]) assert.ok(html.includes(`<code>${column}</code>`), column);
-  for (const column of ['Tot_Dschrgs', ...MUP_KEYS]) assert.ok(html.includes(`<code>${column}</code>`), column);
-  for (const words of ['FY 2027 IPPS final rule impact file, correction notice', 'Medicare Inpatient Hospitals - by Provider and Service, data year 2024',
-    'Table 5, CMS-1849-CN', 'Table 1A, CMS-1849-CN', 'Table 1D, CMS-1849-CN', '$6,848.00', '$539.95', '66%', '62%', '60%']) assert.ok(text.includes(words), words);
-  assert.ok(html.includes('https://www.govinfo.gov/link/fr/91/70328'), 'the OPPS labor share cites 91 FR 70328');
-});
-
-test('the MUP column names match the pipeline that reads the file', () => {
-  const source = readFileSync(join(root, 'pipeline/crosswalk/exposure_sources.py'), 'utf8');
-  for (const name of [...MUP_KEYS, 'Tot_Dschrgs']) assert.ok(source.includes(`"${name}"`), name);
-  assert.ok(source.includes(`^${IMPACT_CCN}$`), IMPACT_CCN);
+  for (const column of Object.values(hMeta.columns)) assert.ok(html.includes(`<code>${column}</code>`), column);
+  for (const key of ['count', 'ccn', 'drg']) assert.ok(html.includes(`<code>${vMeta.columns[key]}</code>`), key);
+  for (const words of [hMeta.source.label, vMeta.source.label, rates.weightsTable, rates.operatingTable, rates.capitalTable,
+    cents(rates.operating), cents(rates.capital), share(hMeta.rates.labor_share), share(hMeta.rates.labor_share_le1), share(hMeta.opps_labor_share)]) assert.ok(text.includes(words), words);
+  assert.ok(html.includes(frLink(hMeta.opps_labor_share_cite)), 'the OPPS labor share cites its FR page');
 });
 
 test('what is left out, with the CFR cites; MA in one sentence with its quote; Maryland with the reason', () => {
@@ -55,15 +59,14 @@ test('what is left out, with the CFR cites; MA in one sentence with its quote; M
 });
 
 test('the per-year ceiling and the MA estimate', () => {
-  for (const words of ['A ceiling, not a forecast', 'under 11', 'IME_CASETA44', 'same MS-DRG mix', 'not saved']) assert.ok(text.includes(words), words);
+  for (const words of [ceiling(vMeta.data_year), `under ${vMeta.suppressed_below}`, hMeta.columns.ime_caseta44, 'same MS-DRG mix', 'not saved']) assert.ok(text.includes(words), words);
 });
 
-test('the patient share: $1,776 and $292 from patient-shares.json with the fact sheet; the 618 with FR 2026-22739 and 64629; one Procedure Price Lookup link', () => {
-  const { deductibles } = read('pipeline/derived/patient-shares.json').meta;
-  assert.ok(text.includes('$1,776') && text.includes('$292'));
+test('the patient share: the deductibles from patient-shares.json with the fact sheet; the ASC additions with their FR document, pages and extra codes; one Procedure Price Lookup link', () => {
+  assert.ok(text.includes(money(deductibles.part_a_inpatient)) && text.includes(money(deductibles.part_b)));
   assert.ok(html.includes(deductibles.url), 'fact sheet link');
-  for (const words of ['618', 'FR Doc. 2026-22739', '64629', '20%']) assert.ok(text.includes(words), words);
-  for (const page of ['70286', '70665']) assert.ok(html.includes(`https://www.govinfo.gov/link/fr/91/${page}`), page);
+  for (const words of [String(aMeta.ipo_removed_2027), `FR Doc. ${rule.doc}`, ...aMeta.also_added, '20%']) assert.ok(text.includes(words), words);
+  for (const cite of [cites['ASC27-618'].cite, cites['ASC27-64629'].cite, aMeta.cite]) assert.ok(html.includes(frLink(cite)), cite);
   assert.equal(html.split('https://www.medicare.gov/procedure-price-lookup').length - 1, 1);
 });
 
@@ -72,7 +75,7 @@ test('figures are read from the tables, never retyped: another deductible shows 
   shares.meta.deductibles = { ...shares.meta.deductibles, part_a_inpatient: 1900, part_b: 300 };
   const changed = hospitalMethods(tablesFrom({ shares }), rates);
   assert.ok(changed.includes('$1,900') && changed.includes('$300'));
-  assert.ok(!changed.includes('$1,776') && !changed.includes('$292'));
+  assert.ok(!changed.includes(money(deductibles.part_a_inpatient)) && !changed.includes(money(deductibles.part_b)));
   assert.ok(!/NaN|undefined|null/.test(html));
 });
 

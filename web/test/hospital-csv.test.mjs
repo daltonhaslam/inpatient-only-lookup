@@ -11,6 +11,7 @@ import { hospitalList, hospitalRecord } from '../src/hospital-data.mjs';
 import { createView } from '../src/hospital-view.mjs';
 import { HOSPITAL_CSV_HEADER, hospitalCsvName } from '../src/hospital-csv.mjs';
 import { csv } from '../src/engine.mjs';
+import { ceiling } from '../src/hospital-words.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (path) => JSON.parse(readFileSync(join(root, path), 'utf8'));
@@ -87,7 +88,7 @@ describe('hospital CSV', () => {
     assert.match(ma.note, /^operating IME only; estimate: 1\.11 MA cases per traditional case/);
     const total = one(rows, 'per_year_total', '32480', '');
     assert.equal(total.add_on_per_year, 1015760.07);
-    assert.match(total.note, /^a ceiling, not a forecast/);
+    assert.equal(total.note, ceiling(2024));
     // No per-case cells on per-year rows.
     for (const key of ['hospital_outpatient', 'inpatient_base', 'inpatient_total', 'outpatient_minus_inpatient']) assert.equal(trad[key], '', key);
   });

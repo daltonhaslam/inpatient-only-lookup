@@ -7,12 +7,10 @@ import { esc } from './views.mjs';
 import { num } from './engine.mjs';
 import { card, money } from './stake-card.mjs';
 import { hospitalContext, hospitalItem, summary as summarize, teaching } from './hospital-math.mjs';
-import { fractionWord } from './hospital-words.mjs';
+import { fractionWord, pct } from './hospital-words.mjs';
 import { shortName, TEACHING_LABEL } from './hospital-pick.mjs';
 import { foldsHtml, yearUpdate } from './hospital-folds.mjs';
 import { hospitalCsvRows, hospitalCsvName } from './hospital-csv.mjs';
-
-const pct = (x) => `${(x * 100).toFixed(1)}%`;
 
 /**
  * "Teaching · IME 31.1% · DSH 7.0% · wage index 1.19". IME and DSH are CMS's operating factors

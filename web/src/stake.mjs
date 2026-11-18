@@ -1,7 +1,7 @@
 // Revenue at stake: the three section pages, the block on each removed code's page, and the CSV.
 // Build-time only. Reads the normalized model from stake-data.mjs, never crosswalk.json keys.
 import { SITE, CFR, claimHref } from './site.mjs';
-import { formatDate, num, plural, csv as toCsv } from './engine.mjs';
+import { formatDate, num, plural, blank, csv as toCsv } from './engine.mjs';
 import { esc, out, cfr, scroller, captionedScroller } from './views.mjs';
 import { layout } from './pages.mjs';
 import { safeProfile } from './stake-data.mjs';
@@ -383,7 +383,6 @@ export const CSV_HEADER = ['code', 'label', 'body_system', 'removed', 'outpatien
   'review_status', 'mapping_fingerprint', 'opps_patient_share', 'asc_patient_share', 'asc_costs_patient_more'];
 
 const round2 = (n) => Math.round(n * 100) / 100;
-const blank = (n) => (n === null || n === undefined ? '' : n);
 
 /**
  * The national patient's share for a code (patient-shares.json, through packShare): hospital outpatient

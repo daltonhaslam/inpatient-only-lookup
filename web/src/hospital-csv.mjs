@@ -8,7 +8,8 @@
 // per_year_total). Codes and DRG numbers only: no procedure labels, so no CPT descriptor can ride along.
 import { alternativeLabel } from './stake-card.mjs';
 import { splitRows, perYearTable, count, round2 } from './hospital-math.mjs';
-import { EMPTY } from './hospital-words.mjs';
+import { EMPTY, ceiling } from './hospital-words.mjs';
+import { blank } from './engine.mjs';
 
 export const HOSPITAL_CSV_HEADER = ['row_type', 'ccn', 'hospital', 'code', 'family_order', 'drg', 'payer',
   'hospital_outpatient', 'inpatient_base', 'ime', 'dsh', 'inpatient_total', 'outpatient_minus_inpatient',
@@ -17,8 +18,7 @@ export const HOSPITAL_CSV_HEADER = ['row_type', 'ccn', 'hospital', 'code', 'fami
 export const hospitalCsvName = (ccn) => `revenue-at-stake-${ccn}.csv`;
 
 const PAYER = { trad: 'traditional_medicare', ma: 'medicare_advantage' };
-const CEILING = 'a ceiling, not a forecast: every 2024 case in these MS-DRGs, not only removed procedures';
-const blank = (n) => (n === null || n === undefined ? '' : n);
+const CEILING = ceiling(2024);   // the counts' data year, as the folds and count_source cms_2024 name it
 const familyOrder = (item, i) => (i === 0 ? 'primary' : alternativeLabel(item.ip.families[i]));
 
 /** A row from named cells; every other column is empty. */
@@ -31,8 +31,9 @@ const row = (cells) => HOSPITAL_CSV_HEADER.map((name) => blank(cells[name]));
  */
 function source(payer, cell, typed, ratio) {
   if (typed !== undefined) {
-    const note = count(typed) !== null ? 'your count' : String(typed).trim() === '' ? 'cleared' : 'not a whole number; not counted';
-    return ['typed', note];
+    if (count(typed) !== null) return ['typed', 'your count'];
+    if (String(typed).trim() === '') return ['typed', 'cleared'];
+    return ['typed', 'not a whole number; not counted'];
   }
   if (cell.count === null) return ['none', payer === 'trad' ? EMPTY.suppressed : EMPTY[cell.reason] || ''];
   if (payer === 'trad') return ['cms_2024', ''];
@@ -68,7 +69,7 @@ export function hospitalCsvRows({ items, ctx, ccn, name, edits = new Map() }) {
         note: [payer === 'ma' ? 'operating IME only' : '', why].filter(Boolean).join('; '),
       });
     }));
-    return [...lines, row({ ...who, row_type: 'per_year_total', code: item.code, add_on_per_year: table.total, note: table.total === null ? `no counts; ${CEILING}` : CEILING })];
+    return [...lines, row({ ...who, row_type: 'per_year_total', code: item.code, add_on_per_year: table.total, note: table.total === null ? `No counts. ${CEILING}` : CEILING })];
   });
   return [HOSPITAL_CSV_HEADER, ...perCase, ...perYear];
 }

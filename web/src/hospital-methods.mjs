@@ -1,19 +1,16 @@
 // The Revenue at stake Methods sections for the hospital view, the per-year ceiling and the national
 // patient share (stake.mjs methodsPage, at build time). Every figure and source is read from the derived
-// tables' meta (hospitals.json, drg-volume.json, asc-new-2027.json, patient-shares.json), the crosswalk's
-// rates, citations.json (quotes checked against their Federal Register pages) and sources.json; none is
-// retyped here. The few file column names no meta carries are named once below, and a test checks them
-// against the pipeline that reads the file (pipeline/crosswalk/exposure_sources.py).
+// tables' meta (hospitals.json, drg-volume.json, asc-new-2027.json, patient-shares.json; the CMS column
+// names included), the crosswalk's rates, citations.json (quotes checked against their Federal Register
+// pages) and sources.json; none is retyped here.
 import { esc, out, fr, cfr, captionedScroller } from './views.mjs';
 import { num } from './engine.mjs';
 import { cents, money } from './stake-card.mjs';
+import { pct as percent, ceiling } from './hospital-words.mjs';
 
-/** The impact file's CCN column, and the MUP file's CCN and MS-DRG columns (exposure_sources.py). */
-export const IMPACT_CCN = 'Provider Number';
-export const MUP_KEYS = ['Rndrng_Prvdr_CCN', 'DRG_Cd'];
 const PRICE_LOOKUP = 'https://www.medicare.gov/procedure-price-lookup';
 
-const pct = (x) => `${Number((x * 100).toFixed(1))}%`;
+const pct = (x) => percent(x, { trim: true });
 const code = (name) => `<code>${esc(name)}</code>`;
 
 /**
@@ -39,12 +36,15 @@ export function methodsTables({ hospitals, volume, ascNew, shares, citations, so
 /** Rows for the Methods sources table that the hospital view and the patient share add: {id, label, landing, file}. */
 export const methodsSources = (t) => [t.hospitals.source, t.volume.source, t.ascNew.source];
 
+/** The MUP file's count column "by" its CCN and MS-DRG columns. */
+const mupKeys = (v) => `${code(v.columns.count)} by ${code(v.columns.ccn)} and ${code(v.columns.drg)}`;
+
 /** The factor table: each figure a hospital's card uses, the file it is read from and the column. */
 function factorTable(t, r) {
   const c = t.hospitals.columns;
   const impact = 'Impact file';
   const rows = [
-    ['Hospital name and CCN (state from the CCN’s first two digits)', impact, `${code(c.name)}, ${code(IMPACT_CCN)}`],
+    ['Hospital name and CCN (state from the CCN’s first two digits)', impact, `${code(c.name)}, ${code(c.ccn)}`],
     ['Wage index (inpatient operating and outpatient)', impact, code(c.wi)],
     ['Capital geographic adjustment factor (GAF)', impact, code(c.gaf)],
     ['Operating IME', impact, code(c.tchop)],
@@ -57,7 +57,7 @@ function factorTable(t, r) {
     [`Operating standardized amount, ${cents(r.operating)}; labor share ${pct(t.hospitals.rates.labor_share)} above a wage index of 1, else ${pct(t.hospitals.rates.labor_share_le1)}`, esc(r.operatingTable), ''],
     [`Capital federal rate, ${cents(r.capital)}`, esc(r.capitalTable), ''],
     [`Outpatient labor share, ${pct(t.hospitals.opps_labor_share)}`, `CY 2027 OPPS final rule, ${fr(t.hospitals.opps_labor_share_cite)}`, ''],
-    [`Traditional Medicare discharges, ${t.volume.data_year}`, 'Inpatient counts file', `${code(t.volume.column)} by ${MUP_KEYS.map(code).join(' and ')}`],
+    [`Traditional Medicare discharges, ${t.volume.data_year}`, 'Inpatient counts file', mupKeys(t.volume)],
   ];
   return captionedScroller('m-factors-cap', 'Each factor, the CMS file it is read from, and the column', 'class="check files"',
     `<thead><tr><th scope="col">Factor</th><th scope="col">File</th><th scope="col">Column</th></tr></thead>
@@ -114,7 +114,7 @@ ${factorTable(t, r)}
 
 <section class="block" aria-labelledby="m-year-h">
 <h2 id="m-year-h">Per year: a ceiling</h2>
-<p>Each card’s per-year fold multiplies the add-on per case by the hospital’s ${v.data_year} traditional Medicare discharges in each MS-DRG of the family (${code(v.column)} by ${MUP_KEYS.map(code).join(' and ')}). A ceiling, not a forecast: it counts every ${v.data_year} case in those MS-DRGs, not only the removed procedure, and not only the cases that could have been outpatient. CMS publishes no count under ${num(v.suppressed_below)}, so an empty cell reads “under ${num(v.suppressed_below)} or none”, and you can fill it in. ${num(v.counts.hospitals)} hospitals have counts.</p>
+<p>Each card’s per-year fold multiplies the add-on per case by the hospital’s ${v.data_year} traditional Medicare discharges in each MS-DRG of the family (${mupKeys(v)}). ${ceiling(v.data_year)} CMS publishes no count under ${num(v.suppressed_below)}, so an empty cell reads “under ${num(v.suppressed_below)} or none”, and you can fill it in. ${num(v.counts.hospitals)} hospitals have counts.</p>
 <p>Medicare Advantage counts are estimates: the traditional count × the hospital’s MA cases per traditional case (${code(h.columns.ime_caseta44)} ÷ ${code(h.columns.caseta44)} in the impact file), rounded to a whole case. That assumes the hospital’s MA cases have the same MS-DRG mix as its traditional Medicare cases. Teaching hospitals only: elsewhere an MA case carries no add-on. Any count can be changed on the page. Your counts are not saved; they leave your browser only in the hospital CSV you download.</p>
 </section>
 

@@ -2,6 +2,18 @@
 // the per-year table and the fold's ceiling. Pure; the numbers come from hospital-math.mjs.
 import { money } from './stake-card.mjs';
 
+/**
+ * A share as a percentage: 0.311 -> "31.1%". digits: decimals shown; trim: drop trailing zeros
+ * (0.66 -> "66%", for prose); without it the digits are fixed (0.07 -> "7.0%", for the facts line).
+ */
+export const pct = (x, { digits = 1, trim = false } = {}) => {
+  const fixed = (x * 100).toFixed(digits);
+  return `${trim ? Number(fixed) : fixed}%`;
+};
+
+/** The per-year caveat, in Methods and in the hospital CSV's total rows. year: the counts' data year. */
+export const ceiling = (year) => `A ceiling, not a forecast: it counts every ${year} case in those MS-DRGs, not only the removed procedure, and not only the cases that could have been outpatient.`;
+
 /** Why a per-year count cell is empty (perYearTable's trad.suppressed, and ma.reason: either key). */
 export const EMPTY = {
   suppressed: 'under 11 or none',
