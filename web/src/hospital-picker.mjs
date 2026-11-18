@@ -12,6 +12,7 @@ import { createView, hospitalLede } from './hospital-view.mjs';
 import { CCN } from './stake-engine.mjs';
 import { fetchJson } from './fetch.mjs';
 import { announcer } from './announce.mjs';
+import { saveCsv } from './download.mjs';
 
 // The option's meta line: state, CCN and, for a teaching hospital, its kind (nothing for the others).
 const teachingTag = (code) => (code ? TEACHING_LABEL[TEACHING[code]] : '');
@@ -227,6 +228,7 @@ export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInv
     else if (event.target.closest('[data-hpick-change]')) { body.innerHTML = field(picked.name); $('#hp-q').focus(); }
     else if (event.target.closest('[data-hpick-cancel]')) show(picked, { focus: true });
     else if (event.target.closest('[data-hpick-clear]')) { token += 1; onClear(ui); }
+    else if (event.target.closest('[data-hpick-csv]')) saveCsv(picked.csvRows(), picked.csvName);   // with every count typed so far
   });
   body.addEventListener('focusout', (event) => {
     if (event.target.id === 'hp-q' && !body.contains(event.relatedTarget)) close();

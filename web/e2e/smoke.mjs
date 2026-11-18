@@ -918,6 +918,59 @@ if (!hasStake) {
     eq(await page.locator('[data-stake-card="32480"] details.hfold[open]').count(), 2, 'folds stay open');
   });
 
+  /** Click the hospital CSV button; the download's filename and its rows (a small CSV reader: quotes, doubled quotes). */
+  async function hospitalCsv(page) {
+    const [download] = await Promise.all([page.waitForEvent('download'), page.locator('[data-hpick-csv]').click()]);
+    const text = readFileSync(await download.path(), 'utf8');
+    const rows = text.trimEnd().split('\n').map((line) => [...line.matchAll(/(?:^|,)("(?:[^"]|"")*"|[^,]*)/g)].map((m) => (m[1].startsWith('"') ? m[1].slice(1, -1).replace(/""/g, '"') : m[1])));
+    const head = rows[0];
+    const named = rows.slice(1).map((row) => Object.fromEntries(head.map((name, i) => [name, row[i]])));
+    return { name: download.suggestedFilename(), text, head, rows: named };
+  }
+
+  await check('hospital CSV: no button on the national page; after a pick, revenue-at-stake-<CCN>.csv with OHSU 32480 rows and the typed counts', async (page) => {
+    await openStake(page, '?q=32480');
+    eq(await page.locator('[data-hpick-csv]').count(), 0, 'no hospital CSV button before a pick');
+    await pickHospital(page, 'ohsu', '380009');
+    eq((await page.locator('[data-hpick-csv]').textContent()).trim(), 'Download for Ohsu Hospital And Clinics (CSV)', 'button label');
+    let csv = await hospitalCsv(page);
+    eq(csv.name, 'revenue-at-stake-380009.csv', 'filename');
+    eq(csv.head.join(','), 'row_type,ccn,hospital,code,family_order,drg,payer,hospital_outpatient,inpatient_base,ime,dsh,inpatient_total,outpatient_minus_inpatient,cases,count_source,add_on_per_case,add_on_per_year,note', 'header');
+    const find = (rows, type, drg, payer = '') => rows.find((r) => r.row_type === type && r.code === '32480' && r.drg === drg && r.payer === payer);
+    const r165 = find(csv.rows, 'per_case', '165');
+    eq([r165.ccn, r165.hospital, r165.hospital_outpatient, r165.inpatient_total, r165.outpatient_minus_inpatient].join(' | '), '380009 | Ohsu Hospital And Clinics | 3995.14 | 22116.6 | -18121.46', 'DRG 165 per case');
+    eq(find(csv.rows, 'per_case', '163').inpatient_total, '51459.44', 'DRG 163 total');
+    eq(csv.rows.find((r) => r.row_type === 'per_year_total' && r.code === '32480').add_on_per_year, '1015760.07', 'prefilled total');
+    eq(find(csv.rows, 'per_year', '165', 'traditional_medicare').count_source, 'cms_2024', 'prefilled count');
+    assert(!/NaN|undefined|Infinity|null/.test(csv.text), 'no junk in the file');
+    // The typed counts go into the file and say so.
+    await openFolds(page, '32480');
+    await page.locator('[data-stake-card="32480"] [data-count="165:trad"]').fill('10');
+    csv = await hospitalCsv(page);
+    const typed = find(csv.rows, 'per_year', '165', 'traditional_medicare');
+    eq([typed.cases, typed.count_source, typed.add_on_per_year, typed.note].join(' | '), '10 | typed | 60670.69 | your count', 'typed count');
+    eq(find(csv.rows, 'per_year', '165', 'medicare_advantage').cases, '11', 'the MA estimate follows');
+    eq(csv.rows.find((r) => r.row_type === 'per_year_total' && r.code === '32480').add_on_per_year, '1005060.92', 'total with the typed count');
+    await page.locator('[data-hpick-clear]').click();
+    await page.waitForFunction(() => !document.querySelector('.hsum'));
+    eq(await page.locator('[data-hpick-csv]').count(), 0, 'no hospital CSV button after Back to national');
+  });
+
+  await check('hospital CSV: a hostile hospital name is escaped on the page and guarded against formulas in the file', async (page) => {
+    const hostile = '=HYPERLINK("http://x.example","<b>click</b>")';
+    await page.route(/\/data\/h\.[0-9a-f]{10}\/380009\.json/, async (route) => {
+      const response = await route.fetch();
+      route.fulfill({ response, json: { ...(await response.json()), name: hostile } });
+    });
+    await openStake(page, '?h=380009&q=32480');
+    await page.waitForSelector('.hsum');
+    eq(await page.locator('.hpick__name b').count(), 0, 'the name never becomes markup');
+    const csv = await hospitalCsv(page);
+    const cells = csv.rows.map((r) => r.hospital);
+    assert(cells.length > 0 && cells.every((cell) => cell === `'${hostile}`), `hospital cells: ${cells[0]}`);
+    assert(!csv.text.split('\n').some((line) => /(^|,)[=+@]/.test(line)), 'a cell starts like a formula');
+  });
+
   await check('hospital: Review Focus 3, suppressed counts read "under 11 or none", stay editable, and totals still work', async (page) => {
     await openStake(page, '?h=010001&q=32480');
     await page.waitForSelector('.hsum');

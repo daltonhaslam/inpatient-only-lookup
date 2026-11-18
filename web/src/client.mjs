@@ -2,10 +2,11 @@
 // Every page is complete without this script; it only makes the date and the search live.
 import {
   isDate, isFullDate, formatDate, todayISO, clampDate, outsideRangeNote, unreadDateNote, printable, dayNumber, fromDayNumber, normalizeCode, isCode, periodIndex,
-  stateAt, lookup, expandOther, countsAt, exemptCodes, buildIndex, search, extractCodes, num, csv, isScheduled,
+  stateAt, lookup, expandOther, countsAt, exemptCodes, buildIndex, search, extractCodes, num, isScheduled,
 } from './engine.mjs';
 import { lookupShare } from './patient-share.mjs';
 import { lazyJson } from './fetch.mjs';
+import { saveCsv } from './download.mjs';
 import { esc, chip, CHIP, verdict, verdictParts, eventList, codeRow, answer, axis, pct, scheduledNote, captionedScroller } from './views.mjs';
 
 // Vercel Web Analytics: never send what someone searched for or which date they chose.
@@ -372,13 +373,7 @@ ${captionedScroller('bulk-cap', `Codes checked for ${formatDate(state.date)}`, '
 function downloadBulk() {
   const rows = [['code', 'procedure', 'date_of_service', 'status', 'left_the_list', 'review_exemption', 'source']]
     .concat(bulkRows().map((row) => [row.code, row.label, state.date, row.status, row.removed, row.exemption, row.basis]));
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(new Blob([csv(rows)], { type: 'text/csv' }));
-  link.download = `inpatient-only-${state.date}.csv`;
-  document.body.append(link);
-  link.click();
-  link.remove();
-  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  saveCsv(rows, `inpatient-only-${state.date}.csv`);
 }
 
 function drawDate() {

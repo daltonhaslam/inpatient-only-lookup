@@ -10,6 +10,7 @@ import { hospitalContext, hospitalItem, summary as summarize, teaching } from '.
 import { fractionWord } from './hospital-words.mjs';
 import { shortName, TEACHING_LABEL } from './hospital-pick.mjs';
 import { foldsHtml, yearUpdate } from './hospital-folds.mjs';
+import { hospitalCsvRows, hospitalCsvName } from './hospital-csv.mjs';
 
 const pct = (x) => `${(x * 100).toFixed(1)}%`;
 
@@ -89,11 +90,11 @@ function cardVariant(item, name) {
   };
 }
 
-/** The one-line "Rates for <name> (<CCN>) · facts" bar with Change and Back to national. */
+/** The one-line "Rates for <name> (<CCN>) · facts" bar with Change, Back to national and the hospital CSV. */
 function bar(name, ccn, h) {
   return `<div class="hpick__on">
 <p class="hpick__who"><span class="hpick__label">Rates for</span> <strong class="hpick__name">${esc(name)} <span class="nw">(${esc(ccn)})</span></strong> <span class="hpick__facts">${facts(h).split(' · ').map((part) => `<span class="nw">${esc(part)}</span>`).join(' · ')}</span></p>
-<p class="hpick__acts"><button type="button" class="hpick__btn" data-hpick-change>Change hospital</button><button type="button" class="hpick__btn" data-hpick-clear>Back to national</button></p>
+<p class="hpick__acts"><button type="button" class="hpick__btn" data-hpick-change>Change hospital</button><button type="button" class="hpick__btn" data-hpick-clear>Back to national</button><button type="button" class="hpick__btn" data-hpick-csv>Download for ${esc(name)} (CSV)</button></p>
 </div>`;
 }
 
@@ -126,6 +127,9 @@ export function createView({ list, record, ccn, data, meta }) {
     barHtml: bar(name, ccn, record),
     // Said once, through the picker's polite status line.
     announce: [`Showing ${name}’s rates.`, summaryText(s, name)?.lead].filter(Boolean).join(' '),
+    csvName: hospitalCsvName(ccn),
+    /** The hospital CSV's rows (hospital-csv.mjs), with every count typed so far. */
+    csvRows: () => hospitalCsvRows({ items: data.items, ctx, ccn, name, edits }),
     card(item) {
       if (!drawn.has(item.code)) drawn.set(item.code, draw(item));
       return drawn.get(item.code);
