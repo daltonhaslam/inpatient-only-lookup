@@ -339,7 +339,8 @@ def main(argv=None):
             fetch.write_json(args.out / name, table)
         lines.append("Wrote %s." % ", ".join(sorted(derived)))
         if not args.allow_missing:
-            sheet = workbook.write(doc, args.out / "crosswalk.xlsx")
+            sheet = workbook.write(doc, args.out / "crosswalk.xlsx", hospitals=derived[exposure.HOSPITALS],
+                                   shares=derived[exposure.SHARES])
             lines.append("Wrote %s." % sheet.name)
     args.checks.parent.mkdir(parents=True, exist_ok=True)
     args.checks.write_text("\n".join(lines) + "\n")
