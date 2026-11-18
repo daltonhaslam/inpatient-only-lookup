@@ -340,7 +340,7 @@ def main(argv=None):
         lines.append("Wrote %s." % ", ".join(sorted(derived)))
         if not args.allow_missing:
             sheet = workbook.write(doc, args.out / "crosswalk.xlsx", hospitals=derived[exposure.HOSPITALS],
-                                   shares=derived[exposure.SHARES])
+                                   shares=derived[exposure.SHARES], volume=derived[exposure.VOLUME])
             lines.append("Wrote %s." % sheet.name)
     args.checks.parent.mkdir(parents=True, exist_ok=True)
     args.checks.write_text("\n".join(lines) + "\n")

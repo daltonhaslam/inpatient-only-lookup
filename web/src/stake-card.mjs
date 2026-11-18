@@ -95,7 +95,7 @@ export function gapParts(item, lead = 'Outpatient pays') {
  * A family's IME and DSH as "$6,067–$14,116" (the card says "Includes <range> in IME and DSH"), or ''
  * when it carries none: no hospital picked (national items have no addOn), no add-ons, or both ends round to $0.
  */
-export const addOnRange = (addOn) => (addOn && (whole(addOn.low) !== '0' || whole(addOn.high) !== '0') ? moneyRange(addOn.low, addOn.high) : '');
+const addOnRange = (addOn) => (addOn && (whole(addOn.low) !== '0' || whole(addOn.high) !== '0') ? moneyRange(addOn.low, addOn.high) : '');
 
 /**
  * What a card says around its figures. NATIONAL_CARD is the national card; hospital-view.mjs builds a
@@ -103,7 +103,7 @@ export const addOnRange = (addOn) => (addOn && (whole(addOn.low) !== '0' || whol
  * (after the surgery-center line), fine (the fine print) and workLink (link text to the code page's
  * national work in place of Show the work; null: the card's own).
  */
-export const NATIONAL_CARD = Object.freeze({
+const NATIONAL_CARD = Object.freeze({
   gapLead: 'Outpatient pays', ascLabel: 'Surgery center (ASC)', rateNote: '', opNote: '',
   fine: 'National, unadjusted: no wage index, IME or DSH.', workLink: null,
 });

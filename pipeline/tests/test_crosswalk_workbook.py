@@ -5,6 +5,8 @@ which needs the `formulas` package in a scratch venv and so is not part of this 
 """
 import json
 import re
+import shutil
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -12,6 +14,7 @@ from pathlib import Path
 import openpyxl
 
 from crosswalk import workbook
+from hospital_fixture import OHSU, RATES
 
 DRGS = [{"drg": "165", "title": "Major Chest Procedures without CC/MCC", "weight": 1.9294, "amount": 14254.31},
         {"drg": "163", "title": "Major Chest Procedures with MCC", "weight": 4.0, "amount": 29551.8}]
@@ -31,8 +34,7 @@ def doc():
     packaged = {"si": "N", "apc": None, "apc_title": None, "rate": None, "asc": None, "proposed": None, "packaged": True}
     review = {"status": "unreviewed", "agrees": 0, "disputes": 0, "stale": 0, "last": None}
     return {"meta": {"built": "2026-11-11", "counts": {"codes": 2, "removed_2026": 1, "removed_2027": 1},
-                     "rates": {"operating": 6848.0, "capital": 539.95, "labor_share": 0.66, "labor_share_le1": 0.62,
-                               "operating_wi_le1": 6800.0},
+                     "rates": dict(RATES, operating_wi_le1=6800.0),   # a distinct 1B amount, to see which is used
                      "sources": {"ipps-2027-table5": {"label": "T5", "landing": "https://example.test/t5", "file": "t5"},
                                  "addenda-2027": {"label": "Add B", "landing": "https://example.test/b", "file": "b"}}},
             "codes": {
@@ -45,8 +47,6 @@ def doc():
                           "difference": None, "batch": None}}}
 
 
-OHSU = {"name": "Ohsu Hospital And Clinics", "state": "OR", "wi": 1.1907, "gaf": 1.126962466, "tchop": 0.31139,
-        "tchcp": 0.22928, "dshopp": 0.07045, "dshcpp": 0.10036, "caseta44": 4098.35, "ime_caseta44": 4552.82, "type": 7}
 
 
 def hospitals():
@@ -74,9 +74,14 @@ def shares():
                                 "opps_capped": False, "asc_more": False}}}
 
 
+def volume():
+    """drg-volume.json as far as the workbook reads it: the counts' data year."""
+    return {"meta": {"data_year": 2024}}
+
+
 def build(tmp, crosswalk=None, reviews=()):
     return openpyxl.load_workbook(workbook.write(crosswalk or doc(), Path(tmp) / "x.xlsx", reviews=list(reviews),
-                                                 hospitals=hospitals(), shares=shares()))
+                                                 hospitals=hospitals(), shares=shares(), volume=volume()))
 
 
 def tokens(formula):
@@ -367,10 +372,33 @@ class ReadsBesideInput(unittest.TestCase):
             self.assertIn(str(tmp), str(missing.exception))
             (tmp / workbook.HOSPITALS).write_text(json.dumps(hospitals()), encoding="utf-8")
             (tmp / workbook.SHARES).write_text(json.dumps(shares()), encoding="utf-8")
+            (tmp / workbook.VOLUME).write_text(json.dumps(volume()), encoding="utf-8")
             self.assertEqual(workbook.main(["--in", str(tmp / "crosswalk.json"), "--out", str(tmp / "x.xlsx")]), 0)
             wb = openpyxl.load_workbook(tmp / "x.xlsx")
             cells = " ".join(str(c.value) for row in wb["Hospitals"].iter_rows() for c in row if c.value)
             self.assertIn("Teaching No Ratio", cells)   # the fixture's hospital, so the file beside --in was read
+
+
+@unittest.skipUnless(shutil.which("node"), "node is not installed")
+class SameWordsAsTheSite(unittest.TestCase):
+    """The Per year tab and Read me say the per-year caveat and the MA estimate's assumption in the site's
+    own sentences (web/src/hospital-words.mjs ceiling() and MA_MIX), verbatim."""
+
+    def test_ceiling_and_ma_mix_match_the_site(self):
+        words = Path(__file__).resolve().parents[2] / "web" / "src" / "hospital-words.mjs"
+        script = ("import(process.argv[1]).then((m) => console.log(JSON.stringify("
+                  "{ceiling: m.ceiling(2024), ceiling2025: m.ceiling(2025), mix: m.MA_MIX})))")
+        site = json.loads(subprocess.run(["node", "--input-type=module", "-e", script, words.as_uri()],
+                                         capture_output=True, text=True, check=True).stdout)
+        self.assertEqual(workbook.CEILING.format(year=2024), site["ceiling"])
+        self.assertEqual(workbook.CEILING.format(year=2025), site["ceiling2025"])
+        self.assertEqual(workbook.MA_MIX, site["mix"])
+        self.assertIn(workbook.MA_MIX, workbook.MA_ESTIMATE)
+        with tempfile.TemporaryDirectory() as tmp:
+            wb = build(tmp)
+        text = " ".join(str(c.value) for name in ("Per year", "Read me") for row in wb[name].iter_rows() for c in row if c.value)
+        self.assertIn(site["ceiling"], text)
+        self.assertIn(site["mix"], text)
 
 
 if __name__ == "__main__":

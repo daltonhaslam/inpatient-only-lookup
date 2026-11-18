@@ -326,7 +326,10 @@ async function hospitalAssets(model) {
     dir: `/${dir}`,
     view: hashed('assets', 'hospital', 'js', await bundleEntry('hospital-picker.mjs', 'esm')),
     css: hashed('assets', 'hospital', 'css', readFileSync(join(here, 'src/hospital.css'), 'utf8')),
+    // The CCN prefix of the hospitals the picker never offers (Maryland), for stake-client.mjs's landing check.
+    maryland: hospitals.meta.maryland_prefix,
   };
+  if (!/^\d{2}$/.test(assets.maryland || '')) throw new Error('hospitals.json meta.maryland_prefix is missing: rebuild the derived tables');
   return { assets, hospitals, volume };
 }
 

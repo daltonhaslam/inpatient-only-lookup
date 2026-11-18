@@ -80,8 +80,11 @@ export function uncoveredDrgs(model, hospitalsMeta, volumeMeta) {
   };
 }
 
-/** One hospital's file: its hospitals.json factors and v: {DRG: discharges in the counts' data year} for the crosswalk's DRGs. */
-export function hospitalRecord(hospital, volume = {}, drgs = []) {
+/**
+ * One hospital's file: its hospitals.json factors and v: {DRG: discharges in the counts' data year} for the
+ * crosswalk's DRGs (drgs: drg-volume.json meta.drgs). volume is undefined for a hospital CMS gives no counts.
+ */
+export function hospitalRecord(hospital, volume = {}, drgs) {
   const record = Object.fromEntries(FACTORS.map((key) => [key, hospital[key]]));
   const priced = new Set(drgs);
   record.v = Object.fromEntries(Object.entries(volume).filter(([drg]) => priced.has(drg)));

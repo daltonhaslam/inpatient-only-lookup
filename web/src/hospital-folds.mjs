@@ -6,7 +6,7 @@
 import { esc, fr, cfr, scroller } from './views.mjs';
 import { cents, drgList, whenLabel } from './stake-card.mjs';
 import { splitRows, perYearTable, count } from './hospital-math.mjs';
-import { EMPTY, roughMoney, ceiling } from './hospital-words.mjs';
+import { EMPTY, roughMoney, ceiling, MA_MIX } from './hospital-words.mjs';
 
 const PAYERS = { trad: 'traditional Medicare', ma: 'Medicare Advantage' };
 
@@ -19,9 +19,9 @@ const SPLIT_NOTE = {
 };
 const YEAR_LEAD = (year, drgs) => `${esc(ceiling(year, drgs))} Change any count and the row, total and heading follow; your counts are not saved.`;
 const YEAR_NOTES = {
-  teaching: (name, ratio) => [
+  teaching: (ratio) => [
     `IME is paid on traditional Medicare and Medicare Advantage cases, DSH on traditional Medicare only: MA cases carry operating IME only (${cfr('412.105', '42 CFR 412.105(g)')}).`,
-    `MA plans must follow the 2-midnight rule and may not treat a removal from the inpatient-only list as requiring outpatient care (${fr('91 FR 70572')}); the risk is that they default removed procedures to outpatient anyway, so MA cases count here. MA counts are estimates: they assume ${esc(name)}’s MA cases have the same DRG mix as its traditional Medicare cases${ratio === null ? '' : ` (${esc(ratio.toFixed(2))} MA cases per traditional case in CMS’s impact file)`}.`,
+    `MA plans must follow the 2-midnight rule and may not treat a removal from the inpatient-only list as requiring outpatient care (${fr('91 FR 70572')}); the risk is that they default removed procedures to outpatient anyway, so MA cases count here. MA counts are estimates${ratio === null ? '' : ` (${esc(ratio.toFixed(2))} MA cases per traditional case in CMS’s impact file)`}. ${esc(MA_MIX)}`,
     `Direct GME is not counted: it follows the Medicare and MA share of inpatient days, so it falls slightly and later (${cfr('413.76', '42 CFR 413.76')}). Medicaid GME is separate and state-run; commercial payers pay no add-on.`,
   ],
   other: () => [`DSH is paid on traditional Medicare cases only. Medicare Advantage cases carry no add-on at a hospital without operating IME (${cfr('412.105', '42 CFR 412.105(g)')}), and commercial payers pay none.`],
@@ -143,7 +143,7 @@ ${line(item, row, 'ma', up, `Medicare Advantage${perCase(row, 'ma', 'operating I
   const table = `<table class="hyr"><caption class="sr" id="${capId}">IME and DSH a year on ${esc(name)}’s cases in MS-DRG ${esc(drgs)}</caption>
 <thead><tr><th scope="col">${teaching ? 'MS-DRG and payer' : 'MS-DRG'}</th><th scope="col">Cases (${esc(ctx.year)})</th><th scope="col" class="num">A year</th></tr></thead>${teaching ? body : `<tbody>${body}</tbody>`}
 <tfoot><tr><th scope="row" colspan="2">Total, a ceiling</th><td class="num" data-year-total>${esc(up.total)}</td></tr></tfoot></table>`;
-  const notes = [...(teaching ? YEAR_NOTES.teaching(name, ctx.maRatio) : YEAR_NOTES.other()), YEAR_NOTES.source(ctx.year)];
+  const notes = [...(teaching ? YEAR_NOTES.teaching(ctx.maRatio) : YEAR_NOTES.other()), YEAR_NOTES.source(ctx.year)];
   const lead = `<p class="hfold__lead">${YEAR_LEAD(ctx.year, drgs)}</p>`;
   return fold('year', open, `Per year at ${esc(name)} <span class="hfold__sub">· <span data-year-head>${esc(up.headline)}</span></span>`,
     `${lead}${scroller(capId, table)}<ul class="hfold__notes">${notes.map((n) => `<li>${n}</li>`).join('')}</ul>`);

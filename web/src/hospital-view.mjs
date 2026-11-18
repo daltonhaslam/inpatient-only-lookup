@@ -27,7 +27,7 @@ export function facts(h) {
  * The summary in plain words, from hospital-math summary(): {lead, tiles: [[value, label]]}, or null
  * when there is nothing to compare. A hospital with no IME or DSH is told so in words, never "$0".
  */
-export function summaryText(s, name) {
+function summaryText(s, name) {
   if (!s || s.state === 'empty') return null;
   const loss = [money(s.medianGap), 'typical loss per case if billed outpatient (median, against the lowest DRG in the family)'];
   const below = [`${num(s.below)} of ${num(s.codes)}`, `removed procedures pay ${name} less outpatient than even the lowest DRG`];

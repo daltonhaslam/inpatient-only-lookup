@@ -9,17 +9,17 @@ import { SHELL, field } from './hospital-field.mjs';
 import { announcer } from './announce.mjs';
 import { fetchJson } from './fetch.mjs';
 
-// The hospital view's file URLs, put into this bundle by build.mjs (null: no picker in this build).
+// The hospital view's file URLs and Maryland's CCN prefix, put into this bundle by build.mjs (null: no picker in this build).
 const HOSPITAL = typeof __HOSPITAL_ASSETS__ === 'undefined' ? null : __HOSPITAL_ASSETS__;
 
 // A landing on ?h=<CCN> will show a hospital's bar and summary where the empty picker is. Reserve their
 // height now, at script start, so the page below does not jump when they arrive (styles.css .hpick-h).
 // Dropped when that hospital turns out not to be shown (an unknown CCN, a failed load) or on Back to
-// national. A Maryland CCN (state code 21) is never shown, so it reserves nothing.
+// national. A Maryland CCN (HOSPITAL.maryland, its state code) is never shown, so it reserves nothing.
 const RESERVE = 'hpick-h';
 const reserve = (on) => document.documentElement.classList.toggle(RESERVE, on);
 const landing = HOSPITAL ? hospitalParam(window.location.search) : '';
-if (landing && !landing.startsWith('21')) reserve(true);
+if (landing && !landing.startsWith(HOSPITAL.maryland)) reserve(true);
 
 const $ = (selector, root = document) => root.querySelector(selector);
 

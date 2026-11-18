@@ -2,7 +2,7 @@
 // changes (typing, a count being edited) is said once, when it settles.
 
 /** How long a status waits for typing to settle before it is said. */
-export const SETTLE_MS = 400;
+const SETTLE_MS = 400;
 
 /** say(text) sets region's text once changes settle; say.now(text) sets it at once (and drops a pending one). */
 export function announcer(region) {

@@ -2,7 +2,7 @@
 // bundle: the labeled text box. hospital-picker.mjs (loaded on first use) makes it work.
 import { esc } from './views.mjs';
 
-export const LABEL = 'Pick a hospital to apply its wage index, IME and DSH.';
+const LABEL = 'Pick a hospital to apply its wage index, IME and DSH.';
 
 /** The mount's two parts: the swapped body, and one polite status line that stays put so it is heard. */
 export const SHELL = '<div data-hpick-body></div><p class="sr" role="status" data-hpick-status></p>';

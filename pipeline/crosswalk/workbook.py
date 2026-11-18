@@ -11,7 +11,7 @@ dollar amount on the Crosswalk and Per year tabs is a formula over the Inputs, H
 weights and APC rates tabs. A hospital CCN typed on the Inputs tab drives every factor; a value of
 your own overrides it; blank means national. At the national defaults the formulas reproduce
 crosswalk.json to the cent (verify_workbook.py checks that, and the OHSU fixture, with an
-independent evaluator). Reads hospitals.json and patient-shares.json beside crosswalk.json.
+independent evaluator). Reads hospitals.json, patient-shares.json and drg-volume.json beside crosswalk.json.
 Needs openpyxl only.
 """
 import argparse
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     sys.path[0] = str(Path(__file__).resolve().parent.parent)
 
 import fetch      # noqa: E402
-from crosswalk.exposure import HOSPITALS, SHARES      # noqa: E402
+from crosswalk.exposure import HOSPITALS, SHARES, VOLUME      # noqa: E402
 from crosswalk.reviews import REVIEWS      # noqa: E402
 from openpyxl import Workbook      # noqa: E402
 from openpyxl.styles import Alignment, Font, PatternFill      # noqa: E402
@@ -55,13 +55,16 @@ STATUS_TEXT = {"unreviewed": "Unreviewed", "one-agrees": "One reviewer agrees", 
 # {caseta44} are the impact-file column names (hospitals.json meta.columns).
 UNCOMPENSATED = ("Uncompensated care is left out: paid per claim only as an interim amount and settled at the "
                  "cost report to a fixed yearly total (42 CFR 412.106(i)), so it is not lost per case.")
+# MA_MIX and CEILING are the site's sentences verbatim (web/src/hospital-words.mjs MA_MIX and ceiling());
+# test_crosswalk_workbook.py pins them equal. CEILING's {year} is drg-volume.json meta.data_year.
+MA_MIX = "That assumes the hospital’s MA cases have the same MS-DRG mix as its traditional Medicare cases."
 MA_ESTIMATE = ("At a teaching hospital the MA count defaults to traditional x the hospital's MA ratio "
-               "({ime_caseta44} / {caseta44}), an estimate that assumes its MA cases have the same DRG mix as "
-               "traditional Medicare; type over it to use your own.")
+               "({ime_caseta44} / {caseta44}), an estimate. " + MA_MIX + " Type over it to use your own.")
 ADDON_CASES = ("Which cases carry add-ons: IME is paid on traditional Medicare and MA discharges (MA: operating IME "
                "only, 42 CFR 412.105(g)); DSH on traditional Medicare only. Direct GME follows the Medicare and MA share "
                "of inpatient days (42 CFR 413.76); Medicaid GME is separate and state-run; commercial payers pay no add-on.")
-CEILING = "A ceiling, not a forecast: a count covers every case in the DRG, not only removed procedures."
+CEILING = ("A ceiling, not a forecast: it counts every {year} case in those MS-DRGs, not only the removed procedure, "
+           "and not only the cases that could have been outpatient.")
 # The CCN status line beside the Hospital CCN cell.
 NATIONAL_STATUS = "National: no hospital. Type a CCN to apply its wage index, IME and DSH."
 NATIONAL_FALLBACK = "Using national values."
@@ -306,14 +309,15 @@ def _crosswalk_sheet(wb, doc, shares):
     return ws
 
 
-def _per_year_sheet(wb, drgs, columns):
+def _per_year_sheet(wb, drgs, columns, year):
     """One row per DRG the Crosswalk uses: per-case amounts at the Inputs hospital (unrounded), yellow
     counts, and per-year add-ons = ROUND(count x unrounded per-case amount, 2)."""
     ws = wb.create_sheet("Per year")
     ws["A1"], ws["A1"].font = "Per year: IME and DSH a year at the hospital on the Inputs tab, a ceiling", Font(bold=True, size=13)
     ws["A2"] = "=HospitalStatus"
-    ws["A3"] = ("Enter traditional Medicare cases a year in the yellow cells (CMS publishes 2024 counts, Medicare Inpatient "
-                "Hospitals by Provider and Service, but none under 11). " + MA_ESTIMATE.format(**columns) + " " + CEILING)
+    ws["A3"] = ("Enter traditional Medicare cases a year in the yellow cells (CMS publishes %d counts, Medicare Inpatient "
+                "Hospitals by Provider and Service, but none under 11). " % year + MA_ESTIMATE.format(**columns) + " "
+                + CEILING.format(year=year))
     ws["A4"] = ADDON_CASES
     header = [name for name, _ in PER_YEAR_COLUMNS]
     _header(ws, PER_YEAR_FIRST - 1, header, [w for _, w in PER_YEAR_COLUMNS])
@@ -492,7 +496,7 @@ def _review_log_sheet(wb, reviews):
     return ws
 
 
-def _readme_sheet(wb, doc, hospitals, shares):
+def _readme_sheet(wb, doc, hospitals, shares, year):
     meta = doc["meta"]
     counts, rates = meta["counts"], meta["rates"]
     impact, deductibles = hospitals["meta"]["source"], shares["meta"]["deductibles"]
@@ -549,7 +553,7 @@ def _readme_sheet(wb, doc, hospitals, shares):
          "yellow cells for traditional Medicare and MA cases a year (blank until you enter them), and add-ons a year = "
          "count x the unrounded per-case add-on, rounded to the cent. Traditional Medicare carries IME and DSH; MA carries "
          "operating IME only (no capital IME or DSH on MA claims). " + MA_ESTIMATE.format(**hospitals["meta"]["columns"])
-         + " " + CEILING + " " + ADDON_CASES, None),
+         + " " + CEILING.format(year=year) + " " + ADDON_CASES, None),
         ("", None),
         ("Patient share (national)", "h"),
         ("The patient-share columns are national and do not follow the CCN. At an ambulatory surgery center: 20%% of the "
@@ -593,10 +597,11 @@ def _readme_sheet(wb, doc, hospitals, shares):
     return ws
 
 
-def write(doc, out_path, reviews=None, hospitals=None, shares=None, beside=None):
+def write(doc, out_path, reviews=None, hospitals=None, shares=None, volume=None, beside=None):
     """Build the workbook for a crosswalk document and save it to out_path. Returns the path.
-    hospitals and shares are hospitals.json and patient-shares.json; when not given they are read from
-    the directory beside (the one holding the crosswalk.json being written; pipeline/derived/ by default)."""
+    hospitals, shares and volume are hospitals.json, patient-shares.json and drg-volume.json (for its
+    data year); when not given they are read from the directory beside (the one holding the
+    crosswalk.json being written; pipeline/derived/ by default)."""
     beside = Path(beside) if beside is not None else fetch.DERIVED
     if reviews is None:
         reviews = fetch.read_json_or(REVIEWS, [])
@@ -604,11 +609,14 @@ def write(doc, out_path, reviews=None, hospitals=None, shares=None, beside=None)
         hospitals = fetch.read_json(beside / HOSPITALS)
     if shares is None:
         shares = fetch.read_json(beside / SHARES)
+    if volume is None:
+        volume = fetch.read_json(beside / VOLUME)
+    year = volume["meta"]["data_year"]
     wb = Workbook()
     wb.remove(wb.active)
     drgs, apcs = _used(doc)
     _crosswalk_sheet(wb, doc, shares)
-    _per_year_sheet(wb, drgs, hospitals["meta"]["columns"])
+    _per_year_sheet(wb, drgs, hospitals["meta"]["columns"], year)
     _pcs_sheet(wb, doc)
     _inputs_sheet(wb, doc, hospitals)
     _hospitals_sheet(wb, hospitals)
@@ -624,7 +632,7 @@ def write(doc, out_path, reviews=None, hospitals=None, shares=None, beside=None)
                   [[a, apcs[a][0], apcs[a][1]] for a in sorted(apcs)], meta["addenda-2027"], [8, 60, 24],
                   {1: "ApcNum", 3: "ApcRate"}, {3: CURRENCY})
     _review_log_sheet(wb, reviews)
-    _readme_sheet(wb, doc, hospitals, shares)
+    _readme_sheet(wb, doc, hospitals, shares, year)
     wb.properties.title = "Revenue at stake: inpatient-only removals"
     wb.properties.creator = "Built with Claude Code"
     out_path = Path(out_path)

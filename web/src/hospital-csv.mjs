@@ -8,7 +8,7 @@
 // per_year_total). Codes and DRG numbers only: no procedure labels, so no CPT descriptor can ride along.
 import { alternativeLabel } from './stake-card.mjs';
 import { splitRows, perYearTable, count, round2 } from './hospital-math.mjs';
-import { EMPTY, ceiling } from './hospital-words.mjs';
+import { EMPTY, ceiling, MA_MIX } from './hospital-words.mjs';
 import { blank } from './engine.mjs';
 
 export const HOSPITAL_CSV_HEADER = ['row_type', 'ccn', 'hospital', 'code', 'family_order', 'drg', 'payer',
@@ -36,7 +36,7 @@ function source(payer, cell, typed, ctx) {
     return ['typed', 'not a whole number; not counted'];
   }
   if (payer === 'trad') return cell.count === null ? ['none', EMPTY.suppressed] : [`cms_${ctx.year}`, ''];
-  if (cell.count !== null) return ['estimate', `estimate: ${ctx.maRatio.toFixed(2)} MA cases per traditional case (CMS impact file), same MS-DRG mix assumed`];
+  if (cell.count !== null) return ['estimate', `estimate: ${ctx.maRatio.toFixed(2)} MA cases per traditional case (CMS impact file). ${MA_MIX}`];
   // No reason means CMS published a traditional count and a ratio: the reader's traditional count is empty.
   if (!cell.reason) return ['estimate', 'no estimate: no traditional count to scale (yours is cleared or not a whole number)'];
   return ['none', EMPTY[cell.reason]];

@@ -6,7 +6,7 @@
 import { esc, out, fr, cfr, captionedScroller } from './views.mjs';
 import { num } from './engine.mjs';
 import { cents, money } from './stake-card.mjs';
-import { pct as percent, ceiling } from './hospital-words.mjs';
+import { pct as percent, ceiling, MA_MIX } from './hospital-words.mjs';
 
 const PRICE_LOOKUP = 'https://www.medicare.gov/procedure-price-lookup';
 
@@ -121,7 +121,7 @@ ${factorTable(t, r)}
 <section class="block" aria-labelledby="m-year-h">
 <h2 id="m-year-h">Per year: a ceiling</h2>
 <p>Each card’s per-year fold multiplies the add-on per case by the hospital’s ${v.data_year} traditional Medicare discharges in each MS-DRG of the family (${mupKeys(v)}). ${ceiling(v.data_year)} CMS publishes no count under ${num(v.suppressed_below)}, so an empty cell reads “under ${num(v.suppressed_below)} or none”, and you can fill it in. ${num(v.counts.hospitals)} hospitals have counts.</p>
-<p>Medicare Advantage counts are estimates: the traditional count × the hospital’s MA cases per traditional case (${code(h.columns.ime_caseta44)} ÷ ${code(h.columns.caseta44)} in the impact file), rounded to a whole case. That assumes the hospital’s MA cases have the same MS-DRG mix as its traditional Medicare cases. Teaching hospitals only: elsewhere an MA case carries no add-on. Any count can be changed on the page. Your counts are not saved; they leave your browser only in the hospital CSV you download.</p>
+<p>Medicare Advantage counts are estimates: the traditional count × the hospital’s MA cases per traditional case (${code(h.columns.ime_caseta44)} ÷ ${code(h.columns.caseta44)} in the impact file), rounded to a whole case. ${MA_MIX} Teaching hospitals only: elsewhere an MA case carries no add-on. Any count can be changed on the page. Your counts are not saved; they leave your browser only in the hospital CSV you download.</p>
 </section>`;
 }
 

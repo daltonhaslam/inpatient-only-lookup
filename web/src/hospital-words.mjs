@@ -17,6 +17,9 @@ export const pct = (x, { digits = 1, trim = false } = {}) => {
  */
 export const ceiling = (year, drgs) => `A ceiling, not a forecast: it counts every ${year} case in ${drgs ? `MS-DRG ${drgs}` : 'those MS-DRGs'}, not only the removed procedure, and not only the cases that could have been outpatient.`;
 
+/** The MA estimate's assumption, in Methods, the per-year fold, the hospital CSV and the workbook (pinned equal there). */
+export const MA_MIX = 'That assumes the hospital’s MA cases have the same MS-DRG mix as its traditional Medicare cases.';
+
 /** Why a per-year count cell is empty (perYearTable's trad.suppressed, and ma.reason: either key). */
 export const EMPTY = {
   suppressed: 'under 11 or none',
