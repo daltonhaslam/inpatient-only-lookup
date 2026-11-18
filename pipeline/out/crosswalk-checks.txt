@@ -72,6 +72,6 @@ info hospital outpatient shares capped: 120 codes' copayment is above $1,776
 info Addendum B copayment vs 20% of the rate: of the 874 codes: 0 use the national unadjusted copayment (the rest CMS's minimum); 574 differ by one cent (e.g. 0219T, 0220T, 15756, 15757, 15758, 20661, 20664, 20816); 0 by more (none)
 ok no CPT descriptor text in the hospital and patient-share tables: 7170 strings in the hospital and patient-share tables, against the CMS descriptors of 874 codes (equal, or 5 consecutive words)
 
-All checks passed. Wrote crosswalk.json (922 codes).
-Wrote asc-new-2027.json, drg-volume.json, hospitals.json, patient-shares.json.
+Crosswalk checks passed. Wrote crosswalk.json (922 codes).
+Hospital and patient-share checks passed. Wrote asc-new-2027.json, drg-volume.json, hospitals.json, patient-shares.json.
 Wrote crosswalk.xlsx.

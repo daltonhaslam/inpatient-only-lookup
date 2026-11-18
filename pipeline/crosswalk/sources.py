@@ -55,6 +55,16 @@ cached = functools.lru_cache(maxsize=None)
 
 # ---------------------------------------------------------------- helpers
 
+def source_meta(source_id, label, members):
+    """{"label", "landing", "file"} for a pinned source, as crosswalk.json and the derived tables cite it.
+    label: the page's name for it; members: [(member pattern, prefer the workbook)] read from the zip,
+    their file names joined with "; ", or [] for a source that is the file itself."""
+    source = next(s for s in fetch.load_sources() if s["id"] == source_id)
+    path = fetch.raw_path(source)
+    files = [parse.pick_member(path, pattern, prefer_spreadsheet=book).rsplit("/", 1)[-1] for pattern, book in members]
+    return {"label": label, "landing": source["landing"], "file": "; ".join(files) if members else path.name}
+
+
 def source_path(source_id):
     for source in fetch.load_sources():
         if source["id"] == source_id:

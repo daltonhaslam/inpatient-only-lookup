@@ -20,7 +20,6 @@ import types
 
 import fetch
 import history
-import parse
 from crosswalk import exposure_sources as xs
 from crosswalk import sources
 
@@ -35,13 +34,16 @@ MARYLAND_REASON = "Maryland hospitals are paid under the state's all-payer model
 HOSPITAL_RATES = ("operating", "operating_wi_le1", "capital", "labor_share", "labor_share_le1")
 COINSURANCE = 0.2                 # Part B coinsurance: the ASC share, and Addendum B's minimum copayment
 
+# The sources the derived tables cite, in build.SOURCE_FILES's shape: a label and the members read, as
+# [(member pattern, prefer the workbook)] ([]: the download is the file). Here addenda-2027 is Addendum B
+# alone (the patient share reads no Addendum A), so its label is not the crosswalk's.
 SOURCE_LABELS = {
-    "ipps-2027-impact": ("FY 2027 IPPS final rule impact file, correction notice", xs.IMPACT_MEMBER),
-    "mup-inp-2024": ("Medicare Inpatient Hospitals - by Provider and Service, data year 2024", None),
+    "ipps-2027-impact": ("FY 2027 IPPS final rule impact file, correction notice", [(xs.IMPACT_MEMBER, True)]),
+    "mup-inp-2024": ("Medicare Inpatient Hospitals - by Provider and Service, data year 2024", []),
     "asc-2027-additions": ("CY 2027 ASC final rule (CMS-1850-FC), Final Additions to the List of ASC Covered Procedures",
-                           xs.ADDITIONS_MEMBER),
-    "asc-2027-aa": ("CY 2027 ASC final rule (CMS-1850-FC), Addendum AA", sources.ASC_AA),
-    "addenda-2027": ("CY 2027 OPPS final rule (CMS-1850-FC), Addendum B", history.ADDENDUM_B),
+                           [(xs.ADDITIONS_MEMBER, True)]),
+    "asc-2027-aa": ("CY 2027 ASC final rule (CMS-1850-FC), Addendum AA", [(sources.ASC_AA, True)]),
+    "addenda-2027": ("CY 2027 OPPS final rule (CMS-1850-FC), Addendum B", [(history.ADDENDUM_B, True)]),
 }
 
 
@@ -57,11 +59,7 @@ def load_tables():
 @functools.lru_cache(maxsize=None)
 def source_meta(source_id):
     """{"id", "label", "landing", "file"} for a pinned source (cached: treat as read-only)."""
-    source = next(s for s in fetch.load_sources() if s["id"] == source_id)
-    label, member = SOURCE_LABELS[source_id]
-    path = fetch.raw_path(source)
-    name = parse.pick_member(path, member).rsplit("/", 1)[-1] if member else path.name
-    return {"id": source_id, "label": label, "landing": source["landing"], "file": name}
+    return {"id": source_id, **sources.source_meta(source_id, *SOURCE_LABELS[source_id])}
 
 
 def crosswalk_drgs(doc):

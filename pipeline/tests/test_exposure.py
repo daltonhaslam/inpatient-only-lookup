@@ -332,9 +332,80 @@ class FixtureBuildTables(unittest.TestCase):
                          (619, 618, ["64629"]))
 
 
+class Gates(unittest.TestCase):
+    """build.gated_write: crosswalk.json has its own gate; the derived tables and the workbook have theirs."""
+    DOC = {"codes": {"11111": {}}}
+
+    def write(self, out, crosswalk_failures=0, table_failures=0, allow_missing=False):
+        report = checks.Report()
+        for n in range(crosswalk_failures):
+            report.check("crosswalk check %d" % n, ["broken"], "")
+        calls = []
+
+        def run_all(rep, doc, removed):
+            calls.append(doc)
+            for n in range(table_failures):
+                rep.check("table check %d" % n, ["broken"], "")
+            return {name: {"new": True} for name in exposure.TABLES}
+
+        with mock.patch.object(exposure_checks, "run_all", run_all), \
+                mock.patch.object(build.workbook, "write") as sheet:
+            lines = build.gated_write(report, self.DOC, types.SimpleNamespace(removed={}), Path(out), allow_missing)
+        return report, lines, calls, sheet
+
+    def previous(self, out):
+        for name in ("crosswalk.json", "crosswalk.xlsx") + exposure.TABLES:
+            (Path(out) / name).write_text("previous\n")
+
+    def test_crosswalk_fails_nothing_written_and_the_tables_not_built(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.previous(tmp)
+            report, lines, calls, sheet = self.write(tmp, crosswalk_failures=1)
+            self.assertEqual(calls, [], "the hospital and patient-share work must not run")
+            sheet.assert_not_called()
+            for name in ("crosswalk.json", "crosswalk.xlsx") + exposure.TABLES:
+                self.assertEqual((Path(tmp) / name).read_text(), "previous\n", name)
+            self.assertIn("skip hospital and patient-share tables: not checked: the crosswalk failed", "\n".join(report.lines))
+            self.assertEqual(lines, ["1 crosswalk check(s) failed. crosswalk.json, crosswalk.xlsx and %s were left as they were."
+                                     % ", ".join(exposure.TABLES)])
+
+    def test_tables_fail_crosswalk_still_written_tables_untouched_workbook_removed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.previous(tmp)
+            report, lines, calls, sheet = self.write(tmp, table_failures=2)
+            self.assertEqual(json.loads((Path(tmp) / "crosswalk.json").read_text()), self.DOC)
+            for name in exposure.TABLES:
+                self.assertEqual((Path(tmp) / name).read_text(), "previous\n", name)
+            sheet.assert_not_called()
+            self.assertFalse((Path(tmp) / "crosswalk.xlsx").exists(), "a workbook that disagrees with crosswalk.json")
+            self.assertEqual(report.failures, 2)
+            self.assertEqual(lines[0], "Crosswalk checks passed. Wrote crosswalk.json (1 codes).")
+            self.assertEqual(lines[1], "2 hospital and patient-share check(s) failed. %s were left as they were." % ", ".join(exposure.TABLES))
+            self.assertIn("crosswalk.xlsx was not built: it needs those tables. The previous one was removed", lines[2])
+
+    def test_tables_fail_under_allow_missing_the_workbook_is_left_alone(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.previous(tmp)
+            _, lines, _, sheet = self.write(tmp, table_failures=1, allow_missing=True)
+            sheet.assert_not_called()
+            self.assertEqual((Path(tmp) / "crosswalk.xlsx").read_text(), "previous\n")
+            self.assertEqual(len(lines), 2)
+
+    def test_both_pass_everything_written(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.previous(tmp)
+            report, lines, _, sheet = self.write(tmp)
+            self.assertEqual(report.failures, 0)
+            for name in exposure.TABLES:
+                self.assertEqual(json.loads((Path(tmp) / name).read_text()), {"new": True}, name)
+            sheet.assert_called_once()
+            self.assertEqual(lines[1:], ["Hospital and patient-share checks passed. Wrote %s." % ", ".join(exposure.TABLES),
+                                         "Wrote crosswalk.xlsx."])
+
+
 @unittest.skipUnless(RAW_PRESENT, "raw CMS files not downloaded; run pipeline/fetch.py")
 class TablesFailClosed(unittest.TestCase):
-    def test_a_corrupted_hospital_factor_fails_and_writes_nothing(self):
+    def test_a_corrupted_hospital_factor_fails_the_tables_only(self):
         assemble = exposure.assemble
 
         def corrupted(*args, **kwargs):
@@ -351,12 +422,14 @@ class TablesFailClosed(unittest.TestCase):
             with mock.patch.object(exposure, "assemble", corrupted), mock.patch("sys.stdout"):
                 self.assertEqual(build.main(args), 1)
             self.assertEqual(previous.read_text(), '{"previous": true}\n')
-            self.assertFalse((Path(tmp) / "crosswalk.json").exists())
+            self.assertTrue((Path(tmp) / "crosswalk.json").exists(), "the crosswalk has its own gate")
             self.assertFalse((Path(tmp) / exposure.SHARES).exists())
             text = (Path(tmp) / "checks.txt").read_text()
             self.assertIn("FAIL OHSU fixture:", text)
+            self.assertIn("Crosswalk checks passed. Wrote crosswalk.json", text)
+            self.assertIn("1 hospital and patient-share check(s) failed.", text)
 
-    def test_a_changed_file_layout_fails_with_a_report_and_writes_nothing(self):
+    def test_a_changed_file_layout_fails_the_tables_with_a_report(self):
         def broken():
             raise parse.ParseError("impact file: no header with columns")
 
@@ -370,7 +443,7 @@ class TablesFailClosed(unittest.TestCase):
             text = checks_file.read_text()
             self.assertIn("FAIL hospital and patient-share tables read:", text)
             self.assertIn("impact file: no header with columns", text)
-            self.assertFalse((Path(tmp) / "crosswalk.json").exists())
+            self.assertTrue((Path(tmp) / "crosswalk.json").exists(), "the crosswalk has its own gate")
             self.assertFalse(any((Path(tmp) / name).exists() for name in exposure.TABLES))
 
 

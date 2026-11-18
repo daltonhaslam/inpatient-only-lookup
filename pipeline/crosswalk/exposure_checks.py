@@ -2,7 +2,8 @@
 
 Each check adds lines to the crosswalk checks report (checks.Report), recomputing what it checks
 from the pinned files and crosswalk.json rather than trusting the tables. Any FAIL stops build.py
-from writing crosswalk.json and every derived table. Never print descriptor text.
+from writing every derived table and crosswalk.xlsx (crosswalk.json has its own gate and is written
+when its checks pass; build.gated_write). Never print descriptor text.
 """
 import collections
 

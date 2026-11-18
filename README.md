@@ -144,6 +144,10 @@ pipeline/facts.json               hand-kept figures no data file carries (deduct
 
 The four derived tables are written by the same `build.py` run, only when their checks pass (hospital count,
 teaching count, the OHSU anchors to the cent, every volume DRG in Table 5, the 618, every patient share recomputed).
+They have their own gate: `crosswalk.json` is written when the crosswalk checks pass, even if a table check fails
+(a stale impact-file pin each October, a missing raw file). When the crosswalk fails, the tables are not built.
+`crosswalk.xlsx` needs both: when a table check fails it is not built and a previous one is removed, so the site
+ships no Excel download rather than one that disagrees with `crosswalk.json`. The checks report says which gate failed.
 Downloads: `revenue-at-stake.xlsx`, `revenue-at-stake.csv` (national, with the patient's share columns), and after a
 pick, a hospital CSV built in the browser (`revenue-at-stake-<CCN>.csv`).
 
