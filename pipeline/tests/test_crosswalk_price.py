@@ -3,7 +3,7 @@ import unittest
 
 import fetch
 from crosswalk.group import Ref
-from crosswalk.price import drg_payment, family_range
+from crosswalk.price import NATIONAL, drg_payment, family_range, hospital_drg_payment, hospital_outpatient, per_year
 
 RAW_PRESENT = fetch.RAW.is_dir() and any(fetch.RAW.iterdir())
 
@@ -51,6 +51,47 @@ class WithCmsTables(unittest.TestCase):
     def test_ungroupable_drgs_have_no_price(self):
         with self.assertRaises(ValueError):
             drg_payment("998", Ref.load())
+
+
+# crosswalk.json meta.rates, as build.py writes it.
+META_RATES = {"operating": 6848.00, "capital": 539.95, "labor_share": 0.66,
+              "operating_wi_le1": 6848.00, "labor_share_le1": 0.62}
+OHSU = {"wi": 1.1907, "gaf": 1.126962466, "tchop": 0.31139, "tchcp": 0.22928, "dshopp": 0.07045, "dshcpp": 0.10036}
+
+
+class AtAHospital(unittest.TestCase):
+    """The plan's fixture: OHSU (380009) as the FY 2027 impact file has it."""
+
+    def test_ohsu_drg_165(self):
+        paid = hospital_drg_payment(1.9294, OHSU, META_RATES)
+        self.assertEqual(round(paid["total"], 2), 22116.60)
+        self.assertEqual(round(paid["addons"], 2), 6067.07)
+        self.assertEqual(round(paid["ime_operating"], 2), 4632.08)
+        self.assertEqual(paid["addons"], paid["ime"] + paid["dsh"])
+        self.assertEqual(paid["ime"], paid["ime_operating"] + paid["ime_capital"])
+
+    def test_ohsu_drg_163(self):
+        paid = hospital_drg_payment(4.4892, OHSU, META_RATES)
+        self.assertEqual(round(paid["total"], 2), 51459.44)
+        self.assertEqual(round(paid["addons"], 2), 14116.45)
+
+    def test_ohsu_outpatient_apc_5183(self):
+        self.assertEqual(round(hospital_outpatient(3584.95, OHSU["wi"], 0.6), 2), 3995.14)
+
+    def test_per_year_rounds_the_unrounded_per_case(self):
+        per_case = hospital_drg_payment(1.9294, OHSU, META_RATES)["addons"]
+        self.assertEqual(per_year(10, per_case), 60670.69)
+        self.assertNotEqual(per_year(10, per_case), round(10 * round(per_case, 2), 2))
+
+    def test_low_wage_index_uses_table_1b(self):
+        rates = dict(META_RATES, operating_wi_le1=100.0, labor_share_le1=0.5)
+        paid = hospital_drg_payment(1.0, dict(OHSU, wi=0.8), rates)
+        self.assertAlmostEqual(paid["operating"], 100.0 * (0.5 * 0.8 + 0.5))
+
+    def test_national_has_no_add_ons_and_matches_the_national_amount(self):
+        paid = hospital_drg_payment(1.9294, NATIONAL, META_RATES)
+        self.assertEqual((paid["ime"], paid["dsh"], paid["addons"]), (0, 0, 0))
+        self.assertEqual(round(paid["total"], 2), 14254.31)
 
 
 if __name__ == "__main__":

@@ -5,10 +5,12 @@
                                         [--checks FILE] [--allow-missing]
 
 Reads   pipeline/derived/ipo-history.json, data/labels.json, the pinned CMS files (data/raw/),
-        the mapping passes (data/crosswalk/passes/), adjudications.json, reviews.json and
-        resolutions.json
+        the mapping passes (data/crosswalk/passes/), adjudications.json, reviews.json,
+        resolutions.json and pipeline/facts.json
 Writes  <out>/crosswalk.json (default pipeline/derived/), only when every check passes, and with it
-        <out>/crosswalk.xlsx (workbook.py), except under --allow-missing
+        <out>/crosswalk.xlsx (workbook.py), except under --allow-missing, and the hospital-view and
+        patient-share tables (exposure.py: hospitals.json, drg-volume.json, asc-new-2027.json,
+        patient-shares.json)
         pipeline/out/crosswalk-checks.txt (or --checks), always
 
 One entry per code with a removal dated 2026-01-01 or 2027-01-01: the CY 2027 outpatient
@@ -31,7 +33,7 @@ if __name__ == "__main__":
 import fetch      # noqa: E402
 import history    # noqa: E402
 import parse      # noqa: E402
-from crosswalk import checks, mapper, mappings, reviews, sources, status, workbook   # noqa: E402
+from crosswalk import checks, exposure, exposure_checks, mapper, mappings, reviews, sources, status, workbook   # noqa: E402
 from crosswalk.group import ANY_OR_FAMILIES, Ref, group     # noqa: E402
 from crosswalk.price import family_range   # noqa: E402
 
@@ -323,14 +325,21 @@ def main(argv=None):
     inputs = load_inputs(args.passes, args.adjudications)
     doc = assemble(inputs)
     report = checks.run(doc, inputs, allow_missing=args.allow_missing)
+    tables = exposure.load_tables()
+    derived = exposure.assemble(doc, inputs.removed, tables)
+    exposure_checks.run(report, doc, derived, inputs.removed, tables)
     target = args.out / "crosswalk.json"
     lines = ["Revenue at stake: crosswalk checks", ""] + report.lines + [""]
     if report.failures:
-        # Never replace the published crosswalk with one that failed a check.
-        lines.append("%d check(s) failed. %s was left as it was." % (report.failures, target.name))
+        # Never replace the published crosswalk or its tables with ones that failed a check.
+        lines.append("%d check(s) failed. %s and %s were left as they were." % (
+            report.failures, target.name, ", ".join(sorted(derived))))
     else:
         fetch.write_json(target, doc)
         lines.append("All checks passed. Wrote %s (%d codes)." % (target.name, len(doc["codes"])))
+        for name, table in sorted(derived.items()):
+            fetch.write_json(args.out / name, table)
+        lines.append("Wrote %s." % ", ".join(sorted(derived)))
         if not args.allow_missing:
             sheet = workbook.write(doc, args.out / "crosswalk.xlsx")
             lines.append("Wrote %s." % sheet.name)
