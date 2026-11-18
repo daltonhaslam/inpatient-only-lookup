@@ -562,16 +562,17 @@ def _readme_sheet(wb, doc, hospitals, shares):
     return ws
 
 
-def write(doc, out_path, reviews=None, hospitals=None, shares=None):
+def write(doc, out_path, reviews=None, hospitals=None, shares=None, beside=None):
     """Build the workbook for a crosswalk document and save it to out_path. Returns the path.
-    hospitals and shares are hospitals.json and patient-shares.json (read from pipeline/derived/
-    when not given)."""
+    hospitals and shares are hospitals.json and patient-shares.json; when not given they are read from
+    the directory beside (the one holding the crosswalk.json being written; pipeline/derived/ by default)."""
+    beside = Path(beside) if beside is not None else fetch.DERIVED
     if reviews is None:
         reviews = fetch.read_json_or(REVIEWS, [])
     if hospitals is None:
-        hospitals = fetch.read_json(fetch.DERIVED / HOSPITALS)
+        hospitals = fetch.read_json(beside / HOSPITALS)
     if shares is None:
-        shares = fetch.read_json(fetch.DERIVED / SHARES)
+        shares = fetch.read_json(beside / SHARES)
     wb = Workbook()
     wb.remove(wb.active)
     drgs, apcs = _used(doc)
@@ -602,7 +603,7 @@ def main(argv=None):
     parser.add_argument("--in", dest="source", type=Path, default=JSON_PATH, help="crosswalk.json to read")
     parser.add_argument("--out", type=Path, default=XLSX_PATH, help="workbook to write")
     args = parser.parse_args(argv)
-    print("Wrote %s" % write(fetch.read_json(args.source), args.out))
+    print("Wrote %s" % write(fetch.read_json(args.source), args.out, beside=args.source.parent))
     return 0
 
 

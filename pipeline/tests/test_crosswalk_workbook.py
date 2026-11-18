@@ -3,6 +3,7 @@
 Numbers are checked against crosswalk.json and the OHSU fixture by crosswalk/verify_workbook.py,
 which needs the `formulas` package in a scratch venv and so is not part of this suite.
 """
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -307,6 +308,25 @@ class FormulaInjection(unittest.TestCase):
         self.assertEqual((pcs["B2"].value, pcs["B2"].data_type), ("=1+1", "s"))
         formulas = [c.coordinate for sheet in (log, pcs) for row in sheet.iter_rows() for c in row if c.data_type == "f"]
         self.assertEqual(formulas, [])
+
+
+class ReadsBesideInput(unittest.TestCase):
+    """main --in reads hospitals.json and patient-shares.json from beside that crosswalk.json, as the
+    module docstring says, not from pipeline/derived/."""
+
+    def test_reads_the_tables_beside_in(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            (tmp / "crosswalk.json").write_text(json.dumps(doc()), encoding="utf-8")
+            with self.assertRaises(FileNotFoundError) as missing:
+                workbook.main(["--in", str(tmp / "crosswalk.json"), "--out", str(tmp / "x.xlsx")])
+            self.assertIn(str(tmp), str(missing.exception))
+            (tmp / workbook.HOSPITALS).write_text(json.dumps(hospitals()), encoding="utf-8")
+            (tmp / workbook.SHARES).write_text(json.dumps(shares()), encoding="utf-8")
+            self.assertEqual(workbook.main(["--in", str(tmp / "crosswalk.json"), "--out", str(tmp / "x.xlsx")]), 0)
+            wb = openpyxl.load_workbook(tmp / "x.xlsx")
+            cells = " ".join(str(c.value) for row in wb["Hospitals"].iter_rows() for c in row if c.value)
+            self.assertIn("Teaching No Ratio", cells)   # the fixture's hospital, so the file beside --in was read
 
 
 if __name__ == "__main__":
