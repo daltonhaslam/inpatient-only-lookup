@@ -161,7 +161,7 @@ export function start(model) {
   let ui = null;       // the picker, once it has taken over the box
   const attach = () => {
     picker ||= import(HOSPITAL.view).then((mod) => mod.attachPicker(mount, HOSPITAL, {
-      data, meta: model.meta,
+      data, meta: model.meta, results,
       // One hospital's view, computed once: swap the strip and the cards together, then say so once.
       onPick: (next, { initial }) => transition(() => { view = next; pending = ''; ui.show(next); update(); })
         .then(() => {

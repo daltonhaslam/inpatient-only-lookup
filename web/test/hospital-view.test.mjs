@@ -10,7 +10,7 @@ import { prepare } from '../src/stake-engine.mjs';
 import { card } from '../src/stake-card.mjs';
 import { hospitalList, hospitalRecord } from '../src/hospital-data.mjs';
 import { hospitalIndex, findHospitals } from '../src/hospital-pick.mjs';
-import { createView, facts, summaryHtml } from '../src/hospital-view.mjs';
+import { createView, facts, summaryHtml, hospitalLede } from '../src/hospital-view.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const read = (path) => JSON.parse(readFileSync(join(root, path), 'utf8'));
@@ -18,7 +18,7 @@ const hospitals = read('pipeline/derived/hospitals.json');
 const volume = read('pipeline/derived/drg-volume.json');
 const model = normalize(read('pipeline/derived/crosswalk.json'));
 // What the browser has: the shipped list, one hospital's file, and the cards' model.
-const list = JSON.parse(JSON.stringify(hospitalList(hospitals)));
+const list = JSON.parse(JSON.stringify(hospitalList(hospitals, model)));
 const doc = JSON.parse(JSON.stringify(clientModel(model, [], [])));
 const data = prepare(doc);
 const recordOf = (ccn) => JSON.parse(JSON.stringify(hospitalRecord(hospitals.hospitals[ccn], volume.volume[ccn], volume.meta.drgs)));
@@ -153,11 +153,25 @@ describe('cards in hospital mode', () => {
     assert.equal((html.match(/class="scard__fam"/g) || []).length, two.ip.families.length);
     assert.equal((html.match(/class="scard__addon"/g) || []).length, two.ip.families.length);
     assert.match(text(html), /than the inpatient DRG families\./);
+    // The legend sits right after "Inpatient", so at 400 px the long family name truncates, not the legend.
+    assert.match(html, /<span class="sbar__name">Inpatient <span class="sbar__keyed">\(<i class="sbar__key"><\/i>IME and DSH\)<\/span>, /);
   });
   test('the view sorts by the hospital\'s gap and keeps every item', () => {
     const view = viewOf('380009');
     assert.equal(view.data.items.length, data.items.length);
     assert.equal(view.data.byCode['32480'].op.rate, 3995.14);
     assert.equal(view.data.index, data.index);
+  });
+});
+
+describe('the lede after a pick', () => {
+  const lede = 'For those 849: what outpatient pays next to the inpatient MS-DRG family the same operation would group to, national and unadjusted, from CMS’s CY 2027 and FY 2027 final rules.';
+  test('names the hospital’s rates where the national lede says national and unadjusted', () => {
+    assert.equal(hospitalLede(lede, 'Ohsu Hospital And Clinics', true), lede.replace('national and unadjusted', 'at Ohsu Hospital And Clinics’s rates: wage index, IME and DSH'));
+    assert.ok(hospitalLede(lede, 'X', false).includes('at X’s rates: wage index (it gets no IME or DSH)'));
+  });
+  test('escapes the name, and leaves a lede without the phrase alone', () => {
+    assert.ok(hospitalLede(lede, '<b>$&</b>', true).includes('at &lt;b&gt;$&amp;&lt;/b&gt;’s rates'));
+    assert.equal(hospitalLede('Something else.', 'X', true), 'Something else.');
   });
 });

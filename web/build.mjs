@@ -280,7 +280,7 @@ function stakeData(ctx) {
  * picker's own bundle and stylesheet. Their URLs go into the stake bundle at build time, so the national page's HTML
  * does not change. null (no picker) when the derived hospital tables are absent.
  */
-async function hospitalAssets() {
+async function hospitalAssets(model) {
   const paths = ['pipeline/derived/hospitals.json', 'pipeline/derived/drg-volume.json'];
   if (!paths.every((path) => existsSync(join(root, path)))) {
     console.warn('No hospitals.json or drg-volume.json: building Revenue at stake without the hospital picker.');
@@ -295,7 +295,7 @@ async function hospitalAssets() {
     entryPoints: [join(here, 'src/hospital-picker.mjs')], bundle: true, minify: true, format: 'esm', target: 'es2020', write: false, legalComments: 'none',
   });
   return {
-    list: hashed('data', 'hospitals', 'json', JSON.stringify(hospitalList(hospitals))),
+    list: hashed('data', 'hospitals', 'json', JSON.stringify(hospitalList(hospitals, model))),
     dir: `/${dir}`,
     view: hashed('assets', 'hospital', 'js', view.outputFiles[0].contents),
     css: hashed('assets', 'hospital', 'css', readFileSync(join(here, 'src/hospital.css'), 'utf8')),
@@ -343,7 +343,7 @@ async function main() {
   const script = await bundle({
     entryPoints: [join(here, 'src/client.mjs')], bundle: true, minify: true, format: 'iife', target: 'es2020', write: false, legalComments: 'none',
   });
-  const hospitals = ctx.stake ? await hospitalAssets() : null;
+  const hospitals = ctx.stake ? await hospitalAssets(ctx.stake.model) : null;
   const stakeScript = ctx.stake ? await bundle({
     entryPoints: [join(here, 'src/stake-client.mjs')], bundle: true, minify: true, format: 'iife', target: 'es2020', write: false, legalComments: 'none',
     define: { __HOSPITAL_ASSETS__: JSON.stringify(hospitals) },

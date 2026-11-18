@@ -22,21 +22,46 @@ const TEACHING = { none: 0, 'capital-only': 1, teaching: 2 };
 const FACTORS = ['name', 'state', 'wi', 'gaf', 'tchop', 'tchcp', 'dshopp', 'dshcpp', 'caseta44', 'ime_caseta44'];
 
 /**
- * {meta: {rates, drg_weights, opps_labor_share, maryland, source}, states: {code: name},
- *  h: [[ccn, name or null, state, teaching 0|1|2]], md: [[ccn, name]]}, in CCN order.
+ * The severity part of a CMS MS-DRG title, for the split and per-year rows ("165 without CC/MCC"): the
+ * last "with/without MCC, CC or CC/MCC" and anything CMS adds after it ("with MCC or Disc Device ..."),
+ * or null for a title without one.
  */
-export function hospitalList(doc) {
+export function drgSeverity(title) {
+  const match = /.*\b((?:with|without) (?:CC\/MCC|MCC|CC)\b.*)$/.exec(title || '');
+  return match ? match[1] : null;
+}
+
+/**
+ * {meta: {rates, drg_weights, drg_sev, opps_labor_share, maryland, source}, states: {code: name},
+ *  h: [[ccn, name or null, state, teaching 0|1|2]], md: [[ccn, name]]}, in CCN order.
+ * model: the normalized crosswalk (stake-data.mjs normalize), for drg_sev: {DRG: severity} from the
+ * MS-DRG titles of the DRGs the crosswalk prices (CMS's public titles; no CPT text).
+ */
+export function hospitalList(doc, model) {
   const { meta } = doc;
   const rows = Object.entries(doc.hospitals).sort(([a], [b]) => a.localeCompare(b));
   const used = new Set([...rows.map(([, h]) => h.state), 'MD']);
   const missing = [...used].filter((code) => !STATES[code]);
   if (missing.length) throw new Error(`hospitals.json has state codes with no name in web/src/hospital-data.mjs: ${missing.join(', ')}`);
   return {
-    meta: { rates: meta.rates, drg_weights: meta.drg_weights, opps_labor_share: meta.opps_labor_share, maryland: meta.maryland, source: meta.source },
+    meta: { rates: meta.rates, drg_weights: meta.drg_weights, drg_sev: drgSeverities(model), opps_labor_share: meta.opps_labor_share, maryland: meta.maryland, source: meta.source },
     states: Object.fromEntries([...used].sort().map((code) => [code, STATES[code]])),
     h: rows.map(([ccn, h]) => [ccn, h.name, h.state, TEACHING[teaching(h)]]),
     md: Object.entries(doc.maryland).sort(([a], [b]) => a.localeCompare(b)).map(([ccn, h]) => [ccn, h.name]),
   };
+}
+
+function drgSeverities(model) {
+  const sev = {};
+  for (const item of Object.values(model ? model.codes : {})) {
+    for (const family of item.ip ? item.ip.families : []) {
+      for (const d of family.drgs) {
+        const text = drgSeverity(d.title);
+        if (text) sev[d.drg] = text;
+      }
+    }
+  }
+  return Object.fromEntries(Object.entries(sev).sort(([a], [b]) => a.localeCompare(b)));
 }
 
 /** One hospital's file: its hospitals.json factors and v: {DRG: 2024 discharges} for the crosswalk's DRGs. */

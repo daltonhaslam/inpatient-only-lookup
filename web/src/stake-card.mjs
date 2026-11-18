@@ -140,7 +140,8 @@ const pct = (n) => `${(n * 100).toFixed(2)}%`;
  */
 function scaleBar(item, hospital) {
   const top = Math.max(item.op.rate || 0, item.ip.high);
-  const lane = (name, bar, key = '') => `<div class="sbar__lane"><span class="sbar__name">${esc(name)}${key}</span><span class="sbar__track">${bar}</span></div>`;
+  // key: the add-on legend, right after "Inpatient" so a long family name after it is what truncates.
+  const lane = (name, bar, key = '', rest = '') => `<div class="sbar__lane"><span class="sbar__name">${esc(name)}${key}${esc(rest)}</span><span class="sbar__track">${bar}</span></div>`;
   const lanes = [lane('Outpatient', item.op.rate !== null ? `<i class="sbar__op" style="width:${pct(item.op.rate / top)}"></i>` : '')];
   const addOnPart = (f) => {
     if (!hospital || !addOnText(f.addOn)) return '';
@@ -148,10 +149,9 @@ function scaleBar(item, hospital) {
     return `<i class="sbar__add" style="left:${pct(from / top)};width:${pct((f.high - from) / top)}"></i>`;
   };
   for (const f of item.ip.families) {
-    const name = item.ip.families.length > 1 ? `Inpatient, ${whenLabel(f)}` : 'Inpatient';
     const add = addOnPart(f);
-    lanes.push(lane(name, `<i class="sbar__ip" style="left:${pct(f.low / top)};width:${pct(Math.max(f.high - f.low, top * 0.006) / top)}"></i>${add}`,
-      add ? ' <span class="sbar__keyed">(<i class="sbar__key"></i>IME and DSH)</span>' : ''));
+    lanes.push(lane('Inpatient', `<i class="sbar__ip" style="left:${pct(f.low / top)};width:${pct(Math.max(f.high - f.low, top * 0.006) / top)}"></i>${add}`,
+      add ? ' <span class="sbar__keyed">(<i class="sbar__key"></i>IME and DSH)</span>' : '', item.ip.families.length > 1 ? `, ${whenLabel(f)}` : ''));
   }
   return `<div class="sbar" aria-hidden="true">${lanes.join('')}<div class="sbar__axis"><span>$0</span><span>${money(top)}</span></div></div>`;
 }

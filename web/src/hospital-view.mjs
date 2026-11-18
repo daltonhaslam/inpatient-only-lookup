@@ -9,6 +9,7 @@ import { card, money } from './stake-card.mjs';
 import { hospitalContext, hospitalItem, summary as summarize } from './hospital-math.mjs';
 import { fractionWord } from './hospital-words.mjs';
 import { shortName } from './hospital-pick.mjs';
+import { foldsHtml, yearUpdate } from './hospital-folds.mjs';
 
 const pct = (x) => `${(x * 100).toFixed(1)}%`;
 
@@ -56,6 +57,15 @@ export function summaryHtml(s, name) {
 </div>`;
 }
 
+/**
+ * The page's lede with the picked hospital's rates named where it says "national and unadjusted"
+ * (stake.mjs mainPage). html: the lede as the server wrote it; unchanged if the phrase is not there.
+ */
+export function hospitalLede(html, name, addOns) {
+  const rates = addOns ? 'wage index, IME and DSH' : 'wage index (it gets no IME or DSH)';
+  return html.replace('national and unadjusted', () => `at ${esc(name)}’s rates: ${rates}`);
+}
+
 /** The one-line "Rates for <name> (<CCN>) · facts" bar with Change and Back to national. */
 function bar(name, ccn, h) {
   return `<div class="hpick__on">
@@ -68,20 +78,46 @@ function bar(name, ccn, h) {
  * One picked hospital, computed once: the cards' items rewritten for it (data: prepare()'s data with
  * those items, same search index), the summary, and the HTML the page swaps in. list: the shipped
  * hospital list; record: the hospital's file; meta: the browser model's meta (years) for card().
- * Per-card state that later folds keep (typed counts) belongs on the view, keyed by code.
+ * The view also keeps what someone does to its cards' folds, so a redraw (a filter change) keeps it:
+ * the counts typed into each card's per-year table and which folds are open. Picking another hospital
+ * (a new view) starts clean; nothing is saved.
  */
 export function createView({ list, record, ccn, data, meta }) {
   const ctx = hospitalContext({ hospital: record, volume: record.v, meta: list.meta });
   const name = shortName({ ccn, name: record.name });
   const items = data.items.map((item) => hospitalItem(item, ctx));
+  const byCode = Object.fromEntries(items.map((item) => [item.code, item]));
   const s = summarize(data.items, ctx);
+  const sev = list.meta.drg_sev || {};
+  const edits = new Map();   // code -> {DRG: {trad, ma}}: the text typed
+  const open = new Set();    // "<code>:split" and "<code>:year"
+  const folds = (item) => foldsHtml(item, ctx, { name, sev, edits: edits.get(item.code), open: (kind) => open.has(`${item.code}:${kind}`) });
   return {
     ccn, name, ctx, summary: s,
-    data: { ...data, items, byCode: Object.fromEntries(items.map((item) => [item.code, item])) },
+    data: { ...data, items, byCode },
     summaryHtml: summaryHtml(s, name),
     barHtml: bar(name, ccn, record),
     // Said once, through the picker's polite status line.
     announce: [`Showing ${name}’s rates.`, summaryText(s, name)?.lead].filter(Boolean).join(' '),
-    card: (item) => card(item, meta, { detail: false, hospital: { name } }),
+    card: (item) => card(item, meta, { detail: false, hospital: { name }, folds: folds(item) }),
+    /**
+     * A count typed into a card's per-year table. key: "<DRG>:trad" or "<DRG>:ma"; raw: the box's text.
+     * Returns yearUpdate() for that card only (never the summary or another card), or null for a key
+     * the card does not have.
+     */
+    count(code, key, raw) {
+      const item = byCode[code];
+      if (!item || item.kind !== 'compare' || !ctx.addOns) return null;
+      const [drg, payer] = String(key).split(':');
+      const row = yearUpdate(item, ctx, edits.get(code)).table.rows.find((r) => r.drg === drg);
+      if (!row || !row[payer] || !(payer === 'trad' || payer === 'ma')) return null;
+      const typed = { ...edits.get(code), [drg]: { ...edits.get(code)?.[drg], [payer]: String(raw) } };
+      edits.set(code, typed);
+      return yearUpdate(item, ctx, typed);
+    },
+    /** Remember whether a card's fold (kind 'split' or 'year') is open, for the next redraw. */
+    toggle(code, kind, isOpen) {
+      if (isOpen) open.add(`${code}:${kind}`); else open.delete(`${code}:${kind}`);
+    },
   };
 }

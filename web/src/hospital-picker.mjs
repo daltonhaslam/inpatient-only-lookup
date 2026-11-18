@@ -8,7 +8,7 @@
 import { esc } from './views.mjs';
 import { field } from './hospital-field.mjs';
 import { hospitalIndex, findHospitals, optionName, pickerMessage } from './hospital-pick.mjs';
-import { createView } from './hospital-view.mjs';
+import { createView, hospitalLede } from './hospital-view.mjs';
 import { CCN } from './stake-engine.mjs';
 
 const TEACHING = ['', 'Capital IME only', 'Teaching'];
@@ -28,14 +28,66 @@ function styles(url) {
   return ready;
 }
 
+/** Restart a short highlight on a figure that just changed (CSS runs it only when motion is welcome). */
+function flash(el) {
+  el.classList.remove('hyr--new');
+  void el.offsetWidth;   // restart the animation
+  el.classList.add('hyr--new');
+}
+
+/**
+ * The cards' folds after a pick. A count typed into a per-year table updates that card in place: each
+ * row's figure, the MA estimates that follow a traditional count, the total and the fold's heading. The
+ * box being typed in is never redrawn, so focus and the caret stay. Its text reaches the view as a
+ * string (count() reads it; HTML gets it only through esc()). Open folds are remembered for a redraw.
+ * The new heading is said once, after typing settles, through the picker's one status line.
+ */
+function folds(results, current, say) {
+  results.addEventListener('input', (event) => {
+    const input = event.target.closest('[data-count]');
+    const view = current();
+    const card = input && input.closest('[data-stake-card]');
+    if (!view || !card) return;
+    const up = view.count(card.dataset.stakeCard, input.dataset.count, input.value);
+    if (!up) return;
+    const set = (selector, text) => {
+      const el = card.querySelector(selector);
+      if (el && el.textContent !== text) { el.textContent = text; flash(el); }
+    };
+    for (const [key, text] of Object.entries(up.cells)) set(`[data-py="${key}"]`, text);
+    for (const [key, text] of Object.entries(up.notes)) {
+      const why = card.querySelector(`[data-why="${key}"]`);
+      if (why) why.textContent = text;
+    }
+    for (const [key, value] of Object.entries(up.values)) {
+      const box = card.querySelector(`[data-count="${key}"]`);
+      if (!box) continue;
+      if (box !== input && box.value !== value) { box.value = value; flash(box); }
+      if (up.invalid[key]) box.setAttribute('aria-invalid', 'true'); else box.removeAttribute('aria-invalid');
+    }
+    set('[data-year-total]', up.total);
+    set('[data-year-head]', up.headline);
+    say(`${card.dataset.stakeCard}, per year at ${view.name}: ${up.headline}.`, 900);
+  });
+  // toggle does not bubble: listen in the capture phase.
+  results.addEventListener('toggle', (event) => {
+    const fold = event.target;
+    const view = current();
+    if (!view || !(fold instanceof HTMLDetailsElement) || !fold.matches('.hfold')) return;
+    const card = fold.closest('[data-stake-card]');
+    if (card) view.toggle(card.dataset.stakeCard, fold.dataset.fold, fold.open);
+  }, true);
+}
+
 /**
  * Take over the picker in mount (already holding hospital-field.mjs SHELL and field()).
  * assets: {list, dir, css} URLs from the build. data, meta: the page's prepare()d items and browser meta.
  * onPick(view, {initial}): show this hospital (the page swaps the cards and calls show()).
  * onClear(): back to national. onInvalid({keepUrl}): an ?h= that named no offered hospital, or (keepUrl)
- * one whose files could not be fetched. Returns {show, say, start(ccn)}.
+ * one whose files could not be fetched. results: the cards' container, where the picked hospital's
+ * per-year counts are typed and its folds opened (folds() below). Returns {show, say, start(ccn)}.
  */
-export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInvalid }) {
+export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInvalid, results }) {
   const body = mount.querySelector('[data-hpick-body]');
   const status = mount.querySelector('[data-hpick-status]');
   const css = styles(assets.css);
@@ -119,10 +171,15 @@ export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInv
     load(h.ccn, false);
   }
 
+  // The page's lede says "national and unadjusted"; after a pick it names the hospital's rates instead.
+  const lede = document.querySelector('.stake-head .lede');
+  const nationalLede = lede ? lede.innerHTML : '';
+
   /** Draw the picked hospital's bar and summary, or the empty picker for national. */
   function show(view, { focus = false } = {}) {
     picked = view;
     body.innerHTML = view ? view.barHtml + view.summaryHtml : field(null);
+    if (lede) lede.innerHTML = view ? hospitalLede(nationalLede, view.name, view.ctx.addOns) : nationalLede;
     if (focus) $(view ? '[data-hpick-change]' : '#hp-q').focus();
   }
 
@@ -163,6 +220,7 @@ export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInv
     if (event.target.id === 'hp-q' && !body.contains(event.relatedTarget)) close();
   });
 
+  if (results) folds(results, () => picked, say);
   loadList().catch(() => {});
   if ($('#hp-q') && $('#hp-q').value) typed();   // they typed while this bundle loaded
   return { show, say, start: (ccn) => load(ccn, true) };

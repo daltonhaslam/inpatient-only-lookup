@@ -42,6 +42,57 @@ button.hpick__btn:hover { background: none; color: var(--ink); text-decoration-t
 .scard__addon b { font-weight: 650; font-variant-numeric: tabular-nums; }
 .sbar__add { position: absolute; top: 0; bottom: 0; background: var(--add); border-radius: 0 2px 2px 0; box-shadow: inset 2px 0 0 var(--paper); min-width: 3px; }
 .sbar__key { display: inline-block; width: 0.9em; height: 0.6em; margin-right: 0.3em; border-radius: 1px; background: var(--add); }   /* the end segment's legend */
+/* A card's two folds (hospital-folds.mjs): closed by default, opening in place under their summary. The
+   native disclosure marker stays: it follows the text color in dark mode and in forced colors. */
+.hfold { max-width: none; margin-top: 0.75rem; border-top: 1px solid var(--rule); }
+.hfold + .hfold { margin-top: 0; }
+.hfold > summary { color: var(--on-ink); padding: 0.55rem 0; }
+.hfold > summary:hover { color: var(--ink); }
+.hfold__sub { font-weight: 400; color: var(--ink-2); }
+.hfold__body { padding: 0.15rem 0 0.9rem; }
+.hfold__lead { max-width: var(--measure); font-size: 0.95rem; margin-bottom: 0.7rem; }
+.hfold__note, .hfold__notes { max-width: var(--measure); margin-top: 0.7rem; font-size: 0.88rem; color: var(--ink-2); line-height: 1.45; }
+.hfold__notes { padding-left: 1.1rem; }
+.hfold__notes li + li { margin-top: 0.3rem; }
+.hfold .scroll + .scroll { margin-top: 1rem; }
+.hfold table { font-size: 0.95rem; font-variant-numeric: tabular-nums lining-nums; }
+.hfold th, .hfold td { padding: 0.45rem 1.1rem 0.45rem 0; vertical-align: baseline; }
+.hfold th:last-child, .hfold td:last-child { padding-right: 0.2rem; }
+.hfold .num { text-align: right; white-space: nowrap; }
+.hfold tbody th { font-weight: 600; white-space: normal; min-width: 7.5rem; }
+.hfold__cap { caption-side: top; text-align: left; font-weight: 600; font-size: 0.92rem; padding-bottom: 0.35rem; }
+.hfold thead th, .hfold thead th.num { white-space: normal; vertical-align: bottom; }
+.hfold .hsplit thead th { min-width: 6rem; }
+.hsplit tbody th { min-width: 0; }
+.hsplit tfoot th, .hsplit tfoot td { font-weight: 650; border-top: 1.5px solid var(--ink); border-bottom: 0; }
+.hyr { width: 100%; max-width: 38rem; }
+.hyr tbody th[scope='row'] { font-weight: 500; min-width: 0; }
+.hyr__drg th { padding: 0.8rem 0 0.15rem; border-bottom: 0; font-weight: 650; }
+.hyr__drg + tr > * { border-top: 0; }
+@media (max-width: 30rem) {
+  .hfold table { font-size: 0.88rem; }
+  .hfold th, .hfold td { padding-right: 0.6rem; }
+  .hfold .hsplit thead th { min-width: 4.5rem; }
+  .hyr__n { width: 4.2em; }
+}
+.hyr__sub { display: block; font-weight: 400; font-size: 0.82rem; color: var(--ink-2); line-height: 1.3; }
+.hyr__count { white-space: nowrap; }
+.hyr__n {
+  width: 5.5em; min-height: 2.5rem; padding: 0.3rem 0.5rem; text-align: right;
+  font: 600 1rem/1.2 var(--sans); font-variant-numeric: tabular-nums lining-nums;
+  color: var(--ink); background: var(--paper); border: 1.5px solid var(--ink-2); border-radius: 3px;
+}
+.hyr__n:hover { border-color: var(--ink); }
+.hyr__n:focus-visible { border-color: var(--on-ink); outline: 3px solid var(--focus); outline-offset: 2px; }
+.hyr__n[aria-invalid='true'] { border-color: var(--ex-ink); border-style: dashed; }
+.hyr__why { display: block; margin-top: 0.15rem; font-size: 0.8rem; line-height: 1.3; color: var(--ink-2); white-space: normal; }
+.hyr__why:empty { display: none; }
+.hyr__n[aria-invalid='true'] + .hyr__why { color: var(--ex-ink); font-weight: 600; }
+.hyr tfoot th, .hyr tfoot td { font-weight: 650; border-top: 1.5px solid var(--ink); border-bottom: 0; }
+.hyr tfoot td { font-size: 1.05rem; }
+/* A figure that just changed with a typed count: a brief tint, only when motion is welcome. */
+@media (prefers-reduced-motion: no-preference) { .hyr--new { animation: hyr-new 0.9s ease-out; } }
+@keyframes hyr-new { from { background-color: var(--panel); } }
 ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation-duration: 0.22s; }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
@@ -52,5 +103,8 @@ button.hpick__btn:hover { background: none; color: var(--ink); text-decoration-t
   .hpick__list [aria-selected='true'] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
   .hpick__list [aria-selected='true'] .hpick__ometa { color: HighlightText; }
   button.hpick__btn { color: LinkText; }
+  .hyr__n { border-color: CanvasText; }
+  .hyr__n[aria-invalid='true'] { border-color: Highlight; }
+  .hyr tfoot th, .hyr tfoot td, .hyr tbody + tbody { border-color: CanvasText; }
 }
 @media print { .hpick__find, .hpick__acts, .hsum__note a { display: none; } .sbar__add, .sbar__key { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
