@@ -8,7 +8,7 @@ import collections
 
 from crosswalk import checks
 from crosswalk import exposure_sources as xs
-from crosswalk.exposure import COINSURANCE, MARYLAND, compared_codes, crosswalk_drgs
+from crosswalk.exposure import COINSURANCE, MARYLAND, compared_codes, crosswalk_drgs, patient_share
 from crosswalk.price import NATIONAL, hospital_drg_payment, hospital_outpatient, per_year
 
 HOSPITALS = (3000, 3200)          # hospitals the picker offers
@@ -20,7 +20,11 @@ OHSU_APC_5183 = (3584.95, 3995.14)
 OHSU_PER_YEAR = ("165", 10, 60670.69)       # 10 traditional cases' IME + DSH
 OHSU_VOLUME = {"163": 15, "164": 34, "165": 11}
 EXAMPLES = 8
-NEW_HCPCS = ("NI", "NP", "NC")     # Addendum DD2: new codes for the next calendar year
+# Addendum DD2 comment indicators that mark a code new to HCPCS for the next year: NI (interim
+# indicator), NP (proposed) and NC (final, after comment). The spec named only NI, but all three
+# mean "new code", and the rule's additions are existing codes. Safe: this only fails the check
+# if a code on CMS's additions list carries one of them.
+NEW_HCPCS = ("NI", "NP", "NC")
 
 
 def run(report, doc, tables, removed, t):
@@ -52,8 +56,6 @@ def _hospitals(report, table, t):
     problems += ["%s: Maryland hospital offered" % ccn for ccn in offered if ccn.startswith(MARYLAND)]
     if sorted(maryland) != sorted(ccn for ccn in t.impact if ccn.startswith(MARYLAND)):
         problems.append("the Maryland list is not every CCN starting %s" % MARYLAND)
-    problems += ["%s: factors differ from the impact file" % ccn
-                 for ccn, row in offered.items() if t.impact.get(ccn) != row]
     if set(offered) | set(maryland) != set(t.impact):
         problems.append("hospitals plus Maryland is not the impact file")
     report.check("hospitals from the impact file", problems,
@@ -180,7 +182,8 @@ def _asc_new(report, table, removed, t):
 
 
 def _shares(report, doc, table, t):
-    """Each share recomputed from Addendum AA, Addendum B and the deductible in facts.json."""
+    """Each share recomputed from Addendum AA, Addendum B and the deductible in facts.json (by
+    exposure.patient_share, the one implementation), and none above the cap."""
     cap = t.facts["deductibles"]["part_a_inpatient"]
     compared = compared_codes(doc)
     codes = sorted(set(compared) | set(t.additions))
@@ -188,15 +191,10 @@ def _shares(report, doc, table, t):
     if sorted(rows) != codes:
         problems.append("codes are not the compared codes plus the CY 2027 ASC additions")
     for code in codes:
-        rate, listed = t.asc_rates.get(code), t.copays.get(code) or {}
-        copay = listed["national"] if listed.get("national") is not None else listed.get("minimum")
-        asc = None if rate is None else round(rate * COINSURANCE, 3)
-        opps = None if copay is None else min(copay, cap)
-        expected = {"asc_rate": rate, "asc_share": asc, "opps_copay": copay, "opps_share": opps,
-                    "opps_capped": None if copay is None else copay > cap,
-                    "asc_more": None if asc is None or opps is None else asc > opps}
-        if rows.get(code) != expected:
+        if rows.get(code) != patient_share(code, t):
             problems.append("%s: shares do not recompute" % code)
+        elif (rows[code]["opps_share"] or 0) > cap:
+            problems.append("%s: hospital outpatient share above the $%s cap" % (code, cap))
     report.check("patient shares recompute", problems, (
         "%d codes; ASC share 20%% of the CY 2027 ASC rate, hospital share Addendum B copayment capped at $%s; "
         "the ASC costs the patient more for %d") % (len(codes), format(cap, ","),

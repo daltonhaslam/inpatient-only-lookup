@@ -325,15 +325,21 @@ def main(argv=None):
     inputs = load_inputs(args.passes, args.adjudications)
     doc = assemble(inputs)
     report = checks.run(doc, inputs, allow_missing=args.allow_missing)
-    tables = exposure.load_tables()
-    derived = exposure.assemble(doc, inputs.removed, tables)
-    exposure_checks.run(report, doc, derived, inputs.removed, tables)
+    try:
+        tables = exposure.load_tables()
+        derived = exposure.assemble(doc, inputs.removed, tables)
+    except (parse.ParseError, OSError) as error:
+        # A changed or missing hospital/ASC file must still leave a report that says so.
+        report.check("hospital and patient-share sources read", [str(error)], "the pinned files exposure.py reads")
+        derived = {}
+    else:
+        exposure_checks.run(report, doc, derived, inputs.removed, tables)
     target = args.out / "crosswalk.json"
     lines = ["Revenue at stake: crosswalk checks", ""] + report.lines + [""]
     if report.failures:
         # Never replace the published crosswalk or its tables with ones that failed a check.
         lines.append("%d check(s) failed. %s and %s were left as they were." % (
-            report.failures, target.name, ", ".join(sorted(derived))))
+            report.failures, target.name, ", ".join(exposure.TABLES)))
     else:
         fetch.write_json(target, doc)
         lines.append("All checks passed. Wrote %s (%d codes)." % (target.name, len(doc["codes"])))

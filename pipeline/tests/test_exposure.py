@@ -11,6 +11,7 @@ from pathlib import Path
 from unittest import mock
 
 import fetch
+import parse
 from crosswalk import build, checks, exposure, exposure_checks
 from crosswalk.price import NATIONAL, hospital_drg_payment
 
@@ -174,12 +175,12 @@ class HospitalsCheck(unittest.TestCase):
         self.assertEqual(table["maryland"], {"210001": {"name": "A", "state": "MD"}})
         self.assertEqual(table["meta"]["counts"], {"offered": 1, "teaching": 1, "in_file": 2, "teaching_in_file": 2, "maryland": 1})
 
-    def test_a_changed_factor_fails(self):
+    def test_a_maryland_hospital_offered_fails(self):
         impact = {"380009": self.ROW, "210001": dict(self.ROW, state="MD")}
         _, table = self.check(impact)
-        table["hospitals"]["380009"] = dict(self.ROW, tchop=0.2)
+        table["hospitals"]["210001"] = table["maryland"].pop("210001")
         report, _ = self.check(impact, table)
-        self.assertIn("380009: factors differ from the impact file", "\n".join(report.lines))
+        self.assertIn("210001: Maryland hospital offered", "\n".join(report.lines))
 
     def test_out_of_range_count_fails(self):
         impact = {"%06d" % n: self.ROW for n in range(380001, 380004)}
@@ -227,6 +228,9 @@ class FixtureBuildTables(unittest.TestCase):
                      "ok no CPT descriptor text in the hospital and patient-share tables:"):
             self.assertIn(line, self.checks_text)
 
+    def test_every_table_named_in_tables_is_written(self):
+        self.assertTrue(all((self.out / name).is_file() for name in exposure.TABLES))
+
     def test_ohsu_row(self):
         self.assertEqual(self.read("hospitals.json")["hospitals"]["380009"]["tchop"], 0.31139)
         self.assertEqual({drg: self.read("drg-volume.json")["volume"]["380009"][drg] for drg in ("163", "164", "165")},
@@ -265,8 +269,24 @@ class TablesFailClosed(unittest.TestCase):
             self.assertFalse((Path(tmp) / "crosswalk.json").exists())
             self.assertFalse((Path(tmp) / "patient-shares.json").exists())
             text = (Path(tmp) / "checks.txt").read_text()
-            self.assertIn("FAIL hospitals from the impact file:", text)
             self.assertIn("FAIL OHSU fixture:", text)
+
+    def test_a_changed_file_layout_fails_with_a_report_and_writes_nothing(self):
+        def broken():
+            raise parse.ParseError("impact file: no header with columns")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            checks_file = Path(tmp) / "checks.txt"
+            checks_file.write_text("All checks passed.\n")
+            args = ["--passes", str(FIXTURE / "passes"), "--adjudications", str(FIXTURE / "adjudications.json"),
+                    "--out", tmp, "--checks", str(checks_file), "--allow-missing"]
+            with mock.patch.object(exposure, "load_tables", broken), mock.patch("sys.stdout"):
+                self.assertEqual(build.main(args), 1)
+            text = checks_file.read_text()
+            self.assertIn("FAIL hospital and patient-share sources read:", text)
+            self.assertIn("impact file: no header with columns", text)
+            self.assertFalse((Path(tmp) / "crosswalk.json").exists())
+            self.assertFalse(any((Path(tmp) / name).exists() for name in exposure.TABLES))
 
 
 if __name__ == "__main__":

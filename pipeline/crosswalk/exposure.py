@@ -20,6 +20,7 @@ from crosswalk import exposure_sources as xs
 from crosswalk import sources
 
 FACTS = fetch.PIPELINE / "facts.json"
+TABLES = ("asc-new-2027.json", "drg-volume.json", "hospitals.json", "patient-shares.json")
 MARYLAND = "21"
 MARYLAND_REASON = "Maryland hospitals are paid under the state's all-payer model, not the IPPS."
 COINSURANCE = 0.2                  # Part B coinsurance: the ASC share, and Addendum B's minimum copayment
@@ -149,7 +150,8 @@ def shares_table(doc, t):
             "asc_share": "20% of the CY 2027 national ASC payment rate (Addendum AA), unrounded",
             "opps_share": ("CY 2027 Addendum B national unadjusted copayment, or where CMS prints none, its minimum "
                            "unadjusted copayment (20% of the national rate), capped at the Part A inpatient deductible"),
-            "units": "dollars; asc_rate, opps_copay and opps_share in cents as CMS prints them, asc_share exact",
+            "units": ("dollars; asc_rate, opps_copay and opps_share to two decimals as CMS prints them, "
+                      "asc_share exact (up to three decimals)"),
             "sources": [source_meta("asc-2027-aa"), source_meta("addenda-2027")],
             "counts": {"codes": len(codes), "compared": len(compared_codes(doc)), "asc_new_2027": len(t.additions)},
         },
