@@ -162,7 +162,7 @@ class Rules(unittest.TestCase):
     def test_every_source_is_an_https_government_address(self):
         for source in fetch.load_sources():
             for key in ("url", "landing"):
-                self.assertRegex(source[key], r"^https://www\.(cms|govinfo)\.gov/", source["id"])
+                self.assertRegex(source[key], r"^https://(www\.(cms|govinfo)|data\.cms)\.gov/", source["id"])
 
     def test_regimes_are_in_date_order(self):
         starts = [regime["removed_from"] for regime in fetch.load_rules()["exemption_regimes"]]

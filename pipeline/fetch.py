@@ -22,7 +22,7 @@ RULES = PIPELINE / "rules.json"
 RAW = ROOT / "data" / "raw"
 # www.cms.gov answers 403 to urllib's default agent.
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
-ALLOWED_HOSTS = {"www.cms.gov", "www.govinfo.gov", "www.ecfr.gov"}
+ALLOWED_HOSTS = {"www.cms.gov", "www.govinfo.gov", "www.ecfr.gov", "data.cms.gov"}
 MAX_BYTES = 60 * 1024 * 1024
 
 
