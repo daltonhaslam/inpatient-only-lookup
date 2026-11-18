@@ -426,7 +426,7 @@ async function main() {
     write('revenue-at-stake/index.html', stake.mainPage(ctx));
     write('revenue-at-stake/help-review/index.html', stake.helpPage(ctx));
     write('revenue-at-stake/methods/index.html', stake.methodsPage(ctx));
-    write('data/revenue-at-stake.csv', stake.csvText(ctx.stake));
+    write('data/revenue-at-stake.csv', stake.csvText(ctx.stake, ctx.shares));
     if (ctx.stake.xlsx) copyFileSync(ctx.stake.xlsxPath, join(out, 'data/revenue-at-stake.xlsx'));
   }
 

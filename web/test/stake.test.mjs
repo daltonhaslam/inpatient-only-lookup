@@ -147,6 +147,34 @@ describe('revenue at stake', { skip }, () => {
     }
   });
 
+  test('CSV: the three patient-share columns come last, in cents, from patient-shares.json; empty without a share', () => {
+    const sharesPath = join(repo, 'pipeline/derived/patient-shares.json');
+    assert.deepEqual(CSV_HEADER.slice(-3), ['opps_patient_share', 'asc_patient_share', 'asc_costs_patient_more']);
+    const at = (name) => CSV_HEADER.indexOf(name);
+    const fake = { codes: { [items.find((i) => i.kind === 'compare').code]: { asc_share: 4674.348, opps_share: 1776, asc_more: true, opps_capped: true } } };
+    const [code] = Object.keys(fake.codes);
+    const row = csvRows(stake, fake).find((r) => r[0] === code);
+    assert.deepEqual([row[at('opps_patient_share')], row[at('asc_patient_share')], row[at('asc_costs_patient_more')]], [1776, 4674.35, 'true']);
+    assert.equal(row.length, CSV_HEADER.length);
+    // No share (no shares file, or a code without one): three empty cells, never 0 or "false".
+    for (const r of [...csvRows(stake, null).slice(1), ...csvRows(stake, fake).slice(1).filter((r) => r[0] !== code)]) {
+      assert.equal(r.length, CSV_HEADER.length, r[0]);
+      assert.deepEqual(r.slice(-3), ['', '', ''], r[0]);
+    }
+    if (!existsSync(sharesPath)) return;
+    const shares = JSON.parse(readFileSync(sharesPath, 'utf8'));
+    let seen = 0;
+    for (const r of csvRows(stake, shares).slice(1)) {
+      const s = shares.codes[r[0]];
+      if (!s || s.asc_share === null || s.opps_share === null) { assert.deepEqual(r.slice(-3), ['', '', ''], r[0]); continue; }
+      seen += 1;
+      assert.equal(r[at('opps_patient_share')], Math.round(s.opps_share * 100) / 100, r[0]);
+      assert.equal(r[at('asc_patient_share')], Math.round(s.asc_share * 100) / 100, r[0]);
+      assert.equal(r[at('asc_costs_patient_more')], s.asc_more ? 'true' : 'false', r[0]);
+    }
+    assert.ok(seen >= 849, `rows with a share: ${seen}`);
+  });
+
   test('every card with an inpatient range also shows a review status', () => {
     for (const code of codes) {
       for (const html of cards(block(code))) {

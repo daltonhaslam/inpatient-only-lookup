@@ -44,6 +44,22 @@ function stripAdditions(code, html, compared) {
   return { html: html.replace(SHARE, '').replace(LINK, ''), added: [...shares, ...links.map((m) => m[0])].join('') };
 }
 
+// The deliberate addition to the national CSV (Task 6): three patient-share columns at the end of every
+// row (two amounts and true/false, or three empty cells; never a comma or quote inside them). Split off
+// so the pinned CSV hash stays the base build's (every existing column and value byte-identical); the
+// added columns are pinned under their own key below.
+const SHARE_COLS = /,([^,\n]*),([^,\n]*),([^,\n]*)$/gm;
+
+/** The national CSV without the three patient-share columns, and those columns; throws unless every row has exactly them. */
+function splitShareColumns(text) {
+  const lines = text.split('\n').filter(Boolean);
+  if (!lines[0].endsWith(',opps_patient_share,asc_patient_share,asc_costs_patient_more')) throw new Error('CSV header does not end with the three patient-share columns');
+  for (const line of lines.slice(1)) {
+    if (!/,(?:\d+(?:\.\d{1,2})?,\d+(?:\.\d{1,2})?,(?:true|false)|,,)$/.test(line)) throw new Error(`CSV row has unexpected share columns: ${line.slice(0, 40)}…`);
+  }
+  return { base: text.replace(SHARE_COLS, ''), added: [...text.matchAll(SHARE_COLS)].map((m) => m[0]).join('\n') };
+}
+
 function build() {
   const dir = mkdtempSync(join(tmpdir(), 'iol-national-'));
   const env = { ...process.env, OUT_DIR: dir, BUILD_DATE: '2026-11-11' };
@@ -68,6 +84,7 @@ function manifest(dir) {
   }
   // The browser's cards: stake-client.mjs draws card(item, model.meta, {detail: false}) for each item.
   const cards = prepare(doc).items.map((item) => card(item, doc.meta, { detail: false })).join('\n');
+  const csvFile = splitShareColumns(readFileSync(join(dir, 'data/revenue-at-stake.csv'), 'utf8'));
   return {
     'revenue-at-stake/index.html': page('revenue-at-stake/index.html'),
     'revenue-at-stake/help-review/index.html': page('revenue-at-stake/help-review/index.html'),
@@ -76,7 +93,8 @@ function manifest(dir) {
     [`code/*/index.html (${codes.length} pages)`]: codePages.digest('hex'),
     [`code pages: share line and hospital link (${compared.size} compared codes)`]: additions.digest('hex'),
     [`data/${stakeFile}`]: sha(readFileSync(join(dir, 'data', stakeFile))),
-    'data/revenue-at-stake.csv': sha(readFileSync(join(dir, 'data/revenue-at-stake.csv'))),
+    'data/revenue-at-stake.csv': sha(csvFile.base),
+    'data/revenue-at-stake.csv: patient-share columns (opps, asc, asc more)': sha(csvFile.added),
     'data/revenue-at-stake.xlsx': sha(readFileSync(join(dir, 'data/revenue-at-stake.xlsx'))),
     'browser cards, national (stake-card.mjs card, detail off)': sha(cards),
   };

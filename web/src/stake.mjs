@@ -376,28 +376,44 @@ ${share ? `<p class="stake-block__share"><strong>Patient’s share, national:</s
 export const CSV_HEADER = ['code', 'label', 'body_system', 'removed', 'outpatient_status_indicator', 'apc', 'apc_title',
   'outpatient_rate', 'asc_rate', 'comparison', 'family_order', 'principal_dx', 'principal_dx_condition', 'coded_as', 'mdc', 'drg_family',
   'drgs', 'inpatient_low', 'inpatient_high', 'outpatient_minus_inpatient_low', 'outpatient_minus_inpatient_high', 'tier',
-  'review_status', 'mapping_fingerprint'];
+  'review_status', 'mapping_fingerprint', 'opps_patient_share', 'asc_patient_share', 'asc_costs_patient_more'];
 
 const round2 = (n) => Math.round(n * 100) / 100;
 const blank = (n) => (n === null || n === undefined ? '' : n);
 
-/** One row per code and inpatient family (a code with no comparison is one row). Plain values, no formulas. */
-export function csvRows(stake) {
+/**
+ * The national patient's share for a code (patient-shares.json, through packShare): hospital outpatient
+ * and ASC in cents, and whether the ASC costs the patient more ('true'/'false', the pipeline's unrounded
+ * flag); three empty cells when there is no share (no comparison, packaged in the ASC, or no shares file).
+ */
+function shareCells(shares, code) {
+  const packed = shares ? packShare(shares.codes[code]) : null;
+  if (!packed) return ['', '', ''];
+  const [asc, opps, ascMore] = packed;
+  return [round2(opps), round2(asc), ascMore ? 'true' : 'false'];
+}
+
+/**
+ * One row per code and inpatient family (a code with no comparison is one row). Plain values, no formulas.
+ * shares: patient-shares.json (or null), for the last three columns.
+ */
+export function csvRows(stake, shares = null) {
   const rows = [CSV_HEADER];
   for (const item of stake.items) {
     const base = [item.code, item.label, stake.groupName[item.group] || item.group, item.removed, item.op.si || '', item.op.apc || '',
       item.op.apcTitle || '', blank(item.op.rate), blank(item.op.asc)];
+    const share = shareCells(shares, item.code);
     if (item.kind !== 'compare') {
-      rows.push([...base, noCompareText(item), ...CSV_HEADER.slice(base.length + 1).map(() => '')]);
+      rows.push([...base, noCompareText(item), ...CSV_HEADER.slice(base.length + 1, -share.length).map(() => ''), ...share]);
       continue;
     }
     item.ip.families.forEach((f, i) => {
       const diff = item.op.rate === null ? ['', ''] : [round2(item.op.rate - f.high), round2(item.op.rate - f.low)];
       rows.push([...base, 'compared', i === 0 ? 'primary' : alternativeLabel(f), f.dx ? dxCode(f.dx.code) : '',
         f.condition, f.when && f.when.variant ? f.when.variant : '', f.mdc || '', f.name, f.drgs.map((d) => d.drg).join(' '), f.low, f.high, ...diff,
-        item.tier ? item.tier.n : '', item.review.status, item.map.fp]);
+        item.tier ? item.tier.n : '', item.review.status, item.map.fp, ...share]);
     });
   }
   return rows;
 }
-export const csvText = (stake) => toCsv(csvRows(stake));
+export const csvText = (stake, shares = null) => toCsv(csvRows(stake, shares));
