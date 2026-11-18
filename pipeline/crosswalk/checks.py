@@ -425,15 +425,15 @@ def _all_descriptors():
     return found
 
 
-def _strings(value, where):
+def strings(value, where):
     if isinstance(value, str):
         yield where, value
     elif isinstance(value, dict):
         for key, item in value.items():
-            yield from _strings(item, "%s.%s" % (where, key))
+            yield from strings(item, "%s.%s" % (where, key))
     elif isinstance(value, list):
         for number, item in enumerate(value):
-            yield from _strings(item, "%s[%d]" % (where, number))
+            yield from strings(item, "%s[%d]" % (where, number))
 
 
 def free_text(passes_dir, adjudications_path):
@@ -443,20 +443,27 @@ def free_text(passes_dir, adjudications_path):
     if adjudications_path.is_file():
         paths.append(adjudications_path)
     for path in paths:
-        yield from _strings(fetch.read_json(path), path.name if path.parent == passes_dir else "%s/%s" % (path.parent.name, path.name))
+        yield from strings(fetch.read_json(path), path.name if path.parent == passes_dir else "%s/%s" % (path.parent.name, path.name))
     notes = passes_dir.parent / "notes"
     for path in sorted(notes.glob("*.md")) if notes.is_dir() else []:
         for number, line in enumerate(path.read_text().splitlines(), 1):
             yield "notes/%s:%d" % (path.name, number), line
 
 
-def _descriptors(report, doc, inputs):
+def no_descriptor_text(report, name, texts, codes, what):
+    """Check that no (where, text) in texts copies the CMS descriptor of any of codes (equal, or
+    RUN consecutive words); what names the texts in the report line."""
     known = _all_descriptors()
-    grams = descriptor_grams(text for code in doc["codes"] for text in known.get(code, ()))
-    texts = list(_strings(doc, "crosswalk.json")) + list(free_text(inputs.passes_dir, inputs.adjudications_path))
+    codes = set(codes)
+    grams = descriptor_grams(text for code in codes for text in known.get(code, ()))
     hits = [where for where, text in texts if copies_descriptor(text, grams)]
-    report.check("no CPT descriptor text", hits, "%d strings in crosswalk.json and the mapping files, against the CMS "
-                 "descriptors of %d codes (equal, or %d consecutive words)" % (len(texts), len(doc["codes"]), RUN))
+    report.check(name, hits, "%d strings in %s, against the CMS descriptors of %d codes (equal, or %d consecutive words)"
+                 % (len(texts), what, len(codes), RUN))
+
+
+def _descriptors(report, doc, inputs):
+    texts = list(strings(doc, "crosswalk.json")) + list(free_text(inputs.passes_dir, inputs.adjudications_path))
+    no_descriptor_text(report, "no CPT descriptor text", texts, doc["codes"], "crosswalk.json and the mapping files")
 
 
 # ---------------------------------------------------------------- TEAM

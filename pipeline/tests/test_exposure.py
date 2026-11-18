@@ -19,7 +19,8 @@ RAW_PRESENT = fetch.RAW.is_dir() and any(fetch.RAW.iterdir())
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "crosswalk"
 FACTS = {"deductibles": {"year": 2027, "part_a_inpatient": 1776, "part_b": 292, "source": "s", "url": "u"},
          "opps_labor_share": {"value": 0.6, "cite": "c"},
-         "asc_additions_2027": {"count": 2, "also_added": ["64629"], "cite": "c"}}
+         "asc_additions_2027": {"count": 2, "also_added": ["64629"], "cite": "c"},
+         "expected": {"hospitals_offered": [1, 2], "teaching_in_file": 2}}
 RATES = {"operating": 6848.00, "capital": 539.95, "labor_share": 0.66, "operating_wi_le1": 6848.00, "labor_share_le1": 0.62}
 
 
@@ -163,8 +164,7 @@ class HospitalsCheck(unittest.TestCase):
         with mock.patch.object(exposure, "source_meta", return_value={}):
             table = table or exposure.hospitals_table(t)
         report = checks.Report()
-        with mock.patch.object(exposure_checks, "HOSPITALS", (1, 2)), mock.patch.object(exposure_checks, "TEACHING_IN_FILE", 2):
-            exposure_checks._hospitals(report, table, t)
+        exposure_checks._hospitals(report, table, t)
         return report, table
 
     def test_maryland_is_named_but_not_offered(self):
@@ -232,17 +232,17 @@ class FixtureBuildTables(unittest.TestCase):
         self.assertTrue(all((self.out / name).is_file() for name in exposure.TABLES))
 
     def test_ohsu_row(self):
-        self.assertEqual(self.read("hospitals.json")["hospitals"]["380009"]["tchop"], 0.31139)
-        self.assertEqual({drg: self.read("drg-volume.json")["volume"]["380009"][drg] for drg in ("163", "164", "165")},
+        self.assertEqual(self.read(exposure.HOSPITALS)["hospitals"]["380009"]["tchop"], 0.31139)
+        self.assertEqual({drg: self.read(exposure.VOLUME)["volume"]["380009"][drg] for drg in ("163", "164", "165")},
                          {"163": 15, "164": 34, "165": 11})
 
     def test_32480_shares(self):
-        share = self.read("patient-shares.json")["codes"]["32480"]
+        share = self.read(exposure.SHARES)["codes"]["32480"]
         self.assertEqual((round(share["asc_share"]), round(share["opps_share"])), (317, 717))
-        self.assertEqual(self.read("patient-shares.json")["meta"]["deductibles"]["part_b"], 292)
+        self.assertEqual(self.read(exposure.SHARES)["meta"]["deductibles"]["part_b"], 292)
 
     def test_asc_additions(self):
-        table = self.read("asc-new-2027.json")
+        table = self.read(exposure.ASC_NEW)
         self.assertEqual((table["meta"]["count"], table["meta"]["ipo_removed_2027"], table["meta"]["also_added"]),
                          (619, 618, ["64629"]))
 
@@ -254,12 +254,12 @@ class TablesFailClosed(unittest.TestCase):
 
         def corrupted(*args, **kwargs):
             tables = assemble(*args, **kwargs)
-            ohsu = tables["hospitals.json"]["hospitals"]["380009"]
-            tables["hospitals.json"]["hospitals"]["380009"] = dict(ohsu, tchop=ohsu["tchop"] + 0.001)
+            ohsu = tables[exposure.HOSPITALS]["hospitals"]["380009"]
+            tables[exposure.HOSPITALS]["hospitals"]["380009"] = dict(ohsu, tchop=ohsu["tchop"] + 0.001)
             return tables
 
         with tempfile.TemporaryDirectory() as tmp:
-            previous = Path(tmp) / "hospitals.json"
+            previous = Path(tmp) / exposure.HOSPITALS
             previous.write_text('{"previous": true}\n')
             args = ["--passes", str(FIXTURE / "passes"), "--adjudications", str(FIXTURE / "adjudications.json"),
                     "--out", tmp, "--checks", str(Path(tmp) / "checks.txt"), "--allow-missing"]
@@ -267,7 +267,7 @@ class TablesFailClosed(unittest.TestCase):
                 self.assertEqual(build.main(args), 1)
             self.assertEqual(previous.read_text(), '{"previous": true}\n')
             self.assertFalse((Path(tmp) / "crosswalk.json").exists())
-            self.assertFalse((Path(tmp) / "patient-shares.json").exists())
+            self.assertFalse((Path(tmp) / exposure.SHARES).exists())
             text = (Path(tmp) / "checks.txt").read_text()
             self.assertIn("FAIL OHSU fixture:", text)
 

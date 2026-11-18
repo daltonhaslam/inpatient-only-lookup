@@ -13,10 +13,9 @@ import csv
 import io
 import re
 
-import fetch
 import history
 import parse
-from crosswalk.sources import _at_least, _money, _path, _table, cached
+from crosswalk.sources import addendum_rows, at_least, cached, money, read_table, source_path
 
 SOURCE_OF = {
     "load_impact": "ipps-2027-impact",          # FY 2027 impact file, correction-notice txt
@@ -50,9 +49,11 @@ PROVIDER_TYPES = {0: "IPPS", 7: "Rural referral center", 8: "Indian Health Servi
                   17: "Sole community hospital and rural referral center", 21: "Essential access community hospital",
                   22: "Essential access community hospital and rural referral center"}
 CCN_RE = re.compile(r"^\d{6}$")
-# Each hospital factor: (key in the table, impact-file column).
-IMPACT_FACTORS = (("wi", "FY 2027 Wage Index"), ("gaf", "GAF"), ("tchop", "TCHOP"), ("tchcp", "TCHCP"),
-                  ("dshopp", "DSHOPP"), ("dshcpp", "DSHCPP"), ("caseta44", "CASETA44"), ("ime_caseta44", "IME_CASETA44"))
+# Each hospital factor: (key in the table, impact-file column). PAYMENT_FACTORS are the ones the
+# per-case payment uses (price.hospital_drg_payment); the case counts give the MA ratio.
+PAYMENT_FACTORS = (("wi", "FY 2027 Wage Index"), ("gaf", "GAF"), ("tchop", "TCHOP"), ("tchcp", "TCHCP"),
+                   ("dshopp", "DSHOPP"), ("dshcpp", "DSHCPP"))
+IMPACT_FACTORS = PAYMENT_FACTORS + (("caseta44", "CASETA44"), ("ime_caseta44", "IME_CASETA44"))
 MUP_COLUMNS = ("Rndrng_Prvdr_CCN", "Rndrng_Prvdr_State_Abrvtn", "DRG_Cd", "Tot_Dschrgs")
 MUP_SUPPRESSED_BELOW = 11
 
@@ -84,7 +85,7 @@ def load_impact():
     columns = {"ccn": r"^Provider Number$", "name": r"^Name$", "type": r"^Provider Type$"}
     columns.update({key: "^%s$" % re.escape(label) for key, label in IMPACT_FACTORS})
     hospitals = {}
-    for row in _table(SOURCE_OF["load_impact"], IMPACT_MEMBER, columns, prefer_spreadsheet=False):
+    for row in read_table(SOURCE_OF["load_impact"], IMPACT_MEMBER, columns, prefer_spreadsheet=False):
         ccn = row["ccn"]
         if not ccn and not any(row.values()):
             continue
@@ -103,7 +104,7 @@ def load_impact():
             raise parse.ParseError("impact file: %s has an unknown Provider Type %s" % (ccn, row["type"]))
         value["type"] = kind
         hospitals[ccn] = value
-    return _at_least(hospitals, 3000, "FY 2027 impact file")
+    return at_least(hospitals, 3000, "FY 2027 impact file")
 
 
 # ---------------------------------------------------------------- discharges (2024)
@@ -111,15 +112,13 @@ def load_impact():
 @cached
 def _mup_rows():
     """The four columns read from the 2024 by-provider-and-service CSV, one tuple per row."""
-    path = _path(SOURCE_OF["load_drg_volume"])
-    if path.stat().st_size > fetch.MAX_BYTES:
-        raise parse.ParseError("%s is larger than %d bytes" % (path.name, fetch.MAX_BYTES))
-    reader = csv.DictReader(io.StringIO(parse._decode(path.read_bytes()), newline=""))
+    path = source_path(SOURCE_OF["load_drg_volume"])
+    reader = csv.DictReader(io.StringIO(parse.decode(path.read_bytes()), newline=""))
     missing = [name for name in MUP_COLUMNS if name not in (reader.fieldnames or ())]
     if missing:
         raise parse.ParseError("%s: no column %s" % (path.name, ", ".join(missing)))
     rows = [tuple((row[name] or "").strip() for name in MUP_COLUMNS) for row in reader]
-    return _at_least(rows, 100000, path.name)
+    return at_least(rows, 100000, path.name)
 
 
 @cached
@@ -159,15 +158,9 @@ def load_copays():
     prints "." or nothing."""
     columns = {"code": r"^HCPCS Code$", "national": r"^National Unadjusted Copayment$",
                "minimum": r"^Minimum Unadjusted Copayment$"}
-    copays = {}
-    for row in _table(SOURCE_OF["load_copays"], history.ADDENDUM_B, columns):
-        code = parse.normalize_code(row["code"])
-        if not parse.CODE_RE.match(code):
-            continue
-        value = {"national": _money(row["national"]), "minimum": _money(row["minimum"])}
-        if copays.setdefault(code, value) != value:
-            raise parse.ParseError("Addendum B: %s listed twice with different copayments" % code)
-    return _at_least(copays, 10000, "Addendum B copayments")
+    return addendum_rows(SOURCE_OF["load_copays"], history.ADDENDUM_B, columns,
+                         lambda row: {"national": money(row["national"]), "minimum": money(row["minimum"])},
+                         10000, "Addendum B copayments")
 
 
 def copay(row):
@@ -180,15 +173,8 @@ def copay(row):
 
 def _asc_aa(source_id):
     columns = {"code": r"^HCPCS Code$", "ci": r"Comment Indicator$", "pi": r"Payment Indicator$"}
-    rows = {}
-    for row in _table(source_id, ASC_AA_MEMBER, columns):
-        code = parse.normalize_code(row["code"])
-        if not parse.CODE_RE.match(code):
-            continue
-        value = {"ci": row["ci"].upper(), "pi": row["pi"].upper()}
-        if rows.setdefault(code, value) != value:
-            raise parse.ParseError("%s Addendum AA: %s listed twice" % (source_id, code))
-    return _at_least(rows, 4000, source_id + " Addendum AA")
+    return addendum_rows(source_id, ASC_AA_MEMBER, columns,
+                         lambda row: {"ci": row["ci"].upper(), "pi": row["pi"].upper()}, 4000, "Addendum AA")
 
 
 @cached
@@ -209,12 +195,5 @@ def load_asc_2027():
 def load_asc_additions():
     """{HCPCS: payment indicator} CMS's Final Additions to the List of ASC Covered Procedures
     for CY 2027 (the 618 IPO removals and CPT 64629, 91 FR 70665)."""
-    additions = {}
-    for row in _table(SOURCE_OF["load_asc_additions"], ADDITIONS_MEMBER, {"code": r"^HCPCS Code$", "pi": r"^PI$"}):
-        code = parse.normalize_code(row["code"])
-        if not parse.CODE_RE.match(code):
-            continue
-        if code in additions:
-            raise parse.ParseError("ASC additions: %s listed twice" % code)
-        additions[code] = row["pi"].upper()
-    return _at_least(additions, 100, "ASC additions")
+    return addendum_rows(SOURCE_OF["load_asc_additions"], ADDITIONS_MEMBER, {"code": r"^HCPCS Code$", "pi": r"^PI$"},
+                         lambda row: row["pi"].upper(), 100, "ASC additions")

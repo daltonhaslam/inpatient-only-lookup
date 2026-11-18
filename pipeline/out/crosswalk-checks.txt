@@ -57,7 +57,7 @@ info TEAM pairing: 66 combinations overlap TEAM's tables, 33 differ (conditional
     - 27138: 0SPS0JZ+0SRS01A x T84030A -> 463-464-465; TEAM lists 521,522
 ok hospitals from the impact file: 3032 offered (3075 in the file less 43 in Maryland); 1311 teaching (1327 in the file with TCHOP > 0)
 ok hospital states: from the CCN; agree with the 2024 discharge file for the 2824 hospitals in both
-ok OHSU fixture: DRG 165 $22,116.60 (IME + DSH $6,067.07, operating IME $4,632.08); DRG 163 $51,459.44 ($14,116.45); APC 5183 $3,995.14; 10 cases of DRG 165 $60,670.69 a year; 2024 counts 15/34/11
+ok OHSU fixture: DRG 165 $22,116.60 (IME + DSH $6,067.07, operating IME $4,632.08); DRG 163 $51,459.44 (IME + DSH $14,116.45); APC 5183 $3,995.14; 10 cases of DRG 165 $60,670.69 a year; 2024 counts 15/34/11
 ok national mode reproduces every DRG amount: 2845 DRG rows: wage index 1, GAF 1, no IME or DSH
 ok 2024 DRG volume: 2663 hospitals, 45070 hospital-DRG counts over 282 crosswalk DRGs; dropped: 43 Maryland (all-payer model), 22 not in the FY 2027 impact file
 ok CY 2027 ASC additions reconcile to the rule: 619 codes: 618 removed from the IPO list for 2027 (91 FR 70665 states 618) + 64629; none on the CY 2026 AA, none new to HCPCS
@@ -67,7 +67,7 @@ ok patient shares recompute: 874 codes; ASC share 20% of the CY 2027 ASC rate, h
 info compared codes without an ASC rate: 0 of 849
 info hospital outpatient shares capped: 120 codes' copayment is above $1,776
 info Addendum B copayment vs 20% of the rate: of the 874 codes: 0 use the national unadjusted copayment (the rest CMS's minimum); 574 differ by one cent (e.g. 0219T, 0220T, 15756, 15757, 15758, 20661, 20664, 20816); 0 by more (none)
-ok no CPT descriptor text in the hospital and patient-share tables: 7164 strings against the descriptors of 874 codes
+ok no CPT descriptor text in the hospital and patient-share tables: 7164 strings in the hospital and patient-share tables, against the CMS descriptors of 874 codes (equal, or 5 consecutive words)
 
 All checks passed. Wrote crosswalk.json (922 codes).
 Wrote asc-new-2027.json, drg-volume.json, hospitals.json, patient-shares.json.

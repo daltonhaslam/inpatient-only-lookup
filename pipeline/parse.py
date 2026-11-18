@@ -84,7 +84,7 @@ def _xlsx_sheets(archive):
         yield sheet.get("name"), rows
 
 
-def _decode(data):
+def decode(data):
     """CMS's text copies are UTF-8 or Windows-1252; Latin-1 decodes anything left."""
     for encoding in ("utf-8-sig", "cp1252"):
         try:
@@ -101,7 +101,7 @@ def read_member(zip_path, member):
         if lower.endswith((".xlsx", ".xlsm")):
             with zipfile.ZipFile(io.BytesIO(_read(archive, member))) as book:
                 return list(_xlsx_sheets(book))
-        text = _decode(_read(archive, member))
+        text = decode(_read(archive, member))
         delimiter = "\t" if lower.endswith(".txt") else ","
         return [("", list(csv.reader(io.StringIO(text, newline=""), delimiter=delimiter)))]
 

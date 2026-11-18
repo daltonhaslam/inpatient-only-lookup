@@ -21,5 +21,20 @@
   "also_added": ["64629"],
   "cite": "91 FR 70665",
   "citations": ["ASC27-618", "ASC27-64629"]
+ },
+ "expected": {
+  "note": "What the fail-closed checks (crosswalk/exposure_checks.py) hold the hospital tables to: the spec's counts (checked 2026-11-18 against the FY 2027 impact file) and the plan's correctness anchors for OHSU. Revisit when a source is repinned.",
+  "hospitals_offered": [3000, 3200],
+  "teaching_in_file": 1327,
+  "ohsu": {
+   "ccn": "380009",
+   "drgs": {
+    "165": {"total": 22116.60, "addons": 6067.07, "ime_operating": 4632.08},
+    "163": {"total": 51459.44, "addons": 14116.45}
+   },
+   "apc": {"apc": "5183", "rate": 3584.95, "at_hospital": 3995.14},
+   "per_year": {"drg": "165", "count": 10, "addons": 60670.69},
+   "volume_2024": {"163": 15, "164": 34, "165": 11}
+  }
  }
 }

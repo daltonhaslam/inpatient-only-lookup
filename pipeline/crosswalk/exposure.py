@@ -11,6 +11,7 @@
 assemble() builds them from crosswalk.json and the pinned files; exposure_checks checks them;
 build.py writes them only when every check passes. Codes only: no CPT descriptor text.
 """
+import functools
 import types
 
 import fetch
@@ -20,7 +21,10 @@ from crosswalk import exposure_sources as xs
 from crosswalk import sources
 
 FACTS = fetch.PIPELINE / "facts.json"
-TABLES = ("asc-new-2027.json", "drg-volume.json", "hospitals.json", "patient-shares.json")
+# The derived tables, by file name.
+HOSPITALS, VOLUME = "hospitals.json", "drg-volume.json"
+ASC_NEW, SHARES = "asc-new-2027.json", "patient-shares.json"
+TABLES = tuple(sorted((HOSPITALS, VOLUME, ASC_NEW, SHARES)))
 MARYLAND = "21"
 MARYLAND_REASON = "Maryland hospitals are paid under the state's all-payer model, not the IPPS."
 COINSURANCE = 0.2                  # Part B coinsurance: the ASC share, and Addendum B's minimum copayment
@@ -44,7 +48,9 @@ def load_tables():
         table5=sources.load_table5(), facts=fetch.read_json(FACTS))
 
 
+@functools.lru_cache(maxsize=None)
 def source_meta(source_id):
+    """{"id", "label", "landing", "file"} for a pinned source (cached: treat as read-only)."""
     source = next(s for s in fetch.load_sources() if s["id"] == source_id)
     label, member = SOURCE_LABELS[source_id]
     path = fetch.raw_path(source)
@@ -162,9 +168,5 @@ def shares_table(doc, t):
 def assemble(doc, removed, t):
     """{file name: document} for the four derived tables."""
     hospitals = hospitals_table(t)
-    return {
-        "hospitals.json": hospitals,
-        "drg-volume.json": volume_table(doc, t, hospitals["hospitals"]),
-        "asc-new-2027.json": asc_new_table(removed, t),
-        "patient-shares.json": shares_table(doc, t),
-    }
+    return {HOSPITALS: hospitals, VOLUME: volume_table(doc, t, hospitals["hospitals"]),
+            ASC_NEW: asc_new_table(removed, t), SHARES: shares_table(doc, t)}

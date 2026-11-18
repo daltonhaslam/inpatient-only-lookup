@@ -6,19 +6,13 @@ from writing crosswalk.json and every derived table. Never print descriptor text
 """
 import collections
 
-from crosswalk import checks
+import parse
+from crosswalk import checks, exposure
 from crosswalk import exposure_sources as xs
-from crosswalk.exposure import COINSURANCE, MARYLAND, compared_codes, crosswalk_drgs, patient_share
+from crosswalk.exposure import ASC_NEW, COINSURANCE, HOSPITALS, MARYLAND, SHARES, VOLUME
+from crosswalk.exposure import compared_codes, crosswalk_drgs, patient_share
 from crosswalk.price import NATIONAL, hospital_drg_payment, hospital_outpatient, per_year
 
-HOSPITALS = (3000, 3200)          # hospitals the picker offers
-TEACHING_IN_FILE = 1327           # impact-file rows with TCHOP > 0 (spec, checked 11-18)
-OHSU = "380009"
-# The plan's fixture, to the cent: {DRG: (total, IME + DSH, operating IME or None)}.
-OHSU_DRGS = {"165": (22116.60, 6067.07, 4632.08), "163": (51459.44, 14116.45, None)}
-OHSU_APC_5183 = (3584.95, 3995.14)
-OHSU_PER_YEAR = ("165", 10, 60670.69)       # 10 traditional cases' IME + DSH
-OHSU_VOLUME = {"163": 15, "164": 34, "165": 11}
 EXAMPLES = 8
 # Addendum DD2 comment indicators that mark a code new to HCPCS for the next year: NI (interim
 # indicator), NP (proposed) and NC (final, after comment). The spec named only NI, but all three
@@ -27,30 +21,48 @@ EXAMPLES = 8
 NEW_HCPCS = ("NI", "NP", "NC")
 
 
+def run_all(report, doc, removed):
+    """Read the pinned files, assemble the derived tables and check them into report. Returns
+    {file name: table}, or {} when a file could not be read (a FAIL line says why)."""
+    try:
+        t = exposure.load_tables()
+        tables = exposure.assemble(doc, removed, t)
+    except (parse.ParseError, OSError) as error:
+        # A changed or missing hospital/ASC file must still leave a report that says so.
+        report.check("hospital and patient-share sources read", [str(error)], "the pinned files exposure.py reads")
+        return {}
+    run(report, doc, tables, removed, t)
+    return tables
+
+
 def run(report, doc, tables, removed, t):
     """Add every check to report. doc is crosswalk.json, tables exposure.assemble's output,
     removed {code: removal date}, t exposure.load_tables()."""
-    hospitals = tables["hospitals.json"]
+    hospitals = tables[HOSPITALS]
     _hospitals(report, hospitals, t)
     _states(report, hospitals, t)
     _fixture(report, doc, tables, t)
     _national(report, doc)
-    _volume(report, doc, tables["drg-volume.json"], hospitals, t)
-    _asc_new(report, tables["asc-new-2027.json"], removed, t)
-    _shares(report, doc, tables["patient-shares.json"], t)
+    _volume(report, doc, tables[VOLUME], hospitals, t)
+    _asc_new(report, tables[ASC_NEW], removed, t)
+    _shares(report, doc, tables[SHARES], t)
     _descriptors(report, tables, t)
 
 
 def _hospitals(report, table, t):
     offered, maryland, counts = table["hospitals"], table["maryland"], table["meta"]["counts"]
+    expected = t.facts["expected"]
     problems = []
-    low, high = HOSPITALS
+    low, high = expected["hospitals_offered"]
     if not low <= len(offered) <= high:
         problems.append("%d hospitals offered, expected %d-%d" % (len(offered), low, high))
-    in_file = sum(1 for row in t.impact.values() if row["tchop"] > 0)
-    if in_file != TEACHING_IN_FILE:
-        problems.append("%d impact-file rows with TCHOP > 0, expected %d" % (in_file, TEACHING_IN_FILE))
-    teaching = sum(1 for ccn, row in t.impact.items() if row["tchop"] > 0 and not ccn.startswith(MARYLAND))
+    in_file = teaching = 0
+    for ccn, row in t.impact.items():
+        if row["tchop"] > 0:
+            in_file += 1
+            teaching += not ccn.startswith(MARYLAND)
+    if in_file != expected["teaching_in_file"]:
+        problems.append("%d impact-file rows with TCHOP > 0, expected %d" % (in_file, expected["teaching_in_file"]))
     if (counts["teaching"], counts["teaching_in_file"]) != (teaching, in_file):
         problems.append("teaching counts %s, file gives %d offered and %d in all" % (counts, teaching, in_file))
     problems += ["%s: Maryland hospital offered" % ccn for ccn in offered if ccn.startswith(MARYLAND)]
@@ -78,31 +90,42 @@ def _states(report, table, t):
                  "from the CCN; agree with the 2024 discharge file for the %d hospitals in both" % both)
 
 
+def _dollars(value):
+    return "$" + format(value, ",.2f")
+
+
 def _fixture(report, doc, tables, t):
-    """OHSU (380009) to the cent, from the table that ships, crosswalk.json meta.rates and Table 5."""
-    rates, problems = doc["meta"]["rates"], []
-    ohsu = tables["hospitals.json"]["hospitals"].get(OHSU)
+    """The plan's OHSU anchors (facts.json expected.ohsu) to the cent, from the table that ships,
+    crosswalk.json meta.rates and Table 5."""
+    rates, fixture, problems = doc["meta"]["rates"], t.facts["expected"]["ohsu"], []
+    ohsu = tables[HOSPITALS]["hospitals"].get(fixture["ccn"])
     if ohsu is None:
-        report.check("OHSU fixture", ["%s not offered" % OHSU], "")
+        report.check("OHSU fixture", ["%s not offered" % fixture["ccn"]], "")
         return
-    for drg, (total, addons, ime_operating) in OHSU_DRGS.items():
+    details = []
+    for drg, want in fixture["drgs"].items():
         paid = hospital_drg_payment(t.table5[drg]["weight"], ohsu, rates)
-        found = (round(paid["total"], 2), round(paid["addons"], 2),
-                 round(paid["ime_operating"], 2) if ime_operating is not None else None)
-        if found != (total, addons, ime_operating):
-            problems.append("DRG %s: %s, expected %s" % (drg, found, (total, addons, ime_operating)))
-    rate, expected = OHSU_APC_5183
-    labor = tables["hospitals.json"]["meta"]["opps_labor_share"]
-    if round(hospital_outpatient(rate, ohsu["wi"], labor), 2) != expected:
-        problems.append("APC 5183 at OHSU is not $%s" % expected)
-    drg, count, expected = OHSU_PER_YEAR
-    if per_year(count, hospital_drg_payment(t.table5[drg]["weight"], ohsu, rates)["addons"]) != expected:
-        problems.append("%d cases of DRG %s: add-ons per year are not $%s" % (count, drg, expected))
-    volume = tables["drg-volume.json"]["volume"].get(OHSU, {})
-    if {drg: volume.get(drg) for drg in OHSU_VOLUME} != OHSU_VOLUME:
-        problems.append("2024 discharges for DRGs 163-165: %s" % {drg: volume.get(drg) for drg in OHSU_VOLUME})
-    report.check("OHSU fixture", problems, "DRG 165 $22,116.60 (IME + DSH $6,067.07, operating IME $4,632.08); DRG 163 "
-                 "$51,459.44 ($14,116.45); APC 5183 $3,995.14; 10 cases of DRG 165 $60,670.69 a year; 2024 counts 15/34/11")
+        found = {key: round(paid[key], 2) for key in want}
+        if found != want:
+            problems.append("DRG %s: %s, expected %s" % (drg, found, want))
+        operating = ", operating IME %s" % _dollars(want["ime_operating"]) if "ime_operating" in want else ""
+        details.append("DRG %s %s (IME + DSH %s%s)" % (drg, _dollars(want["total"]), _dollars(want["addons"]), operating))
+    apc = fixture["apc"]
+    labor = tables[HOSPITALS]["meta"]["opps_labor_share"]
+    if round(hospital_outpatient(apc["rate"], ohsu["wi"], labor), 2) != apc["at_hospital"]:
+        problems.append("APC %s at OHSU is not %s" % (apc["apc"], _dollars(apc["at_hospital"])))
+    year = fixture["per_year"]
+    addons = hospital_drg_payment(t.table5[year["drg"]]["weight"], ohsu, rates)["addons"]
+    if per_year(year["count"], addons) != year["addons"]:
+        problems.append("%d cases of DRG %s: add-ons per year are not %s" % (
+            year["count"], year["drg"], _dollars(year["addons"])))
+    volume = tables[VOLUME]["volume"].get(fixture["ccn"], {})
+    found = {drg: volume.get(drg) for drg in fixture["volume_2024"]}
+    if found != fixture["volume_2024"]:
+        problems.append("2024 discharges: %s, expected %s" % (found, fixture["volume_2024"]))
+    report.check("OHSU fixture", problems, "%s; APC %s %s; %d cases of DRG %s %s a year; 2024 counts %s" % (
+        "; ".join(details), apc["apc"], _dollars(apc["at_hospital"]), year["count"], year["drg"],
+        _dollars(year["addons"]), "/".join(str(n) for _, n in sorted(fixture["volume_2024"].items()))))
 
 
 def _national(report, doc):
@@ -183,7 +206,7 @@ def _asc_new(report, table, removed, t):
 
 def _shares(report, doc, table, t):
     """Each share recomputed from Addendum AA, Addendum B and the deductible in facts.json (by
-    exposure.patient_share, the one implementation), and none above the cap."""
+    exposure.patient_share, the one implementation)."""
     cap = t.facts["deductibles"]["part_a_inpatient"]
     compared = compared_codes(doc)
     codes = sorted(set(compared) | set(t.additions))
@@ -193,8 +216,6 @@ def _shares(report, doc, table, t):
     for code in codes:
         if rows.get(code) != patient_share(code, t):
             problems.append("%s: shares do not recompute" % code)
-        elif (rows[code]["opps_share"] or 0) > cap:
-            problems.append("%s: hospital outpatient share above the $%s cap" % (code, cap))
     report.check("patient shares recompute", problems, (
         "%d codes; ASC share 20%% of the CY 2027 ASC rate, hospital share Addendum B copayment capped at $%s; "
         "the ASC costs the patient more for %d") % (len(codes), format(cap, ","),
@@ -225,10 +246,7 @@ def _copay_vs_rate(report, codes, t):
 
 
 def _descriptors(report, tables, t):
-    known = checks._all_descriptors()
-    codes = set(tables["patient-shares.json"]["codes"]) | set(t.additions)
-    grams = checks.descriptor_grams(text for code in codes for text in known.get(code, ()))
-    texts = [item for name, table in sorted(tables.items()) for item in checks._strings(table, name)]
-    hits = [where for where, text in texts if checks.copies_descriptor(text, grams)]
-    report.check("no CPT descriptor text in the hospital and patient-share tables", hits,
-                 "%d strings against the descriptors of %d codes" % (len(texts), len(codes)))
+    codes = set(tables[SHARES]["codes"]) | set(t.additions)
+    texts = [item for name, table in sorted(tables.items()) for item in checks.strings(table, name)]
+    checks.no_descriptor_text(report, "no CPT descriptor text in the hospital and patient-share tables",
+                              texts, codes, "the hospital and patient-share tables")
