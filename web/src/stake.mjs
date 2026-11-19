@@ -1,10 +1,14 @@
 // Revenue at stake: the three section pages, the block on each removed code's page, and the CSV.
 // Build-time only. Reads the normalized model from stake-data.mjs, never crosswalk.json keys.
 import { SITE, CFR, claimHref } from './site.mjs';
-import { formatDate, num, plural, csv as toCsv } from './engine.mjs';
+import { formatDate, num, plural, blank, csv as toCsv } from './engine.mjs';
 import { esc, out, cfr, scroller, captionedScroller } from './views.mjs';
 import { layout } from './pages.mjs';
 import { safeProfile } from './stake-data.mjs';
+import { packShare, shareHtml } from './patient-share.mjs';
+import { hospitalMethods, methodsSources } from './hospital-methods.mjs';
+import { pct } from './hospital-words.mjs';
+import { shell, field } from './hospital-field.mjs';
 import { BADGE, card, money, moneyRange, cents, drgList, dxCode, statusText, noCompareText, yearLines, alternativeLabel } from './stake-card.mjs';
 
 export const ROOT = '/revenue-at-stake/';
@@ -96,9 +100,14 @@ function progressBar(stake) {
 </div>`;
 }
 
+/**
+ * The national downloads. Each link carries its label for both modes: stake-client.mjs swaps in
+ * data-hospital-label while a hospital is picked ("Download national Excel"), so they are not taken for
+ * the hospital's (its CSV is in the hospital's bar), and data-national-label back.
+ */
 function downloads(stake) {
-  const excel = stake.xlsx ? '<a class="btn btn--quiet" href="/data/revenue-at-stake.xlsx" download>Download Excel</a>' : '';
-  return `<p class="stake__actions">${excel}<a class="btn btn--quiet" href="/data/revenue-at-stake.csv" download>Download CSV</a></p>`;
+  const link = (file, what) => `<a class="btn btn--quiet" href="/data/revenue-at-stake.${file}" download data-national-label="Download ${what}" data-hospital-label="Download national ${what}">Download ${what}</a>`;
+  return `<p class="stake__actions">${stake.xlsx ? link('xlsx', 'Excel') : ''}${link('csv', 'CSV')}</p>`;
 }
 
 /** Compare · Help review · Methods, shown on all three section pages. */
@@ -116,6 +125,12 @@ function helpCallout(stake) {
 </aside>`;
 }
 
+/**
+ * The hospital picker with its labeled box (hospital-field.mjs), where stake-client.mjs puts, after a pick,
+ * the hospital's bar and summary. Hidden without JS (styles.css), and removed if the page's data fails to load.
+ */
+export const PICK_MOUNT = `<div class="hpick" data-hospital-pick>${shell(field(null))}</div>`;
+
 export function mainPage(ctx) {
   const stake = ctx.stake;
   const { meta } = stake.model;
@@ -123,7 +138,7 @@ export function mainPage(ctx) {
 <section class="stake-head" aria-labelledby="stake-h1">
 <h1 id="stake-h1">Revenue at stake</h1>
 <p class="lede">${coverageSentence(stake)} For those ${num(stake.summary.compared)}: what outpatient pays next to the inpatient MS-DRG family the same operation would group to, national and unadjusted, from CMS’s ${esc(meta.years.outpatient)} and ${esc(meta.years.inpatient)} final rules.</p>
-${draft()}
+${draft()}${ctx.assets.hospitals ? `\n${PICK_MOUNT}` : ''}
 ${helpCallout(stake)}
 ${downloads(stake)}
 ${years(meta)}
@@ -247,7 +262,9 @@ export function methodsPage(ctx) {
   const tiers = meta.counts.tiers;
   const drg165 = stake.items.flatMap((item) => (item.ip ? item.ip.families : [])).flatMap((f) => f.drgs).find((d) => d.drg === '165');
   const formula = drg165 ? ` For example, DRG 165 (major chest procedures without CC/MCC) is its relative weight, ${drg165.weight.toFixed(4)}, × ${cents(r.combined)}.` : '';
-  const files = meta.sources.map((s) => `<tr><td>${out(s.landing, esc(s.label))}</td><td>${esc(s.file).replace(/; /g, '<br>')}</td></tr>`).join('');
+  // The Methods tables (build.mjs): hospital is the hospital tables' meta, or null without the picker.
+  const hospital = ctx.methods && ctx.methods.hospitals;
+  const files = [...meta.sources, ...(ctx.methods ? methodsSources(ctx.methods) : [])].map((s) => `<tr><td>${out(s.landing, esc(s.label))}</td><td>${esc(s.file).replace(/; /g, '<br>')}</td></tr>`).join('');
   const body = `${subnav('methods')}
 <nav class="crumbs" aria-label="Breadcrumb"><a href="${ROOT}">Revenue at stake</a> <span aria-hidden="true">/</span> <span>Methods</span></nav>
 <h1>Revenue at stake: methods</h1>
@@ -274,9 +291,10 @@ ${draft()}
 <section class="block" aria-labelledby="m-nat-h">
 <h2 id="m-nat-h">National, unadjusted</h2>
 <p>Every dollar figure here is a national amount with no hospital-specific adjustment: ${esc(r.adjusters)}. A hospital’s own inpatient payment is usually higher. Its wage index adjusts the labor share of the operating amount, and teaching (IME) and disproportionate-share (DSH) add-ons raise it further. Published hand-worked examples, such as a figure of about $20,000 for a lobectomy, may include those adjustments. The figures here include none of them.${formula}</p>
-<p>Outpatient payments are wage-adjusted too (60% of the rate), but get no IME or DSH add-on. ${stake.xlsx ? 'The Excel download has an Inputs tab where you can enter your own wage index, IME and DSH; every amount recalculates.' : ''}</p>
+<p>Outpatient payments are wage-adjusted too${hospital ? ` (${pct(hospital.opps_labor_share, { trim: true })} of the rate)` : ''}, but get no IME or DSH add-on. ${stake.xlsx ? 'The Excel download has an Inputs tab where you can enter your own wage index, IME and DSH; every amount recalculates.' : ''}</p>${hospital ? `
+<p>Pick a hospital on the <a href="${ROOT}">Revenue at stake</a> page to see every card at that hospital’s rates; how is below.</p>` : ''}
 </section>
-
+${ctx.methods ? `\n${hospitalMethods(ctx.methods, r)}\n` : ''}
 <section class="block" aria-labelledby="m-tier-h">
 <h2 id="m-tier-h">Tiers and review status</h2>
 <p>Each mapped code gets a tier, computed from the mapping passes, never set by hand.</p>
@@ -298,7 +316,7 @@ ${guardrail()}
 <li>The range is the whole MS-DRG family. Where a real case lands depends on its secondary diagnoses (CC/MCC), which this cannot know.</li>
 <li>The expected principal diagnosis is one typical choice, with an alternative only where it changes the family. Real cases vary.</li>
 <li>Outliers, transfers, post-acute transfer reductions, new-technology add-on payments and device credits are not modelled.</li>
-<li>Fee-for-service Medicare only. Medicare Advantage and other payers pay on their own contracts.</li>
+<li>Fee-for-service Medicare only. Medicare Advantage and other payers pay on their own contracts.${hospital ? ' The per-year view counts MA cases only for the operating IME Medicare pays on them (see Medicare Advantage, above).' : ''}</li>
 <li>Labels are this site’s own plain-language names, not CPT descriptors, and may be less specific than the code.</li>
 </ul>
 </section>
@@ -337,7 +355,8 @@ ${captionedScroller('m-files-cap', 'CMS sources and the files read from each', '
 <section class="block" aria-labelledby="m-upd-h">
 <h2 id="m-upd-h">Updates and downloads</h2>
 <p>Built ${formatDate(meta.built)}. Rebuilt each October for the new fiscal year’s inpatient weights, rates and grouper version, and each January for the new calendar year’s outpatient rates and the next removals from the list. Coder reviews are added between those updates; a status changes only when they are.</p>
-<p>${stake.xlsx ? '<a href="/data/revenue-at-stake.xlsx" download>Download Excel</a> (live formulas off an Inputs tab) or ' : ''}<a href="/data/revenue-at-stake.csv" download>download the CSV</a>: one row per code and DRG family, plain values. No AMA content: codes and this site’s labels only. ${out(SITE.repo, 'The code and the mappings')} are public under the MIT license.</p>
+<p>${stake.xlsx ? '<a href="/data/revenue-at-stake.xlsx" download>Download Excel</a> (live formulas off an Inputs tab) or ' : ''}<a href="/data/revenue-at-stake.csv" download>download the CSV</a>: one row per code and DRG family, plain values${ctx.shares ? ', with the national patient’s share at the end of each row' : ''}. No AMA content: codes and this site’s labels only. Codes keep their leading zeros (MDC 04, MS-DRG 038, a CCN) when the CSV is opened with Excel’s text import; double-clicking it strips them. ${out(SITE.repo, 'The code and the mappings')} are public under the MIT license.</p>${hospital ? `
+<p>After you pick a hospital, “Download for” that hospital builds its CSV in your browser: a row per code and MS-DRG at its rates (outpatient, base, IME, DSH, total and the gap), then the per-year rows with the counts shown, yours included where you changed them. Codes and MS-DRG numbers only.</p>` : ''}
 </section>`;
   return layout(ctx, {
     path: `${ROOT}methods/`, page: 'stake-methods', title: 'Revenue at stake: methods and sources', body,
@@ -347,15 +366,23 @@ ${captionedScroller('m-files-cap', 'CMS sources and the files read from each', '
 
 // ---- the block on each code page ----------------------------------------------------------
 
+/**
+ * The Revenue at stake block on a removed code's page. A compared code also gets the national ASC
+ * patient-share line (ctx.shares: patient-shares.json) and, when the build has the hospital picker, a
+ * link to the same card at a hospital's rates. The page itself stays national.
+ */
 export function codeBlock(ctx, code) {
   const stake = ctx.stake;
   const item = stake.model.codes[code];
   if (!item) return '';
+  const compare = item.kind === 'compare';
+  const share = compare && ctx.shares ? packShare(ctx.shares.codes[code]) : null;
+  const local = compare && ctx.assets && ctx.assets.hospitals ? `<a href="${ROOT}?q=${esc(code)}">See this at your hospital →</a> <span aria-hidden="true">/</span> ` : '';
   return `<section class="block stake-block" aria-labelledby="stake-h" data-stake-code="${esc(code)}">
 <h2 id="stake-h">Revenue at stake</h2>
-<p class="stake-block__lede">Left the list ${formatDate(item.removed)}. ${item.kind === 'compare' ? 'What Medicare pays for it as a hospital outpatient, next to the inpatient MS-DRG family the same operation would group to.' : 'Why there is no payment comparison for it:'}</p>
+<p class="stake-block__lede">Left the list ${formatDate(item.removed)}. ${compare ? 'What Medicare pays for it as a hospital outpatient, next to the inpatient MS-DRG family the same operation would group to.' : 'Why there is no payment comparison for it:'}</p>
 ${card(item, stake.model.meta, { title: false })}
-<p class="stake-block__more"><a href="${ROOT}">All ${num(stake.items.length)} removed codes</a> <span aria-hidden="true">/</span> <a href="${ROOT}methods/">How the numbers are built</a></p>
+${share ? `<p class="stake-block__share"><strong>Patient’s share, national:</strong> ${shareHtml(share, ctx.shares.meta.deductibles)}</p>\n` : ''}<p class="stake-block__more">${local}<a href="${ROOT}">All ${num(stake.items.length)} removed codes</a> <span aria-hidden="true">/</span> <a href="${ROOT}methods/">How the numbers are built</a></p>
 </section>`;
 }
 
@@ -364,28 +391,43 @@ ${card(item, stake.model.meta, { title: false })}
 export const CSV_HEADER = ['code', 'label', 'body_system', 'removed', 'outpatient_status_indicator', 'apc', 'apc_title',
   'outpatient_rate', 'asc_rate', 'comparison', 'family_order', 'principal_dx', 'principal_dx_condition', 'coded_as', 'mdc', 'drg_family',
   'drgs', 'inpatient_low', 'inpatient_high', 'outpatient_minus_inpatient_low', 'outpatient_minus_inpatient_high', 'tier',
-  'review_status', 'mapping_fingerprint'];
+  'review_status', 'mapping_fingerprint', 'opps_patient_share', 'asc_patient_share', 'asc_costs_patient_more'];
 
 const round2 = (n) => Math.round(n * 100) / 100;
-const blank = (n) => (n === null || n === undefined ? '' : n);
 
-/** One row per code and inpatient family (a code with no comparison is one row). Plain values, no formulas. */
-export function csvRows(stake) {
+/**
+ * The national patient's share for a code (patient-shares.json, through packShare): hospital outpatient
+ * and ASC in cents, and whether the ASC costs the patient more ('true'/'false', the pipeline's unrounded
+ * flag); three empty cells when there is no share (no comparison, packaged in the ASC, or no shares file).
+ */
+function shareCells(shares, code) {
+  const packed = shares ? packShare(shares.codes[code]) : null;
+  if (!packed) return ['', '', ''];
+  const [asc, opps, ascMore] = packed;
+  return [round2(opps), round2(asc), ascMore ? 'true' : 'false'];
+}
+
+/**
+ * One row per code and inpatient family (a code with no comparison is one row). Plain values, no formulas.
+ * shares: patient-shares.json (or null), for the last three columns.
+ */
+export function csvRows(stake, shares = null) {
   const rows = [CSV_HEADER];
   for (const item of stake.items) {
     const base = [item.code, item.label, stake.groupName[item.group] || item.group, item.removed, item.op.si || '', item.op.apc || '',
       item.op.apcTitle || '', blank(item.op.rate), blank(item.op.asc)];
+    const share = shareCells(shares, item.code);
     if (item.kind !== 'compare') {
-      rows.push([...base, noCompareText(item), ...CSV_HEADER.slice(base.length + 1).map(() => '')]);
+      rows.push([...base, noCompareText(item), ...CSV_HEADER.slice(base.length + 1, -share.length).map(() => ''), ...share]);
       continue;
     }
     item.ip.families.forEach((f, i) => {
       const diff = item.op.rate === null ? ['', ''] : [round2(item.op.rate - f.high), round2(item.op.rate - f.low)];
       rows.push([...base, 'compared', i === 0 ? 'primary' : alternativeLabel(f), f.dx ? dxCode(f.dx.code) : '',
         f.condition, f.when && f.when.variant ? f.when.variant : '', f.mdc || '', f.name, f.drgs.map((d) => d.drg).join(' '), f.low, f.high, ...diff,
-        item.tier ? item.tier.n : '', item.review.status, item.map.fp]);
+        item.tier ? item.tier.n : '', item.review.status, item.map.fp, ...share]);
     });
   }
   return rows;
 }
-export const csvText = (stake) => toCsv(csvRows(stake));
+export const csvText = (stake, shares = null) => toCsv(csvRows(stake, shares));

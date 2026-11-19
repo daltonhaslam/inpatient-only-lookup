@@ -613,6 +613,54 @@
    "landing": "https://www.cms.gov/priorities/innovation/innovation-models/team-model",
    "sha256": "3cf6d049d8937feb644d891a73929149e47fdba04b7bd300b5a4a2d24f06ab4d",
    "note": "TEAM MS-DRG mapping specifications workbook, FY2020-FY2027 (13 sheets; Table_10-12 are the FY2027 IPPS changes). Defines the TEAM episode categories by MS-DRG/procedure. Landing page also lists exclusion lists (PY2 = 2027) and target-price files, not downloaded."
+  },
+  {
+   "id": "ipps-2027-impact",
+   "kind": "ipps_impact",
+   "fy": 2027,
+   "rule": "CMS-1849-F",
+   "url": "https://www.cms.gov/files/zip/fy2027-ipps-fr-impact-file.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/acute-inpatient-pps/fy-2027-ipps-final-rule-home-page",
+   "sha256": "6e51b1015b6c5c9320a3cb3a086450787f8fef3723d5cc382f6aa64b2c716f17",
+   "note": "FY 2027 IPPS impact file: one row per IPPS hospital with its wage index, capital GAF, IME (TCHOP, TCHCP), DSH (DSHOPP, DSHCPP), transfer-adjusted cases (CASETA44, IME_CASETA44) and provider type. Zip holds the final-rule txt, the correction-notice txt (the one read: 'FY 2027 IPPS Impact File - Correction Notice.txt', tab-delimited, Latin-1), a combined xlsx and the variable descriptions. Modeled values; CMS points to the Provider Specific File for actual payment."
+  },
+  {
+   "id": "mup-inp-2024",
+   "kind": "mup_inpatient",
+   "dy": 2024,
+   "url": "https://data.cms.gov/sites/default/files/2026-04/828defb5-c9e6-4442-8c1b-f27bc0799daf/MUP_INP_RY26_P03_V10_DY24_PrvSvc.CSV",
+   "landing": "https://data.cms.gov/provider-summary-by-type-of-service/medicare-inpatient-hospitals/medicare-inpatient-hospitals-by-provider-and-service",
+   "sha256": "2ab6da15be4cd47c4ecc05e0f54545e4493ee4eea58df626d1aa2e6b19b65e0d",
+   "note": "Medicare Inpatient Hospitals - by Provider and Service, data year 2024 (posted 2026-04): traditional Medicare discharges (Tot_Dschrgs) by CCN (Rndrng_Prvdr_CCN) and MS-DRG (DRG_Cd). CMS suppresses counts under 11, so a missing row means under 11 or none. A plain CSV, not a zip."
+  },
+  {
+   "id": "asc-2026-aa",
+   "kind": "asc_addendum_aa",
+   "cy": 2026,
+   "rule": "CMS-1834-FC",
+   "url": "https://www.cms.gov/files/zip/2026-nfrm-addendum-aa-bb-dd1-dd2-ee-ff.zip",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/ambulatory-surgical-center-asc/asc-regulations-and-notices/cms-1834-fc",
+   "sha256": "03c2e1570905d0e264ce0ae2d3252e47d59121b46365b8d70a3d59e02a34b822",
+   "note": "CY2026 ASC final-rule Addenda AA, BB, DD1, DD2, EE, FF (CMS-1834-FC). Read only for the codes on the CY2026 ASC covered procedures list: the build checks that none of the CY2027 additions (asc-2027-additions) was already on it, and prints the CY2027-minus-CY2026 file difference for comparison. Carries CPT short descriptors, so keep in gitignored data/raw/."
+  },
+  {
+   "id": "asc-2027-additions",
+   "kind": "asc_additions",
+   "cy": 2027,
+   "rule": "CMS-1850-FC",
+   "url": "https://www.cms.gov/files/zip/2027-fr-additions-list-asc-covered-procedures.zip-0",
+   "landing": "https://www.cms.gov/medicare/payment/prospective-payment-systems/ambulatory-surgical-center-asc/asc-regulations-and-notices/cms-1850-fc",
+   "sha256": "f25891b176c63cc51dbd77a3a7ac4a25eaadac5f5fa62d69255810c9490ee5de",
+   "note": "CY2027 final rule public use file 'Final Additions to the List of ASC Covered Procedures for CY 2027' (HCPCS code, short descriptor, payment indicator), the file 91 FR 70665 points to for the 618 codes plus CPT 64629. Carries CPT short descriptors, so keep in gitignored data/raw/."
+  },
+  {
+   "id": "deductibles-2027",
+   "kind": "fact_sheet",
+   "year": 2027,
+   "url": "https://www.cms.gov/newsroom/fact-sheets/2027-medicare-parts-b-premiums-deductibles",
+   "landing": "https://www.cms.gov/newsroom/fact-sheets/2027-medicare-parts-b-premiums-deductibles",
+   "sha256": "68c1898ca6800d60761347c118423b3a667a094ac0627315037825e8df7250cf",
+   "note": "CMS fact sheet, 2027 Medicare Parts A & B Premiums and Deductibles (HTML page). The source of the deductibles in facts.json (matched by URL): the crosswalk build (exposure_checks) and test_raw.py check each figure is quoted and each quote is on the downloaded copy. Its HTML may drift around the same sentences, so a new hash is adopted while the quotes still verify (fetch.py, refresh.py; citations.QUOTED_PAGES) and fails, for a person, when they do not."
   }
  ]
 }

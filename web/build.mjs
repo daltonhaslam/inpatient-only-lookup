@@ -3,9 +3,11 @@
 //   BUILD_DATE=2026-11-11 node build.mjs   build as of a fixed date (for reproducible output)
 //   CROSSWALK_JSON=/path/to/crosswalk.json node build.mjs   Revenue at stake from another crosswalk
 //     (default pipeline/derived/crosswalk.json; without one the section is left out with a warning)
+//   OUT_DIR=/tmp/site node build.mjs   build somewhere other than ../docs (the national snapshot test does)
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync, rmSync, copyFileSync, existsSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { mkdirSync, readFileSync, writeFileSync, rmSync, copyFileSync, existsSync, realpathSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build as bundle } from 'esbuild';
 import { SITE } from './src/site.mjs';
@@ -13,10 +15,33 @@ import { todayISO, isDate, monthYear, formatDate, clampDate, periodIndex, siAt, 
 import * as pages from './src/pages.mjs';
 import * as stake from './src/stake.mjs';
 import { normalize, credits, clientModel, removalMismatches } from './src/stake-data.mjs';
+import { hospitalList, hospitalRecord, uncoveredDrgs, staleHospitalTables } from './src/hospital-data.mjs';
+import { sharesFile } from './src/patient-share.mjs';
+import { methodsTables } from './src/hospital-methods.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
-const out = join(root, 'docs');
+const DOCS = join(root, 'docs');
+// A directory the build made before; any other existing OUT_DIR outside the temp dir is refused.
+const MARKER = '.iol-build-output';
+const out = process.env.OUT_DIR ? safeOutDir(resolve(process.env.OUT_DIR)) : DOCS;
+
+/**
+ * The build empties its output directory first, so an OUT_DIR is checked before anything is deleted: never
+ * the repo, web/ or a parent of them; only a new directory, one strictly under the system temp dir, or one this
+ * build wrote before (it holds MARKER).
+ */
+function safeOutDir(dir) {
+  const real = (path) => (existsSync(path) ? realpathSync(path) : path);
+  const target = real(dir);
+  const inside = (parent, child) => child === parent || child.startsWith(`${parent}${sep}`);
+  if ([real(root), real(here)].some((guarded) => inside(target, guarded))) throw new Error(`Refusing OUT_DIR=${dir}: it is the repository, web/ or a parent of them.`);
+  const underTmp = target.startsWith(`${real(tmpdir())}${sep}`); // strictly under: never the temp dir itself
+  if (target !== real(DOCS) && existsSync(target) && !underTmp && !existsSync(join(target, MARKER))) {
+    throw new Error(`Refusing OUT_DIR=${dir}: it already exists and does not look like a build output (no ${MARKER}, not under ${tmpdir()}). Use a new or empty-to-be directory.`);
+  }
+  return dir;
+}
 const read = (path) => JSON.parse(readFileSync(join(root, path), 'utf8'));
 const sha = (content) => createHash('sha256').update(content).digest('hex').slice(0, 10);
 
@@ -252,7 +277,8 @@ function stakeData(ctx) {
     console.warn(`No crosswalk at ${process.env.CROSSWALK_JSON ? path : 'pipeline/derived/crosswalk.json'}: building without the Revenue at stake section. Run python3 pipeline/crosswalk/build.py, or set CROSSWALK_JSON.`);
     return null;
   }
-  const model = normalize(JSON.parse(readFileSync(path, 'utf8')));
+  const raw = JSON.parse(readFileSync(path, 'utf8'));
+  const model = normalize(raw);
   const missing = Object.keys(model.codes).filter((code) => !ctx.data.codes[code]);
   if (missing.length) throw new Error(`crosswalk.json has codes with no page on this site: ${missing.slice(0, 10).join(', ')}`);
   const moved = removalMismatches(model, ctx.data);
@@ -269,7 +295,79 @@ function stakeData(ctx) {
   const resolutions = existsSync(resolutionsPath) ? JSON.parse(readFileSync(resolutionsPath, 'utf8')) : {};
   const xlsx = join(dirname(path), 'crosswalk.xlsx');
   if (!existsSync(xlsx)) console.warn('No crosswalk.xlsx next to crosswalk.json: the Excel download is left out.');
-  return { ...stake.stakeContext(model, credits(reviews, model, resolutions), ctx.data.groups, { xlsx: existsSync(xlsx) }), xlsxPath: xlsx };
+  // rates: crosswalk.json meta.rates as written (the model keeps only some), for hospitalAssets' check.
+  return { ...stake.stakeContext(model, credits(reviews, model, resolutions), ctx.data.groups, { xlsx: existsSync(xlsx) }), xlsxPath: xlsx, rates: (raw.meta || {}).rates };
+}
+
+/**
+ * The hospital view's files, loaded only after someone uses the picker: the list (with the math's
+ * constants), one file per hospital under a directory named for the hash of all of them, and the
+ * picker's own bundle and stylesheet. Their URLs go into the stake bundle at build time, so the national page's HTML
+ * does not change. Returns {assets (those URLs), hospitals, volume (the two tables, for Methods)}, or null
+ * (no picker) when the derived hospital tables are absent.
+ */
+async function hospitalAssets(model, rates) {
+  const paths = ['pipeline/derived/hospitals.json', 'pipeline/derived/drg-volume.json'];
+  if (!paths.every((path) => existsSync(join(root, path)))) {
+    console.warn('No hospitals.json or drg-volume.json: building Revenue at stake without the hospital picker.');
+    return null;
+  }
+  const [hospitals, volume] = paths.map(read);
+  // The tables must cover every DRG this crosswalk prices (it can be another one, CROSSWALK_JSON), or a
+  // card would throw for a missing weight, or show "under 11 or none" for a count that was never looked up.
+  for (const [table, missing] of Object.entries(uncoveredDrgs(model, hospitals.meta, volume.meta))) {
+    if (missing.length) throw new Error(`${table} lacks ${missing.length} MS-DRG(s) the crosswalk prices: ${missing.slice(0, 10).join(', ')}. Rebuild the derived tables: python3 pipeline/crosswalk/build.py`);
+  }
+  // And price them as the crosswalk does: old tables beside a newer crosswalk.json fail the build.
+  const stale = staleHospitalTables(model, rates, hospitals.meta);
+  if (stale.length) throw new Error(`hospitals.json disagrees with the crosswalk in ${stale.length} place(s): ${stale.slice(0, 10).join('; ')}. Rebuild the derived tables: python3 pipeline/crosswalk/build.py (its hospital checks must pass)`);
+  const records = Object.keys(hospitals.hospitals).sort()
+    .map((ccn) => [ccn, JSON.stringify(hospitalRecord(hospitals.hospitals[ccn], volume.volume[ccn], volume.meta.drgs))]);
+  const dir = `data/h.${sha(records.map(([ccn, text]) => `${ccn}\n${text}`).join('\n'))}`;
+  mkdirSync(join(out, dir), { recursive: true });
+  for (const [ccn, text] of records) writeFileSync(join(out, dir, `${ccn}.json`), text);
+  const assets = {
+    list: hashed('data', 'hospitals', 'json', JSON.stringify(hospitalList(hospitals, model, volume.meta))),
+    dir: `/${dir}`,
+    view: hashed('assets', 'hospital', 'js', await bundleEntry('hospital-picker.mjs', 'esm')),
+    css: hashed('assets', 'hospital', 'css', readFileSync(join(here, 'src/hospital.css'), 'utf8')),
+    // The CCN prefix of the hospitals the picker never offers (Maryland), for stake-client.mjs's landing check.
+    maryland: hospitals.meta.maryland_prefix,
+  };
+  if (!/^\d{2}$/.test(assets.maryland || '')) throw new Error('hospitals.json meta.maryland_prefix is missing: rebuild the derived tables');
+  return { assets, hospitals, volume };
+}
+
+/**
+ * One minified browser bundle of src/<file>, as bytes. define: build-time constants (the lazy files'
+ * hashed URLs), baked in so the pages' HTML need not change when those files do.
+ */
+async function bundleEntry(file, format, define = {}) {
+  const result = await bundle({
+    entryPoints: [join(here, 'src', file)], bundle: true, minify: true, format, target: 'es2020', write: false, legalComments: 'none', define,
+  });
+  return result.outputFiles[0].contents;
+}
+
+/**
+ * The ASC patient-share tables: doc (patient-shares.json, for the code pages' line), ascNew
+ * (asc-new-2027.json, for Methods) and lookup ({url,
+ * from}: the small file the lookup loads when an answer needs it, holding CMS's 2027 ASC additions, and
+ * the date they leave the list; client.mjs gets it through esbuild define). null, with a warning, when
+ * the derived tables are absent; the share line is then left out.
+ */
+function patientShares(ctx) {
+  const paths = ['pipeline/derived/patient-shares.json', 'pipeline/derived/asc-new-2027.json'];
+  if (!paths.every((path) => existsSync(join(root, path)))) {
+    console.warn('No patient-shares.json or asc-new-2027.json: building without the patient-share line.');
+    return null;
+  }
+  const [doc, ascNew] = paths.map(read);
+  const file = sharesFile(doc, ascNew);
+  // Every code in the file must leave the list on one date, the date the lookup starts showing the line.
+  const dates = new Set(Object.keys(file.c).map((code) => (ctx.data.codes[code] ? lookup(ctx.data, code, ctx.data.dosMax).removed : null)));
+  if (dates.size !== 1 || dates.has(null)) throw new Error(`asc-new-2027.json codes do not all leave the inpatient-only list on one date: ${[...dates].join(', ')}`);
+  return { doc, ascNew, lookup: { url: hashed('data', 'shares', 'json', JSON.stringify(file)), from: [...dates][0] } };
 }
 
 const FONTS = [
@@ -299,6 +397,7 @@ async function main() {
 
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });
+  if (out !== DOCS) writeFileSync(join(out, MARKER), 'Inpatient Only Lookup build output (web/build.mjs). The next build with this OUT_DIR empties this directory.\n');
 
   const faces = FONTS.map(([family, path, weights]) => {
     const bytes = readFileSync(join(here, 'node_modules', path));
@@ -310,18 +409,25 @@ async function main() {
       return `@font-face{font-family:'${family} Fallback';font-weight:${weight};src:local('${local}');size-adjust:${size}%;ascent-override:${scaled(ascent)};descent-override:${scaled(descent)};line-gap-override:0%}`;
     })).join('\n');
   const css = hashed('assets', 'site', 'css', `${fontCss}\n${readFileSync(join(here, 'src/styles.css'), 'utf8')}`);
-  const script = await bundle({
-    entryPoints: [join(here, 'src/client.mjs')], bundle: true, minify: true, format: 'iife', target: 'es2020', write: false, legalComments: 'none',
-  });
-  const stakeScript = ctx.stake ? await bundle({
-    entryPoints: [join(here, 'src/stake-client.mjs')], bundle: true, minify: true, format: 'iife', target: 'es2020', write: false, legalComments: 'none',
+  const shares = patientShares(ctx);
+  ctx.shares = shares && shares.doc;
+  const script = await bundleEntry('client.mjs', 'iife', { __SHARES__: JSON.stringify(shares && shares.lookup) });
+  const tables = ctx.stake ? await hospitalAssets(ctx.stake.model, ctx.stake.rates) : null;
+  const hospitals = tables && tables.assets;
+  // The Methods page's hospital sections (with the hospital tables) and patient-share section (with the
+  // share tables), each built when its own tables are.
+  ctx.methods = tables || shares ? methodsTables({
+    hospitals: tables && tables.hospitals, volume: tables && tables.volume, ascNew: shares && shares.ascNew, shares: shares && shares.doc,
+    citations: read('pipeline/citations.json'), sources: read('pipeline/sources.json'),
   }) : null;
+  const stakeScript = ctx.stake ? await bundleEntry('stake-client.mjs', 'iife', { __HOSPITAL_ASSETS__: JSON.stringify(hospitals) }) : null;
   ctx.assets = {
     css,
-    js: hashed('assets', 'app', 'js', script.outputFiles[0].contents),
-    stakeJs: stakeScript ? hashed('assets', 'stake', 'js', stakeScript.outputFiles[0].contents) : null,
+    js: hashed('assets', 'app', 'js', script),
+    stakeJs: stakeScript ? hashed('assets', 'stake', 'js', stakeScript) : null,
     data: hashed('data', 'ipo', 'json', JSON.stringify(ctx.data)),
     other: hashed('data', 'other', 'json', JSON.stringify(packOther())),
+    hospitals,
     stake: ctx.stake ? hashed('data', 'stake', 'json', JSON.stringify(clientModel(ctx.stake.model, ctx.stake.groups, ctx.codes))) : null,
     preload: faces.map((f) => `<link rel="preload" href="${f.url}" as="font" type="font/woff2" crossorigin>`).join('\n'),
   };
@@ -339,7 +445,7 @@ async function main() {
     write('revenue-at-stake/index.html', stake.mainPage(ctx));
     write('revenue-at-stake/help-review/index.html', stake.helpPage(ctx));
     write('revenue-at-stake/methods/index.html', stake.methodsPage(ctx));
-    write('data/revenue-at-stake.csv', stake.csvText(ctx.stake));
+    write('data/revenue-at-stake.csv', stake.csvText(ctx.stake, ctx.shares));
     if (ctx.stake.xlsx) copyFileSync(ctx.stake.xlsxPath, join(out, 'data/revenue-at-stake.xlsx'));
   }
 

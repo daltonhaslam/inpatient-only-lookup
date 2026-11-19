@@ -5,10 +5,13 @@
                                         [--checks FILE] [--allow-missing]
 
 Reads   pipeline/derived/ipo-history.json, data/labels.json, the pinned CMS files (data/raw/),
-        the mapping passes (data/crosswalk/passes/), adjudications.json, reviews.json and
-        resolutions.json
-Writes  <out>/crosswalk.json (default pipeline/derived/), only when every check passes, and with it
-        <out>/crosswalk.xlsx (workbook.py), except under --allow-missing
+        the mapping passes (data/crosswalk/passes/), adjudications.json, reviews.json,
+        resolutions.json and pipeline/facts.json
+Writes  <out>/crosswalk.json (default pipeline/derived/), only when every crosswalk check passes;
+        the hospital-view and patient-share tables (exposure.py: hospitals.json, drg-volume.json,
+        asc-new-2027.json, patient-shares.json), only when those pass and their own checks pass too;
+        <out>/crosswalk.xlsx (workbook.py), only when both pass, except under --allow-missing
+        (see gated_write)
         pipeline/out/crosswalk-checks.txt (or --checks), always
 
 One entry per code with a removal dated 2026-01-01 or 2027-01-01: the CY 2027 outpatient
@@ -30,8 +33,7 @@ if __name__ == "__main__":
 
 import fetch      # noqa: E402
 import history    # noqa: E402
-import parse      # noqa: E402
-from crosswalk import checks, mapper, mappings, reviews, sources, status, workbook   # noqa: E402
+from crosswalk import checks, exposure, exposure_checks, mapper, mappings, reviews, sources, status, workbook   # noqa: E402
 from crosswalk.group import ANY_OR_FAMILIES, Ref, group     # noqa: E402
 from crosswalk.price import family_range   # noqa: E402
 
@@ -47,7 +49,8 @@ REVISION_CAVEAT = ("In MS-DRG v44 a hip or knee revision coded as removal plus r
                    "knee prosthesis) covers only the PCS Revision root operation.")
 
 # Every source sources.py reads: a label for the page and the members it reads, as
-# [(member pattern, prefer the workbook)], the same patterns sources.py uses.
+# [(member pattern, prefer the workbook)], the same patterns sources.py uses (sources.source_meta).
+# The derived tables cite their own sources the same way (exposure.SOURCE_LABELS).
 SOURCE_FILES = {
     "addenda-2027": ("CY 2027 OPPS final rule (CMS-1850-FC), Addenda A and B",
                      [(sources.ADDENDUM_A, True), (history.ADDENDUM_B, True)]),
@@ -259,14 +262,6 @@ def entry(code, inputs, batch_of):
     return item
 
 
-def source_meta(source_id):
-    source = next(s for s in fetch.load_sources() if s["id"] == source_id)
-    label, members = SOURCE_FILES[source_id]
-    path = fetch.raw_path(source)
-    files = [parse.pick_member(path, pattern, prefer_spreadsheet=book).rsplit("/", 1)[-1] for pattern, book in members]
-    return {"label": label, "landing": source["landing"], "file": "; ".join(files)}
-
-
 def assemble(inputs):
     """The crosswalk document (see the module docstring); never raises on a bad mapping."""
     ref = inputs.ref
@@ -304,7 +299,7 @@ def assemble(inputs):
                   "weights_table": "Table 5, CMS-1849-CN: relative weights with the 10% cap applied",
                   "version": "FY 2027 IPPS final rule correction notice (CN) tables, which supersede the final-rule tables",
                   "adjusters": "none: no wage index, IME, DSH, outlier or other hospital-specific adjustment"},
-        "sources": {source_id: source_meta(source_id) for source_id in sorted(used)},
+        "sources": {source_id: sources.source_meta(source_id, *SOURCE_FILES[source_id]) for source_id in sorted(used)},
         "years": {"outpatient": "CY 2027", "inpatient": "FY 2027"},
         "batches": batches,
     }
@@ -323,21 +318,51 @@ def main(argv=None):
     inputs = load_inputs(args.passes, args.adjudications)
     doc = assemble(inputs)
     report = checks.run(doc, inputs, allow_missing=args.allow_missing)
-    target = args.out / "crosswalk.json"
-    lines = ["Revenue at stake: crosswalk checks", ""] + report.lines + [""]
-    if report.failures:
-        # Never replace the published crosswalk with one that failed a check.
-        lines.append("%d check(s) failed. %s was left as it was." % (report.failures, target.name))
-    else:
-        fetch.write_json(target, doc)
-        lines.append("All checks passed. Wrote %s (%d codes)." % (target.name, len(doc["codes"])))
-        if not args.allow_missing:
-            sheet = workbook.write(doc, args.out / "crosswalk.xlsx")
-            lines.append("Wrote %s." % sheet.name)
+    lines = gated_write(report, doc, inputs, args.out, args.allow_missing)
+    lines = ["Revenue at stake: crosswalk checks", ""] + report.lines + [""] + lines
     args.checks.parent.mkdir(parents=True, exist_ok=True)
     args.checks.write_text("\n".join(lines) + "\n")
     print("\n".join(lines))
     return 1 if report.failures else 0
+
+
+def gated_write(report, doc, inputs, out, allow_missing):
+    """Write what passed its own gate, and return the report's closing lines. Nothing that failed a
+    check replaces a published file.
+
+    Gate 1, the crosswalk (report holds checks.run's lines): crosswalk.json. When it fails nothing is
+    written and the hospital and patient-share tables are not even assembled (they are built from it).
+    Gate 2, the hospital and patient-share tables (exposure_checks, added to report): exposure.TABLES,
+    each checked from the pinned files and facts.json. A stale impact-file pin or a missing raw file
+    fails only this gate, so the national crosswalk still publishes.
+    crosswalk.xlsx (not under --allow-missing) needs both: it carries the hospital and share tables. When
+    gate 2 fails it is not built, and a previous one is removed, so no workbook disagrees with the
+    crosswalk.json just written (the site then ships no Excel download until both gates pass)."""
+    target, sheet = out / "crosswalk.json", out / "crosswalk.xlsx"
+    tables = ", ".join(exposure.TABLES)
+    if report.failures:
+        report.skip("hospital and patient-share tables", "not checked: the crosswalk failed, and they are built from it")
+        return ["%d crosswalk check(s) failed. %s, %s and %s were left as they were." % (
+            report.failures, target.name, sheet.name, tables)]
+    fetch.write_json(target, doc)
+    lines = ["Crosswalk checks passed. Wrote %s (%d codes)." % (target.name, len(doc["codes"]))]
+    derived = exposure_checks.run_all(report, doc, inputs.removed)
+    if report.failures or not derived:
+        lines.append("%d hospital and patient-share check(s) failed. %s were left as they were." % (report.failures, tables))
+        if not allow_missing:
+            removed = sheet.exists()
+            sheet.unlink(missing_ok=True)
+            lines.append("%s was not built: it needs those tables.%s" % (
+                sheet.name, " The previous one was removed, so no workbook disagrees with %s." % target.name if removed else ""))
+        return lines
+    for name, table in sorted(derived.items()):
+        fetch.write_json(out / name, table)
+    lines.append("Hospital and patient-share checks passed. Wrote %s." % ", ".join(sorted(derived)))
+    if not allow_missing:
+        workbook.write(doc, sheet, hospitals=derived[exposure.HOSPITALS], shares=derived[exposure.SHARES],
+                       volume=derived[exposure.VOLUME])
+        lines.append("Wrote %s." % sheet.name)
+    return lines
 
 
 if __name__ == "__main__":

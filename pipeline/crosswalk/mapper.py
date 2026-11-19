@@ -95,7 +95,7 @@ def cmd_batch(args):
     labels = fetch.read_json(LABELS)
     opps = sources.load_opps()
     apcs = sources.load_apc_titles()
-    path = sources._path("addenda-2027")
+    path = sources.source_path("addenda-2027")
     descriptors = parse.descriptor_table(path, parse.pick_member(path, history.ADDENDUM_B))
     removed = removal_dates(fetch.read_json(HISTORY))
     print(REMINDER + "\n")

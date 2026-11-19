@@ -77,15 +77,37 @@ export function mappingSummary(item) {
   return `${pcs} | ${lead}${families.length > 1 ? `; +${families.length - 1} more` : ''}`;
 }
 
-/** One sentence: what outpatient pays against the inpatient family. Reads as exposure, not advice. */
-export function gapText(item) {
+/**
+ * One sentence: what outpatient pays against the inpatient family. Reads as exposure, not advice. As
+ * parts [before, range, after] when it has a dollar range (so the card can keep the range on one line),
+ * else [sentence]. lead: "Outpatient pays", or a hospital's conditional "If billed outpatient, <H> is paid".
+ */
+export function gapParts(item, lead = 'Outpatient pays') {
   const d = item.diff;
   const what = item.ip.families.length > 1 ? 'the inpatient DRG families' : 'the inpatient DRG family';
-  if (!d) return `No national outpatient rate for ${siText(item.op.si)}, so no difference is shown.`;
-  if (d.high <= 0) return `Outpatient pays ${moneyRange(-d.high, -d.low)} less than ${what}.`;
-  if (d.low >= 0) return `Outpatient pays ${moneyRange(d.low, d.high)} more than ${what}.`;
-  return `Outpatient pays from ${money(-d.low)} less to ${money(d.high)} more than ${what}.`;
+  if (!d) return [`No national outpatient rate for ${siText(item.op.si)}, so no difference is shown.`];
+  if (d.high <= 0) return [`${lead} `, moneyRange(-d.high, -d.low), ` less than ${what}.`];
+  if (d.low >= 0) return [`${lead} `, moneyRange(d.low, d.high), ` more than ${what}.`];
+  return [`${lead} from ${money(-d.low)} less to ${money(d.high)} more than ${what}.`];
 }
+
+/**
+ * A family's add-ons as "$6,067–$14,116" (the card says "Includes <range> in <variant.addOns>"), or ''
+ * when it carries none: no hospital picked (national items have no addOn), no add-ons, or both ends round to $0.
+ */
+const addOnRange = (addOn) => (addOn && (whole(addOn.low) !== '0' || whole(addOn.high) !== '0') ? moneyRange(addOn.low, addOn.high) : '');
+
+/**
+ * What a card says around its figures. NATIONAL_CARD is the national card; hospital-view.mjs builds a
+ * hospital's: gapLead (the gap sentence's start), ascLabel, rateNote (under the outpatient rate), opNote
+ * (after the surgery-center line), fine (the fine print), addOns (the add-ons the hospital gets, "IME and
+ * DSH" or one of them, for the Includes line and the bar's legend; national items carry none) and
+ * workLink (link text to the code page's national work in place of Show the work; null: the card's own).
+ */
+const NATIONAL_CARD = Object.freeze({
+  gapLead: 'Outpatient pays', ascLabel: 'Surgery center (ASC)', rateNote: '', opNote: '',
+  fine: 'National, unadjusted: no wage index, IME or DSH.', addOns: '', workLink: null,
+});
 
 const NO_COMPARE = {
   packaged: 'Packaged: no separate outpatient payment, so there is nothing to compare. Medicare pays for it inside the payment for the main procedure.',
@@ -95,20 +117,25 @@ const NO_COMPARE = {
 };
 export const noCompareText = (item) => NO_COMPARE[item.kind];
 
-function opLine(item) {
+function opLine(item, v = NATIONAL_CARD) {
   const op = item.op;
   if (op.rate === null) return `<span class="scard__amt">No national rate</span><span class="scard__what">${esc(siText(op.si).replace(/^s/, 'S'))}</span>`;
-  return `<span class="scard__amt">${money(op.rate)}</span><span class="scard__what">APC ${esc(op.apc)}${op.apcTitle ? ` ${esc(op.apcTitle)}` : ''}</span>${op.asc !== null ? `<span class="scard__asc">Surgery center (ASC): ${money(op.asc)}</span>` : ''}`;
+  return `<span class="scard__amt">${money(op.rate)}</span><span class="scard__what">APC ${esc(op.apc)}${op.apcTitle ? ` ${esc(op.apcTitle)}` : ''}</span>`
+    + (v.rateNote ? `<span class="scard__cond">${esc(v.rateNote)}</span>` : '')
+    + (op.asc !== null ? `<span class="scard__asc">${esc(v.ascLabel)}: ${money(op.asc)}</span>` : '')
+    + (v.opNote ? `<span class="scard__asc">${esc(v.opNote)}</span>` : '');
 }
 
-function familyLine(f, many) {
+function familyLine(f, many, v) {
   const basis = basisText(f.basis);
   const code = f.dx ? ` (${esc(dxCode(f.dx.code))})` : '';
   const lines = many
     ? whenParts(f).map((p) => (p.kind === 'dx' ? `If the principal diagnosis is ${esc(p.text)}${code}` : `If coded as: ${esc(p.text)}`))
     : [`Principal diagnosis: ${esc(f.condition)}${code}`];
   if (basis) lines.push(esc(basis.charAt(0).toUpperCase() + basis.slice(1)));
+  const addOn = addOnRange(f.addOn);
   return `<div class="scard__fam"><span class="scard__amt">${moneyRange(f.low, f.high)}</span><span class="scard__what">MS-DRG ${esc(drgList(f.drgs))} ${esc(f.name)}</span>`
+    + (addOn ? `<span class="scard__addon">Includes <b class="nw">${addOn}</b> in ${esc(v.addOns)}</span>` : '')
     + lines.map((line) => `<span class="scard__cond">${line}</span>`).join('')
     + `${f.caveat ? `<span class="scard__caveat">${esc(f.caveat)}</span>` : ''}</div>`;
 }
@@ -117,13 +144,27 @@ function familyLine(f, many) {
 // would change every card's markup for no visible gain.
 const pct = (n) => `${(n * 100).toFixed(2)}%`;
 
-/** Bars on one dollar scale: hollow for outpatient, filled for each inpatient range. Decorative; the text says it all. */
-function scaleBar(item) {
+/**
+ * Bars on one dollar scale: hollow for outpatient, filled for each inpatient range. Decorative; the text
+ * says it all. With a hospital's add-ons (exactly when the card says "Includes $A–$B"), the top of each
+ * inpatient range gets an end segment in its own color for the top DRG's add-ons: the dollars above
+ * that DRG's base payment (never left of the range's low end). Its legend is a swatch of that color, not
+ * a word like "darker", which is not true in dark mode or forced colors.
+ */
+function scaleBar(item, v) {
   const top = Math.max(item.op.rate || 0, item.ip.high);
-  const lane = (name, bar) => `<div class="sbar__lane"><span class="sbar__name">${esc(name)}</span><span class="sbar__track">${bar}</span></div>`;
+  // key: the add-on legend, right after "Inpatient" so a long family name after it is what truncates.
+  const lane = (name, bar, key = '', rest = '') => `<div class="sbar__lane"><span class="sbar__name">${esc(name)}${key}${esc(rest)}</span><span class="sbar__track">${bar}</span></div>`;
   const lanes = [lane('Outpatient', item.op.rate !== null ? `<i class="sbar__op" style="width:${pct(item.op.rate / top)}"></i>` : '')];
+  const addOnPart = (f) => {
+    if (!addOnRange(f.addOn)) return '';
+    const from = Math.max(f.high - f.addOn.high, f.low);
+    return `<i class="sbar__add" style="left:${pct(from / top)};width:${pct((f.high - from) / top)}"></i>`;
+  };
   for (const f of item.ip.families) {
-    lanes.push(lane(item.ip.families.length > 1 ? `Inpatient, ${whenLabel(f)}` : 'Inpatient', `<i class="sbar__ip" style="left:${pct(f.low / top)};width:${pct(Math.max(f.high - f.low, top * 0.006) / top)}"></i>`));
+    const add = addOnPart(f);
+    lanes.push(lane('Inpatient', `<i class="sbar__ip" style="left:${pct(f.low / top)};width:${pct(Math.max(f.high - f.low, top * 0.006) / top)}"></i>${add}`,
+      add ? ` <span class="sbar__keyed">(<i class="sbar__key"></i>${esc(v.addOns)})</span>` : '', item.ip.families.length > 1 ? `, ${whenLabel(f)}` : ''));
   }
   return `<div class="sbar" aria-hidden="true">${lanes.join('')}<div class="sbar__axis"><span>$0</span><span>${money(top)}</span></div></div>`;
 }
@@ -174,8 +215,16 @@ ${stale}
 </details>`;
 }
 
-/** The full card. title: render the code and label (off on the code's own page, where the h1 says it). detail: include Show the work (off in the browser, which links to the code page instead). */
-export function card(item, meta, { title = true, detail = true } = {}) {
+/**
+ * The full card. title: render the code and label (off on the code's own page, where the h1 says it).
+ * detail: include Show the work (off in the browser, which links to the code page instead).
+ * variant: the words around the figures (NATIONAL_CARD, or a hospital's from hospital-view.mjs, whose
+ * workLink also keeps the national Show the work off the card). An item from hospital-math.mjs
+ * hospitalItem() carries each family's add-ons, drawn as an "Includes" line and the bar's end
+ * segment. folds: HTML for the hospital's folded sections, placed before the fine print.
+ * A code with no comparison draws the same with or without a hospital.
+ */
+export function card(item, meta, { title = true, detail = true, variant = NATIONAL_CARD, folds = '' } = {}) {
   const head = title ? `<p class="scard__title"><span class="scard__code">${esc(item.code)}</span> <span class="scard__label">${esc(item.label)}</span></p>` : '';
   if (item.kind !== 'compare') {
     return `<article class="scard scard--none" data-stake-card="${esc(item.code)}" data-kind="${esc(item.kind)}">
@@ -184,18 +233,19 @@ ${item.kind === 'pending' || item.kind === 'unmapped' ? `<dl class="scard__pay">
 </article>`;
   }
   const many = item.ip.families.length > 1;
+  const gap = gapParts(item, variant.gapLead).map((part, i) => (i === 1 && part.includes('–') ? `<span class="nw">${esc(part)}</span>` : esc(part))).join('');
   const tier = item.tier ? `<p class="scard__tier"><strong>Tier ${item.tier.n}.</strong> ${esc(item.tier.why)}</p>` : '';
   return `<article class="scard scard--t${item.tier ? item.tier.n : 0}" data-stake-card="${esc(item.code)}" data-kind="compare">
 ${head}<p class="scard__status">${statusBadge(item.review)}</p>
-<p class="scard__gap">${esc(gapText(item)).replace(/\$[\d,]+–\$[\d,]+/g, (range) => `<span class="nw">${range}</span>`)}</p>
+<p class="scard__gap">${gap}</p>
 <dl class="scard__pay">
-<div class="scard__op"><dt>Outpatient <span>${esc(meta.years.outpatient)} OPPS</span></dt><dd>${opLine(item)}</dd></div>
-<div class="scard__ip"><dt>Inpatient <span>${esc(meta.years.inpatient)} IPPS</span></dt><dd>${item.ip.families.map((f) => familyLine(f, many)).join('')}</dd></div>
+<div class="scard__op"><dt>Outpatient <span>${esc(meta.years.outpatient)} OPPS</span></dt><dd>${opLine(item, variant)}</dd></div>
+<div class="scard__ip"><dt>Inpatient <span>${esc(meta.years.inpatient)} IPPS</span></dt><dd>${item.ip.families.map((f) => familyLine(f, many, variant)).join('')}</dd></div>
 </dl>
-${scaleBar(item)}
-${tier}
-<p class="scard__fine">National, unadjusted: no wage index, IME or DSH. <span class="scard__draft">${esc(BADGE)}</span></p>
-${detail ? work(item, meta) : `<p class="scard__more"><a href="/code/${esc(item.code)}/#stake-h">Show the work for ${esc(item.code)}</a></p>`}
+${scaleBar(item, variant)}
+${tier}${folds}
+<p class="scard__fine">${esc(variant.fine)} <span class="scard__draft">${esc(BADGE)}</span></p>
+${detail && !variant.workLink ? work(item, meta) : `<p class="scard__more"><a href="/code/${esc(item.code)}/#stake-h">${esc(variant.workLink || `Show the work for ${item.code}`)}</a></p>`}
 <p class="scard__act">${out(agreeHref(item.code, item.map.fp, mappingSummary(item)), 'Agree', 'btn')}${out(wrongHref(item.code, item.map.fp, mappingSummary(item)), 'Something’s wrong', 'btn btn--quiet')} <a class="scard__batch" href="/revenue-at-stake/help-review/">Review a batch of 10 →</a></p>
 </article>`;
 }

@@ -21,10 +21,10 @@ class Helpers(unittest.TestCase):
             sources._expand("165-163")
 
     def test_money(self):
-        self.assertEqual(sources._money("$3,584.95 "), 3584.95)
-        self.assertEqual(sources._money("1584.98"), 1584.98)
-        self.assertIsNone(sources._money("."))
-        self.assertIsNone(sources._money(""))
+        self.assertEqual(sources.money("$3,584.95 "), 3584.95)
+        self.assertEqual(sources.money("1584.98"), 1584.98)
+        self.assertIsNone(sources.money("."))
+        self.assertIsNone(sources.money(""))
 
 
 @unittest.skipUnless(RAW_PRESENT, "raw CMS files not downloaded; run pipeline/fetch.py")
@@ -140,7 +140,7 @@ class Sources(unittest.TestCase):
         self.assertEqual(sources.load_opps_proposed()["32480"], {"si": "J1", "apc": "5182", "rate": 1777.99})
 
     def test_missing_proposed_file_warns_and_returns_nothing(self):
-        with mock.patch.object(sources, "_path", return_value=fetch.RAW / "absent" / "absent.zip"):
+        with mock.patch.object(sources, "source_path", return_value=fetch.RAW / "absent" / "absent.zip"):
             with self.assertWarns(UserWarning):
                 self.assertEqual(sources.load_opps_proposed.__wrapped__(), {})
 

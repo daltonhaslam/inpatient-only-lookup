@@ -55,7 +55,17 @@ cached = functools.lru_cache(maxsize=None)
 
 # ---------------------------------------------------------------- helpers
 
-def _path(source_id):
+def source_meta(source_id, label, members):
+    """{"label", "landing", "file"} for a pinned source, as crosswalk.json and the derived tables cite it.
+    label: the page's name for it; members: [(member pattern, prefer the workbook)] read from the zip,
+    their file names joined with "; ", or [] for a source that is the file itself."""
+    source = next(s for s in fetch.load_sources() if s["id"] == source_id)
+    path = fetch.raw_path(source)
+    files = [parse.pick_member(path, pattern, prefer_spreadsheet=book).rsplit("/", 1)[-1] for pattern, book in members]
+    return {"label": label, "landing": source["landing"], "file": "; ".join(files) if members else path.name}
+
+
+def source_path(source_id):
     for source in fetch.load_sources():
         if source["id"] == source_id:
             return fetch.raw_path(source)
@@ -64,10 +74,10 @@ def _path(source_id):
 
 def _lines(source_id, pattern):
     """The lines of one text member of a source's zip."""
-    path = _path(source_id)
+    path = source_path(source_id)
     member = parse.pick_member(path, pattern, prefer_spreadsheet=False)
     with zipfile.ZipFile(path) as archive:
-        text = parse._decode(parse._read(archive, member))
+        text = parse.decode(parse._read(archive, member))
     return text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
 
 
@@ -80,10 +90,10 @@ def _find(lines, regex, start=0, what=None):
     raise parse.ParseError("no line matching %r (%s)" % (regex, what or "layout changed?"))
 
 
-def _table(source_id, pattern, columns, prefer_spreadsheet=True):
+def read_table(source_id, pattern, columns, prefer_spreadsheet=True):
     """Rows of a CMS table as [{key: cell}], under the first header row in which each regex of
     columns ({key: regex}) matches exactly one label."""
-    path = _path(source_id)
+    path = source_path(source_id)
     member = parse.pick_member(path, pattern, prefer_spreadsheet)
     for _, rows in parse.read_member(path, member):
         for number, row in enumerate(rows[:40]):
@@ -98,7 +108,7 @@ def _table(source_id, pattern, columns, prefer_spreadsheet=True):
     raise parse.ParseError("no header with columns %s in %s" % (sorted(columns), member))
 
 
-def _money(text):
+def money(text):
     """'$3,584.95' or '3584.95' -> 3584.95; blank or '.' -> None."""
     value = (text or "").strip().replace("$", "").replace(",", "")
     return None if value in ("", ".") else float(value)
@@ -116,7 +126,7 @@ def _expand(drgs):
     return out
 
 
-def _at_least(table, minimum, what):
+def at_least(table, minimum, what):
     if len(table) < minimum:
         raise parse.ParseError("only %d entries parsed for %s" % (len(table), what))
     return table
@@ -138,7 +148,7 @@ def _order_file(source_id, pattern, code_re, what):
             if not code_re.match(code) or code in titles:
                 raise parse.ParseError("%s: bad or repeated code %r" % (what, code))
             titles[code] = title
-    return _at_least(titles, 50000, what)
+    return at_least(titles, 50000, what)
 
 
 @cached
@@ -171,7 +181,7 @@ def load_drg_titles():
             raise parse.ParseError("Appendix A: unexpected line %r" % line[:60])
         drg, mdc, kind, title = match.groups()
         titles[drg] = {"title": title, "mdc": mdc.strip() or None, "type": _DRG_TYPE[kind]}
-    return _at_least(titles, 700, "Appendix A")
+    return at_least(titles, 700, "Appendix A")
 
 
 @cached
@@ -181,13 +191,13 @@ def load_table5():
     columns = {"drg": r"^MS-DRG$", "weight": r"10% Cap Applied$",
                "gmlos": r"^Geometric mean LOS$", "amlos": r"^Arithmetic mean LOS$"}
     table = {}
-    for row in _table(SOURCE_OF["load_table5"], r"-CN Table 5\.txt$", columns, prefer_spreadsheet=False):
+    for row in read_table(SOURCE_OF["load_table5"], r"-CN Table 5\.txt$", columns, prefer_spreadsheet=False):
         if not re.fullmatch(r"\d{3}", row["drg"]) or not row["weight"]:
             continue    # 998 and 999 (ungroupable) have no weight
         if row["drg"] in table:
             raise parse.ParseError("Table 5: MS-DRG %s repeated" % row["drg"])
         table[row["drg"]] = {key: float(row[key]) for key in ("weight", "gmlos", "amlos")}
-    return _at_least(table, 700, "Table 5")
+    return at_least(table, 700, "Table 5")
 
 
 def _operating(rows, table):
@@ -201,7 +211,7 @@ def _operating(rows, table):
     if (not share or not groups[0].startswith("Hospital Submitted Quality Data and is a Meaningful EHR User")
             or labels[:2] != ["Labor-related", "Nonlabor-related"]):
         raise parse.ParseError("Table %s layout changed" % table)
-    labor, nonlabor = _money(amounts[0]), _money(amounts[1])
+    labor, nonlabor = money(amounts[0]), money(amounts[1])
     total = round(labor + nonlabor, 2)
     stated = float(share.group(1)) / 100
     if abs(labor / total - stated) > 0.0005:
@@ -215,7 +225,7 @@ def load_rates():
     amount (labor + nonlabor, full update) for wage index > 1 (1A) and <= 1 (1B), the labor shares
     those tables state, and the capital federal rate (1D)."""
     source_id = SOURCE_OF["load_rates"]
-    path = _path(source_id)
+    path = source_path(source_id)
     member = parse.pick_member(path, r"-CN Tables 1A", prefer_spreadsheet=False)
     rows = [[cell.strip() for cell in row] for row in parse.read_member(path, member)[0][1]]
     share_gt1, operating_gt1 = _operating(rows, "1A")
@@ -227,7 +237,7 @@ def load_rates():
     return {
         "operating_wi_gt1": operating_gt1, "operating_wi_le1": operating_le1,
         "labor_share_gt1": share_gt1, "labor_share_le1": share_le1,
-        "capital": _money(national[1]), "source": source_id,
+        "capital": money(national[1]), "source": source_id,
     }
 
 
@@ -254,7 +264,7 @@ def _surgical_classes():
             classes.append((mdc, row.group(1), row.group(2)))
         elif line.strip() and not line.startswith("="):
             raise parse.ParseError("Appendix D: unexpected line %r" % line[:60])
-    return _at_least(classes, 100, "Appendix D")
+    return at_least(classes, 100, "Appendix D")
 
 
 @cached
@@ -313,7 +323,7 @@ def load_proc_index():
         if not family:
             raise parse.ParseError("Appendix E: %s MDC %s %s has no category" % (current, mdc, drgs))
         index[current].append({"mdc": mdc, "drgs": _expand(drgs), "family": family, "non_or": non_or})
-    return _at_least(index, 10000, "Appendix E")
+    return at_least(index, 10000, "Appendix E")
 
 
 _CLUSTER_LINE = re.compile(r"^  (?:(and |One of|with one of)\s*)?(%s)?\s*(?:(Pre|\d\d)\s+(%s)\s+(\S.*?))?\s*$"
@@ -373,7 +383,7 @@ def load_clusters():
             current["rows"].append({"mdc": mdc, "drgs": _expand(drgs),
                                     "family": titles.get((mdc, drgs)) or category})
     close()
-    return _at_least(clusters, 1000, "Appendix E Part 2")
+    return at_least(clusters, 1000, "Appendix E Part 2")
 
 
 @cached
@@ -396,7 +406,7 @@ def load_non_or_combos():
             current = []
         else:
             raise parse.ParseError("Appendix E Part 3: unexpected line %r" % line[:60])
-    return _at_least(combos, 1, "Appendix E Part 3")
+    return at_least(combos, 1, "Appendix E Part 3")
 
 
 _JOINT_SITES = ("RIGHT HIP", "LEFT HIP", "RIGHT KNEE", "LEFT KNEE", "RIGHT ANKLE", "LEFT ANKLE")
@@ -498,7 +508,7 @@ def load_dx_mdc():
     if found != ASSIGNED_MDCS:
         raise parse.ParseError("diagnosis assignment lists for MDCs %s, expected %s"
                                % (sorted(found), sorted(ASSIGNED_MDCS)))
-    return _at_least(assigned, 50000, "MDC diagnosis assignment")
+    return at_least(assigned, 50000, "MDC diagnosis assignment")
 
 
 _APPENDIX_B_ROW = re.compile(r"^ (%s)? +(Pre|\d\d) +(%s(?:,%s)*)(?: +\S.*)?\s*$" % (CM, DRGS, DRGS))
@@ -560,25 +570,35 @@ def load_dx_pre_drgs():
         if mdc == PRE_MDC:
             row = drgs.setdefault(code, [])
             row.extend(drg for drg in listed if drg not in row)
-    return _at_least(drgs, 1000, "Appendix B Pre-MDC rows")
+    return at_least(drgs, 1000, "Appendix B Pre-MDC rows")
 
 
 # ---------------------------------------------------------------- outpatient (CY2027)
 
-def _opps(source_id):
-    """{HCPCS: {"si", "apc", "rate"}} from an Addendum B; apc and rate are None where blank."""
-    columns = {"code": r"^HCPCS Code$", "si": r"^SI$", "apc": r"^APC$", "rate": r"^Payment Rate$"}
+def addendum_rows(source_id, pattern, columns, build, minimum, what):
+    """{HCPCS: build(row)} from a CMS addendum table with a "code" column (in columns), skipping
+    rows that are not a HCPCS code or that build returns None for. A code listed twice with
+    different values, or fewer than minimum codes, raises ParseError."""
     table = {}
-    for row in _table(source_id, history.ADDENDUM_B, columns):
+    for row in read_table(source_id, pattern, columns):
         code = parse.normalize_code(row["code"])
         if not parse.CODE_RE.match(code):
             continue
-        apc = row["apc"].strip()
-        value = {"si": row["si"].upper(), "apc": apc.zfill(4) if apc.isdigit() else (apc or None),
-                 "rate": _money(row["rate"])}
-        if table.setdefault(code, value) != value:
-            raise parse.ParseError("%s: %s listed twice with different values" % (source_id, code))
-    return _at_least(table, 10000, source_id + " Addendum B")
+        value = build(row)
+        if value is not None and table.setdefault(code, value) != value:
+            raise parse.ParseError("%s %s: %s listed twice with different values" % (source_id, what, code))
+    return at_least(table, minimum, "%s %s" % (source_id, what))
+
+
+def _opps_row(row):
+    apc = row["apc"].strip()
+    return {"si": row["si"].upper(), "apc": apc.zfill(4) if apc.isdigit() else (apc or None), "rate": money(row["rate"])}
+
+
+def _opps(source_id):
+    """{HCPCS: {"si", "apc", "rate"}} from an Addendum B; apc and rate are None where blank."""
+    columns = {"code": r"^HCPCS Code$", "si": r"^SI$", "apc": r"^APC$", "rate": r"^Payment Rate$"}
+    return addendum_rows(source_id, history.ADDENDUM_B, columns, _opps_row, 10000, "Addendum B")
 
 
 @cached
@@ -591,11 +611,11 @@ def load_opps():
 def load_apc_titles():
     """{APC: group title} from the CY2027 final OPPS Addendum A."""
     titles = {}
-    for row in _table(SOURCE_OF["load_apc_titles"], ADDENDUM_A, {"apc": r"^APC$", "title": r"^Group Title$"}):
+    for row in read_table(SOURCE_OF["load_apc_titles"], ADDENDUM_A, {"apc": r"^APC$", "title": r"^Group Title$"}):
         apc = row["apc"].strip()
         if apc.isdigit():
             titles[apc.zfill(4)] = row["title"].strip()
-    return _at_least(titles, 500, "Addendum A")
+    return at_least(titles, 500, "Addendum A")
 
 
 @cached
@@ -603,13 +623,7 @@ def load_asc():
     """{HCPCS: national ASC payment rate} from CY2027 final ASC Addendum AA, where CMS lists a
     rate (codes packaged in the ASC, with no rate, are left out)."""
     columns = {"code": r"^HCPCS Code$", "indicator": r"Payment Indicator$", "rate": r"Payment Rate$"}
-    rates = {}
-    for row in _table(SOURCE_OF["load_asc"], ASC_AA, columns):
-        code, rate = parse.normalize_code(row["code"]), _money(row["rate"])
-        if parse.CODE_RE.match(code) and rate is not None:
-            if rates.setdefault(code, rate) != rate:
-                raise parse.ParseError("Addendum AA: %s listed twice with different rates" % code)
-    return _at_least(rates, 1000, "Addendum AA")
+    return addendum_rows(SOURCE_OF["load_asc"], ASC_AA, columns, lambda row: money(row["rate"]), 1000, "Addendum AA")
 
 
 @cached
@@ -618,7 +632,7 @@ def load_opps_proposed():
     when that file is not downloaded (the comparison is optional)."""
     source_id = SOURCE_OF["load_opps_proposed"]
     try:
-        present = _path(source_id).is_file()
+        present = source_path(source_id).is_file()
     except KeyError:
         present = False
     if not present:

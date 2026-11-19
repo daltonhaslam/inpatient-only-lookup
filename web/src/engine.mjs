@@ -67,6 +67,9 @@ export const num = (n) => n.toLocaleString('en-US');
 /** "1 code" / "2 codes" (or the given plural), with the count formatted. */
 export const plural = (n, one, many = `${one}s`) => `${num(n)} ${n === 1 ? one : many}`;
 
+/** A missing value (null or undefined) as an empty CSV cell; anything else as it is. */
+export const blank = (n) => (n === null || n === undefined ? '' : n);
+
 /** Rows of strings as CSV text. A cell a spreadsheet would run as a formula gets a leading apostrophe. */
 export function csv(rows) {
   const cell = (value) => {

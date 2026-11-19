@@ -334,6 +334,7 @@ td a[target] { white-space: nowrap; }
 .steps li::marker { color: var(--ink-2); font-weight: 600; }
 .credits { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.3rem 1.4rem; }
 .stake-block__lede { max-width: var(--measure); color: var(--ink-2); }
+.stake-block__share { margin-top: 1.1rem; max-width: var(--measure); padding-left: 0.8rem; border-left: 3px solid var(--rule); }
 .stake-block__more { margin-top: 0.9rem; font-size: 0.95rem; }
 
 .scard {
@@ -472,3 +473,20 @@ td a[target] { white-space: nowrap; }
 .stake-tablewrap { max-width: none; margin-top: 1.6rem; }
 .stake-tablewrap > summary { font-weight: 600; }
 .stake-tablewrap > h2 { margin-top: 1rem; }
+
+/* ---- revenue at stake: the hospital picker's empty box (in the page's HTML, stake.mjs PICK_MOUNT, so it
+   holds its own height from the first paint). The rest of the hospital view's styles load with the
+   picker, on first use: web/src/hospital.css. ---- */
+/* Without JavaScript the box cannot work; stake-client.mjs removes it if the page's data fails to load. */
+@media (scripting: none) { .hpick { display: none; } }
+/* On an ?h= landing (stake-client.mjs sets .hpick-h at script start) hold about the height the hospital's bar
+   and summary will take, so nothing below jumps when they arrive. Set a little under the shortest summary
+   (two numbers) at each layout: one column of numbers on a phone, two, then three. */
+.hpick-h .hpick { min-height: 37.5rem; }
+@media (min-width: 30rem) { .hpick-h .hpick { min-height: 26rem; } }
+@media (min-width: 46rem) { .hpick-h .hpick { min-height: 23rem; } }
+.hpick { margin-top: 1.3rem; max-width: 46rem; }
+.hpick__box { position: relative; }
+.hpick__field input { font-size: 1.15rem; }
+.hpick__note { margin-top: 0.45rem; font-size: 0.9rem; color: var(--ink-2); max-width: var(--measure); }
+.hpick__note:empty { display: none; }

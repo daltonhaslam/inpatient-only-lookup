@@ -12,6 +12,8 @@ import { normalize, clientModel, hydrate, removalMismatches } from '../src/stake
 import { card, alternativeLabel } from '../src/stake-card.mjs';
 import { CSV_HEADER, csvRows } from '../src/stake.mjs';
 import { out } from '../src/views.mjs';
+import { LEDE_NATIONAL, hospitalLede } from '../src/hospital-view.mjs';
+import { PICK_MOUNT } from '../src/stake.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '..', '..');
@@ -76,6 +78,19 @@ describe('revenue at stake', { skip }, () => {
     for (const item of packaged) assert.doesNotMatch(block(item.code), /scard__fam|scard__gap/, item.code);
   });
 
+  test('a compared code page: the national patient-share line and the link to see it at your hospital', () => {
+    const html = block('32480');
+    const t = textOf(html).replace(/\s+/g, ' ');
+    assert.ok(t.includes('Patient’s share, national: about $317 at a surgery center, $717 in the hospital outpatient department, plus the $292 Part B deductible in either.'), t);
+    assert.match(html, /<a href="\/revenue-at-stake\/\?q=32480">See this at your hospital →<\/a>/);
+    assert.match(textOf(block('0202T')).replace(/\s+/g, ' '), /Patient’s share, national: more at a surgery center ?, about \$4,674, than the \$1,776 in the hospital outpatient department \(capped at the inpatient deductible\)/);
+    const compared = items.filter((item) => item.kind === 'compare');
+    for (const item of compared) assert.equal((block(item.code).match(/stake-block__share/g) || []).length, 1, item.code);
+    for (const item of items.filter((i) => i.kind !== 'compare')) {
+      assert.doesNotMatch(block(item.code), /stake-block__share|See this at your hospital/, item.code);
+    }
+  });
+
   test('Tier 3 cards stack two or more ranges, each labeled with its condition, and ask for reviewers', () => {
     const tier3 = items.filter((item) => item.kind === 'compare' && item.tier && item.tier.n === 3 && item.ip.families.length > 1);
     assert.ok(tier3.length > 0, 'no multi-family Tier 3 codes in the data');
@@ -133,6 +148,34 @@ describe('revenue at stake', { skip }, () => {
     }
   });
 
+  test('CSV: the three patient-share columns come last, in cents, from patient-shares.json; empty without a share', () => {
+    const sharesPath = join(repo, 'pipeline/derived/patient-shares.json');
+    assert.deepEqual(CSV_HEADER.slice(-3), ['opps_patient_share', 'asc_patient_share', 'asc_costs_patient_more']);
+    const at = (name) => CSV_HEADER.indexOf(name);
+    const fake = { codes: { [items.find((i) => i.kind === 'compare').code]: { asc_share: 4674.348, opps_share: 1776, asc_more: true, opps_capped: true } } };
+    const [code] = Object.keys(fake.codes);
+    const row = csvRows(stake, fake).find((r) => r[0] === code);
+    assert.deepEqual([row[at('opps_patient_share')], row[at('asc_patient_share')], row[at('asc_costs_patient_more')]], [1776, 4674.35, 'true']);
+    assert.equal(row.length, CSV_HEADER.length);
+    // No share (no shares file, or a code without one): three empty cells, never 0 or "false".
+    for (const r of [...csvRows(stake, null).slice(1), ...csvRows(stake, fake).slice(1).filter((r) => r[0] !== code)]) {
+      assert.equal(r.length, CSV_HEADER.length, r[0]);
+      assert.deepEqual(r.slice(-3), ['', '', ''], r[0]);
+    }
+    if (!existsSync(sharesPath)) return;
+    const shares = JSON.parse(readFileSync(sharesPath, 'utf8'));
+    let seen = 0;
+    for (const r of csvRows(stake, shares).slice(1)) {
+      const s = shares.codes[r[0]];
+      if (!s || s.asc_share === null || s.opps_share === null) { assert.deepEqual(r.slice(-3), ['', '', ''], r[0]); continue; }
+      seen += 1;
+      assert.equal(r[at('opps_patient_share')], Math.round(s.opps_share * 100) / 100, r[0]);
+      assert.equal(r[at('asc_patient_share')], Math.round(s.asc_share * 100) / 100, r[0]);
+      assert.equal(r[at('asc_costs_patient_more')], s.asc_more ? 'true' : 'false', r[0]);
+    }
+    assert.ok(seen >= 849, `rows with a share: ${seen}`);
+  });
+
   test('every card with an inpatient range also shows a review status', () => {
     for (const code of codes) {
       for (const html of cards(block(code))) {
@@ -174,6 +217,26 @@ describe('revenue at stake', { skip }, () => {
     assert.ok(textOf(html).includes('Agreements under the same name count as one reviewer.'), 'help page does not say how reviewers are counted');
   });
 
+  test('main page: the lede holds the phrase a hospital pick replaces, exactly once (hospital-view.mjs LEDE_NATIONAL)', () => {
+    const html = read('revenue-at-stake/index.html');
+    const lede = /<section class="stake-head"[\s\S]*?<p class="lede">([\s\S]*?)<\/p>/.exec(html)[1];
+    assert.equal(lede.split(LEDE_NATIONAL).length - 1, 1, lede);
+    assert.notEqual(hospitalLede(lede), lede, 'the swap changes it');
+  });
+
+  test('main page: each national download link carries its label for both modes, so a pick can relabel it (A52)', () => {
+    const html = read('revenue-at-stake/index.html');
+    const links = [.../<p class="stake__actions">([\s\S]*?)<\/p>/.exec(html)[1].matchAll(/<a [^>]*data-national-label="([^"]*)" data-hospital-label="([^"]*)">([^<]*)<\/a>/g)];
+    assert.deepEqual(links.map((m) => m.slice(1).join(' | ')), ['Download Excel | Download national Excel | Download Excel', 'Download CSV | Download national CSV | Download CSV']);
+  });
+
+  test('main page: the hospital picker\'s labeled box is in the HTML, exactly stake.mjs PICK_MOUNT (no reserved height)', () => {
+    const html = read('revenue-at-stake/index.html');
+    assert.equal(html.split(PICK_MOUNT).length - 1, 1);
+    assert.ok(PICK_MOUNT.includes('<label class="field hpick__field" for="hp-q"><span>Pick a hospital to apply its wage index and its teaching (IME) and safety-net (DSH) add-ons.</span>'), PICK_MOUNT);
+    assert.ok(PICK_MOUNT.includes('role="status" data-hpick-status'));
+  });
+
   test('main page: badge, guardrail, years, progress, downloads, a row per code', () => {
     const html = read('revenue-at-stake/index.html');
     const text = textOf(html);
@@ -208,6 +271,18 @@ describe('revenue at stake', { skip }, () => {
     const withCard = readdirSync(join(docs, 'code')).filter((code) => read(`code/${code}/index.html`).includes('scard__act'));
     assert.ok(withCard.length > 0);
     for (const code of withCard.slice(0, 20)) assert.ok(read(`code/${code}/index.html`).includes('Review a batch of 10 →'), code);
+  });
+
+  test('methods page: with the hospital picker built, the hospital, left-out, MA, per-year and patient-share sections and their sources', () => {
+    const html = read('revenue-at-stake/methods/index.html');
+    if (!read('revenue-at-stake/index.html').includes('data-hospital-pick')) return;
+    for (const id of ['m-hosp-h', 'm-left-h', 'm-ma-h', 'm-year-h', 'm-share-h', 'm-factors-cap']) assert.ok(html.includes(`id="${id}"`), id);
+    for (const id of ['hospitals', 'drg-volume', 'asc-new-2027']) {
+      const { source } = JSON.parse(readFileSync(join(repo, `pipeline/derived/${id}.json`), 'utf8')).meta;
+      assert.ok(html.includes(`href="${source.landing}"`) && textOf(html).includes(source.file), `methods sources lack ${source.id}`);
+    }
+    assert.ok(html.includes('Download for'), 'the hospital CSV is described with the downloads');
+    assert.ok(html.includes('text import'), 'how to keep leading zeros');
   });
 
   test('methods page cites every source file, the guardrail and the years', () => {

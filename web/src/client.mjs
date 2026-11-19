@@ -2,8 +2,11 @@
 // Every page is complete without this script; it only makes the date and the search live.
 import {
   isDate, isFullDate, formatDate, todayISO, clampDate, outsideRangeNote, unreadDateNote, printable, dayNumber, fromDayNumber, normalizeCode, isCode, periodIndex,
-  stateAt, lookup, expandOther, countsAt, exemptCodes, buildIndex, search, extractCodes, num, csv, isScheduled,
+  stateAt, lookup, expandOther, countsAt, exemptCodes, buildIndex, search, extractCodes, num, isScheduled,
 } from './engine.mjs';
+import { lookupShare } from './patient-share.mjs';
+import { lazyJson } from './fetch.mjs';
+import { saveCsv } from './download.mjs';
 import { esc, chip, CHIP, verdict, verdictParts, eventList, codeRow, answer, axis, pct, scheduledNote, captionedScroller } from './views.mjs';
 
 // Vercel Web Analytics: never send what someone searched for or which date they chose.
@@ -15,9 +18,12 @@ const $$ = (selector, rootNode = document) => [...rootNode.querySelectorAll(sele
 const params = () => new URLSearchParams(window.location.search);
 
 const BULK_LIMIT = 500;
+// The ASC patient-share file for CMS's 2027 ASC additions ({url, from}, put into this bundle by build.mjs;
+// null when the build had none). Loaded only when a lookup answer needs it: one of those codes, off the list.
+const SHARES = typeof __SHARES__ === 'undefined' ? null : __SHARES__;
 
 const state = {
-  data: null, other: null, otherLoading: null, otherFailed: false, index: null,
+  data: null, other: null, index: null,
   date: null, today: null, period: null,   // period: index of the Addendum B in force on `date`
   query: '', bulk: [], bulkDropped: 0,
   cells: [],         // the whole-list squares, resolved once: {node, record, state}
@@ -86,16 +92,37 @@ function persist(now = false) {
   if (now) save(); else persistTimer = setTimeout(save, 250);
 }
 
+// The never-listed codes: loaded when a code outside the list's history is asked about, and tried again
+// on the next ask after a failure.
+let others = null;
 function loadOther() {
-  if (!state.otherLoading) {
-    state.otherFailed = false;
-    state.otherLoading = fetch(document.body.dataset.other)
-      .then((response) => { if (!response.ok) throw new Error(String(response.status)); return response.json(); })
-      .then((packed) => { state.other = expandOther(packed); })
-      .catch(() => { state.otherLoading = null; state.otherFailed = true; })
-      // A throw while redrawing must not become an unhandled rejection.
-      .then(() => { drawVerdicts(); drawBulk(); announce(); }).catch(() => {});
-  }
+  others ||= lazyJson(document.body.dataset.other, {
+    retry: true,
+    settled: () => {
+      if (others.data && !state.other) state.other = expandOther(others.data);
+      drawVerdicts(); drawBulk(); announce();
+    },
+  });
+  others.load();
+}
+const otherFailed = () => Boolean(others && others.failed);
+
+// The 2027 ASC additions' patient shares: loaded when an answer first needs them, at most one load at a
+// time. After a failure, the next code asked about tries again (like the never-listed codes); redraws of
+// the same answer (a date change) do not. The answer stands without the line meanwhile.
+const shares = SHARES && lazyJson(SHARES.url, { retry: true, settled: () => drawVerdicts() });
+let sharesAsked = null;   // the code whose answer last started a load
+
+/**
+ * The patient-share line for a lookup answer (HTML from patient-share.mjs, or ''), given the answer's own
+ * lookup() result. Only a code that left the list on the additions' date can have one; lookupShare checks
+ * the rest. The answer redraws when the file lands.
+ */
+function shareFor(code, result) {
+  if (!shares || result.removed !== SHARES.from) return '';
+  if (shares.data) return lookupShare(shares.data, code, result.state, state.date, result.removed);
+  if (!shares.failed || sharesAsked !== code) { sharesAsked = code; shares.load(); }
+  return '';
 }
 
 // ---- drawing ------------------------------------------------------------------------------
@@ -207,8 +234,10 @@ function drawVerdicts() {
   for (const host of $$('[data-verdict-host]')) {
     const code = host.dataset.verdictHost;
     const options = { title: host.dataset.title || 'h2', heading: host.dataset.heading || 'h3', link: host.dataset.link === '1' };
+    // data-share: the lookup's answers (a code's own page has the line in its Revenue at stake block).
+    if (host.dataset.share === '1') options.share = (result) => shareFor(code, result);
     const body = $('[data-verdict-body]', host);
-    if (!data.codes[code] && !other && state.otherFailed) {
+    if (!data.codes[code] && !other && otherFailed()) {
       setHtml(host, `<p class="results__none">Couldn’t load the list of codes that were never inpatient only, so ${esc(code)} can’t be checked right now. Check your connection and try again.</p>`);
       continue;
     }
@@ -264,7 +293,7 @@ function drawExempt() {
 
 function showVerdict(host, code, before) {
   if (!state.data.codes[code] && !state.other) loadOther();
-  host.innerHTML = `${before}<div data-verdict-host="${esc(code)}" data-link="1"></div>`;
+  host.innerHTML = `${before}<div data-verdict-host="${esc(code)}" data-link="1" data-share="1"></div>`;
   drawVerdicts();
   drawControls();
 }
@@ -322,7 +351,7 @@ function drawBulk() {
   const host = $('[data-bulk-out]');
   if (!host || !state.bulk.length) return;
   if (!state.other) {
-    setHtml(host, state.otherFailed
+    setHtml(host, otherFailed()
       ? '<p class="results__none">Couldn’t load the list of codes that were never inpatient only. Check your connection and try again.</p>'
       : '<p>Checking…</p>');
     return;
@@ -344,13 +373,7 @@ ${captionedScroller('bulk-cap', `Codes checked for ${formatDate(state.date)}`, '
 function downloadBulk() {
   const rows = [['code', 'procedure', 'date_of_service', 'status', 'left_the_list', 'review_exemption', 'source']]
     .concat(bulkRows().map((row) => [row.code, row.label, state.date, row.status, row.removed, row.exemption, row.basis]));
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(new Blob([csv(rows)], { type: 'text/csv' }));
-  link.download = `inpatient-only-${state.date}.csv`;
-  document.body.append(link);
-  link.click();
-  link.remove();
-  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  saveCsv(rows, `inpatient-only-${state.date}.csv`);
 }
 
 function drawDate() {

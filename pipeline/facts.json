@@ -1,0 +1,44 @@
+{
+ "note": "Hand-maintained figures the hospital view and the patient share use that no pinned CMS data file carries. Each names where it was read. The derived tables carry these values; nothing else may retype them. Refresh the deductibles each November; each figure must be in a quote and each quote on the downloaded fact sheet (sources.json, the entry with the same URL), checked by the crosswalk build and tests/test_raw.py.",
+ "deductibles": {
+  "year": 2027,
+  "part_a_inpatient": 1776,
+  "part_b": 292,
+  "source": "CMS fact sheet, 2027 Medicare Parts A & B Premiums and Deductibles, 2026-11-17 (notices CMS-8092-N, CMS-8093-N, CMS-8094-N)",
+  "url": "https://www.cms.gov/newsroom/fact-sheets/2027-medicare-parts-b-premiums-deductibles",
+  "quotes": [
+   "The Medicare Part A inpatient hospital deductible that beneficiaries pay if admitted to the hospital will be $1,776 in 2027, an increase of $40 from $1,736 in 2026.",
+   "The annual deductible for all Medicare Part B beneficiaries will be $292 in 2027, an increase of $9 from the annual deductible of $283 in 2026."
+  ]
+ },
+ "opps_labor_share": {
+  "value": 0.6,
+  "cite": "91 FR 70328",
+  "citation": "OPPS27-labor-share"
+ },
+ "asc_additions_2027": {
+  "count": 618,
+  "also_added": ["64629"],
+  "cite": "91 FR 70665",
+  "citations": ["ASC27-618", "ASC27-64629"]
+ },
+ "expected": {
+  "note": "What the fail-closed checks (crosswalk/exposure_checks.py) hold the hospital tables to: the spec's counts (checked 2026-11-18 against the FY 2027 impact file) and the plan's correctness anchors for OHSU. Revisit when a source is repinned.",
+  "hospitals_offered": [3000, 3200],
+  "teaching_in_file": 1327,
+  "ohsu": {
+   "ccn": "380009",
+   "drgs": {
+    "165": {"total": 22116.60, "addons": 6067.07, "ime_operating": 4632.08},
+    "163": {"total": 51459.44, "addons": 14116.45}
+   },
+   "apc": {"apc": "5183", "rate": 3584.95, "at_hospital": 3995.14},
+   "per_year": {"drg": "165", "count": 10, "addons": 60670.69},
+   "volume_2024": {"163": 15, "164": 34, "165": 11}
+  },
+  "shares": {
+   "32480": {"asc_share": 316.996, "opps_share": 716.99, "asc_more": false},
+   "53448": {"asc_share": 4115.24, "opps_share": 1776, "opps_capped": true, "asc_more": true}
+  }
+ }
+}

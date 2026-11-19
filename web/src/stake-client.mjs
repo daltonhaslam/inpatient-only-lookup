@@ -4,9 +4,49 @@
 import { num } from './engine.mjs';
 import { esc } from './views.mjs';
 import { card, STATUS } from './stake-card.mjs';
-import { prepare, filterCodes, outsideCrosswalk, stateFromParams, paramsFromState, countText, PAGE_SIZE, TIERS, DEFAULTS } from './stake-engine.mjs';
+import { prepare, filterCodes, outsideCrosswalk, stateFromParams, hospitalParam, queryString, countText, PAGE_SIZE, TIERS, DEFAULTS } from './stake-engine.mjs';
+import { announcer } from './announce.mjs';
+import { fetchJson } from './fetch.mjs';
+
+// The hospital view's file URLs and Maryland's CCN prefix, put into this bundle by build.mjs (null: no picker in this build).
+const HOSPITAL = typeof __HOSPITAL_ASSETS__ === 'undefined' ? null : __HOSPITAL_ASSETS__;
+
+// A landing on ?h=<CCN> will show a hospital's bar and summary where the empty picker is. Reserve their
+// height now, at script start, so the page below does not jump when they arrive (styles.css .hpick-h).
+// Dropped once the landing resolves: in the same change that shows the hospital (its bar and summary
+// then hold the space), or when it is not shown (an unknown CCN, a failed load, a later pick or Back to
+// national won). Left on, "Change hospital" would sit above a blank band. A Maryland CCN
+// (HOSPITAL.maryland, its state code) is never shown, so it reserves nothing.
+const RESERVE = 'hpick-h';
+// The page's Download Excel / CSV links stay national: while a hospital is shown (picked, set by start())
+// they say so (stake.mjs downloads(): data-hospital-label), and on an ?h= landing from the moment its
+// height is reserved, so they change before the first paint, not when the hospital arrives (the longer
+// labels wrap on a phone: no layout shift).
+let picked = false;
+let wired = false;   // start() has wired the picker's box (stake.mjs PICK_MOUNT)
+function labelDownloads() {
+  const on = picked || document.documentElement.classList.contains(RESERVE);
+  for (const a of document.querySelectorAll('[data-hospital-label]')) a.textContent = on ? a.dataset.hospitalLabel : a.dataset.nationalLabel;
+}
+const reserve = (on) => { document.documentElement.classList.toggle(RESERVE, on); labelDownloads(); };
+const landing = HOSPITAL ? hospitalParam(window.location.search) : '';
+if (landing && !landing.startsWith(HOSPITAL.maryland)) reserve(true);
 
 const $ = (selector, root = document) => root.querySelector(selector);
+
+/** Run a DOM change as a view transition where the browser has them and motion is welcome; else at once. A change that throws rejects the promise returned. */
+function transition(change) {
+  if (!document.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    try { change(); } catch (error) { return Promise.reject(error); }
+    return Promise.resolve();
+  }
+  const view = document.startViewTransition(change);
+  // A change that throws rejects all three promises; the caller handles updateCallbackDone's, so the
+  // other two must not surface as unhandled rejections.
+  view.ready.catch(() => {});
+  view.finished.catch(() => {});
+  return view.updateCallbackDone;
+}
 
 const option = (value, text, current) => `<option value="${esc(value)}"${value === current ? ' selected' : ''}>${esc(text)}</option>`;
 const select = (id, label, options, current, hint) => `<label class="sfilter__field" for="${id}"><span>${label}</span><select id="${id}" data-f="${id.replace('sf-', '')}"${hint ? ` aria-describedby="${hint}"` : ''}>${options.map(([v, t]) => option(v, t, current)).join('')}</select></label>`;
@@ -63,6 +103,11 @@ export function start(model) {
   if (!host) return;
   const data = prepare(model);
   const state = stateFromParams(window.location.search, data);
+  // The picked hospital: its view (hospital-view.mjs createView), or null for national. pending: a
+  // six-digit ?h= still being checked against the list, kept in the URL until then.
+  let view = null;
+  const setView = (next) => { view = next; picked = Boolean(next); labelDownloads(); };
+  let pending = hospitalParam(window.location.search);
   let matches = [];
   let shown = 0;
 
@@ -72,17 +117,17 @@ export function start(model) {
   const more = $('[data-more]', host);
   const count = $('#sf-count', host);
   const box = $('#sf-q', host);
-  let announce = 0;
+  const say = announcer(count);   // the count line: said once typing settles
 
   const writeUrl = () => {
-    const text = paramsFromState(state);
+    const text = queryString(state, view ? view.ccn : pending);
     try { window.history.replaceState(null, '', `${window.location.pathname}${text ? `?${text}` : ''}${window.location.hash}`); } catch { /* the page still works without a remembered state */ }
   };
 
   // Cards are drawn in slices of PAGE_SIZE; the results node is rebuilt only when the filters change.
   const draw = (from) => {
     const slice = matches.slice(from, from + PAGE_SIZE);
-    const html = slice.map((item) => card(item, model.meta, { detail: false })).join('');
+    const html = slice.map((item) => (view ? view.card(item) : card(item, model.meta, { detail: false }))).join('');
     if (from === 0) {
       const miss = matches.length ? null : outsideCrosswalk(data, state.q);
       results.innerHTML = matches.length ? html : (miss ? missing(miss) : empty());
@@ -96,13 +141,12 @@ export function start(model) {
   };
 
   const update = () => {
-    matches = filterCodes(data, state);
+    matches = filterCodes(view ? view.data : data, state);
     draw(0);
     writeUrl();
     const miss = !matches.length && outsideCrosswalk(data, state.q);
     const text = miss ? `${miss.code} is not in this crosswalk.` : countText(matches.length, shown);
-    clearTimeout(announce);
-    announce = setTimeout(() => { count.textContent = text; }, 250);   // one announcement after typing settles
+    say(text);
   };
 
   host.addEventListener('input', (event) => {
@@ -119,8 +163,7 @@ export function start(model) {
       draw(from);
       const first = results.querySelectorAll('[data-stake-card]')[from];
       if (first) { first.tabIndex = -1; first.focus(); }   // keyboard users continue from the first new card
-      clearTimeout(announce);
-      count.textContent = countText(matches.length, shown);
+      say.now(countText(matches.length, shown));
     } else if (event.target.closest('[data-reset]')) {
       Object.assign(state, DEFAULTS);
       host.querySelectorAll('[data-f]').forEach((field) => {
@@ -132,15 +175,69 @@ export function start(model) {
   });
 
   update();
-  count.textContent = countText(matches.length, shown);
+  say.now(countText(matches.length, shown));
+
+  const mount = HOSPITAL && $('[data-hospital-pick]');
+  if (!mount) return;
+  // The picker's box is in the page's HTML (stake.mjs PICK_MOUNT); the code that makes it work, the
+  // hospital list and each hospital's file load on first use (focus, a tap, or an ?h= in the address), so
+  // the national page carries none of it.
+  // The picker, once its bundle has loaded and taken over the box: a promise of its {show, say, start},
+  // or of null when the bundle failed to load (the next focus or tap tries again).
+  let picker = null;
+  const attach = () => {
+    picker ||= import(HOSPITAL.view).then((mod) => mod.attachPicker(mount, HOSPITAL, {
+      data, meta: model.meta, results,
+      // One hospital's view, computed once: swap the strip and the cards together, then say so once. The
+      // pick is committed only when both drew; if either throws, the page goes back to what it showed
+      // before (the picker's box, whose note line then says what went wrong) and the error reaches the
+      // picker. The URL keeps a landing's h until the pick is committed.
+      onPick: (next, { initial, ui }) => {
+        const prev = view;
+        return transition(() => {
+          try {
+            setView(next);
+            ui.show(next);
+            update();
+          } catch (error) {
+            setView(prev);
+            ui.show(prev, { find: true });
+            update();
+            throw error;
+          }
+          pending = '';
+          reserve(false);
+        }).then(() => {
+          if (!initial) $('[data-hpick-change]', mount)?.focus();
+          ui.say(next.announce);
+        });
+      },
+      onClear: (ui) => transition(() => { setView(null); reserve(false); ui.show(null); update(); })
+        .then(() => { $('#hp-q', mount)?.focus(); ui.say('Showing national rates.'); }),
+      // An ?h= that names no hospital the picker offers (Maryland, unknown): national, clean URL.
+      onInvalid: ({ keepUrl = false }) => { reserve(false); if (!keepUrl) { pending = ''; writeUrl(); } },
+    })).catch(() => { picker = null; return null; });
+    return picker;
+  };
+  for (const type of ['focusin', 'pointerdown']) mount.addEventListener(type, attach);
+  wired = true;
+  // Someone who focused or typed in the box before the page's data arrived gets the picker now.
+  if (mount.contains(document.activeElement) || $('#hp-q', mount)?.value) attach();
+  // A failed load keeps national, and the h in the URL for a reload. However the landing ends (shown, not
+  // shown, or overtaken by a pick of someone's own), its reserved height goes.
+  if (pending) attach().then((ui) => ui?.start(pending)).finally(() => reserve(false));
 }
 
 async function load() {
   const source = document.body.dataset.stake;
   if (!source) return;
-  const response = await fetch(source);
-  if (!response.ok) return;
-  start(await response.json());
+  start(await fetchJson(source));
 }
 
-load().catch(() => { /* the tables below stand on their own */ });
+load().catch(() => {
+  // The tables below stand on their own; drop the picker, which cannot work without the page's data
+  // (unless start() got as far as wiring it), and any reserved space.
+  const mount = $('[data-hospital-pick]');
+  if (mount && !wired) mount.remove();
+  reserve(false);
+});

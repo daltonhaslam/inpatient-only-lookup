@@ -672,6 +672,7 @@ if (!hasStake) {
     assert(await page.locator('tr[data-code="32480"]').count() === 1, 'table row for 32480');
     eq(await page.locator('[data-stake-app] *').count(), 0, 'app is empty without JS');
     eq(await page.locator('details.stake-tablewrap').count(), 0, 'table not wrapped without JS');
+    eq(await page.locator('[data-hospital-pick]').isVisible(), false, 'the hospital picker, which needs JS, is hidden');
     // The tables render lazily (content-visibility); a jump link must still land on its table.
     const jump = page.locator('.stab__jump a').last();
     const target = (await jump.getAttribute('href')).slice(1);
@@ -679,6 +680,592 @@ if (!hasStake) {
     await page.waitForFunction((id) => { const box = document.getElementById(id).getBoundingClientRect(); return box.top >= -2 && box.top < innerHeight / 2; }, target);
     assert(await page.locator(`#${target} + .scroll tbody tr`).first().isVisible(), 'jumped-to table shows its rows');
   }, { javaScriptEnabled: false });
+
+  // ---- the hospital view -------------------------------------------------------------------
+  const HOSPITAL_FILES = /\/(data\/hospitals\.|data\/h\.|assets\/hospital\.)/;
+  const lazyRequests = (page) => {
+    const seen = [];
+    page.on('request', (request) => { if (HOSPITAL_FILES.test(new URL(request.url()).pathname)) seen.push(new URL(request.url()).pathname); });
+    return seen;
+  };
+  async function pickHospital(page, query, ccn) {
+    await page.locator('#hp-q').fill(query);
+    await page.locator(`#hp-o-${ccn}`).click();
+    await page.waitForSelector('.hpick__on');
+  }
+  const headText = async (page) => (await page.locator('[data-hospital-pick]').textContent()).replace(/\s+/g, ' ');
+  async function cardFor(page, code) {
+    await page.locator('#sf-q').fill(code);
+    await countLine(page, (t) => t === '1 code.', `count for ${code}`);
+    return (await page.locator(`[data-stake-card="${code}"]`).textContent()).replace(/\s+/g, ' ');
+  }
+  async function openFolds(page, code) {
+    for (const kind of ['split', 'year']) {
+      const fold = page.locator(`[data-stake-card="${code}"] [data-fold="${kind}"]`);
+      if (await fold.count() && !(await fold.evaluate((d) => d.open))) await fold.locator('> summary').click();
+    }
+  }
+  const foldText = async (page, code, kind) => (await page.locator(`[data-stake-card="${code}"] [data-fold="${kind}"]`).textContent()).replace(/\s+/g, ' ');
+  const noJunk = (text, what) => assert(!/NaN|undefined|Infinity|\$0–\$0|null/.test(text), `${what}: ${text}`);
+
+  await check('hospital: the national landing shows only the empty picker and loads no hospital files', async (page) => {
+    const seen = lazyRequests(page);
+    await openStake(page);
+    eq((await page.locator('label[for="hp-q"]').textContent()).trim(), 'Pick a hospital to apply its wage index and its teaching (IME) and safety-net (DSH) add-ons.', 'picker label');
+    eq((await page.locator('.stake__actions a[download]').allTextContents()).join(' | '), 'Download Excel | Download CSV', 'national download labels');
+    eq(await page.locator('#hp-q').getAttribute('role'), 'combobox', 'combobox role');
+    eq(await page.locator('.hsum, .hpick__on').count(), 0, 'no summary or hospital bar');
+    await page.waitForTimeout(400);
+    eq(seen.length, 0, `hospital files on the national landing: ${seen.join(', ')}`);
+    has(await cardFor(page, '32480'), 'Outpatient pays', 'national card');
+    eq(page.url().includes('h='), false, 'no h in the URL');
+  });
+
+  await check('hospital: pick OHSU: bar, summary, URL, hospital card for 32480, one announcement, focus', async (page) => {
+    await openStake(page);
+    await pickHospital(page, 'ohsu', '380009');
+    await page.waitForFunction(() => new URLSearchParams(location.search).get('h') === '380009');
+    const head = await headText(page);
+    has(head, 'Rates for Ohsu Hospital And Clinics (380009)', 'bar');
+    has(head, 'Teaching · IME 31.1% · DSH 7.0% · wage index 1.19', 'facts');
+    has(head, 'At Ohsu Hospital And Clinics, about half of what a removed procedure loses when billed outpatient is teaching (IME) and safety-net (DSH) add-ons.', 'lead');
+    for (const part of ['$10,478', '$5,156', '822 of 849']) has(head, part, 'summary number');
+    eq(await page.evaluate(() => document.activeElement.hasAttribute('data-hpick-change')), true, 'focus moves to Change hospital');
+    eq((await page.locator('.stake__actions a[download]').allTextContents()).join(' | '), 'Download national Excel | Download national CSV', 'A52: a pick relabels the page’s downloads');
+    await waitText(page.locator('[data-hpick-status]'), (t) => t.startsWith('Showing rates for Ohsu Hospital And Clinics.'), 'status line');
+    const text = await cardFor(page, '32480');
+    for (const part of ['If billed outpatient, Ohsu Hospital And Clinics is paid $18,121–$47,464 less than the inpatient DRG family.', '$3,995', 'national rate $3,585',
+      'Surgery center (ASC), national: $1,585', '$22,117–$51,459', 'Includes $6,067–$14,116 in IME and DSH', 'No IME or DSH add-on in either outpatient setting.',
+      'Ohsu Hospital And Clinics rates: wage index, IME and DSH (operating and capital).']) has(text, part, '32480 card');
+    assert(!text.includes('National, unadjusted'), 'no national fine print on a hospital card');
+    eq(await page.locator('[data-stake-card="32480"] .sbar__add').count(), 1, 'add-on end segment of the bar');
+    const legend = await page.locator('[data-stake-card="32480"] .sbar__keyed').textContent();
+    eq(legend, '(IME and DSH)', 'bar legend: a swatch and words true in every color mode');
+    const key = await page.locator('[data-stake-card="32480"] .sbar__key').evaluate((el) => getComputedStyle(el).backgroundColor);
+    eq(key, await page.locator('[data-stake-card="32480"] .sbar__add').evaluate((el) => getComputedStyle(el).backgroundColor), 'swatch matches the segment');
+    has(page.url(), 'h=380009&q=32480', 'URL keeps the hospital and the search');
+    await page.reload();
+    await page.waitForSelector('.hsum');
+    has(await page.locator('[data-stake-card="32480"]').textContent(), '$18,121–$47,464', 'reload keeps the hospital');
+  });
+
+  await check('hospital: keyboard only, type a CCN, arrow to it, Enter', async (page) => {
+    await openStake(page);
+    await page.locator('#hp-q').focus();
+    await page.keyboard.type('380009');
+    await page.waitForSelector('#hp-o-380009');
+    eq(await page.locator('#hp-q').getAttribute('aria-expanded'), 'true', 'list open');
+    await page.keyboard.press('ArrowDown');
+    eq(await page.locator('#hp-q').getAttribute('aria-activedescendant'), 'hp-o-380009', 'active option');
+    eq(await page.locator('#hp-o-380009').getAttribute('aria-selected'), 'true', 'option selected');
+    await page.keyboard.press('Enter');
+    await page.waitForSelector('.hsum');
+    await page.keyboard.press('Enter');   // Change hospital
+    eq(await page.evaluate(() => document.activeElement.id), 'hp-q', 'Change returns to the search box');
+    await page.keyboard.press('Escape');
+    await page.waitForSelector('.hpick__on');
+    has(await headText(page), 'Ohsu Hospital And Clinics (380009)', 'Escape keeps the picked hospital');
+  });
+
+  await check('hospital: a non-teaching DSH hospital, a hospital with no add-ons, and Puerto Rico', async (page) => {
+    await openStake(page);
+    await pickHospital(page, '010005', '010005');
+    let head = await headText(page);
+    has(head, 'Not a teaching hospital · DSH', 'DSH-only facts');
+    has(head, 'At Marshall Medical Centers South Campus, a small part of what a removed procedure loses when billed outpatient is a safety-net (DSH) add-on.', 'DSH-only lead');
+    has(head, 'typical DSH in that lowest DRG (median)', 'DSH-only tile');
+    const dshSummary = await page.locator('.hsum').textContent();
+    assert(!/IME|teaching/.test(dshSummary), `DSH-only summary names IME: ${dshSummary}`);
+    noJunk(head, 'DSH-only summary');
+    let text = await cardFor(page, '32480');
+    has(text, 'If billed outpatient, Marshall Medical Centers South Campus is paid', 'DSH-only gap');
+    for (const part of ['Includes $392–$912 in DSH', 'No DSH add-on in either outpatient setting.', 'Marshall Medical Centers South Campus rates: wage index and operating DSH.']) has(text, part, 'DSH-only card');
+    eq(await page.locator('[data-stake-card="32480"] .sbar__keyed').textContent(), '(DSH)', 'DSH-only bar legend');
+    await openFolds(page, '32480');
+    has(await foldText(page, '32480', 'split'), 'The split by DRG · base, DSH', 'DSH-only split heading');
+    eq((await page.locator('[data-stake-card="32480"] [data-fold="split"] th[scope="row"]').allTextContents()).join(' | '), 'Base | DSH | Total', 'DSH-only split rows: no $0 IME row');
+    noJunk(text, 'DSH-only card');
+
+    await page.locator('[data-hpick-change]').click();
+    await pickHospital(page, '010018', '010018');
+    head = await headText(page);
+    has(head, 'At Uab Callahan Eye Hospital Authority, about a third of what a removed procedure loses when billed outpatient is a teaching (IME) add-on.', 'IME-only lead');
+    const imeSummary = await page.locator('.hsum').textContent();
+    assert(!/DSH|safety-net/.test(imeSummary), `IME-only summary names DSH: ${imeSummary}`);
+    text = await cardFor(page, '32480');
+    for (const part of ['Includes $2,985–$6,945 in IME', 'No IME add-on in either outpatient setting.', 'Uab Callahan Eye Hospital Authority rates: wage index and IME (operating and capital).']) has(text, part, 'IME-only card');
+    eq(await page.locator('[data-stake-card="32480"] .sbar__keyed').textContent(), '(IME)', 'IME-only bar legend');
+
+    await page.locator('[data-hpick-change]').click();
+    await pickHospital(page, 'arizona spine', '030107');
+    head = await headText(page);
+    has(head, 'Arizona Spine And Joint Hospital gets no teaching (IME) or safety-net (DSH) add-ons, so what a removed procedure loses when billed outpatient is base payment only.', 'no add-ons lead');
+    has(head, 'No DSH', 'facts');
+    noJunk(head, 'no add-ons summary');
+    text = (await page.locator('[data-stake-card="32480"]').textContent()).replace(/\s+/g, ' ');
+    assert(!text.includes('Includes'), 'no add-on line');
+    has(text, 'This hospital gets no IME or DSH.', 'fine print');
+    eq(await page.locator('[data-stake-card="32480"] .sbar__add').count(), 0, 'no darker part');
+
+    await page.locator('[data-hpick-change]').click();
+    await pickHospital(page, 'puerto rico presbyterian', '400001');
+    head = await headText(page);
+    has(head, 'Presbyterian Community Hospital (400001)', 'PR bar');
+    has(head, 'wage index 0.53', 'PR wage index');
+    noJunk(head, 'PR summary');
+    text = (await page.locator('[data-stake-card="32480"]').textContent()).replace(/\s+/g, ' ');
+    has(text, 'If billed outpatient, Presbyterian Community Hospital is paid', 'PR gap');
+    noJunk(text, 'PR card');
+    eq(new URL(page.url()).searchParams.get('h'), '400001', 'URL follows the newest pick');
+  });
+
+  await check('hospital: a Maryland search says why, and offers nothing', async (page) => {
+    await openStake(page);
+    await page.locator('#hp-q').fill('meritus');
+    await waitText(page.locator('#hp-note'), (t) => t.includes('Maryland hospitals are paid under the state'), 'Maryland note');
+    eq(await page.locator('#hp-list [role="option"]').count(), 0, 'no options');
+    eq(await page.locator('#hp-q').getAttribute('aria-expanded'), 'false', 'list closed');
+    await page.locator('#hp-q').fill('zzzzqq');
+    await waitText(page.locator('#hp-note'), (t) => t.startsWith('No IPPS hospital matches'), 'no-match note');
+  });
+
+  await check('hospital: ?h= junk, Maryland or unknown falls back to national with a clean URL and no error', async (page) => {
+    const seen = lazyRequests(page);
+    for (const [query, left] of [['?h=abc', ''], ['?h=..%2Fhospitals', ''], ['?h=210001', ''], ['?h=999999&tier=3', '?tier=3'], ['?h=38000&q=32480', '?q=32480']]) {
+      await openStake(page, query);
+      await page.waitForFunction((rest) => location.search === rest, left, { timeout: 5000 }).catch(async () => { throw new Error(`${query}: URL is ${await page.evaluate(() => location.search)}, expected ${JSON.stringify(left)}`); });
+      eq(await page.locator('.hsum, .hpick__on').count(), 0, `${query}: no hospital view`);
+      const first = await page.locator('[data-results] .scard__gap').first().textContent();
+      assert(!first.includes('If billed outpatient'), `${query}: cards stay national`);
+    }
+    const perHospital = seen.filter((path) => path.startsWith('/data/h.'));
+    eq(perHospital.length, 0, `no hospital file fetched for a bad h: ${perHospital.join(', ')}`);
+  });
+
+  await check('hospital: Back to national restores the national page, URL and focus', async (page) => {
+    await openStake(page, '?h=380009&q=32480');
+    await page.waitForSelector('.hsum');
+    has(await page.locator('[data-stake-card="32480"]').textContent(), 'Ohsu Hospital And Clinics', 'landing on ?h= shows the hospital');
+    eq((await page.locator('.stake__actions a[download]').allTextContents()).join(' | '), 'Download national Excel | Download national CSV', 'A52: the page’s downloads say national while a hospital is picked');
+    await page.locator('[data-hpick-clear]').click();
+    await page.waitForFunction(() => !document.querySelector('.hsum'));
+    eq((await page.locator('.stake__actions a[download]').allTextContents()).join(' | '), 'Download Excel | Download CSV', 'download labels restored');
+    eq(await page.evaluate(() => location.search), '?q=32480', 'URL keeps only the search');
+    eq(await page.evaluate(() => document.activeElement.id), 'hp-q', 'focus returns to the picker');
+    const text = (await page.locator('[data-stake-card="32480"]').textContent()).replace(/\s+/g, ' ');
+    has(text, 'Outpatient pays', 'national card again');
+    has(text, 'National, unadjusted: no wage index, IME or DSH.', 'national fine print again');
+    await waitText(page.locator('[data-hpick-status]'), (t) => t === 'Showing national rates.', 'status line');
+  });
+
+  await check('hospital 400px: no horizontal overflow with the picker open and with OHSU picked', async (page) => {
+    await openStake(page);
+    await page.locator('#hp-q').fill('providence');
+    await page.waitForSelector('#hp-list [role="option"]');
+    const wide = [];
+    const measure = async (what) => {
+      const m = await page.evaluate(() => ({ s: document.documentElement.scrollWidth, c: document.documentElement.clientWidth }));
+      if (m.s > m.c + 1) wide.push(`${what}: ${m.s} > ${m.c}`);
+    };
+    await measure('picker open');
+    await pickHospital(page, 'ohsu', '380009');
+    await measure('OHSU picked');
+    await cardFor(page, '32480');
+    await measure('OHSU 32480');
+    await openFolds(page, '32480');
+    await measure('OHSU 32480, folds open');
+    // The fold tables fit the card at 400 px (a three-DRG family), so no figure hides behind a scroll.
+    const tables = await page.evaluate(() => [...document.querySelectorAll('[data-stake-card="32480"] .hfold .scroll')].map((el) => el.scrollWidth - el.clientWidth));
+    assert(tables.every((d) => d <= 1), `fold tables scroll sideways at 400 px: ${tables.join(', ')}`);
+    await cardFor(page, '19305');
+    await openFolds(page, '19305');
+    await measure('OHSU 19305 (two families), folds open');
+    // A six-DRG family (47600, MS-DRG 411–416) may scroll inside its named region, never the page.
+    await cardFor(page, '47600');
+    await openFolds(page, '47600');
+    await measure('OHSU 47600 (six DRGs), folds open');
+    const region = page.locator('[data-stake-card="47600"] [data-fold="split"] .scroll').first();
+    eq(await region.getAttribute('role'), 'region', 'a wide split table scrolls in a named region');
+    eq(await region.getAttribute('tabindex'), '0', 'reachable by keyboard');
+    assert(wide.length === 0, wide.join('\n'));
+  }, { viewport: { width: 400, height: 860 } });
+
+  // ---- the hospital view: folds, counts, lede, color modes -------------------------------------
+
+  await check('hospital: the split by DRG and per year folds, to the cent', async (page) => {
+    await openStake(page, '?h=380009&q=32480');
+    await page.waitForSelector('.hsum');
+    eq(await page.locator('[data-stake-card="32480"] details.hfold[open]').count(), 0, 'folds start closed');
+    await openFolds(page, '32480');
+    const split = await foldText(page, '32480', 'split');
+    for (const part of ['MS-DRG 165 without CC/MCC', '$16,049.53', '$22,116.60', '$51,459.44', 'Uncompensated care is left out']) has(split, part, 'split');
+    const year = await foldText(page, '32480', 'year');
+    for (const part of ['Per year at Ohsu Hospital And Clinics · up to about $1 million, a ceiling', '$14,116.45 a case: IME + DSH', '$4,632.08 a case: operating IME only', '$1,015,760.07', 'A ceiling, not a forecast', 'not saved']) has(year, part, 'per year');
+    noJunk(split + year, 'folds');
+    // The summary is a button-like disclosure: keyboard toggles it.
+    await page.locator('[data-stake-card="32480"] [data-fold="split"] > summary').focus();
+    await page.keyboard.press('Enter');
+    eq(await page.locator('[data-stake-card="32480"] [data-fold="split"]').evaluate((d) => d.open), false, 'Enter closes the split');
+  });
+
+  await check('hospital: editing counts updates the row, the MA estimate, the total and the heading, and keeps focus', async (page) => {
+    await openStake(page, '?h=380009&q=32480');
+    await page.waitForSelector('.hsum');
+    await openFolds(page, '32480');
+    const card = page.locator('[data-stake-card="32480"]');
+    const box = card.locator('[data-count="165:trad"]');
+    await box.click();
+    await page.keyboard.press('ControlOrMeta+a');
+    await page.keyboard.type('10');
+    eq(await card.locator('[data-cell="165:trad"] .hyr__year').textContent(), '$60,670.69', '10 traditional cases of DRG 165');
+    eq(await card.locator('[data-count="165:ma"]').inputValue(), '11', 'MA estimate follows the traditional count');
+    eq(await card.locator('[data-cell="165:ma"] .hyr__year').textContent(), '$50,952.86', 'MA row');
+    eq(await card.locator('[data-year-total]').textContent(), '$1,005,060.92', 'total');
+    eq(await card.locator('[data-year-head]').textContent(), 'up to about $1 million, a ceiling', 'heading');
+    eq(await page.evaluate(() => document.activeElement.dataset.count), '165:trad', 'focus stays in the box');
+    await waitText(page.locator('[data-hpick-status]'), (t) => t === '32480, per year at Ohsu Hospital And Clinics: up to about $1 million, a ceiling.', 'one announcement');
+    // Clearing 163 and 164 moves the heading.
+    for (const key of ['163:trad', '164:trad']) await card.locator(`[data-count="${key}"]`).fill('');
+    eq(await card.locator('[data-year-head]').textContent(), 'up to about $112,000, a ceiling', 'heading after clearing');
+    // Not a whole number: flagged in words and to assistive tech, never drawn raw.
+    await card.locator('[data-count="163:ma"]').fill('2.5');
+    eq(await card.locator('[data-count="163:ma"]').getAttribute('aria-invalid'), 'true', 'aria-invalid');
+    eq(await card.locator('[data-cell="163:ma"] .hyr__why').textContent(), 'not a whole number', 'note');
+    eq(await card.locator('[data-cell="163:ma"] .hyr__year').textContent(), 'no count', 'no figure for a bad count');
+    await card.locator('[data-count="163:ma"]').fill('<b>x</b>');
+    eq(await card.locator('b', { hasText: /^x$/ }).count(), 0, 'typed markup never becomes markup');
+    // A redraw (a filter change) keeps the counts and the open folds.
+    await page.locator('#sf-compared').check();
+    await countLine(page, (t) => t === '1 code.', 'count after the filter');
+    eq(await page.locator('[data-stake-card="32480"] [data-count="165:trad"]').inputValue(), '10', 'typed count kept');
+    eq(await page.locator('[data-stake-card="32480"] details.hfold[open]').count(), 2, 'folds stay open');
+  });
+
+  /** Click the hospital CSV button; the download's filename and its rows (a small CSV reader: quotes, doubled quotes). */
+  async function hospitalCsv(page) {
+    const [download] = await Promise.all([page.waitForEvent('download'), page.locator('[data-hpick-csv]').click()]);
+    const text = readFileSync(await download.path(), 'utf8');
+    const rows = text.trimEnd().split('\n').map((line) => [...line.matchAll(/(?:^|,)("(?:[^"]|"")*"|[^,]*)/g)].map((m) => (m[1].startsWith('"') ? m[1].slice(1, -1).replace(/""/g, '"') : m[1])));
+    const head = rows[0];
+    const named = rows.slice(1).map((row) => Object.fromEntries(head.map((name, i) => [name, row[i]])));
+    return { name: download.suggestedFilename(), text, head, rows: named };
+  }
+
+  await check('hospital CSV: no button on the national page; after a pick, revenue-at-stake-<CCN>.csv with OHSU 32480 rows and the typed counts', async (page) => {
+    await openStake(page, '?q=32480');
+    eq(await page.locator('[data-hpick-csv]').count(), 0, 'no hospital CSV button before a pick');
+    await pickHospital(page, 'ohsu', '380009');
+    eq((await page.locator('[data-hpick-csv]').textContent()).trim(), 'Download for Ohsu Hospital And Clinics (CSV)', 'button label');
+    let csv = await hospitalCsv(page);
+    eq(csv.name, 'revenue-at-stake-380009.csv', 'filename');
+    eq(csv.head.join(','), 'row_type,ccn,hospital,code,family_order,drg,payer,hospital_outpatient,inpatient_base,ime,dsh,inpatient_total,outpatient_minus_inpatient,cases,count_source,add_on_per_case,add_on_per_year,note', 'header');
+    const find = (rows, type, drg, payer = '') => rows.find((r) => r.row_type === type && r.code === '32480' && r.drg === drg && r.payer === payer);
+    const r165 = find(csv.rows, 'per_case', '165');
+    eq([r165.ccn, r165.hospital, r165.hospital_outpatient, r165.inpatient_total, r165.outpatient_minus_inpatient].join(' | '), '380009 | Ohsu Hospital And Clinics | 3995.14 | 22116.6 | -18121.46', 'DRG 165 per case');
+    eq(find(csv.rows, 'per_case', '163').inpatient_total, '51459.44', 'DRG 163 total');
+    eq(csv.rows.find((r) => r.row_type === 'per_year_total' && r.code === '32480').add_on_per_year, '1015760.07', 'prefilled total');
+    eq(find(csv.rows, 'per_year', '165', 'traditional_medicare').count_source, 'cms_2024', 'prefilled count');
+    assert(!/NaN|undefined|Infinity|null/.test(csv.text), 'no junk in the file');
+    // The typed counts go into the file and say so.
+    await openFolds(page, '32480');
+    await page.locator('[data-stake-card="32480"] [data-count="165:trad"]').fill('10');
+    csv = await hospitalCsv(page);
+    const typed = find(csv.rows, 'per_year', '165', 'traditional_medicare');
+    eq([typed.cases, typed.count_source, typed.add_on_per_year, typed.note].join(' | '), '10 | typed | 60670.69 | your count', 'typed count');
+    eq(find(csv.rows, 'per_year', '165', 'medicare_advantage').cases, '11', 'the MA estimate follows');
+    eq(csv.rows.find((r) => r.row_type === 'per_year_total' && r.code === '32480').add_on_per_year, '1005060.92', 'total with the typed count');
+    await page.locator('[data-hpick-clear]').click();
+    await page.waitForFunction(() => !document.querySelector('.hsum'));
+    eq(await page.locator('[data-hpick-csv]').count(), 0, 'no hospital CSV button after Back to national');
+  });
+
+  await check('hospital CSV: a hostile hospital name is escaped on the page and guarded against formulas in the file', async (page) => {
+    const hostile = '=HYPERLINK("http://x.example","<b>click</b>")';
+    await page.route(/\/data\/h\.[0-9a-f]{10}\/380009\.json/, async (route) => {
+      const response = await route.fetch();
+      route.fulfill({ response, json: { ...(await response.json()), name: hostile } });
+    });
+    await openStake(page, '?h=380009&q=32480');
+    await page.waitForSelector('.hsum');
+    eq(await page.locator('.hpick__name b').count(), 0, 'the name never becomes markup');
+    const csv = await hospitalCsv(page);
+    const cells = csv.rows.map((r) => r.hospital);
+    assert(cells.length > 0 && cells.every((cell) => cell === `'${hostile}`), `hospital cells: ${cells[0]}`);
+    assert(!csv.text.split('\n').some((line) => /(^|,)[=+@]/.test(line)), 'a cell starts like a formula');
+  });
+
+  await check('hospital: Review Focus 3, suppressed counts read "under 11 or none", stay editable, and totals still work', async (page) => {
+    await openStake(page, '?h=010001&q=32480');
+    await page.waitForSelector('.hsum');
+    await openFolds(page, '32480');
+    const card = page.locator('[data-stake-card="32480"]');
+    eq(await card.locator('[data-count="164:trad"]').inputValue(), '', 'suppressed cell is empty');
+    eq(await card.locator('[data-cell="164:trad"] .hyr__why').textContent(), 'under 11 or none', 'suppressed note');
+    const before = await card.locator('[data-year-total]').textContent();
+    await card.locator('[data-count="164:trad"]').fill('20');
+    assert((await card.locator('[data-cell="164:trad"] .hyr__year').textContent()).startsWith('$'), 'typed count gives a figure');
+    assert((await card.locator('[data-year-total]').textContent()) !== before, 'total moves');
+    eq(await card.locator('[data-cell="164:trad"] .hyr__why').textContent(), 'under 11 or none', 'still says CMS published none');
+
+    await page.locator('[data-hpick-change]').click();
+    await pickHospital(page, '010006', '010006');
+    await openFolds(page, '32480');
+    eq(await page.locator('[data-stake-card="32480"] [data-year-head]').textContent(), 'no 2024 counts published', 'no counts for the family');
+    noJunk(await foldText(page, '32480', 'year'), 'no-count fold');
+  });
+
+  await check('hospital: the lede names the hospital’s rates after a pick and reverts on clear', async (page) => {
+    await openStake(page);
+    const lede = page.locator('.stake-head .lede');
+    const national = await lede.innerHTML();
+    has(national, 'national and unadjusted', 'national lede');
+    await pickHospital(page, 'ohsu', '380009');
+    has(await lede.textContent(), 'at this hospital’s rates', 'hospital lede');
+    await page.locator('[data-hpick-change]').click();
+    await pickHospital(page, 'arizona spine', '030107');
+    has(await lede.textContent(), 'at this hospital’s rates', 'no add-on lede');
+    eq(await page.locator('[data-fold="year"]').count(), 0, 'no per-year fold without add-ons');
+    await page.locator('[data-hpick-clear]').click();
+    await page.waitForFunction(() => !document.querySelector('.hsum'));
+    eq(await lede.innerHTML(), national, 'lede back to the server’s words');
+  });
+
+  await check('hospital dark mode: folds, inputs and the add-on segment use the dark palette', async (page) => {
+    await openStake(page, '?h=380009&q=32480');
+    await page.waitForSelector('.hsum');
+    await openFolds(page, '32480');
+    const style = (selector, prop) => page.locator(selector).first().evaluate((el, p) => getComputedStyle(el)[p], prop);
+    const bodyBg = await style('body', 'backgroundColor');
+    eq(await style('[data-count="163:trad"]', 'backgroundColor'), bodyBg, 'input sits on the dark page');
+    eq(await style('[data-count="163:trad"]', 'color'), await style('body', 'color'), 'input text is the page text');
+    eq(await style('[data-stake-card="32480"] .sbar__add', 'backgroundColor'), 'rgb(116, 214, 195)', 'add-on segment uses the dark step');
+    await page.mouse.move(0, 0);
+    eq(await style('[data-fold="year"] > summary', 'color'), 'rgb(116, 214, 195)', 'fold summary in the brand ink');
+  }, { colorScheme: 'dark' });
+
+  await check('hospital forced colors: the add-on segment, the count boxes and the fold markers stay visible', async (page) => {
+    await openStake(page, '?h=380009&q=32480');
+    await page.waitForSelector('.hsum');
+    await openFolds(page, '32480');
+    const canvas = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    const seg = await page.locator('[data-stake-card="32480"] .sbar__add').evaluate((el) => getComputedStyle(el).backgroundColor);
+    assert(seg !== canvas && seg !== 'rgba(0, 0, 0, 0)', `add-on segment ${seg} on ${canvas}`);
+    const box = await page.locator('[data-count="163:trad"]').evaluate((el) => { const s = getComputedStyle(el); return { w: s.borderTopWidth, c: s.borderTopColor }; });
+    assert(parseFloat(box.w) >= 1 && box.c !== canvas && box.c !== 'rgba(0, 0, 0, 0)', `count box border ${box.w} ${box.c}`);
+    const marker = await page.locator('[data-fold="year"] > summary').evaluate((el) => { const s = getComputedStyle(el); return `${s.display} ${s.listStyleType}`; });
+    eq(marker, 'list-item disclosure-open', 'native disclosure marker');
+    const markerColor = await page.locator('[data-fold="year"] > summary').evaluate((el) => getComputedStyle(el, '::marker').color);
+    assert(markerColor !== canvas, `marker color ${markerColor}`);
+  }, { forcedColors: 'active' });
+
+  for (const scheme of ['light', 'dark']) {
+    await check(`hospital axe (${scheme}): folds open, a one-family and a two-family card`, async (page) => {
+      const report = [];
+      for (const code of ['32480', '19305']) {
+        await openStake(page, `?h=380009&q=${code}`);
+        await page.waitForSelector('.hsum');
+        await openFolds(page, code);
+        await page.evaluate(axeSource());
+        const results = await page.evaluate(() => window.axe.run(document));
+        for (const v of results.violations.filter((x) => x.impact === 'serious' || x.impact === 'critical')) {
+          report.push(`${code} [${v.impact}] ${v.id}: ${v.help}\n      ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join('\n      ')}`);
+        }
+      }
+      assert(report.length === 0, `${report.length} violations\n  ${report.join('\n  ')}`);
+    }, { colorScheme: scheme });
+  }
+
+  // ---- the ASC patient-share line --------------------------------------------------------------
+  await check('code page: the patient-share line and the link to see the card at your hospital', async (page) => {
+    await open(page, '/code/32480/');
+    const share = (await page.locator('.stake-block__share').textContent()).replace(/\s+/g, ' ');
+    eq(share, 'Patient’s share, national: about $317 at a surgery center, $717 in the hospital outpatient department, plus the $292 Part B deductible in either. Most Medigap plans pay the coinsurance; Medicare Advantage plans set their own.', 'share line');
+    const link = page.locator('.stake-block__more a', { hasText: 'See this at your hospital' });
+    eq(await link.getAttribute('href'), '/revenue-at-stake/?q=32480', 'link');
+    await link.click();
+    await page.waitForSelector('[data-stake-card="32480"]');
+    eq(await page.locator('#hp-q').count(), 1, 'lands on the picker');
+    await open(page, '/code/0202T/');
+    has(await page.locator('.stake-block__share').textContent(), 'more at a surgery center', 'ASC-higher line leads with it');
+  });
+
+  await check('lookup: a 2027 ASC addition gets the share line once it is off the list, loaded only then', async (page) => {
+    const asked = [];
+    page.on('request', (request) => { if (/\/data\/shares\./.test(request.url())) asked.push(request.url()); });
+    await open(page, '/?q=32480');
+    await page.waitForSelector('[data-results] .verdict');
+    eq(await page.locator('.facts__share').count(), 0, 'no line while it is still on the list');
+    await page.waitForTimeout(300);
+    eq(asked.length, 0, 'no shares file before an answer needs it');
+    await setDate(page, '2027-03-01');
+    const line = await waitText(page.locator('[data-results] .facts__share dd'), (t) => t.startsWith('About'), 'share line');
+    eq(line, 'About $317 at a surgery center, $717 in the hospital outpatient department, plus the $292 Part B deductible in either. Most Medigap plans pay the coinsurance; Medicare Advantage plans set their own.', 'lookup line');
+    eq(asked.length, 1, 'one fetch');
+    await page.fill('[data-q]', '27447');
+    await waitText(page.locator('[data-results] .verdict__code'), (t) => t === '27447', 'another code');
+    eq(await page.locator('.facts__share').count(), 0, 'no line for a code CMS did not add for 2027');
+  });
+
+  await check('lookup: a failed shares file is not retried on redraws, is retried on the next code asked, and the answer stands', async (page) => {
+    let asked = 0;
+    let fail = true;
+    await page.route(/\/data\/shares\./, (route) => { asked += 1; if (fail) route.fulfill({ status: 404, body: '' }); else route.continue(); });
+    ignore404 = true;   // the browser logs the failed load as a console error
+    try {
+      await open(page, '/?q=32480&dos=2027-03-01');
+      await waitText(answer(page), (t) => t.startsWith('Not inpatient only'), 'answer');
+      for (const day of ['2027-03-02', '2027-03-03']) {
+        await setDate(page, day);
+        await waitText(answer(page), (t) => t.includes(`March ${Number(day.slice(-2))}, 2027`), `answer on ${day}`);
+      }
+      await page.waitForTimeout(300);
+      eq(asked, 1, 'one try for the same answer');
+      eq(await page.locator('.facts__share').count(), 0, 'no line without the file');
+      fail = false;
+      await page.fill('[data-q]', '11004');   // another of CMS's 2027 ASC additions
+      await waitText(page.locator('[data-results] .facts__share dd'), (t) => t.startsWith('About'), 'line after the retry');
+      eq(asked, 2, 'the next code asked tries again');
+    } finally {
+      ignore404 = false;
+    }
+  });
+
+  // Layout shift, measured the way Core Web Vitals counts it (shifts without recent input), with the page's
+  // data held back 500 ms so the national page paints first.
+  async function layoutShift(context, path, ready) {
+    await context.addInitScript(() => {
+      window.__cls = 0;
+      new PerformanceObserver((list) => { for (const e of list.getEntries()) if (!e.hadRecentInput) window.__cls += e.value; })
+        .observe({ type: 'layout-shift', buffered: true });
+    });
+    const page = await context.newPage();
+    await page.route(/\/data\/stake\./, async (route) => { await new Promise((r) => setTimeout(r, 500)); await route.continue(); });
+    await page.goto(base + path);
+    await page.waitForSelector(ready, { timeout: 15000 });
+    await page.waitForTimeout(800);
+    const cls = await page.evaluate(() => window.__cls);
+    await page.close();
+    return cls;
+  }
+  for (const width of [400, 1280]) {
+    await check(`hospital ${width}px: an ?h= landing barely shifts (CLS < 0.1) and the national landing not at all`, async (_page, context) => {
+      const hospital = await layoutShift(context, '/revenue-at-stake/?h=380009', '.hsum');
+      assert(hospital < 0.1, `CLS ${hospital.toFixed(3)} on ?h=380009`);
+      const national = await layoutShift(context, '/revenue-at-stake/', '[data-results] [data-stake-card]');
+      assert(national < 0.001, `CLS ${national.toFixed(3)} on the national landing`);
+    }, { viewport: { width, height: 860 } });
+  }
+
+  // The picker's labeled box is in the page's HTML (its label wraps on a phone): nothing moves when the script takes it over.
+  await check('hospital: the picker\'s box has its height before the page\'s data arrives, at one to three label lines', async (page) => {
+    let release;
+    let held;
+    await page.route(/\/data\/stake\./, async (route) => { await held; await route.continue(); });
+    const off = [];
+    for (const width of [320, 400, 700, 1280]) {
+      held = new Promise((resolve) => { release = resolve; });
+      await page.setViewportSize({ width, height: 860 });
+      await page.goto(`${base}/revenue-at-stake/`);
+      await page.evaluate(() => document.fonts.ready);
+      const reserved = await page.locator('[data-hospital-pick]').evaluate((el) => el.getBoundingClientRect().height);
+      release();
+      await page.waitForSelector('#hp-q');
+      const drawn = await page.locator('[data-hospital-pick]').evaluate((el) => el.getBoundingClientRect().height);
+      if (Math.abs(drawn - reserved) > 1) off.push(`${width}px: reserved ${reserved.toFixed(1)}, drawn ${drawn.toFixed(1)}`);
+    }
+    assert(off.length === 0, off.join('; '));
+  });
+
+  await check('hospital: a file that arrives but cannot be computed says so, not "check the connection"', async (page) => {
+    await page.route(/\/data\/h\.[0-9a-f]{10}\/380009\.json/, (route) => route.fulfill({ status: 200, contentType: 'application/json', body: 'null' }));
+    await openStake(page);
+    const before = problems.length;
+    await page.locator('#hp-q').fill('ohsu');
+    await page.locator('#hp-o-380009').click();
+    const note = await waitText(page.locator('#hp-note'), (t) => t.startsWith('Could not show'), 'compute-failure note');
+    has(note, 'This is not a connection problem', 'distinct from a network failure');
+    eq(await page.locator('.hsum').count(), 0, 'national stays');
+    const logged = problems.splice(before);   // the one console.error this check expects
+    assert(logged.length === 1 && logged[0].includes('the hospital view for 380009 could not be shown'), `console: ${logged.join(' | ')}`);
+  });
+
+  const reserved = (page) => page.evaluate(() => document.documentElement.classList.contains('hpick-h'));
+  await check('hospital: an ?h= landing drops its reserved height once shown, so Change hospital leaves no blank band', async (page) => {
+    await openStake(page, '?h=380009');
+    await page.waitForSelector('.hsum');
+    eq(await reserved(page), false, 'reservation dropped once the hospital shows');
+    await page.locator('[data-hpick-change]').click();
+    await page.waitForSelector('#hp-q');
+    const tall = await page.locator('[data-hospital-pick]').evaluate((el) => el.getBoundingClientRect().height);
+    assert(tall < 200, `the picker's box sits in a ${Math.round(tall)}px band after Change hospital`);
+  });
+
+  await check('hospital: an ?h= landing overtaken by a pick that fails still drops its reserved height', async (page) => {
+    let release;
+    const held = new Promise((resolve) => { release = resolve; });
+    await page.route(/\/data\/h\.[0-9a-f]{10}\/380009\.json/, async (route) => { await held; await route.continue(); });
+    await page.route(/\/data\/h\.[0-9a-f]{10}\/030107\.json/, (route) => route.fulfill({ status: 404, body: '' }));
+    ignore404 = true;
+    try {
+      await openStake(page, '?h=380009');
+      await waitText(page.locator('#hp-note'), (t) => t.startsWith('Loading'), 'landing loading');
+      eq(await reserved(page), true, 'reserved while the landing loads');
+      await page.locator('#hp-q').fill('arizona spine');
+      await page.locator('#hp-o-030107').click();
+      await waitText(page.locator('#hp-note'), (t) => t.startsWith('Could not load'), 'the overtaking pick fails');
+      release();
+      await page.waitForFunction(() => !document.documentElement.classList.contains('hpick-h'));
+      eq(await page.locator('.hsum').count(), 0, 'the overtaken landing is not shown');
+    } finally {
+      release();
+      ignore404 = false;
+    }
+  });
+
+  await check('hospital: a view that fails while drawing rolls back to the page before the pick, with a live note', async (page) => {
+    await openStake(page, '?q=32480');
+    // Break the cards' redraw for hospital cards only: the hospital's view is built, then update() throws.
+    await page.evaluate(() => {
+      const results = document.querySelector('[data-results]');
+      const { get, set } = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+      Object.defineProperty(results, 'innerHTML', {
+        configurable: true,
+        get() { return get.call(this); },
+        set(html) { if (window.__breakCards && html.includes('If billed outpatient')) throw new Error('test: card draw failed'); set.call(this, html); },
+      });
+      window.__breakCards = true;
+    });
+    const before = problems.length;
+    await page.locator('#hp-q').fill('ohsu');
+    await page.locator('#hp-o-380009').click();
+    const note = await waitText(page.locator('#hp-note'), (t) => t.startsWith('Could not show'), 'compute-failure note in a live box');
+    has(note, 'This is not a connection problem', 'the note');
+    eq(await page.locator('.hsum, .hpick__on').count(), 0, 'no hospital bar or summary');
+    has(await page.locator('[data-stake-card="32480"]').textContent(), 'Outpatient pays', 'cards stay national');
+    eq(new URL(page.url()).searchParams.get('h'), null, 'no h in the URL');
+    eq(await page.evaluate(() => document.activeElement.id), 'hp-q', 'focus back in the picker box');
+    const logged = problems.splice(before);   // the one console.error this check expects
+    assert(logged.length === 1 && logged[0].includes('the hospital view for 380009 could not be shown'), `console: ${logged.join(' | ')}`);
+    // The view committed nothing: a typed search still draws national cards, and a later pick works.
+    await page.locator('#sf-q').fill('19305');
+    await countLine(page, (t) => t === '1 code.', 'count after the rollback');
+    has(await page.locator('[data-stake-card="19305"]').textContent(), 'Outpatient pays', 'still national after a redraw');
+    await page.evaluate(() => { window.__breakCards = false; });
+    await pickHospital(page, 'ohsu', '380009');
+    has(await page.locator('[data-stake-card="19305"]').textContent(), 'If billed outpatient, Ohsu Hospital And Clinics', 'a later pick works');
+  });
+
+  await check('stake: if the page data fails to load, the picker leaves no blank band', async (page) => {
+    await page.route(/\/data\/stake\./, (route) => route.fulfill({ status: 404, body: '' }));
+    ignore404 = true;
+    try {
+      await page.goto(`${base}/revenue-at-stake/`);
+      await page.waitForFunction(() => !document.querySelector('[data-hospital-pick]'));
+      eq(await page.locator('[data-stake-table] table').count() > 0, true, 'the server tables still stand');
+    } finally {
+      ignore404 = false;
+    }
+  });
 }
 
 // ---- accessibility ------------------------------------------------------------------------
@@ -688,13 +1275,13 @@ function axeSource() {
   if (!existsSync(AXE)) throw new Error('axe-core is not installed. Run: cd web && npm install');
   return readFileSync(AXE, 'utf8');
 }
-const axePaths = ['/?q=27447', ...(hasStake ? ['/revenue-at-stake/?tier=3', '/revenue-at-stake/?q=99213', '/revenue-at-stake/?q=qqqzzzx'] : []), '/code/27132/', '/history/', '/phase-out/', '/exemption/', '/methods/', '/group/spine/'];
+const axePaths = ['/?q=27447', ...(hasStake ? ['/revenue-at-stake/?tier=3', '/revenue-at-stake/?q=99213', '/revenue-at-stake/?q=qqqzzzx', '/revenue-at-stake/?h=380009&q=32480'] : []), '/code/27132/', '/history/', '/phase-out/', '/exemption/', '/methods/', '/group/spine/'];
 for (const scheme of ['light', 'dark']) {
   await check(`axe (${scheme}): no serious or critical violations`, async (page) => {
     const report = [];
     for (const path of axePaths) {
       await open(page, path);
-      if (path.startsWith('/revenue-at-stake/')) await page.waitForSelector('[data-results] [data-stake-card], [data-results] [data-outside], [data-results] [data-empty]');
+      if (path.startsWith('/revenue-at-stake/')) await page.waitForSelector(path.includes('h=') ? '.hsum' : '[data-results] [data-stake-card], [data-results] [data-outside], [data-results] [data-empty]');
       else if (path.includes('q=')) await page.waitForSelector('[data-results] .verdict');
       await page.evaluate(axeSource());   // evaluate, not addScriptTag: the live CSP forbids inline scripts
       const results = await page.evaluate(() => window.axe.run(document));

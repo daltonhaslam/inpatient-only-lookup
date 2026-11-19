@@ -1002,6 +1002,24 @@
    "quote": "MA plans must comply with the 2-midnight rule and may not treat removal from the IPO list as requiring those procedures to be performed in the outpatient setting.",
    "cite": "91 FR 70572",
    "source": "fr-2026-22739"
+  },
+  "ASC27-618": {
+   "claim": "CY2027: CMS adds 618 codes to the ASC covered procedures list",
+   "quote": "For CY 2027, we are continuing to expand the ASC covered procedures list (CPL) by adding 618 codes to the ASC CPL that were recommended by interested parties or were finalized for removal from the IPO list for CY 2027.",
+   "cite": "91 FR 70286",
+   "source": "fr-2026-22739"
+  },
+  "ASC27-64629": {
+   "claim": "CY2027: the 618 are IPO removals; CPT 64629 is added on top of them",
+   "quote": "After consideration of public comments, we are finalizing our proposal to update the ASC CPL by adding 618 procedures that we proposed to remove from the IPO list for CY 2027. Additionally, we are finalizing adding an additional code, CPT code 64629, recommended by commenters to the ASC CPL for CY 2027.",
+   "cite": "91 FR 70665",
+   "source": "fr-2026-22739"
+  },
+  "OPPS27-labor-share": {
+   "claim": "CY2027: the OPPS labor-related share is 60 percent",
+   "quote": "The OPPS labor-related share is 60 percent of the national OPPS payment.",
+   "cite": "91 FR 70328",
+   "source": "fr-2026-22739"
   }
  }
 }

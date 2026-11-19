@@ -147,6 +147,20 @@ class Replaced(unittest.TestCase):
         self.assertEqual([(source["id"], data) for source, data in changed], [("addenda-2027", new_rule)])
         self.assertEqual(problems, [])
 
+    def test_the_fact_sheet_is_adopted_while_its_deductible_quotes_still_verify(self):
+        facts = fetch.read_json(fetch.PIPELINE / "facts.json")["deductibles"]
+        sheet = {"id": "deductibles-2027", "kind": "fact_sheet", "url": facts["url"], "sha256": fetch.sha256(b"old")}
+        drifted = ("<header>new menu</header><p>" + "</p><p>".join(facts["quotes"]) + "</p>").encode()
+        adopt, problems = refresh.quoted_pages_changed([sheet], {facts["url"]: drifted}.get)
+        self.assertEqual([(source["id"], data) for source, data, _ in adopt], [("deductibles-2027", drifted)])
+        self.assertIn("deductible quotes still match -> adopted new hash", adopt[0][2])
+        self.assertEqual(problems, [])
+        adopt, problems = refresh.quoted_pages_changed([sheet], {facts["url"]: b"<p>Coming soon</p>"}.get)
+        self.assertEqual(adopt, [])
+        self.assertIn("no longer match -> FAIL, needs a person", problems[0])
+        same = dict(sheet, sha256=fetch.sha256(drifted))
+        self.assertEqual(refresh.quoted_pages_changed([same], {facts["url"]: drifted}.get), ([], []))
+
     def test_an_error_page_at_the_old_address_is_a_problem_not_a_replacement(self):
         sources = [
             {"id": "b-2026-10", "kind": "addendum_b", "effective": "2026-10-01", "url": "u1", "sha256": "pinned"},
@@ -179,6 +193,76 @@ class FollowUps(unittest.TestCase):
         self.assertNotIn(refresh.CROSSWALK_NOTE, refresh.follow_ups(sources))
         self.assertIn(refresh.CROSSWALK_NOTE, refresh.follow_ups(sources, history_changed=True))
         self.assertIn("python3 pipeline/crosswalk/build.py", refresh.CROSSWALK_NOTE)
+
+
+class CalendarFollowUps(unittest.TestCase):
+    """The hospital view's and patient share's sources, which refresh.py does not discover: each comes
+    due on its own calendar and goes on the "needs a person" list from that day until it is repinned."""
+
+    SOURCES = [
+        {"id": "ipps-2027-impact", "kind": "ipps_impact", "fy": 2027},
+        {"id": "mup-inp-2024", "kind": "mup_inpatient", "dy": 2024},
+        {"id": "asc-2027-additions", "kind": "asc_additions", "cy": 2027},
+    ]
+    FACTS = {"deductibles": {"year": 2027, "part_a_inpatient": 1776, "part_b": 292}}
+
+    def notes(self, today, sources=None, facts=None):
+        import datetime
+        return refresh.calendar_follow_ups(sources or self.SOURCES, facts or self.FACTS, datetime.date.fromisoformat(today))
+
+    def test_nothing_is_due_right_after_the_current_files(self):
+        self.assertEqual(self.notes("2026-11-18"), [])
+        self.assertEqual(self.notes("2027-03-31"), [])
+
+    def test_the_mup_file_each_spring(self):
+        notes = self.notes("2027-04-01")
+        self.assertEqual(len(notes), 1)
+        self.assertIn("data year 2025", notes[0])
+        self.assertIn("mup-inp-2025", notes[0])
+
+    def test_the_impact_file_each_october(self):
+        notes = self.notes("2027-10-01")
+        impact = [n for n in notes if "impact file" in n]
+        self.assertEqual(len(impact), 1)
+        self.assertIn("FY 2028", impact[0])
+        self.assertIn("ipps-2028-impact", impact[0])
+        self.assertIn("python3 pipeline/crosswalk/build.py", impact[0])
+
+    def test_the_deductibles_and_the_asc_additions_each_november(self):
+        notes = self.notes("2027-11-01")
+        deductibles = [n for n in notes if "deductible" in n]
+        additions = [n for n in notes if "ASC covered procedures" in n]
+        self.assertEqual(len(deductibles), 1)
+        self.assertIn("2028", deductibles[0])
+        self.assertIn("pipeline/facts.json", deductibles[0])
+        self.assertIn("deductibles-2028", deductibles[0])
+        self.assertEqual(len(additions), 1)
+        self.assertIn("CY 2028", additions[0])
+        self.assertIn("asc-2028-additions", additions[0])
+        self.assertEqual(len(notes), 4, notes)   # the impact file and the MUP file are still due too
+
+    def test_a_repinned_source_drops_off_the_list(self):
+        sources = [dict(s, fy=2028) if s["kind"] == "ipps_impact" else s for s in self.SOURCES]
+        self.assertFalse([n for n in self.notes("2027-10-15", sources=sources) if "impact file" in n])
+        facts = {"deductibles": dict(self.FACTS["deductibles"], year=2028)}
+        self.assertFalse([n for n in self.notes("2027-11-15", facts=facts) if "deductible" in n])
+
+    def test_the_real_sources_and_facts_have_what_it_reads(self):
+        import datetime
+        notes = refresh.calendar_follow_ups(fetch.load_sources(), fetch.read_json(fetch.PIPELINE / "facts.json"), datetime.date(2099, 1, 1))
+        self.assertEqual(len(notes), 4, notes)
+
+    def test_a_new_quarter_asks_for_the_asc_check(self):
+        sources = fetch.load_sources()
+        self.assertNotIn(refresh.QUARTER_ASC_NOTE, refresh.follow_ups(sources))
+        self.assertIn(refresh.QUARTER_ASC_NOTE, refresh.follow_ups(sources, new_quarter=True))
+
+    def test_an_addendum_b_replaced_in_place_counts_as_a_new_quarter(self):
+        addendum, rule = {"kind": "addendum_b"}, {"kind": "rule_addenda"}
+        self.assertTrue(refresh.new_addendum_b([], [(addendum, b"x")]))       # CMS corrected a quarter in place
+        self.assertTrue(refresh.new_addendum_b([(addendum, b"x")], []))
+        self.assertFalse(refresh.new_addendum_b([(rule, b"x")], [(rule, b"x")]))
+        self.assertFalse(refresh.new_addendum_b([], []))
 
 
 if __name__ == "__main__":

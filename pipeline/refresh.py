@@ -9,11 +9,17 @@ One run does four things:
      to a recent one, the next calendar year's final rule (its addenda and, if there is one, its
      "removed from the IPO list" file), or a re-posted copy of the newest rule's files.
   2. Re-downloads the recent files it already has, because CMS also replaces files in place under
-     the same address. A changed file is adopted and re-pinned, and the report says so.
+     the same address. A changed file is adopted and re-pinned, and the report says so. The CMS fact
+     sheet the deductibles quote is re-downloaded too: its page changes around the same sentences, so
+     a new copy is adopted while the deductible quotes still verify, and is a problem when they do not.
   3. Runs build.py, which reconciles the whole history and leaves the published tables alone if
      any check fails.
   4. Runs the tests, then lists what still needs a person: a new rule's Federal Register facts in
-     rules.json, plain-language labels for new codes, and a crosswalk rebuild when the history changed.
+     rules.json, plain-language labels for new codes, a crosswalk rebuild when the history changed,
+     a check of the quarterly ASC update when a new quarter came in, and the Revenue at stake sources
+     it does not discover, each on its own calendar: the next FY's IPPS impact file each October, the
+     next MUP inpatient file each spring, the deductibles each November (facts.json) and the next
+     year's ASC additions list with each November rule.
 Every new download is checked to be the table it claims to be before sources.json is touched.
 
 To add a file CMS posted somewhere discovery does not look:
@@ -21,6 +27,7 @@ To add a file CMS posted somewhere discovery does not look:
     python3 pipeline/refresh.py --add-rule 2028 https://www.cms.gov/files/zip/....zip [--removal-file URL]
 """
 import argparse
+import datetime
 import re
 import subprocess
 import sys
@@ -29,6 +36,7 @@ import urllib.parse
 import zipfile
 from pathlib import Path
 
+import citations
 import fetch
 import history
 import parse
@@ -253,6 +261,31 @@ def replaced_in_place(sources, grab, skip=()):
     return changed, problems
 
 
+def quoted_pages_changed(sources, grab):
+    """The fact sheet facts.json quotes (citations.QUOTED_PAGES), re-downloaded: its HTML drifts, so a
+    new hash is adopted while the quoted sentences still verify. Returns ([(source, new bytes, message)]
+    to adopt, [problems]): quotes that no longer match, or a dead address, need a person."""
+    adopt, problems = [], []
+    for source in sources:
+        if source["kind"] not in citations.QUOTED_PAGES or source is not citations.deductible_source(sources):
+            continue
+        data = grab(source["url"])
+        if data is None or fetch.sha256(data) == source["sha256"]:
+            continue
+        ok, message = citations.quoted_page_change(source, data)
+        if ok:
+            adopt.append((source, data, message))
+        else:
+            problems.append("%s: %s" % (source["id"], message))
+    return adopt, problems
+
+
+def new_addendum_b(found, replaced):
+    """True when this run adopted an Addendum B, new or replaced in place by CMS (a corrected
+    quarter changes rates as much as a new one)."""
+    return any(source["kind"] == "addendum_b" for source, _ in list(found) + list(replaced))
+
+
 def keep_previous(path):
     """Set the current download aside as <name>.prev so a refresh can be undone by hand."""
     if path.exists():
@@ -268,9 +301,52 @@ CROSSWALK_NOTE = ("The list history changed: rebuild the Revenue at stake crossw
                   "date disagrees with the history.")
 
 
-def follow_ups(sources, history_changed=False):
+QUARTER_ASC_NOTE = ("A new quarterly Addendum B came in. Revenue at stake's outpatient and surgery-center rates and the "
+                    "patient shares are the CY final rule's (Addenda B and AA), which refresh.py does not re-read each "
+                    "quarter: check CMS's quarterly OPPS and ASC updates for changes to the removed codes, and repin the "
+                    "rule's addenda if CMS corrected them.")
+BUILD = "python3 pipeline/crosswalk/build.py"
+
+
+def calendar_follow_ups(sources, facts, today):
+    """The Revenue at stake sources refresh.py does not discover, each listed from the day its next
+    version is due until it is repinned: the IPPS impact file when the next FY starts (October 1), the
+    MUP inpatient file each spring (data year + 3, April), the deductibles each November (facts.json)
+    and the next year's ASC additions with the November final rule."""
+    def newest(kind, key):
+        years = [source[key] for source in sources if source["kind"] == kind and key in source]
+        return max(years) if years else None
+
+    notes = []
+    fy = newest("ipps_impact", "fy")
+    if fy and today >= datetime.date(fy, 10, 1):
+        notes.append("FY %d started %s: pin CMS's FY %d IPPS impact file (the correction-notice version) as ipps-%d-impact "
+                     "in sources.json, with that year's Tables 1A-1E and 5 (pipeline/crosswalk/exposure_sources.py names the "
+                     "source ids), update facts.json expected (hospital counts, the OHSU anchors) and rebuild: %s"
+                     % (fy + 1, datetime.date(fy, 10, 1).isoformat(), fy + 1, fy + 1, BUILD))
+    dy = newest("mup_inpatient", "dy")
+    if dy and today >= datetime.date(dy + 3, 4, 1):
+        notes.append("CMS posts Medicare Inpatient Hospitals - by Provider and Service each spring: pin data year %d as "
+                     "mup-inp-%d in sources.json and rebuild: %s" % (dy + 1, dy + 1, BUILD))
+    deductibles = (facts or {}).get("deductibles")
+    if deductibles and today >= datetime.date(deductibles["year"], 11, 1):
+        notes.append("CMS announces the %d Part A and Part B deductibles each November: update deductibles in "
+                     "pipeline/facts.json (year, amounts, fact-sheet source, URL and quotes), pin the new fact sheet in "
+                     "sources.json as deductibles-%d (kind fact_sheet, the same URL; fetch.py pins it, and test_raw.py "
+                     "checks the quotes are on it), and rebuild the patient shares: %s"
+                     % (deductibles["year"] + 1, deductibles["year"] + 1, BUILD))
+    cy = newest("asc_additions", "cy")
+    if cy and today >= datetime.date(cy, 11, 1):
+        notes.append("The CY %d OPPS/ASC final rule (each November) adds codes to the ASC covered procedures list: pin its "
+                     "additions file as asc-%d-additions, update the ASC additions count, extra codes and citation in "
+                     "pipeline/facts.json and citations.json, and rebuild: %s" % (cy + 1, cy + 1, BUILD))
+    return notes
+
+
+def follow_ups(sources, history_changed=False, new_quarter=False, today=None):
     """What a person still has to do by hand after an automatic refresh. history_changed: the run
-    adopted a new or replaced file, so ipo-history.json may have changed."""
+    adopted a new or replaced file, so ipo-history.json may have changed. new_quarter: it adopted a
+    new quarterly Addendum B. today: the date the calendar notes are judged on (default: today)."""
     notes = []
     have_rules = {rule["cy"] for rule in fetch.load_rules()["rules"]}
     first_quarterly = min(int(source["effective"][:4]) for source in sources if source["kind"] == "addendum_b")
@@ -290,7 +366,10 @@ def follow_ups(sources, history_changed=False):
             notes.append("data/labels.json has labels for codes with no list history: %s" % ", ".join(sorted(labels - listed)))
     if history_changed:
         notes.append(CROSSWALK_NOTE)
-    return notes
+    if new_quarter:
+        notes.append(QUARTER_ASC_NOTE)
+    facts = fetch.read_json_or(fetch.PIPELINE / "facts.json", {})
+    return notes + calendar_follow_ups(sources, facts, today or datetime.date.today())
 
 
 def manual_sources(args, parser):
@@ -350,6 +429,8 @@ def main(argv=None):
         problems += notes
     replaced, stale = replaced_in_place(manifest["sources"], grab, skip={source["id"] for source, _ in found})
     problems += stale
+    quoted, drifted = quoted_pages_changed(manifest["sources"], grab)
+    problems += drifted
 
     print("New files: %d" % len(found))
     for source, _ in found:
@@ -357,6 +438,8 @@ def main(argv=None):
     print("Files CMS replaced in place: %d" % len(replaced))
     for source, _ in replaced:
         print("  %-18s %s" % (source["id"], source["url"]))
+    for source, _, message in quoted:
+        print("  %-18s %s" % (source["id"], message))
     for problem in problems:
         print("  PROBLEM: " + problem)
     if args.dry_run:
@@ -378,6 +461,12 @@ def main(argv=None):
         if before:
             print(list_change(source, before, data))
         source["sha256"] = fetch.sha256(data)
+    for source, data, _ in quoted:
+        path = fetch.raw_path(source)
+        keep_previous(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+        source["sha256"] = fetch.sha256(data)
     fetch.save_manifest(manifest)
 
     status = run("fetch.py") or run("build.py") or run("run_tests.py")
@@ -385,7 +474,8 @@ def main(argv=None):
         print("\nREFRESH FAILED. The site's tables were not updated. Fix what is reported above and run it again.")
         print("To undo: git checkout pipeline/sources.json, and in data/raw/ rename any <file>.prev back to <file>.")
         return 1
-    notes = follow_ups(fetch.load_sources(), history_changed=bool(found or replaced))
+    notes = follow_ups(fetch.load_sources(), history_changed=bool(found or replaced),
+                       new_quarter=new_addendum_b(found, replaced))
     print("\nStill to do by hand:" if notes else "\nNothing left to do by hand.")
     for note in notes:
         print("  - " + note)
