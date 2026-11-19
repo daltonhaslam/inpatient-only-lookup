@@ -8,6 +8,7 @@ import { safeProfile } from './stake-data.mjs';
 import { packShare, shareHtml } from './patient-share.mjs';
 import { hospitalMethods, methodsSources } from './hospital-methods.mjs';
 import { pct } from './hospital-words.mjs';
+import { shell, field } from './hospital-field.mjs';
 import { BADGE, card, money, moneyRange, cents, drgList, dxCode, statusText, noCompareText, yearLines, alternativeLabel } from './stake-card.mjs';
 
 export const ROOT = '/revenue-at-stake/';
@@ -99,9 +100,14 @@ function progressBar(stake) {
 </div>`;
 }
 
+/**
+ * The national downloads. Each link carries its label for both modes: stake-client.mjs swaps in
+ * data-hospital-label while a hospital is picked ("Download national Excel"), so they are not taken for
+ * the hospital's (its CSV is in the hospital's bar), and data-national-label back.
+ */
 function downloads(stake) {
-  const excel = stake.xlsx ? '<a class="btn btn--quiet" href="/data/revenue-at-stake.xlsx" download>Download Excel</a>' : '';
-  return `<p class="stake__actions">${excel}<a class="btn btn--quiet" href="/data/revenue-at-stake.csv" download>Download CSV</a></p>`;
+  const link = (file, what) => `<a class="btn btn--quiet" href="/data/revenue-at-stake.${file}" download data-national-label="Download ${what}" data-hospital-label="Download national ${what}">Download ${what}</a>`;
+  return `<p class="stake__actions">${stake.xlsx ? link('xlsx', 'Excel') : ''}${link('csv', 'CSV')}</p>`;
 }
 
 /** Compare · Help review · Methods, shown on all three section pages. */
@@ -119,8 +125,11 @@ function helpCallout(stake) {
 </aside>`;
 }
 
-/** Where stake-client.mjs puts the hospital picker and, after a pick, the summary strip. Empty without JS. */
-export const PICK_MOUNT = '<div class="hpick" data-hospital-pick></div>';
+/**
+ * The hospital picker with its labeled box (hospital-field.mjs), where stake-client.mjs puts, after a pick,
+ * the hospital's bar and summary. Hidden without JS (styles.css), and removed if the page's data fails to load.
+ */
+export const PICK_MOUNT = `<div class="hpick" data-hospital-pick>${shell(field(null))}</div>`;
 
 export function mainPage(ctx) {
   const stake = ctx.stake;

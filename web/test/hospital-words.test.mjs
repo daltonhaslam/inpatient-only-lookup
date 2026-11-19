@@ -1,7 +1,7 @@
 // The hospital view's words and round figures (hospital-words.mjs).
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { EMPTY, fractionWord, roughMoney, series, addOnsOf, addOnNames, addOnsSpelled } from '../src/hospital-words.mjs';
+import { EMPTY, fractionWord, roughMoney, series, addOnsOf, addOnsSpelled, ratesWords, partsWords, MA_ADD_ON } from '../src/hospital-words.mjs';
 
 describe('fractionWord: the nearest named fraction, cutoffs at the midpoints', () => {
   const cases = [
@@ -46,17 +46,29 @@ describe('the add-ons a hospital gets, in words (K1, one place builds them)', ()
     assert.equal(series(['wage index', 'IME', 'DSH']), 'wage index, IME and DSH');
   });
   test('names from the hospital’s own factors; a capital factor alone counts', () => {
-    assert.deepEqual(addOnNames(both), ['IME', 'DSH']);
-    assert.deepEqual(addOnNames(dsh), ['DSH']);
-    assert.deepEqual(addOnNames(ime), ['IME']);
-    assert.deepEqual(addOnNames(capitalIme), ['IME', 'DSH']);
-    assert.deepEqual(addOnNames(none), []);
-    assert.deepEqual(addOnsOf(capitalIme).map((a) => a.capitalOnly), [true, false]);
+    const names = (h) => addOnsOf(h).map((a) => a.name);
+    assert.deepEqual(names(both), ['IME', 'DSH']);
+    assert.deepEqual(names(dsh), ['DSH']);
+    assert.deepEqual(names(ime), ['IME']);
+    assert.deepEqual(names(capitalIme), ['IME', 'DSH']);
+    assert.deepEqual(names(none), []);
+    assert.deepEqual(addOnsOf(capitalIme).map((a) => [a.side, a.label]), [['capital', 'capital IME'], ['both', 'DSH']]);
+    assert.deepEqual(addOnsOf(dsh).map((a) => [a.side, a.label]), [['operating', 'operating DSH']]);
+  });
+  test('the fine print and the split name each side a hospital has; MA carries operating IME', () => {
+    assert.equal(ratesWords(addOnsOf(both)), 'wage index, IME and DSH (operating and capital)');
+    assert.equal(ratesWords(addOnsOf(dsh)), 'wage index and operating DSH');
+    assert.equal(ratesWords(addOnsOf(ime)), 'wage index and IME (operating and capital)');
+    assert.equal(ratesWords(addOnsOf(capitalIme)), 'wage index, capital IME and DSH');
+    assert.equal(partsWords(addOnsOf(both)), 'IME and DSH each include their capital part');
+    assert.equal(partsWords(addOnsOf(dsh)), 'DSH here is operating DSH only');
+    assert.equal(partsWords(addOnsOf(capitalIme)), 'IME here is capital IME only; DSH includes its capital part');
+    assert.equal(MA_ADD_ON, 'operating IME');
   });
   test('spelled out for the lead: plain word first, acronym in parentheses, singular for one', () => {
-    assert.equal(addOnsSpelled(both), 'teaching (IME) and safety-net (DSH) add-ons');
-    assert.equal(addOnsSpelled(dsh), 'a safety-net (DSH) add-on');
-    assert.equal(addOnsSpelled(ime), 'a teaching (IME) add-on');
-    assert.equal(addOnsSpelled(none), 'no teaching (IME) or safety-net (DSH) add-ons');
+    assert.equal(addOnsSpelled(addOnsOf(both)), 'teaching (IME) and safety-net (DSH) add-ons');
+    assert.equal(addOnsSpelled(addOnsOf(dsh)), 'a safety-net (DSH) add-on');
+    assert.equal(addOnsSpelled(addOnsOf(ime)), 'a teaching (IME) add-on');
+    assert.equal(addOnsSpelled(addOnsOf(none)), 'no teaching (IME) or safety-net (DSH) add-ons');
   });
 });

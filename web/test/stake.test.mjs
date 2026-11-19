@@ -13,7 +13,7 @@ import { card, alternativeLabel } from '../src/stake-card.mjs';
 import { CSV_HEADER, csvRows } from '../src/stake.mjs';
 import { out } from '../src/views.mjs';
 import { LEDE_NATIONAL, hospitalLede } from '../src/hospital-view.mjs';
-import { nationalDownload } from '../src/hospital-field.mjs';
+import { PICK_MOUNT } from '../src/stake.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '..', '..');
@@ -224,11 +224,17 @@ describe('revenue at stake', { skip }, () => {
     assert.notEqual(hospitalLede(lede), lede, 'the swap changes it');
   });
 
-  test('main page: the national download links read as nationalDownload() expects, so a pick can relabel them (A52)', () => {
+  test('main page: each national download link carries its label for both modes, so a pick can relabel it (A52)', () => {
     const html = read('revenue-at-stake/index.html');
-    const links = [.../<p class="stake__actions">([\s\S]*?)<\/p>/.exec(html)[1].matchAll(/<a [^>]*download>([^<]*)<\/a>/g)].map((m) => m[1]);
-    assert.ok(links.length >= 1, html.slice(0, 200));
-    for (const text of links) assert.match(nationalDownload(text), /^Download national (Excel|CSV)$/, text);
+    const links = [.../<p class="stake__actions">([\s\S]*?)<\/p>/.exec(html)[1].matchAll(/<a [^>]*data-national-label="([^"]*)" data-hospital-label="([^"]*)">([^<]*)<\/a>/g)];
+    assert.deepEqual(links.map((m) => m.slice(1).join(' | ')), ['Download Excel | Download national Excel | Download Excel', 'Download CSV | Download national CSV | Download CSV']);
+  });
+
+  test('main page: the hospital picker\'s labeled box is in the HTML, exactly stake.mjs PICK_MOUNT (no reserved height)', () => {
+    const html = read('revenue-at-stake/index.html');
+    assert.equal(html.split(PICK_MOUNT).length - 1, 1);
+    assert.ok(PICK_MOUNT.includes('<label class="field hpick__field" for="hp-q"><span>Pick a hospital to apply its wage index and its teaching (IME) and safety-net (DSH) add-ons.</span>'), PICK_MOUNT);
+    assert.ok(PICK_MOUNT.includes('role="status" data-hpick-status'));
   });
 
   test('main page: badge, guardrail, years, progress, downloads, a row per code', () => {

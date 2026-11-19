@@ -5,8 +5,7 @@ import assert from 'node:assert/strict';
 import { hospitals, list, data, recordOf, viewOf } from './hospital-fixture.mjs';
 import { drgSeverity } from '../src/hospital-data.mjs';
 import { drgLabel, yearUpdate } from '../src/hospital-folds.mjs';
-import { addOnName } from '../src/hospital-words.mjs';
-import { ceiling } from '../src/hospital-words.mjs';
+import { addOnName, addOnsOf, ceiling } from '../src/hospital-words.mjs';
 
 const text = (html) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 const folds = (view, code) => {
@@ -70,17 +69,23 @@ describe('split by DRG', () => {
     assert.ok(!/\$0\.00/.test(t), t);
   });
   test('K1: only the add-ons the hospital gets have a row, and the heading and note follow (010005 DSH only, 010018 IME only)', () => {
-    for (const [ccn, got, not] of [['010005', 'DSH', 'IME'], ['010018', 'IME', 'DSH']]) {
+    for (const [ccn, got, not, parts] of [['010005', 'DSH', 'IME', 'DSH here is operating DSH only.'], ['010018', 'IME', 'DSH', 'IME includes its capital part.']]) {
       const html = fold(folds(viewOf(ccn), '32480'), 'split');
       const t = text(html);
       assert.ok(t.startsWith(`The split by DRG · base, ${got} `), t.slice(0, 60));
       assert.match(html, new RegExp(`<th scope="row">${got}</th>`));
       assert.ok(!html.includes(`<th scope="row">${not}</th>`), `${ccn}: a ${not} row`);
       assert.ok(!/\$0\.00/.test(t), `${ccn}: a $0.00 cell`);
-      assert.ok(t.includes(`; ${got} includes its capital part.`), t);
+      assert.ok(t.includes(`capital GAF; ${parts}`), t);
       assert.ok(t.includes(`payment per case at ${viewOf(ccn).name}`), 'caption without a possessive');
       assert.ok(t.includes('with this hospital’s wage index'), t);
     }
+  });
+  test('a capital-IME-only hospital (110165): the row says Capital IME and the note says it is capital IME only', () => {
+    const html = fold(folds(viewOf('110165'), '32480'), 'split');
+    const t = text(html);
+    assert.match(html, /<th scope="row">Capital IME<\/th>/);
+    assert.ok(t.includes('capital GAF; IME here is capital IME only; DSH includes its capital part.'), t);
   });
   test('two-family codes get one table per family', () => {
     const view = viewOf('380009');
@@ -179,11 +184,12 @@ describe('per year', () => {
     assert.ok(!t.includes('DSH'), t);
   });
   test('the per-case label names the add-ons the hospital actually gets', () => {
-    assert.equal(addOnName(hospitals.hospitals['380009']), 'IME + DSH');
-    assert.equal(addOnName(hospitals.hospitals['010005']), 'DSH');
-    assert.equal(addOnName(hospitals.hospitals['110165']), 'capital IME + DSH');
-    assert.equal(addOnName({ tchop: 0, tchcp: 0, dshopp: 0, dshcpp: 0.1 }), 'capital DSH');
-    assert.equal(addOnName({ tchop: 0.2, tchcp: 0, dshopp: 0, dshcpp: 0 }), 'IME');
+    const name = (h) => addOnName(addOnsOf(h));
+    assert.equal(name(hospitals.hospitals['380009']), 'IME + DSH');
+    assert.equal(name(hospitals.hospitals['010005']), 'DSH');
+    assert.equal(name(hospitals.hospitals['110165']), 'capital IME + DSH');
+    assert.equal(name({ tchop: 0, tchcp: 0, dshopp: 0, dshcpp: 0.1 }), 'capital DSH');
+    assert.equal(name({ tchop: 0.2, tchcp: 0, dshopp: 0, dshcpp: 0 }), 'IME');
     assert.match(text(fold(folds(viewOf('110165'), '32480'), 'year')), /a case: capital IME \+ DSH/);
   });
   test('Review Focus 1: a hospital with no add-ons has no per year fold', () => {

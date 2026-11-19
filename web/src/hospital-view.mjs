@@ -7,7 +7,7 @@ import { esc } from './views.mjs';
 import { num } from './engine.mjs';
 import { card, money } from './stake-card.mjs';
 import { hospitalContext, hospitalItem, summary as summarize, teaching } from './hospital-math.mjs';
-import { fractionWord, pct, addOnsOf, addOnNames, addOnsSpelled, series } from './hospital-words.mjs';
+import { fractionWord, pct, addOnsOf, addOnsSpelled, ratesWords, series } from './hospital-words.mjs';
 import { shortName, TEACHING_LABEL } from './hospital-pick.mjs';
 import { foldsHtml, yearUpdate } from './hospital-folds.mjs';
 import { hospitalCsvRows, hospitalCsvName } from './hospital-csv.mjs';
@@ -25,10 +25,10 @@ export function facts(h) {
 
 /**
  * The summary in plain words, from hospital-math summary(): {lead, tiles: [[value, label]]}, or null
- * when there is nothing to compare. h: the hospital's record (its factors), so the words name only the
- * add-ons it gets. A hospital with no IME or DSH is told so in words, never "$0".
+ * when there is nothing to compare. addOns: addOnsOf() the hospital, so the words name only the add-ons
+ * it gets. A hospital with no IME or DSH is told so in words, never "$0".
  */
-function summaryText(s, name, h) {
+function summaryText(s, name, addOns) {
   if (!s || s.state === 'empty') return null;
   const loss = [money(s.medianGap), 'typical loss per case if billed outpatient (median, against the lowest DRG in the family)'];
   const below = [`${num(s.below)} of ${num(s.codes)}`, `removed procedures pay ${name} less outpatient than even the lowest DRG`];
@@ -39,32 +39,34 @@ function summaryText(s, name, h) {
     };
   }
   if (s.state === 'no-addons') {
-    return { lead: `${name} gets ${addOnsSpelled(h)}, so what a removed procedure loses when billed outpatient is base payment only.`, tiles: [loss, below] };
+    return { lead: `${name} gets ${addOnsSpelled(addOns)}, so what a removed procedure loses when billed outpatient is base payment only.`, tiles: [loss, below] };
   }
   return {
-    lead: `At ${name}, ${fractionWord(s.ratio)} of what a removed procedure loses when billed outpatient is ${addOnsSpelled(h)}.`,
-    tiles: [loss, [money(s.medianAddOn), `typical ${series(addOnNames(h))} in that lowest DRG (median)`], below],
+    lead: `At ${name}, ${fractionWord(s.ratio)} of what a removed procedure loses when billed outpatient is ${addOnsSpelled(addOns)}.`,
+    tiles: [loss, [money(s.medianAddOn), `typical ${series(addOns.map((a) => a.name))} in that lowest DRG (median)`], below],
   };
 }
 
 /** "The IME and DSH percentages above are CMS’s operating factors; …" for the factors the facts line shows as a percentage. */
-function factorNote(h) {
-  const shown = addOnsOf(h).filter((a) => !a.capitalOnly).map((a) => a.name);
+function factorNote(addOns) {
+  const shown = addOns.filter((a) => a.side !== 'capital').map((a) => a.name);
   if (!shown.length) return '';
   const one = shown.length === 1;
   return ` The ${series(shown)} ${one ? 'percentage above is CMS’s operating factor; the capital one is' : 'percentages above are CMS’s operating factors; the capital ones are'} applied too.`;
 }
 
-/** The summary strip: the lead sentence, its numbers and what they leave out. '' with nothing to compare. h: as summaryText(). */
-export function summaryHtml(s, name, h) {
-  const text = summaryText(s, name, h);
+/** The summary strip from summaryText()'s text: the lead sentence, its numbers and what they leave out. '' with nothing to compare. */
+function strip(text, s, addOns) {
   if (!text) return '';
   return `<div class="hsum">
 <p class="hsum__lead">${esc(text.lead)}</p>
 <dl class="hsum__nums">${text.tiles.map(([value, label]) => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl>
-<p class="hsum__note">Medians over the ${num(s.codes)} removed procedures with a comparison.${esc(factorNote(h))} Uncompensated care, outliers and quality adjustments are left out (<a href="/revenue-at-stake/methods/">Methods</a>).</p>
+<p class="hsum__note">Medians over the ${num(s.codes)} removed procedures with a comparison.${esc(factorNote(addOns))} Uncompensated care, outliers and quality adjustments are left out (<a href="/revenue-at-stake/methods/">Methods</a>).</p>
 </div>`;
 }
+
+/** The summary strip for summary() s at the hospital named name, whose add-ons are addOnsOf()'s addOns. */
+export const summaryHtml = (s, name, addOns) => strip(summaryText(s, name, addOns), s, addOns);
 
 /**
  * The words in the server's lede (stake.mjs mainPage) that a pick replaces. The national page's HTML must
@@ -82,19 +84,32 @@ export const LEDE_HOSPITAL = 'at this hospital’s rates';
 export const hospitalLede = (html) => html.replace(LEDE_NATIONAL, LEDE_HOSPITAL);
 
 /**
+ * The add-on words on a hospital's cards, built once per view from addOnsOf(): the outpatient note, the
+ * fine print (its factors by side, ratesWords()) and the Includes line and bar legend's names.
+ */
+function cardWords(name, addOns) {
+  const names = addOns.map((a) => a.name);
+  return {
+    opNote: `No ${series(names, 'or')} add-on in either outpatient setting.`,
+    fine: addOns.length ? `${name} rates: ${ratesWords(addOns)}.` : `${name} rates: wage index. This hospital gets no IME or DSH.`,
+    addOns: series(names),
+  };
+}
+
+/**
  * The words a hospital's card says around its figures (stake-card.mjs NATIONAL_CARD has the national
  * ones): whose rates, the national rate beside the wage-adjusted one, the surgery center kept national
- * (ASC wage rules differ), the add-ons it gets by name, and a link to the code page's national work in
- * place of Show the work. names: addOnNames() of the hospital.
+ * (ASC wage rules differ), the add-ons it gets by name (words: cardWords()), and a link to the code
+ * page's national work in place of Show the work.
  */
-function cardVariant(item, name, names) {
+function cardVariant(item, name, words) {
   return {
     gapLead: `If billed outpatient, ${name} is paid`,
     ascLabel: 'Surgery center (ASC), national',
     rateNote: item.op.national !== undefined ? `With its wage index; national rate ${money(item.op.national)}` : '',
-    opNote: item.addOn ? `No ${series(names, 'or')} add-on in either outpatient setting.` : '',
-    fine: item.addOn ? `${name} rates: ${series(['wage index', ...names])} (operating and capital).` : `${name} rates: wage index. This hospital gets no IME or DSH.`,
-    addOns: series(names),
+    opNote: item.addOn ? words.opNote : '',
+    fine: words.fine,
+    addOns: words.addOns,
     workLink: `Show the national work for ${item.code}`,
   };
 }
@@ -121,25 +136,28 @@ export function createView({ list, record, ccn, data, meta }) {
   if (!Number.isInteger(year)) throw new Error('the hospital list has no meta.volume_year');
   const ctx = { ...hospitalContext({ hospital: record, volume: record.v, meta: list.meta }), year };
   const name = shortName({ ccn, name: record.name });
-  const names = addOnNames(record);
+  // The hospital's add-ons and every sentence built from them, once per view.
+  const addOns = addOnsOf(record);
+  const words = cardWords(name, addOns);
   const items = data.items.map((item) => hospitalItem(item, ctx));
   const byCode = Object.fromEntries(items.map((item) => [item.code, item]));
   const s = summarize(data.items, ctx);
   const sev = list.meta.drg_sev || {};
   const edits = new Map();   // code -> {DRG: {trad, ma}}: the text typed
   const open = new Set();    // "<code>:split" and "<code>:year"
-  const folds = (item) => foldsHtml(item, ctx, { name, sev, edits: edits.get(item.code), open: (kind) => open.has(`${item.code}:${kind}`) });
+  const folds = (item) => foldsHtml(item, ctx, { name, addOns, sev, edits: edits.get(item.code), open: (kind) => open.has(`${item.code}:${kind}`) });
   // Each card's HTML, drawn once and kept until its counts or folds change: a search keystroke redraws
   // up to 50 cards, and their folds need not be rebuilt each time.
   const drawn = new Map();
-  const draw = (item) => card(item, meta, { detail: false, variant: cardVariant(item, name, names), folds: folds(item) });
+  const draw = (item) => card(item, meta, { detail: false, variant: cardVariant(item, name, words), folds: folds(item) });
+  const text = summaryText(s, name, addOns);
   return {
     ccn, name, ctx, summary: s,
     data: { ...data, items, byCode },
-    summaryHtml: summaryHtml(s, name, record),
+    summaryHtml: strip(text, s, addOns),
     barHtml: bar(name, ccn, record),
     // Said once, through the picker's polite status line.
-    announce: [`Showing rates for ${name}.`, summaryText(s, name, record)?.lead].filter(Boolean).join(' '),
+    announce: [`Showing rates for ${name}.`, text?.lead].filter(Boolean).join(' '),
     csvName: hospitalCsvName(ccn),
     /** The hospital CSV's rows (hospital-csv.mjs), with every count typed so far. */
     csvRows: () => hospitalCsvRows({ items: data.items, ctx, ccn, name, edits }),

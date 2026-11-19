@@ -3,7 +3,9 @@
 // The test builds the site into a temp directory and compares hashes with national-snapshot.json,
 // which was written from the build before the hospital view existed (commit 47018f0).
 // Normalized, and only these: the hashed names of the site's own CSS and JS bundles, whose contents
-// legitimately change, and the empty hospital-picker mount on /revenue-at-stake/ (stake.mjs PICK_MOUNT).
+// legitimately change, and the hospital picker's mount on /revenue-at-stake/: exactly stake.mjs PICK_MOUNT,
+// its labeled box included (ruling A1). The main page's download links also carry their two labels
+// (data-national-label, data-hospital-label: the A52 relabel); that hash was updated for them, 2026-11-19.
 //   UPDATE_SNAPSHOT=1 node --test test/national-snapshot.test.mjs   rewrite the snapshot (a deliberate
 //   change to national output only, such as a new CSV column; say why in the commit)
 import { test } from 'node:test';
@@ -16,16 +18,17 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { card } from '../src/stake-card.mjs';
 import { prepare } from '../src/stake-engine.mjs';
+import { PICK_MOUNT } from '../src/stake.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const web = join(here, '..');
 const SNAPSHOT = join(here, 'national-snapshot.json');
 const sha = (text) => createHash('sha256').update(text).digest('hex');
 
-/** The differences national mode may have from the base build on any page: bundle hashes and the empty picker mount. */
+/** The differences national mode may have from the base build on any page: bundle hashes and the picker mount. */
 export const normalize = (html) => html
   .replace(/\/assets\/(app|stake|site)\.[0-9a-f]{10}\.(js|css)/g, '/assets/$1.$2')
-  .replace(/\n<div class="hpick" data-hospital-pick><\/div>/g, '');
+  .split(`\n${PICK_MOUNT}`).join('');
 
 // The two deliberate additions to a compared code's Revenue at stake block (Task 4), each in its one
 // exact place: the patient-share line between the card and the links line, and the hospital link at the

@@ -8,7 +8,7 @@
 // per_year_total). Codes and DRG numbers only: no procedure labels, so no CPT descriptor can ride along.
 import { alternativeLabel } from './stake-card.mjs';
 import { splitRows, perYearTable, round2 } from './hospital-math.mjs';
-import { EMPTY, ceiling, MA_MIX } from './hospital-words.mjs';
+import { EMPTY, ceiling, MA_MIX, MA_ADD_ON } from './hospital-words.mjs';
 import { blank } from './engine.mjs';
 
 export const HOSPITAL_CSV_HEADER = ['row_type', 'ccn', 'hospital', 'code', 'family_order', 'drg', 'payer',
@@ -68,7 +68,7 @@ export function hospitalCsvRows({ items, ctx, ccn, name, edits = new Map() }) {
       return row({
         ...who, row_type: 'per_year', code: item.code, family_order: familyOrder(item, r.family), drg: r.drg, payer: PAYER[payer],
         cases: cell.count, count_source: from, add_on_per_case: cell.perCase, add_on_per_year: cell.perYear,
-        note: [payer === 'ma' ? 'operating IME only' : '', why].filter(Boolean).join('; '),
+        note: [payer === 'ma' ? `${MA_ADD_ON} only` : '', why].filter(Boolean).join('; '),
       });
     }));
     return [...lines, row({ ...who, row_type: 'per_year_total', code: item.code, add_on_per_year: table.total, note: table.total === null ? `No counts. ${ceiling(ctx.year)}` : ceiling(ctx.year) })];

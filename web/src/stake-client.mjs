@@ -5,7 +5,6 @@ import { num } from './engine.mjs';
 import { esc } from './views.mjs';
 import { card, STATUS } from './stake-card.mjs';
 import { prepare, filterCodes, outsideCrosswalk, stateFromParams, hospitalParam, queryString, countText, PAGE_SIZE, TIERS, DEFAULTS } from './stake-engine.mjs';
-import { SHELL, field, nationalDownload } from './hospital-field.mjs';
 import { announcer } from './announce.mjs';
 import { fetchJson } from './fetch.mjs';
 
@@ -20,13 +19,14 @@ const HOSPITAL = typeof __HOSPITAL_ASSETS__ === 'undefined' ? null : __HOSPITAL_
 // (HOSPITAL.maryland, its state code) is never shown, so it reserves nothing.
 const RESERVE = 'hpick-h';
 // The page's Download Excel / CSV links stay national: while a hospital is shown (picked, set by start())
-// they say so, and on an ?h= landing from the moment its height is reserved, so they change before the
-// first paint, not when the hospital arrives (the longer labels wrap on a phone: no layout shift).
-const downloads = [...document.querySelectorAll('.stake__actions a[download]')].map((a) => [a, a.textContent]);
+// they say so (stake.mjs downloads(): data-hospital-label), and on an ?h= landing from the moment its
+// height is reserved, so they change before the first paint, not when the hospital arrives (the longer
+// labels wrap on a phone: no layout shift).
 let picked = false;
+let wired = false;   // start() has wired the picker's box (stake.mjs PICK_MOUNT)
 function labelDownloads() {
   const on = picked || document.documentElement.classList.contains(RESERVE);
-  for (const [a, text] of downloads) a.textContent = on ? nationalDownload(text) : text;
+  for (const a of document.querySelectorAll('[data-hospital-label]')) a.textContent = on ? a.dataset.hospitalLabel : a.dataset.nationalLabel;
 }
 const reserve = (on) => { document.documentElement.classList.toggle(RESERVE, on); labelDownloads(); };
 const landing = HOSPITAL ? hospitalParam(window.location.search) : '';
@@ -179,10 +179,9 @@ export function start(model) {
 
   const mount = HOSPITAL && $('[data-hospital-pick]');
   if (!mount) return;
-  // The empty picker draws now; the code that makes it work, the hospital list and each hospital's file
-  // load on first use (focus, a tap, or an ?h= in the address), so the national page carries none of it.
-  mount.innerHTML = SHELL;
-  $('[data-hpick-body]', mount).innerHTML = field(null);
+  // The picker's box is in the page's HTML (stake.mjs PICK_MOUNT); the code that makes it work, the
+  // hospital list and each hospital's file load on first use (focus, a tap, or an ?h= in the address), so
+  // the national page carries none of it.
   // The picker, once its bundle has loaded and taken over the box: a promise of its {show, say, start},
   // or of null when the bundle failed to load (the next focus or tap tries again).
   let picker = null;
@@ -221,6 +220,9 @@ export function start(model) {
     return picker;
   };
   for (const type of ['focusin', 'pointerdown']) mount.addEventListener(type, attach);
+  wired = true;
+  // Someone who focused or typed in the box before the page's data arrived gets the picker now.
+  if (mount.contains(document.activeElement) || $('#hp-q', mount)?.value) attach();
   // A failed load keeps national, and the h in the URL for a reload. However the landing ends (shown, not
   // shown, or overtaken by a pick of someone's own), its reserved height goes.
   if (pending) attach().then((ui) => ui?.start(pending)).finally(() => reserve(false));
@@ -233,8 +235,9 @@ async function load() {
 }
 
 load().catch(() => {
-  // The tables below stand on their own; drop the picker's reserved space, which would stay blank.
+  // The tables below stand on their own; drop the picker, which cannot work without the page's data
+  // (unless start() got as far as wiring it), and any reserved space.
   const mount = $('[data-hospital-pick]');
-  if (mount && !mount.firstChild) mount.remove();
+  if (mount && !wired) mount.remove();
   reserve(false);
 });

@@ -81,7 +81,7 @@ function folds(results, current, say) {
 }
 
 /**
- * Take over the picker in mount (already holding hospital-field.mjs SHELL and field()).
+ * Take over the picker in mount (already holding hospital-field.mjs shell() and field(), from the page's HTML).
  * assets: {list, dir, css} URLs from the build. data, meta: the page's prepare()d items and browser meta.
  * onPick(view, {initial, ui}): show this hospital (the page swaps the cards and calls ui.show()).
  * onClear(ui): back to national. onInvalid({keepUrl}): an ?h= that named no offered hospital, or (keepUrl)

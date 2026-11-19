@@ -7,7 +7,7 @@ import { card, gapParts } from '../src/stake-card.mjs';
 import { uncoveredDrgs, staleHospitalTables } from '../src/hospital-data.mjs';
 import { hospitalIndex, findHospitals } from '../src/hospital-pick.mjs';
 import { facts, summaryHtml, hospitalLede, LEDE_NATIONAL, LEDE_HOSPITAL } from '../src/hospital-view.mjs';
-import { nationalDownload } from '../src/hospital-field.mjs';
+import { addOnsOf } from '../src/hospital-words.mjs';
 
 const text = (html) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
@@ -127,11 +127,11 @@ describe('summary strip', () => {
     const h = hospitals.hospitals['380009'];
     const none = hospitals.hospitals['030107'];
     for (const [s, record] of [[{ ...base, state: 'addons' }, h], [{ ...base, medianAddOn: 0, ratio: null, state: 'no-addons' }, none], [{ ...base, medianGap: -250, ratio: null, state: 'no-gap' }, h], [{ ...base, medianGap: 0, ratio: null, state: 'no-gap' }, none]]) {
-      const t = text(summaryHtml(s, 'A <b>Hospital</b>', record));
+      const t = text(summaryHtml(s, 'A <b>Hospital</b>', addOnsOf(record)));
       assert.ok(!/NaN|undefined|null|Infinity/.test(t), `${s.state}: ${t}`);
       assert.ok(!t.includes('<b>'), 'the name is escaped');
     }
-    assert.equal(summaryHtml({ codes: 0, below: 0, medianGap: null, medianAddOn: null, ratio: null, state: 'empty' }, 'X', h), '');
+    assert.equal(summaryHtml({ codes: 0, below: 0, medianGap: null, medianAddOn: null, ratio: null, state: 'empty' }, 'X', addOnsOf(h)), '');
   });
   test('the name is escaped everywhere it appears', () => {
     const record = { ...recordOf('380009'), name: '<img src=x onerror=alert(1)>' };
@@ -175,13 +175,13 @@ describe('cards in hospital mode', () => {
     assert.ok(!/\$0–\$0|NaN/.test(t));
   });
   test('K1: a DSH-only hospital (010005) and an IME-only one (010018): every add-on word names only what it gets', () => {
-    for (const [ccn, got, not, range] of [['010005', 'DSH', 'IME', '$392–$912'], ['010018', 'IME', 'DSH', '$2,985–$6,945']]) {
+    for (const [ccn, got, not, range, rates] of [['010005', 'DSH', 'IME', '$392–$912', 'wage index and operating DSH'], ['010018', 'IME', 'DSH', '$2,985–$6,945', 'wage index and IME (operating and capital)']]) {
       const view = viewOf(ccn);
       const html = view.card(view.data.byCode['32480']);
       const t = text(html);
       assert.ok(t.includes(`Includes ${range} in ${got} `), t);
       assert.ok(t.includes(`No ${got} add-on in either outpatient setting.`), t);
-      assert.ok(t.includes(`${view.name} rates: wage index and ${got} (operating and capital).`), t);
+      assert.ok(t.includes(`${view.name} rates: ${rates}.`), t);
       assert.match(html, new RegExp(`<span class="sbar__keyed">\\(<i class="sbar__key"></i>${got}\\)</span>`));
       const outsideFolds = t.replace(/The split by DRG[\s\S]*$/, '');
       assert.ok(!outsideFolds.includes(not), `${ccn}: ${not} named on the card: ${outsideFolds}`);
@@ -246,10 +246,11 @@ describe('the lede after a pick', () => {
   });
 });
 
-describe('the national downloads after a pick (A52)', () => {
-  test('"Download Excel" and "Download CSV" say national; anything else is left alone', () => {
-    assert.equal(nationalDownload('Download Excel'), 'Download national Excel');
-    assert.equal(nationalDownload('Download CSV'), 'Download national CSV');
-    assert.equal(nationalDownload('download the CSV'), 'download the CSV');
+describe('fine print by the sides a hospital has', () => {
+  test('a capital-IME-only hospital (110165) reads "capital IME", without "(operating and capital)"', () => {
+    const view = viewOf('110165');
+    const t = text(view.card(view.data.byCode['32480']));
+    assert.ok(t.includes(`${view.name} rates: wage index, capital IME and DSH.`), t);
+    assert.ok(!t.includes('(operating and capital)'), t);
   });
 });

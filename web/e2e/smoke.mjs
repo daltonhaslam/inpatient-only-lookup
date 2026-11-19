@@ -672,6 +672,7 @@ if (!hasStake) {
     assert(await page.locator('tr[data-code="32480"]').count() === 1, 'table row for 32480');
     eq(await page.locator('[data-stake-app] *').count(), 0, 'app is empty without JS');
     eq(await page.locator('details.stake-tablewrap').count(), 0, 'table not wrapped without JS');
+    eq(await page.locator('[data-hospital-pick]').isVisible(), false, 'the hospital picker, which needs JS, is hidden');
     // The tables render lazily (content-visibility); a jump link must still land on its table.
     const jump = page.locator('.stab__jump a').last();
     const target = (await jump.getAttribute('href')).slice(1);
@@ -778,7 +779,7 @@ if (!hasStake) {
     noJunk(head, 'DSH-only summary');
     let text = await cardFor(page, '32480');
     has(text, 'If billed outpatient, Marshall Medical Centers South Campus is paid', 'DSH-only gap');
-    for (const part of ['Includes $392–$912 in DSH', 'No DSH add-on in either outpatient setting.', 'Marshall Medical Centers South Campus rates: wage index and DSH (operating and capital).']) has(text, part, 'DSH-only card');
+    for (const part of ['Includes $392–$912 in DSH', 'No DSH add-on in either outpatient setting.', 'Marshall Medical Centers South Campus rates: wage index and operating DSH.']) has(text, part, 'DSH-only card');
     eq(await page.locator('[data-stake-card="32480"] .sbar__keyed').textContent(), '(DSH)', 'DSH-only bar legend');
     await openFolds(page, '32480');
     has(await foldText(page, '32480', 'split'), 'The split by DRG · base, DSH', 'DSH-only split heading');
@@ -1155,8 +1156,8 @@ if (!hasStake) {
     }, { viewport: { width, height: 860 } });
   }
 
-  // The picker's label wraps on a phone (one, two or three lines); the empty mount reserves each height.
-  await check('hospital: the empty picker reserves the height its labeled box draws at, one to three label lines', async (page) => {
+  // The picker's labeled box is in the page's HTML (its label wraps on a phone): nothing moves when the script takes it over.
+  await check('hospital: the picker\'s box has its height before the page\'s data arrives, at one to three label lines', async (page) => {
     let release;
     let held;
     await page.route(/\/data\/stake\./, async (route) => { await held; await route.continue(); });

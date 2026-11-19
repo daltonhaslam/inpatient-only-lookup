@@ -29,31 +29,59 @@ export const EMPTY = {
 // The two add-ons, each with CMS's operating and capital factor (hospitals.json keys) and the plain word
 // the summary's lead puts first: teaching (IME), safety-net (DSH). "Safety-net" is this site's gloss; CMS's
 // names are the indirect medical education and disproportionate share hospital adjustments (Methods).
+// ma: Medicare Advantage cases carry its operating part (42 CFR 412.105(g)); no capital part, and no DSH.
 const ADD_ONS = [
-  { name: 'IME', operating: 'tchop', capital: 'tchcp', plain: 'teaching' },
-  { name: 'DSH', operating: 'dshopp', capital: 'dshcpp', plain: 'safety-net' },
+  { name: 'IME', operating: 'tchop', capital: 'tchcp', plain: 'teaching', ma: true },
+  { name: 'DSH', operating: 'dshopp', capital: 'dshcpp', plain: 'safety-net', ma: false },
 ];
 
 /** A list in prose: "IME", "IME and DSH", "wage index, IME and DSH". join: "and" or "or". */
-export const series = (words, join = 'and') => (words.length > 1 ? `${words.slice(0, -1).join(', ')} ${join} ${words[words.length - 1]}` : words.join(''));
+export function series(words, join = 'and') {
+  return words.length > 1 ? `${words.slice(0, -1).join(', ')} ${join} ${words[words.length - 1]}` : words.join('');
+}
+
+/** What an MA case carries, where it carries anything: "operating IME". */
+export const MA_ADD_ON = series(ADD_ONS.filter((a) => a.ma).map((a) => `operating ${a.name}`));
 
 /**
  * The add-ons a hospital gets, from its own factors (a hospitals.json record), IME first:
- * [{name: 'IME' | 'DSH', plain, capitalOnly}]. An add-on counts when either of its factors is above 0;
- * capitalOnly when its operating factor is 0 (the "Capital IME only" and "Capital DSH only" hospitals).
- * [] for none. Every add-on word the hospital view says starts here.
+ * [{name: 'IME' | 'DSH', plain, ma, side, label}]. An add-on counts when either of its factors is above 0.
+ * side: 'both', 'operating' (capital factor 0) or 'capital' (operating factor 0: the "Capital IME only"
+ * and "Capital DSH only" hospitals); label: the name, or "operating DSH" / "capital IME" for one side.
+ * [] for none. Every add-on word the hospital view says starts here; the view computes it once
+ * (createView) and the functions below take its result.
  */
-export const addOnsOf = (h) => ADD_ONS.filter((a) => h[a.operating] > 0 || h[a.capital] > 0)
-  .map((a) => ({ name: a.name, plain: a.plain, capitalOnly: !(h[a.operating] > 0) }));
-
-/** The names alone: ['IME', 'DSH'], ['DSH'], ['IME'] or []. */
-export const addOnNames = (h) => addOnsOf(h).map((a) => a.name);
+export function addOnsOf(h) {
+  return ADD_ONS.filter((a) => h[a.operating] > 0 || h[a.capital] > 0).map((a) => {
+    const side = !(h[a.capital] > 0) ? 'operating' : !(h[a.operating] > 0) ? 'capital' : 'both';
+    return { name: a.name, plain: a.plain, ma: a.ma, side, label: side === 'both' ? a.name : `${side} ${a.name}` };
+  });
+}
 
 /**
  * What a traditional Medicare case's add-on is made of (the per-year fold's per-case label): "IME + DSH",
- * "DSH", "IME", "capital IME + DSH", "capital DSH"… (an add-on with an operating factor includes its capital part).
+ * "DSH", "IME", "capital IME + DSH", "capital DSH"… (an add-on with an operating factor is named bare).
  */
-export const addOnName = (h) => addOnsOf(h).map((a) => (a.capitalOnly ? `capital ${a.name}` : a.name)).join(' + ');
+export const addOnName = (addOns) => addOns.map((a) => (a.side === 'capital' ? a.label : a.name)).join(' + ');
+
+/**
+ * The fine print's factors: "wage index, IME and DSH (operating and capital)" when every add-on has both
+ * parts, else each one-sided add-on by its side: "wage index and operating DSH", "wage index, capital IME
+ * and DSH".
+ */
+export function ratesWords(addOns) {
+  const both = addOns.every((a) => a.side === 'both');
+  return `${series(['wage index', ...addOns.map((a) => a.label)])}${both ? ' (operating and capital)' : ''}`;
+}
+
+/**
+ * What the split's add-on rows hold: "IME and DSH each include their capital part" when each has both
+ * parts, else per add-on: "IME here is capital IME only; DSH includes its capital part".
+ */
+export function partsWords(addOns) {
+  if (addOns.length > 1 && addOns.every((a) => a.side === 'both')) return `${series(addOns.map((a) => a.name))} each include their capital part`;
+  return addOns.map((a) => (a.side === 'both' ? `${a.name} includes its capital part` : `${a.name} here is ${a.label} only`)).join('; ');
+}
 
 const spelled = (a) => `${a.plain} (${a.name})`;
 
@@ -62,10 +90,9 @@ const spelled = (a) => `${a.plain} (${a.name})`;
  * after a pick): "teaching (IME) and safety-net (DSH) add-ons", "a safety-net (DSH) add-on", "a teaching
  * (IME) add-on". With none, both, negated: "no teaching (IME) or safety-net (DSH) add-ons".
  */
-export function addOnsSpelled(h) {
-  const got = addOnsOf(h);
-  if (!got.length) return `no ${series(ADD_ONS.map(spelled), 'or')} add-ons`;
-  return got.length > 1 ? `${series(got.map(spelled))} add-ons` : `a ${spelled(got[0])} add-on`;
+export function addOnsSpelled(addOns) {
+  if (!addOns.length) return `no ${series(ADD_ONS.map(spelled), 'or')} add-ons`;
+  return addOns.length > 1 ? `${series(addOns.map(spelled))} add-ons` : `a ${spelled(addOns[0])} add-on`;
 }
 
 const LADDER = [[1, 'all'], [7 / 8, 'nearly all'], [17 / 24, 'about three quarters'], [7 / 12, 'about two thirds'],
