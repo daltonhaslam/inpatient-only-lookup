@@ -22,6 +22,15 @@ class Raw(unittest.TestCase):
     def test_quotes_are_on_their_cited_pages(self):
         self.assertEqual(citations.verify(self.sources), [])
 
+    def test_deductible_quotes_are_on_the_pinned_fact_sheet(self):
+        self.assertEqual(citations.verify_deductibles(self.sources), [])
+        # The check can fail: a changed figure, or a fact sheet nobody pinned.
+        facts = fetch.read_json(fetch.PIPELINE / "facts.json")
+        wrong = dict(facts["deductibles"], quotes=[facts["deductibles"]["quotes"][0].replace("$1,776", "$1,777")])
+        self.assertEqual(len(citations.verify_deductibles(self.sources, dict(facts, deductibles=wrong))), 1)
+        unpinned = dict(facts["deductibles"], url="https://www.cms.gov/newsroom/fact-sheets/none")
+        self.assertIn("no source", citations.verify_deductibles(self.sources, dict(facts, deductibles=unpinned))[0])
+
     def test_no_label_copies_a_cms_descriptor(self):
         """A label may not equal its own code's CMS/AMA descriptor, or share five consecutive words
         with ANY code's descriptor (a label can echo a sibling code's wording)."""

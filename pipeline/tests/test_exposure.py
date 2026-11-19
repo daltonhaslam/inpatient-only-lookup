@@ -50,7 +50,7 @@ def asc_report(t, removed=REMOVED):
 
 class Facts(unittest.TestCase):
     """pipeline/facts.json says only what its sources say (the FR quotes are checked on their
-    pages by test_raw.py)."""
+    pages, and the deductible quotes on the pinned fact sheet, by test_raw.py)."""
     facts = fetch.read_json(exposure.FACTS)
     quoted = fetch.read_json(fetch.PIPELINE / "citations.json")["citations"]
 

@@ -309,8 +309,10 @@ def calendar_follow_ups(sources, facts, today):
     deductibles = (facts or {}).get("deductibles")
     if deductibles and today >= datetime.date(deductibles["year"], 11, 1):
         notes.append("CMS announces the %d Part A and Part B deductibles each November: update deductibles in "
-                     "pipeline/facts.json (year, amounts, fact-sheet source, URL and quotes) and rebuild the patient "
-                     "shares: %s" % (deductibles["year"] + 1, BUILD))
+                     "pipeline/facts.json (year, amounts, fact-sheet source, URL and quotes), pin the new fact sheet in "
+                     "sources.json as deductibles-%d (kind fact_sheet, the same URL; fetch.py pins it, and test_raw.py "
+                     "checks the quotes are on it), and rebuild the patient shares: %s"
+                     % (deductibles["year"] + 1, deductibles["year"] + 1, BUILD))
     cy = newest("asc_additions", "cy")
     if cy and today >= datetime.date(cy, 11, 1):
         notes.append("The CY %d OPPS/ASC final rule (each November) adds codes to the ASC covered procedures list: pin its "

@@ -221,6 +221,7 @@ class CalendarFollowUps(unittest.TestCase):
         self.assertEqual(len(deductibles), 1)
         self.assertIn("2028", deductibles[0])
         self.assertIn("pipeline/facts.json", deductibles[0])
+        self.assertIn("deductibles-2028", deductibles[0])
         self.assertEqual(len(additions), 1)
         self.assertIn("CY 2028", additions[0])
         self.assertIn("asc-2028-additions", additions[0])

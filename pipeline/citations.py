@@ -1,4 +1,5 @@
-"""Check that every quoted Federal Register passage really is on the page it cites."""
+"""Check that every quoted Federal Register passage really is on the page it cites, and that the
+deductible quotes in facts.json are on the pinned CMS fact sheet they come from."""
 import re
 from pathlib import Path
 
@@ -44,3 +45,15 @@ def verify(sources):
         elif not quote or quote not in cache[source["id"]].get(page, ""):
             problems.append("%s: quote not found on %s" % (key, item["cite"]))
     return problems
+
+
+def verify_deductibles(sources, facts=None):
+    """Problems with facts.json's deductible quotes; empty when each is on the pinned copy of the fact
+    sheet it names (the sources.json entry with the same URL)."""
+    deductibles = (facts or fetch.read_json(fetch.PIPELINE / "facts.json"))["deductibles"]
+    source = next((s for s in sources if s["url"] == deductibles["url"]), None)
+    if source is None:
+        return ["deductibles: no source in sources.json for %s; pin the fact sheet" % deductibles["url"]]
+    text = fetch.squash(fetch.text_of(fetch.raw_path(source).read_text(encoding="utf-8", errors="replace")))
+    return ["deductibles: quote not found on %s: %s" % (source["id"], quote[:60])
+            for quote in deductibles["quotes"] if not fetch.squash(quote) or fetch.squash(quote) not in text]
