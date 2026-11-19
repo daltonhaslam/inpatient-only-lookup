@@ -128,6 +128,7 @@ def fetch(source, repin=False):
 
 
 def main(argv=None):
+    import citations    # here, not at the top: citations imports this module
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--only", nargs="*", default=None, help="source ids to fetch (default: all)")
     parser.add_argument("--repin", nargs="*", default=[], help="source ids whose pin should be replaced")
@@ -142,8 +143,14 @@ def main(argv=None):
             status, changed = fetch(source, repin=source["id"] in args.repin)
         except Exception as error:  # one bad URL must not hide the rest
             status, changed = "FAILED: %s" % error, False
+        if status.startswith("MISMATCH") and source["kind"] in citations.QUOTED_PAGES:
+            # A page whose HTML drifts: a new hash is fine while the quoted sentences still verify.
+            adopt, status = citations.quoted_page_change(source, raw_path(source).read_bytes())
+            if adopt:
+                source["sha256"] = sha256(raw_path(source).read_bytes())
+                changed = True
         dirty = dirty or changed
-        if not status.startswith(("ok", "pinned")):
+        if not status.startswith(("ok", "pinned", "page changed; deductible quotes still match")):
             failed = True
         print("%-16s %s" % (source["id"], status))
     if dirty:

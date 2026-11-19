@@ -1,5 +1,5 @@
 {
- "note": "Hand-maintained figures the hospital view and the patient share use that no pinned CMS data file carries. Each names where it was read. The derived tables carry these values; nothing else may retype them. Refresh the deductibles each November; their quotes are checked against the pinned copy of the fact sheet (sources.json, the entry with the same URL) by tests/test_raw.py.",
+ "note": "Hand-maintained figures the hospital view and the patient share use that no pinned CMS data file carries. Each names where it was read. The derived tables carry these values; nothing else may retype them. Refresh the deductibles each November; each figure must be in a quote and each quote on the downloaded fact sheet (sources.json, the entry with the same URL), checked by the crosswalk build and tests/test_raw.py.",
  "deductibles": {
   "year": 2027,
   "part_a_inpatient": 1776,

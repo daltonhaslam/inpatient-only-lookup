@@ -17,16 +17,38 @@ class Raw(unittest.TestCase):
 
     def test_every_file_matches_its_pin(self):
         for source in self.sources:
+            if source["kind"] in citations.QUOTED_PAGES:
+                continue    # test_quoted_pages_match_their_pin_or_their_quotes
+            self.assertTrue(fetch.raw_path(source).is_file(), "%s is not downloaded; run pipeline/fetch.py" % source["id"])
             self.assertEqual(fetch.sha256(fetch.raw_path(source).read_bytes()), source["sha256"], source["id"])
+
+    def test_quoted_pages_match_their_pin_or_their_quotes(self):
+        """A fact sheet's HTML may drift: its pin, or failing that its quotes, must hold."""
+        for source in self.sources:
+            if source["kind"] not in citations.QUOTED_PAGES:
+                continue
+            path = fetch.raw_path(source)
+            if not path.is_file():
+                self.skipTest("%s is not downloaded; run pipeline/fetch.py --only %s" % (source["id"], source["id"]))
+            data = path.read_bytes()
+            if fetch.sha256(data) != source["sha256"]:
+                adopt, message = citations.quoted_page_change(source, data)
+                self.assertTrue(adopt, "%s: %s" % (source["id"], message))
 
     def test_quotes_are_on_their_cited_pages(self):
         self.assertEqual(citations.verify(self.sources), [])
 
     def test_deductible_quotes_are_on_the_pinned_fact_sheet(self):
+        source = citations.deductible_source(self.sources)
+        if source is not None and not fetch.raw_path(source).is_file():
+            self.skipTest("%s is not downloaded; run pipeline/fetch.py --only %s" % (source["id"], source["id"]))
         self.assertEqual(citations.verify_deductibles(self.sources), [])
-        # The check can fail: a changed figure, or a fact sheet nobody pinned.
+        # The check can fail: a mistyped figure, a quote CMS's page does not have, or a sheet nobody pinned.
         facts = fetch.read_json(fetch.PIPELINE / "facts.json")
-        wrong = dict(facts["deductibles"], quotes=[facts["deductibles"]["quotes"][0].replace("$1,776", "$1,777")])
+        typo = dict(facts["deductibles"], part_a_inpatient=1777)
+        self.assertEqual(citations.verify_deductibles(self.sources, dict(facts, deductibles=typo)),
+                         ["deductibles: part_a_inpatient $1,777 is in no quote"])
+        wrong = dict(facts["deductibles"], quotes=[q.replace("$292", "$293") for q in facts["deductibles"]["quotes"]], part_b=293)
         self.assertEqual(len(citations.verify_deductibles(self.sources, dict(facts, deductibles=wrong))), 1)
         unpinned = dict(facts["deductibles"], url="https://www.cms.gov/newsroom/fact-sheets/none")
         self.assertIn("no source", citations.verify_deductibles(self.sources, dict(facts, deductibles=unpinned))[0])

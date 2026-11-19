@@ -7,6 +7,8 @@ when its checks pass; build.gated_write). Never print descriptor text.
 """
 import collections
 
+import citations
+import fetch
 from crosswalk import checks, exposure
 from crosswalk import exposure_sources as xs
 from crosswalk.exposure import ASC_NEW, COINSURANCE, HOSPITAL_RATES, HOSPITALS, MARYLAND, SHARES, VOLUME
@@ -50,6 +52,7 @@ def run(report, doc, tables, removed, t):
     _volume(report, doc, tables[VOLUME], hospitals, t)
     _asc_new(report, tables[ASC_NEW], removed, t)
     _shares(report, doc, tables[SHARES], t)
+    _deductibles(report, t)
     _descriptors(report, tables, t)
 
 
@@ -257,6 +260,14 @@ def _shares(report, doc, table, t):
     report.info("hospital outpatient shares capped", "%d codes' copayment is above $%s" % (
         sum(1 for r in rows.values() if r["opps_capped"]), format(cap, ",")))
     _copay_vs_rate(report, codes, t)
+
+
+def _deductibles(report, t, sources=None):
+    """facts.json's deductibles (they cap the shares and ship in patient-shares.json) against the
+    downloaded CMS fact sheet: each figure in a quote, each quote on the page."""
+    d = t.facts["deductibles"]
+    report.check("deductibles on CMS's fact sheet", citations.verify_deductibles(fetch.load_sources() if sources is None else sources, t.facts),
+                 "Part A $%s, Part B $%s in %d, quoted from %s" % (format(d["part_a_inpatient"], ","), format(d["part_b"], ","), d["year"], d["url"]))
 
 
 def _copay_vs_rate(report, codes, t):

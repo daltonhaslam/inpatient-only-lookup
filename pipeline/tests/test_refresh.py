@@ -147,6 +147,20 @@ class Replaced(unittest.TestCase):
         self.assertEqual([(source["id"], data) for source, data in changed], [("addenda-2027", new_rule)])
         self.assertEqual(problems, [])
 
+    def test_the_fact_sheet_is_adopted_while_its_deductible_quotes_still_verify(self):
+        facts = fetch.read_json(fetch.PIPELINE / "facts.json")["deductibles"]
+        sheet = {"id": "deductibles-2027", "kind": "fact_sheet", "url": facts["url"], "sha256": fetch.sha256(b"old")}
+        drifted = ("<header>new menu</header><p>" + "</p><p>".join(facts["quotes"]) + "</p>").encode()
+        adopt, problems = refresh.quoted_pages_changed([sheet], {facts["url"]: drifted}.get)
+        self.assertEqual([(source["id"], data) for source, data, _ in adopt], [("deductibles-2027", drifted)])
+        self.assertIn("deductible quotes still match -> adopted new hash", adopt[0][2])
+        self.assertEqual(problems, [])
+        adopt, problems = refresh.quoted_pages_changed([sheet], {facts["url"]: b"<p>Coming soon</p>"}.get)
+        self.assertEqual(adopt, [])
+        self.assertIn("no longer match -> FAIL, needs a person", problems[0])
+        same = dict(sheet, sha256=fetch.sha256(drifted))
+        self.assertEqual(refresh.quoted_pages_changed([same], {facts["url"]: drifted}.get), ([], []))
+
     def test_an_error_page_at_the_old_address_is_a_problem_not_a_replacement(self):
         sources = [
             {"id": "b-2026-10", "kind": "addendum_b", "effective": "2026-10-01", "url": "u1", "sha256": "pinned"},

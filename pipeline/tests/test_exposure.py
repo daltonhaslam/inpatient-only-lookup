@@ -10,6 +10,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+import citations
 import fetch
 import parse
 from crosswalk import build, checks, exposure, exposure_checks
@@ -60,6 +61,37 @@ class Facts(unittest.TestCase):
         self.assertIn("will be ${:,} in 2027".format(deductibles["part_a_inpatient"]), quotes)
         self.assertIn("will be ${:,} in 2027".format(deductibles["part_b"]), quotes)
         self.assertTrue(deductibles["url"].startswith("https://www.cms.gov/newsroom/"))
+
+    def test_the_deductible_check_reads_figures_and_quotes_from_the_page_text(self):
+        facts = {"deductibles": dict(self.facts["deductibles"])}
+        page = "<p>" + "</p><p>".join(facts["deductibles"]["quotes"]) + "</p>"
+        self.assertEqual(citations.deductible_problems(page, facts), [])
+        typo = {"deductibles": dict(facts["deductibles"], part_b=293)}
+        self.assertEqual(citations.deductible_problems(page, typo), ["deductibles: part_b $293 is in no quote"])
+        self.assertEqual(len(citations.deductible_problems("<p>CMS changed the page</p>", facts)), 2)
+
+    def test_a_drifted_fact_sheet_is_adopted_only_while_its_quotes_verify(self):
+        source = {"id": "deductibles-2027", "kind": "fact_sheet", "url": self.facts["deductibles"]["url"]}
+        page = ("<nav>new menu</nav><p>" + "</p><p>".join(self.facts["deductibles"]["quotes"]) + "</p>").encode()
+        adopt, message = citations.quoted_page_change(source, page)
+        self.assertTrue(adopt, message)
+        self.assertIn("deductible quotes still match", message)
+        adopt, message = citations.quoted_page_change(source, b"<p>The 2027 deductible will be announced soon.</p>")
+        self.assertFalse(adopt)
+        self.assertIn("no longer match -> FAIL, needs a person", message)
+        self.assertFalse(citations.quoted_page_change(dict(source, url="https://www.cms.gov/other"), page)[0])
+
+    def test_a_missing_or_unpinned_fact_sheet_is_a_problem_not_an_error(self):
+        facts = {"deductibles": dict(self.facts["deductibles"])}
+        absent = {"id": "no-such-download-xyz", "kind": "fact_sheet", "url": facts["deductibles"]["url"]}
+        self.assertIn("is not downloaded", citations.verify_deductibles([absent], facts)[0])
+        self.assertIn("no source", citations.verify_deductibles([], facts)[0])
+
+    def test_the_build_gate_fails_on_a_mistyped_deductible(self):
+        report = checks.Report()
+        exposure_checks._deductibles(report, types.SimpleNamespace(facts={"deductibles": dict(self.facts["deductibles"])}), sources=[])
+        self.assertEqual(report.failures, 1)
+        self.assertTrue(report.lines[0].startswith("FAIL deductibles on CMS's fact sheet"), report.lines)
 
     def test_asc_additions_and_labor_share_are_quoted_from_the_rule(self):
         additions = self.facts["asc_additions_2027"]

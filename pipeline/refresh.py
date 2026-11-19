@@ -9,7 +9,9 @@ One run does four things:
      to a recent one, the next calendar year's final rule (its addenda and, if there is one, its
      "removed from the IPO list" file), or a re-posted copy of the newest rule's files.
   2. Re-downloads the recent files it already has, because CMS also replaces files in place under
-     the same address. A changed file is adopted and re-pinned, and the report says so.
+     the same address. A changed file is adopted and re-pinned, and the report says so. The CMS fact
+     sheet the deductibles quote is re-downloaded too: its page changes around the same sentences, so
+     a new copy is adopted while the deductible quotes still verify, and is a problem when they do not.
   3. Runs build.py, which reconciles the whole history and leaves the published tables alone if
      any check fails.
   4. Runs the tests, then lists what still needs a person: a new rule's Federal Register facts in
@@ -34,6 +36,7 @@ import urllib.parse
 import zipfile
 from pathlib import Path
 
+import citations
 import fetch
 import history
 import parse
@@ -258,6 +261,25 @@ def replaced_in_place(sources, grab, skip=()):
     return changed, problems
 
 
+def quoted_pages_changed(sources, grab):
+    """The fact sheet facts.json quotes (citations.QUOTED_PAGES), re-downloaded: its HTML drifts, so a
+    new hash is adopted while the quoted sentences still verify. Returns ([(source, new bytes, message)]
+    to adopt, [problems]): quotes that no longer match, or a dead address, need a person."""
+    adopt, problems = [], []
+    for source in sources:
+        if source["kind"] not in citations.QUOTED_PAGES or source is not citations.deductible_source(sources):
+            continue
+        data = grab(source["url"])
+        if data is None or fetch.sha256(data) == source["sha256"]:
+            continue
+        ok, message = citations.quoted_page_change(source, data)
+        if ok:
+            adopt.append((source, data, message))
+        else:
+            problems.append("%s: %s" % (source["id"], message))
+    return adopt, problems
+
+
 def new_addendum_b(found, replaced):
     """True when this run adopted an Addendum B, new or replaced in place by CMS (a corrected
     quarter changes rates as much as a new one)."""
@@ -407,6 +429,8 @@ def main(argv=None):
         problems += notes
     replaced, stale = replaced_in_place(manifest["sources"], grab, skip={source["id"] for source, _ in found})
     problems += stale
+    quoted, drifted = quoted_pages_changed(manifest["sources"], grab)
+    problems += drifted
 
     print("New files: %d" % len(found))
     for source, _ in found:
@@ -414,6 +438,8 @@ def main(argv=None):
     print("Files CMS replaced in place: %d" % len(replaced))
     for source, _ in replaced:
         print("  %-18s %s" % (source["id"], source["url"]))
+    for source, _, message in quoted:
+        print("  %-18s %s" % (source["id"], message))
     for problem in problems:
         print("  PROBLEM: " + problem)
     if args.dry_run:
@@ -434,6 +460,12 @@ def main(argv=None):
             source["id"], source["sha256"][:12], fetch.sha256(data)[:12]))
         if before:
             print(list_change(source, before, data))
+        source["sha256"] = fetch.sha256(data)
+    for source, data, _ in quoted:
+        path = fetch.raw_path(source)
+        keep_previous(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
         source["sha256"] = fetch.sha256(data)
     fetch.save_manifest(manifest)
 

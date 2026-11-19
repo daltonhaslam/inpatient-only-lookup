@@ -660,7 +660,7 @@
    "url": "https://www.cms.gov/newsroom/fact-sheets/2027-medicare-parts-b-premiums-deductibles",
    "landing": "https://www.cms.gov/newsroom/fact-sheets/2027-medicare-parts-b-premiums-deductibles",
    "sha256": "68c1898ca6800d60761347c118423b3a667a094ac0627315037825e8df7250cf",
-   "note": "CMS fact sheet, 2027 Medicare Parts A & B Premiums and Deductibles (HTML page). The source of the deductibles in facts.json (matched by URL): test_raw.py checks each of its quotes is on this pinned copy. Fetched twice on 2026-11-19 with the same SHA-256; a later mismatch may be CMS changing the page's template, not the figures: check the quotes, then repin."
+   "note": "CMS fact sheet, 2027 Medicare Parts A & B Premiums and Deductibles (HTML page). The source of the deductibles in facts.json (matched by URL): the crosswalk build (exposure_checks) and test_raw.py check each figure is quoted and each quote is on the downloaded copy. Its HTML may drift around the same sentences, so a new hash is adopted while the quotes still verify (fetch.py, refresh.py; citations.QUOTED_PAGES) and fails, for a person, when they do not."
   }
  ]
 }
