@@ -1,7 +1,7 @@
 // The hospital view's words and round figures (hospital-words.mjs).
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { EMPTY, fractionWord, roughMoney } from '../src/hospital-words.mjs';
+import { EMPTY, fractionWord, roughMoney, series, addOnsOf, addOnNames, addOnsSpelled } from '../src/hospital-words.mjs';
 
 describe('fractionWord: the nearest named fraction, cutoffs at the midpoints', () => {
   const cases = [
@@ -30,4 +30,33 @@ describe('roughMoney: the per-year fold headline', () => {
 test('EMPTY labels the two reasons a count cell is empty', () => {
   assert.deepEqual(Object.keys(EMPTY).sort(), ['no-ma-ratio', 'suppressed']);
   assert.equal(EMPTY.suppressed, 'under 11 or none');
+});
+
+describe('the add-ons a hospital gets, in words (K1, one place builds them)', () => {
+  const both = { tchop: 0.3, tchcp: 0.1, dshopp: 0.07, dshcpp: 0.05 };
+  const dsh = { tchop: 0, tchcp: 0, dshopp: 0.035, dshcpp: 0 };
+  const ime = { tchop: 0.2, tchcp: 0.1, dshopp: 0, dshcpp: 0 };
+  const capitalIme = { tchop: 0, tchcp: 0.05, dshopp: 0.04, dshcpp: 0.02 };
+  const none = { tchop: 0, tchcp: 0, dshopp: 0, dshcpp: 0 };
+  test('series joins a list for prose', () => {
+    assert.equal(series([]), '');
+    assert.equal(series(['DSH']), 'DSH');
+    assert.equal(series(['IME', 'DSH']), 'IME and DSH');
+    assert.equal(series(['IME', 'DSH'], 'or'), 'IME or DSH');
+    assert.equal(series(['wage index', 'IME', 'DSH']), 'wage index, IME and DSH');
+  });
+  test('names from the hospital’s own factors; a capital factor alone counts', () => {
+    assert.deepEqual(addOnNames(both), ['IME', 'DSH']);
+    assert.deepEqual(addOnNames(dsh), ['DSH']);
+    assert.deepEqual(addOnNames(ime), ['IME']);
+    assert.deepEqual(addOnNames(capitalIme), ['IME', 'DSH']);
+    assert.deepEqual(addOnNames(none), []);
+    assert.deepEqual(addOnsOf(capitalIme).map((a) => a.capitalOnly), [true, false]);
+  });
+  test('spelled out for the lead: plain word first, acronym in parentheses, singular for one', () => {
+    assert.equal(addOnsSpelled(both), 'teaching (IME) and safety-net (DSH) add-ons');
+    assert.equal(addOnsSpelled(dsh), 'a safety-net (DSH) add-on');
+    assert.equal(addOnsSpelled(ime), 'a teaching (IME) add-on');
+    assert.equal(addOnsSpelled(none), 'no teaching (IME) or safety-net (DSH) add-ons');
+  });
 });

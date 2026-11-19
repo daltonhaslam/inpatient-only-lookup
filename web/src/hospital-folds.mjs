@@ -1,42 +1,33 @@
-// The two folded sections a compared card gains after a hospital is picked: "The split by DRG"
-// (base, IME, DSH and total per DRG, to the cent) and "Per year at <hospital>" (the add-ons on its
-// cases in those DRGs, with counts anyone can change). Pure: strings in, HTML strings out; the hospital
-// bundle's DOM code (hospital-picker.mjs) applies yearUpdate() to the card when a count changes.
+// The two folded sections a compared card gains after a hospital is picked: "The split by DRG" (base,
+// the add-ons the hospital gets and total per DRG, to the cent) and "Per year at <hospital>" (the add-ons
+// on its cases in those DRGs, with counts anyone can change). Pure: strings in, HTML strings out; the
+// hospital bundle's DOM code (hospital-picker.mjs) applies yearUpdate() to the card when a count changes.
 // Every string from data or from a typed count goes through esc(); figures come from cents().
 import { esc, fr, cfr, scroller } from './views.mjs';
 import { cents, drgList, whenLabel } from './stake-card.mjs';
 import { splitRows, perYearTable, count } from './hospital-math.mjs';
-import { EMPTY, roughMoney, ceiling, MA_MIX } from './hospital-words.mjs';
+import { EMPTY, roughMoney, ceiling, MA_MIX, addOnName, addOnNames, series } from './hospital-words.mjs';
 
 const PAYERS = { trad: 'traditional Medicare', ma: 'Medicare Advantage' };
 
-// The folds' fixed prose (HTML). Names and ratios are filled in by the functions below, through esc().
-// Spec § Rounding: each figure is rounded once from unrounded parts, so the parts need not add to the total.
+// The folds' fixed prose (HTML). The functions below fill in names and ratios (a hospital's name through
+// esc(); the add-ons' names are fixed words, from addOnNames()). Spec § Rounding: each figure is rounded
+// once from unrounded parts, so the parts need not add to the total.
 const ROUNDING = 'Parts are rounded separately, so they can differ from the total by a cent.';
 const SPLIT_NOTE = {
-  addOns: (name) => `Base is operating plus capital payment with ${esc(name)}’s wage index and capital GAF; IME and DSH each include their capital part. Uncompensated care is left out: it is a fixed yearly amount, settled at cost report, not lost per case (${cfr('412.106', '42 CFR 412.106(i)')}). Outliers are left out too. ${ROUNDING}`,
-  none: (name) => `With ${esc(name)}’s wage index and capital GAF. This hospital gets no IME or DSH. Outliers are left out. ${ROUNDING}`,
+  addOns: (names) => `Base is operating plus capital payment with this hospital’s wage index and capital GAF; ${names.length > 1 ? `${series(names)} each include their` : `${names[0]} includes its`} capital part. Uncompensated care is left out: it is a fixed yearly amount, settled at cost report, not lost per case (${cfr('412.106', '42 CFR 412.106(i)')}). Outliers are left out too. ${ROUNDING}`,
+  none: () => `With this hospital’s wage index and capital GAF. This hospital gets no IME or DSH. Outliers are left out. ${ROUNDING}`,
 };
 const YEAR_LEAD = (year, drgs) => `${esc(ceiling(year, drgs))} Change any count and the row, total and heading follow; your counts are not saved.`;
 const YEAR_NOTES = {
-  teaching: (ratio) => [
-    `IME is paid on traditional Medicare and Medicare Advantage cases, DSH on traditional Medicare only: MA cases carry operating IME only (${cfr('412.105', '42 CFR 412.105(g)')}).`,
+  teaching: (ratio, names) => [
+    `IME is paid on traditional Medicare and Medicare Advantage cases${names.includes('DSH') ? ', DSH on traditional Medicare only' : ''}: MA cases carry operating IME only (${cfr('412.105', '42 CFR 412.105(g)')}).`,
     `MA plans must follow the 2-midnight rule and may not treat a removal from the inpatient-only list as requiring outpatient care (${fr('91 FR 70572')}); the risk is that they default removed procedures to outpatient anyway, so MA cases count here. MA counts are estimates${ratio === null ? '' : ` (${esc(ratio.toFixed(2))} MA cases per traditional case in CMS’s impact file)`}. ${esc(MA_MIX)}`,
     `Direct GME is not counted: it follows the Medicare and MA share of inpatient days, so it falls slightly and later (${cfr('413.76', '42 CFR 413.76')}). Medicaid GME is separate and state-run; commercial payers pay no add-on.`,
   ],
-  other: () => [`DSH is paid on traditional Medicare cases only. Medicare Advantage cases carry no add-on at a hospital without operating IME (${cfr('412.105', '42 CFR 412.105(g)')}), and commercial payers pay none.`],
+  other: (names) => [`${series(names)} ${names.length > 1 ? 'are' : 'is'} paid on traditional Medicare cases only. Medicare Advantage cases carry no add-on at a hospital without operating IME (${cfr('412.105', '42 CFR 412.105(g)')}), and commercial payers pay none.`],
   source: (year) => `Traditional counts: CMS’s Medicare Inpatient Hospitals by Provider and Service, ${esc(year)}. CMS does not publish a count under 11.`,
 };
-
-/**
- * What a traditional Medicare case's add-on is made of at this hospital, from its nonzero factors:
- * "IME + DSH", "DSH", "IME", "capital IME + DSH", "capital DSH"… (IME or DSH with an operating factor
- * includes its capital part; "capital" only when the operating factor is 0).
- */
-export function addOnName(h) {
-  const part = (operating, capital, word) => (h[operating] > 0 ? word : h[capital] > 0 ? `capital ${word}` : null);
-  return [part('tchop', 'tchcp', 'IME'), part('dshopp', 'dshcpp', 'DSH')].filter(Boolean).join(' + ');
-}
 
 /** "165 without CC/MCC": the DRG and the severity part of its title (hospitals list meta.drg_sev). */
 export const drgLabel = (drg, sev = {}) => (sev[drg] ? `${drg} ${sev[drg]}` : drg);
@@ -48,23 +39,27 @@ function fold(kind, open, summary, body) {
 <div class="hfold__body">${body}</div></details>`;
 }
 
-/** The split by DRG: one table per family (named when a code has several), and what is left out. */
+/**
+ * The split by DRG: one table per family (named when a code has several), and what is left out. Only the
+ * add-ons the hospital gets have a row (a DSH-only hospital has no IME row of $0.00s).
+ */
 function splitFold(item, ctx, { name, sev, open }) {
   const families = splitRows(item, ctx);
   const many = families.length > 1;
+  const names = addOnNames(ctx.hospital);
   // A column per DRG, its parts above its total: three DRGs fit a 400 px phone.
-  const parts = ctx.addOns ? [['Base', 'base'], ['IME', 'ime'], ['DSH', 'dsh']] : [['Operating', 'operating'], ['Capital', 'capital']];
+  const parts = ctx.addOns ? [['Base', 'base'], ...names.map((n) => [n, n.toLowerCase()])] : [['Operating', 'operating'], ['Capital', 'capital']];
   const tables = families.map((family, i) => {
     const source = item.ip.families[i];
     const capId = id(item.code, 's', i);
-    const caption = `MS-DRG ${drgList(source.drgs)} ${family.name}${many ? `, ${whenLabel(source)}` : ''}: ${name}’s payment per case`;
+    const caption = `MS-DRG ${drgList(source.drgs)} ${family.name}${many ? `, ${whenLabel(source)}` : ''}: payment per case at ${name}`;
     const row = (label, key) => `<tr><th scope="row">${label}</th>${family.rows.map((r) => `<td class="num">${cents(r[key])}</td>`).join('')}</tr>`;
     return scroller(capId, `<table class="hsplit"><caption class="${many ? 'hfold__cap' : 'sr'}" id="${capId}">${esc(caption)}</caption>
 <thead><tr><td></td>${family.rows.map((r) => `<th scope="col" class="num">MS-DRG ${esc(drgLabel(r.drg, sev))}</th>`).join('')}</tr></thead>
 <tbody>${parts.map(([label, key]) => row(label, key)).join('')}</tbody><tfoot>${row('Total', 'total')}</tfoot></table>`);
   }).join('');
-  const note = (ctx.addOns ? SPLIT_NOTE.addOns : SPLIT_NOTE.none)(name);
-  const sub = ctx.addOns ? 'base, IME, DSH' : 'operating and capital, no IME or DSH';
+  const note = (ctx.addOns ? SPLIT_NOTE.addOns : SPLIT_NOTE.none)(names);
+  const sub = ctx.addOns ? ['base', ...names].join(', ') : 'operating and capital, no IME or DSH';
   return fold('split', open, `The split by DRG <span class="hfold__sub">· ${sub}</span>`, `${tables}<p class="hfold__note">${note}</p>`);
 }
 
@@ -131,6 +126,7 @@ function yearFold(item, ctx, { name, sev, edits, open }) {
   const drgs = drgList(rows.map((row) => ({ drg: row.drg })));
   const capId = id(item.code, 'y');
   const what = addOnName(ctx.hospital);
+  const names = addOnNames(ctx.hospital);
   // Teaching: a heading row per DRG, then traditional Medicare and Medicare Advantage under it.
   const body = rows.map((row) => {
     const drg = esc(drgLabel(row.drg, sev));
@@ -139,10 +135,10 @@ function yearFold(item, ctx, { name, sev, edits, open }) {
 ${line(item, row, 'trad', up, `Traditional Medicare${perCase(row, 'trad', what)}`)}
 ${line(item, row, 'ma', up, `Medicare Advantage${perCase(row, 'ma', 'operating IME only')}`)}</tbody>`;
   }).join('');
-  const table = `<table class="hyr"><caption class="sr" id="${capId}">IME and DSH a year on ${esc(name)}’s cases in MS-DRG ${esc(drgs)}</caption>
+  const table = `<table class="hyr"><caption class="sr" id="${capId}">${series(names)} a year on cases in MS-DRG ${esc(drgs)} at ${esc(name)}</caption>
 <thead><tr><th scope="col">${teaching ? 'MS-DRG and payer' : 'MS-DRG'}</th><th scope="col">Cases (${esc(ctx.year)})</th><th scope="col" class="num">A year</th></tr></thead>${teaching ? body : `<tbody>${body}</tbody>`}
 <tfoot><tr><th scope="row" colspan="2">Total, a ceiling</th><td class="num" data-year-total>${esc(up.total)}</td></tr></tfoot></table>`;
-  const notes = [...(teaching ? YEAR_NOTES.teaching(ctx.maRatio) : YEAR_NOTES.other()), YEAR_NOTES.source(ctx.year)];
+  const notes = [...(teaching ? YEAR_NOTES.teaching(ctx.maRatio, names) : YEAR_NOTES.other(names)), YEAR_NOTES.source(ctx.year)];
   const lead = `<p class="hfold__lead">${YEAR_LEAD(ctx.year, drgs)}</p>`;
   return fold('year', open, `Per year at ${esc(name)} <span class="hfold__sub">· <span data-year-head>${esc(up.headline)}</span></span>`,
     `${lead}${scroller(capId, table)}<ul class="hfold__notes">${notes.map((n) => `<li>${n}</li>`).join('')}</ul>`);

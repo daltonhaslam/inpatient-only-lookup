@@ -85,6 +85,7 @@ function hospitalSections(t, r) {
   const opps = h.opps_labor_share;
   return `<section class="block" aria-labelledby="m-hosp-h">
 <h2 id="m-hosp-h">At a hospital’s rates</h2>
+<p>Two add-ons raise a hospital’s inpatient payment. <strong>IME</strong> is the indirect medical education adjustment, paid to teaching hospitals (${cfr('412.105')}). <strong>DSH</strong> is the disproportionate share hospital adjustment, paid to hospitals that serve many low-income patients (${cfr('412.106')}). The hospital view calls them the teaching and safety-net add-ons; “safety-net” is this site’s word, and CMS’s names are the formal ones.</p>
 <p>Pick a hospital on the <a href="/revenue-at-stake/">Revenue at stake</a> page and every compared card is recomputed in your browser at that hospital’s FY 2027 inpatient and CY 2027 outpatient rates. The national figures are the same formula with each factor at its national value: wage index and GAF of 1, no IME or DSH.</p>
 <ol class="plain steps">
 <li><strong>Operating base</strong> = MS-DRG weight × ${cents(r.operating)} × (labor share × wage index + 1 − labor share). The labor share is ${pct(h.rates.labor_share)} when the wage index is above 1, else ${pct(h.rates.labor_share_le1)}.</li>

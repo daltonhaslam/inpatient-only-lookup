@@ -174,7 +174,7 @@ export function attachPicker(mount, assets, { data, meta, onPick, onClear, onInv
       if (mine !== token) return;
       if (initial) onInvalid({ keepUrl: true });
       else $('#hp-q')?.focus();
-      note(`Could not show ${optionName(index.byCcn.get(ccn))}’s rates: something in its data could not be computed. This is not a connection problem; trying again will not help.`);
+      note(`Could not show the rates for ${optionName(index.byCcn.get(ccn))}: something in its data could not be computed. This is not a connection problem; trying again will not help.`);
     }
   }
 

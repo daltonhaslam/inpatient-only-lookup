@@ -13,6 +13,7 @@ import { card, alternativeLabel } from '../src/stake-card.mjs';
 import { CSV_HEADER, csvRows } from '../src/stake.mjs';
 import { out } from '../src/views.mjs';
 import { LEDE_NATIONAL, hospitalLede } from '../src/hospital-view.mjs';
+import { nationalDownload } from '../src/hospital-field.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '..', '..');
@@ -221,6 +222,13 @@ describe('revenue at stake', { skip }, () => {
     const lede = /<section class="stake-head"[\s\S]*?<p class="lede">([\s\S]*?)<\/p>/.exec(html)[1];
     assert.equal(lede.split(LEDE_NATIONAL).length - 1, 1, lede);
     assert.notEqual(hospitalLede(lede), lede, 'the swap changes it');
+  });
+
+  test('main page: the national download links read as nationalDownload() expects, so a pick can relabel them (A52)', () => {
+    const html = read('revenue-at-stake/index.html');
+    const links = [.../<p class="stake__actions">([\s\S]*?)<\/p>/.exec(html)[1].matchAll(/<a [^>]*download>([^<]*)<\/a>/g)].map((m) => m[1]);
+    assert.ok(links.length >= 1, html.slice(0, 200));
+    for (const text of links) assert.match(nationalDownload(text), /^Download national (Excel|CSV)$/, text);
   });
 
   test('main page: badge, guardrail, years, progress, downloads, a row per code', () => {

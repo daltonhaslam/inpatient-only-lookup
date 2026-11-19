@@ -478,7 +478,11 @@ td a[target] { white-space: nowrap; }
    hospital view's styles load with the picker, on first use: web/src/hospital.css. ---- */
 /* Hold the picker's place until it draws (no layout shift). stake-client.mjs removes the empty mount if its
    data fails to load; only a script that never runs at all leaves the band. */
-@media (scripting: enabled) { .hpick:empty { min-height: 4.25rem; } }
+/* The box is 4.25rem tall with a one-line label (hospital-field.mjs LABEL); the label takes two lines below
+   38.125rem (610 px) and three below 20.5625rem (329 px), measured with the site's font. */
+@media (scripting: enabled) { .hpick:empty { min-height: 6.375rem; } }
+@media (scripting: enabled) and (min-width: 20.5625rem) { .hpick:empty { min-height: 5.31rem; } }
+@media (scripting: enabled) and (min-width: 38.125rem) { .hpick:empty { min-height: 4.25rem; } }
 /* On an ?h= landing (stake-client.mjs sets .hpick-h at script start) hold about the height the hospital's bar
    and summary will take, so nothing below jumps when they arrive. Set a little under the shortest summary
    (two numbers) at each layout: one column of numbers on a phone, two, then three. */

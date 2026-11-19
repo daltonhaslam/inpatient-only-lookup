@@ -698,12 +698,20 @@ if (!hasStake) {
     await countLine(page, (t) => t === '1 code.', `count for ${code}`);
     return (await page.locator(`[data-stake-card="${code}"]`).textContent()).replace(/\s+/g, ' ');
   }
+  async function openFolds(page, code) {
+    for (const kind of ['split', 'year']) {
+      const fold = page.locator(`[data-stake-card="${code}"] [data-fold="${kind}"]`);
+      if (await fold.count() && !(await fold.evaluate((d) => d.open))) await fold.locator('> summary').click();
+    }
+  }
+  const foldText = async (page, code, kind) => (await page.locator(`[data-stake-card="${code}"] [data-fold="${kind}"]`).textContent()).replace(/\s+/g, ' ');
   const noJunk = (text, what) => assert(!/NaN|undefined|Infinity|\$0–\$0|null/.test(text), `${what}: ${text}`);
 
   await check('hospital: the national landing shows only the empty picker and loads no hospital files', async (page) => {
     const seen = lazyRequests(page);
     await openStake(page);
-    eq((await page.locator('label[for="hp-q"]').textContent()).trim(), 'Pick a hospital to apply its wage index, IME and DSH.', 'picker label');
+    eq((await page.locator('label[for="hp-q"]').textContent()).trim(), 'Pick a hospital to apply its wage index and its teaching (IME) and safety-net (DSH) add-ons.', 'picker label');
+    eq((await page.locator('.stake__actions a[download]').allTextContents()).join(' | '), 'Download Excel | Download CSV', 'national download labels');
     eq(await page.locator('#hp-q').getAttribute('role'), 'combobox', 'combobox role');
     eq(await page.locator('.hsum, .hpick__on').count(), 0, 'no summary or hospital bar');
     await page.waitForTimeout(400);
@@ -719,13 +727,14 @@ if (!hasStake) {
     const head = await headText(page);
     has(head, 'Rates for Ohsu Hospital And Clinics (380009)', 'bar');
     has(head, 'Teaching · IME 31.1% · DSH 7.0% · wage index 1.19', 'facts');
-    has(head, 'At Ohsu Hospital And Clinics, about half of what a removed procedure loses when billed outpatient is teaching and DSH add-ons.', 'lead');
+    has(head, 'At Ohsu Hospital And Clinics, about half of what a removed procedure loses when billed outpatient is teaching (IME) and safety-net (DSH) add-ons.', 'lead');
     for (const part of ['$10,478', '$5,156', '822 of 849']) has(head, part, 'summary number');
     eq(await page.evaluate(() => document.activeElement.hasAttribute('data-hpick-change')), true, 'focus moves to Change hospital');
-    await waitText(page.locator('[data-hpick-status]'), (t) => t.startsWith('Showing Ohsu Hospital And Clinics’s rates.'), 'status line');
+    eq((await page.locator('.stake__actions a[download]').allTextContents()).join(' | '), 'Download national Excel | Download national CSV', 'A52: a pick relabels the page’s downloads');
+    await waitText(page.locator('[data-hpick-status]'), (t) => t.startsWith('Showing rates for Ohsu Hospital And Clinics.'), 'status line');
     const text = await cardFor(page, '32480');
     for (const part of ['If billed outpatient, Ohsu Hospital And Clinics is paid $18,121–$47,464 less than the inpatient DRG family.', '$3,995', 'national rate $3,585',
-      'Surgery center (ASC), national: $1,585', '$22,117–$51,459', 'Includes $6,067–$14,116 in IME and DSH', 'No teaching or DSH add-on in either outpatient setting.',
+      'Surgery center (ASC), national: $1,585', '$22,117–$51,459', 'Includes $6,067–$14,116 in IME and DSH', 'No IME or DSH add-on in either outpatient setting.',
       'Ohsu Hospital And Clinics rates: wage index, IME and DSH (operating and capital).']) has(text, part, '32480 card');
     assert(!text.includes('National, unadjusted'), 'no national fine print on a hospital card');
     eq(await page.locator('[data-stake-card="32480"] .sbar__add').count(), 1, 'add-on end segment of the bar');
@@ -762,16 +771,34 @@ if (!hasStake) {
     await pickHospital(page, '010005', '010005');
     let head = await headText(page);
     has(head, 'Not a teaching hospital · DSH', 'DSH-only facts');
+    has(head, 'At Marshall Medical Centers South Campus, a small part of what a removed procedure loses when billed outpatient is a safety-net (DSH) add-on.', 'DSH-only lead');
+    has(head, 'typical DSH in that lowest DRG (median)', 'DSH-only tile');
+    const dshSummary = await page.locator('.hsum').textContent();
+    assert(!/IME|teaching/.test(dshSummary), `DSH-only summary names IME: ${dshSummary}`);
     noJunk(head, 'DSH-only summary');
     let text = await cardFor(page, '32480');
     has(text, 'If billed outpatient, Marshall Medical Centers South Campus is paid', 'DSH-only gap');
-    has(text, 'in IME and DSH', 'DSH-only add-on line');
+    for (const part of ['Includes $392–$912 in DSH', 'No DSH add-on in either outpatient setting.', 'Marshall Medical Centers South Campus rates: wage index and DSH (operating and capital).']) has(text, part, 'DSH-only card');
+    eq(await page.locator('[data-stake-card="32480"] .sbar__keyed').textContent(), '(DSH)', 'DSH-only bar legend');
+    await openFolds(page, '32480');
+    has(await foldText(page, '32480', 'split'), 'The split by DRG · base, DSH', 'DSH-only split heading');
+    eq((await page.locator('[data-stake-card="32480"] [data-fold="split"] th[scope="row"]').allTextContents()).join(' | '), 'Base | DSH | Total', 'DSH-only split rows: no $0 IME row');
     noJunk(text, 'DSH-only card');
+
+    await page.locator('[data-hpick-change]').click();
+    await pickHospital(page, '010018', '010018');
+    head = await headText(page);
+    has(head, 'At Uab Callahan Eye Hospital Authority, about a third of what a removed procedure loses when billed outpatient is a teaching (IME) add-on.', 'IME-only lead');
+    const imeSummary = await page.locator('.hsum').textContent();
+    assert(!/DSH|safety-net/.test(imeSummary), `IME-only summary names DSH: ${imeSummary}`);
+    text = await cardFor(page, '32480');
+    for (const part of ['Includes $2,985–$6,945 in IME', 'No IME add-on in either outpatient setting.', 'Uab Callahan Eye Hospital Authority rates: wage index and IME (operating and capital).']) has(text, part, 'IME-only card');
+    eq(await page.locator('[data-stake-card="32480"] .sbar__keyed').textContent(), '(IME)', 'IME-only bar legend');
 
     await page.locator('[data-hpick-change]').click();
     await pickHospital(page, 'arizona spine', '030107');
     head = await headText(page);
-    has(head, 'Arizona Spine And Joint Hospital gets no teaching or DSH add-ons, so what a removed procedure loses when billed outpatient is base payment only.', 'no add-ons lead');
+    has(head, 'Arizona Spine And Joint Hospital gets no teaching (IME) or safety-net (DSH) add-ons, so what a removed procedure loses when billed outpatient is base payment only.', 'no add-ons lead');
     has(head, 'No DSH', 'facts');
     noJunk(head, 'no add-ons summary');
     text = (await page.locator('[data-stake-card="32480"]').textContent()).replace(/\s+/g, ' ');
@@ -818,8 +845,10 @@ if (!hasStake) {
     await openStake(page, '?h=380009&q=32480');
     await page.waitForSelector('.hsum');
     has(await page.locator('[data-stake-card="32480"]').textContent(), 'Ohsu Hospital And Clinics', 'landing on ?h= shows the hospital');
+    eq((await page.locator('.stake__actions a[download]').allTextContents()).join(' | '), 'Download national Excel | Download national CSV', 'A52: the page’s downloads say national while a hospital is picked');
     await page.locator('[data-hpick-clear]').click();
     await page.waitForFunction(() => !document.querySelector('.hsum'));
+    eq((await page.locator('.stake__actions a[download]').allTextContents()).join(' | '), 'Download Excel | Download CSV', 'download labels restored');
     eq(await page.evaluate(() => location.search), '?q=32480', 'URL keeps only the search');
     eq(await page.evaluate(() => document.activeElement.id), 'hp-q', 'focus returns to the picker');
     const text = (await page.locator('[data-stake-card="32480"]').textContent()).replace(/\s+/g, ' ');
@@ -861,13 +890,6 @@ if (!hasStake) {
   }, { viewport: { width: 400, height: 860 } });
 
   // ---- the hospital view: folds, counts, lede, color modes -------------------------------------
-  async function openFolds(page, code) {
-    for (const kind of ['split', 'year']) {
-      const fold = page.locator(`[data-stake-card="${code}"] [data-fold="${kind}"]`);
-      if (await fold.count() && !(await fold.evaluate((d) => d.open))) await fold.locator('> summary').click();
-    }
-  }
-  const foldText = async (page, code, kind) => (await page.locator(`[data-stake-card="${code}"] [data-fold="${kind}"]`).textContent()).replace(/\s+/g, ' ');
 
   await check('hospital: the split by DRG and per year folds, to the cent', async (page) => {
     await openStake(page, '?h=380009&q=32480');
@@ -1132,6 +1154,26 @@ if (!hasStake) {
       assert(national < 0.001, `CLS ${national.toFixed(3)} on the national landing`);
     }, { viewport: { width, height: 860 } });
   }
+
+  // The picker's label wraps on a phone (one, two or three lines); the empty mount reserves each height.
+  await check('hospital: the empty picker reserves the height its labeled box draws at, one to three label lines', async (page) => {
+    let release;
+    let held;
+    await page.route(/\/data\/stake\./, async (route) => { await held; await route.continue(); });
+    const off = [];
+    for (const width of [320, 400, 700, 1280]) {
+      held = new Promise((resolve) => { release = resolve; });
+      await page.setViewportSize({ width, height: 860 });
+      await page.goto(`${base}/revenue-at-stake/`);
+      await page.evaluate(() => document.fonts.ready);
+      const reserved = await page.locator('[data-hospital-pick]').evaluate((el) => el.getBoundingClientRect().height);
+      release();
+      await page.waitForSelector('#hp-q');
+      const drawn = await page.locator('[data-hospital-pick]').evaluate((el) => el.getBoundingClientRect().height);
+      if (Math.abs(drawn - reserved) > 1) off.push(`${width}px: reserved ${reserved.toFixed(1)}, drawn ${drawn.toFixed(1)}`);
+    }
+    assert(off.length === 0, off.join('; '));
+  });
 
   await check('hospital: a file that arrives but cannot be computed says so, not "check the connection"', async (page) => {
     await page.route(/\/data\/h\.[0-9a-f]{10}\/380009\.json/, (route) => route.fulfill({ status: 200, contentType: 'application/json', body: 'null' }));

@@ -53,6 +53,14 @@ test('what is left out, with the CFR cites; MA in one sentence with its quote; M
   assert.ok(text.includes(`${meta.counts.maryland} Maryland hospitals`), 'how many');
 });
 
+test('IME and DSH are defined once at the top of the hospital section, with their CFR sections and CMS’s names', () => {
+  const top = text.slice(text.indexOf('At a hospital’s rates'), text.indexOf('Pick a hospital on the')).replace(/\( /g, '(').replace(/ \)/g, ')');
+  for (const words of ['IME is the indirect medical education adjustment, paid to teaching hospitals (42 CFR 412.105)',
+    'DSH is the disproportionate share hospital adjustment, paid to hospitals that serve many low-income patients (42 CFR 412.106)',
+    'safety-net']) assert.ok(top.includes(words), `${words}: ${top}`);
+  assert.ok(!html.includes('<abbr'), 'no hover-only abbr');
+});
+
 test('the per-year ceiling and the MA estimate', () => {
   for (const words of [ceiling(vMeta.data_year), `under ${vMeta.suppressed_below}`, hMeta.columns.ime_caseta44, 'same MS-DRG mix', 'not saved']) assert.ok(text.includes(words), words);
 });

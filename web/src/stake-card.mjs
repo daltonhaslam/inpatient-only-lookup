@@ -92,7 +92,7 @@ export function gapParts(item, lead = 'Outpatient pays') {
 }
 
 /**
- * A family's IME and DSH as "$6,067–$14,116" (the card says "Includes <range> in IME and DSH"), or ''
+ * A family's add-ons as "$6,067–$14,116" (the card says "Includes <range> in <variant.addOns>"), or ''
  * when it carries none: no hospital picked (national items have no addOn), no add-ons, or both ends round to $0.
  */
 const addOnRange = (addOn) => (addOn && (whole(addOn.low) !== '0' || whole(addOn.high) !== '0') ? moneyRange(addOn.low, addOn.high) : '');
@@ -100,12 +100,13 @@ const addOnRange = (addOn) => (addOn && (whole(addOn.low) !== '0' || whole(addOn
 /**
  * What a card says around its figures. NATIONAL_CARD is the national card; hospital-view.mjs builds a
  * hospital's: gapLead (the gap sentence's start), ascLabel, rateNote (under the outpatient rate), opNote
- * (after the surgery-center line), fine (the fine print) and workLink (link text to the code page's
- * national work in place of Show the work; null: the card's own).
+ * (after the surgery-center line), fine (the fine print), addOns (the add-ons the hospital gets, "IME and
+ * DSH" or one of them, for the Includes line and the bar's legend; national items carry none) and
+ * workLink (link text to the code page's national work in place of Show the work; null: the card's own).
  */
 const NATIONAL_CARD = Object.freeze({
   gapLead: 'Outpatient pays', ascLabel: 'Surgery center (ASC)', rateNote: '', opNote: '',
-  fine: 'National, unadjusted: no wage index, IME or DSH.', workLink: null,
+  fine: 'National, unadjusted: no wage index, IME or DSH.', addOns: '', workLink: null,
 });
 
 const NO_COMPARE = {
@@ -125,7 +126,7 @@ function opLine(item, v = NATIONAL_CARD) {
     + (v.opNote ? `<span class="scard__asc">${esc(v.opNote)}</span>` : '');
 }
 
-function familyLine(f, many) {
+function familyLine(f, many, v) {
   const basis = basisText(f.basis);
   const code = f.dx ? ` (${esc(dxCode(f.dx.code))})` : '';
   const lines = many
@@ -134,7 +135,7 @@ function familyLine(f, many) {
   if (basis) lines.push(esc(basis.charAt(0).toUpperCase() + basis.slice(1)));
   const addOn = addOnRange(f.addOn);
   return `<div class="scard__fam"><span class="scard__amt">${moneyRange(f.low, f.high)}</span><span class="scard__what">MS-DRG ${esc(drgList(f.drgs))} ${esc(f.name)}</span>`
-    + (addOn ? `<span class="scard__addon">Includes <b class="nw">${addOn}</b> in IME and DSH</span>` : '')
+    + (addOn ? `<span class="scard__addon">Includes <b class="nw">${addOn}</b> in ${esc(v.addOns)}</span>` : '')
     + lines.map((line) => `<span class="scard__cond">${line}</span>`).join('')
     + `${f.caveat ? `<span class="scard__caveat">${esc(f.caveat)}</span>` : ''}</div>`;
 }
@@ -146,11 +147,11 @@ const pct = (n) => `${(n * 100).toFixed(2)}%`;
 /**
  * Bars on one dollar scale: hollow for outpatient, filled for each inpatient range. Decorative; the text
  * says it all. With a hospital's add-ons (exactly when the card says "Includes $A–$B"), the top of each
- * inpatient range gets an end segment in its own color for the top DRG's IME and DSH: the dollars above
+ * inpatient range gets an end segment in its own color for the top DRG's add-ons: the dollars above
  * that DRG's base payment (never left of the range's low end). Its legend is a swatch of that color, not
  * a word like "darker", which is not true in dark mode or forced colors.
  */
-function scaleBar(item) {
+function scaleBar(item, v) {
   const top = Math.max(item.op.rate || 0, item.ip.high);
   // key: the add-on legend, right after "Inpatient" so a long family name after it is what truncates.
   const lane = (name, bar, key = '', rest = '') => `<div class="sbar__lane"><span class="sbar__name">${esc(name)}${key}${esc(rest)}</span><span class="sbar__track">${bar}</span></div>`;
@@ -163,7 +164,7 @@ function scaleBar(item) {
   for (const f of item.ip.families) {
     const add = addOnPart(f);
     lanes.push(lane('Inpatient', `<i class="sbar__ip" style="left:${pct(f.low / top)};width:${pct(Math.max(f.high - f.low, top * 0.006) / top)}"></i>${add}`,
-      add ? ' <span class="sbar__keyed">(<i class="sbar__key"></i>IME and DSH)</span>' : '', item.ip.families.length > 1 ? `, ${whenLabel(f)}` : ''));
+      add ? ` <span class="sbar__keyed">(<i class="sbar__key"></i>${esc(v.addOns)})</span>` : '', item.ip.families.length > 1 ? `, ${whenLabel(f)}` : ''));
   }
   return `<div class="sbar" aria-hidden="true">${lanes.join('')}<div class="sbar__axis"><span>$0</span><span>${money(top)}</span></div></div>`;
 }
@@ -219,7 +220,7 @@ ${stale}
  * detail: include Show the work (off in the browser, which links to the code page instead).
  * variant: the words around the figures (NATIONAL_CARD, or a hospital's from hospital-view.mjs, whose
  * workLink also keeps the national Show the work off the card). An item from hospital-math.mjs
- * hospitalItem() carries each family's IME and DSH, drawn as an "Includes" line and the bar's end
+ * hospitalItem() carries each family's add-ons, drawn as an "Includes" line and the bar's end
  * segment. folds: HTML for the hospital's folded sections, placed before the fine print.
  * A code with no comparison draws the same with or without a hospital.
  */
@@ -239,9 +240,9 @@ ${head}<p class="scard__status">${statusBadge(item.review)}</p>
 <p class="scard__gap">${gap}</p>
 <dl class="scard__pay">
 <div class="scard__op"><dt>Outpatient <span>${esc(meta.years.outpatient)} OPPS</span></dt><dd>${opLine(item, variant)}</dd></div>
-<div class="scard__ip"><dt>Inpatient <span>${esc(meta.years.inpatient)} IPPS</span></dt><dd>${item.ip.families.map((f) => familyLine(f, many)).join('')}</dd></div>
+<div class="scard__ip"><dt>Inpatient <span>${esc(meta.years.inpatient)} IPPS</span></dt><dd>${item.ip.families.map((f) => familyLine(f, many, variant)).join('')}</dd></div>
 </dl>
-${scaleBar(item)}
+${scaleBar(item, variant)}
 ${tier}${folds}
 <p class="scard__fine">${esc(variant.fine)} <span class="scard__draft">${esc(BADGE)}</span></p>
 ${detail && !variant.workLink ? work(item, meta) : `<p class="scard__more"><a href="/code/${esc(item.code)}/#stake-h">${esc(variant.workLink || `Show the work for ${item.code}`)}</a></p>`}

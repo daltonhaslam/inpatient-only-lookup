@@ -5,7 +5,7 @@ import { num } from './engine.mjs';
 import { esc } from './views.mjs';
 import { card, STATUS } from './stake-card.mjs';
 import { prepare, filterCodes, outsideCrosswalk, stateFromParams, hospitalParam, queryString, countText, PAGE_SIZE, TIERS, DEFAULTS } from './stake-engine.mjs';
-import { SHELL, field } from './hospital-field.mjs';
+import { SHELL, field, nationalDownload } from './hospital-field.mjs';
 import { announcer } from './announce.mjs';
 import { fetchJson } from './fetch.mjs';
 
@@ -19,7 +19,16 @@ const HOSPITAL = typeof __HOSPITAL_ASSETS__ === 'undefined' ? null : __HOSPITAL_
 // national won). Left on, "Change hospital" would sit above a blank band. A Maryland CCN
 // (HOSPITAL.maryland, its state code) is never shown, so it reserves nothing.
 const RESERVE = 'hpick-h';
-const reserve = (on) => document.documentElement.classList.toggle(RESERVE, on);
+// The page's Download Excel / CSV links stay national: while a hospital is shown (picked, set by start())
+// they say so, and on an ?h= landing from the moment its height is reserved, so they change before the
+// first paint, not when the hospital arrives (the longer labels wrap on a phone: no layout shift).
+const downloads = [...document.querySelectorAll('.stake__actions a[download]')].map((a) => [a, a.textContent]);
+let picked = false;
+function labelDownloads() {
+  const on = picked || document.documentElement.classList.contains(RESERVE);
+  for (const [a, text] of downloads) a.textContent = on ? nationalDownload(text) : text;
+}
+const reserve = (on) => { document.documentElement.classList.toggle(RESERVE, on); labelDownloads(); };
 const landing = HOSPITAL ? hospitalParam(window.location.search) : '';
 if (landing && !landing.startsWith(HOSPITAL.maryland)) reserve(true);
 
@@ -97,6 +106,7 @@ export function start(model) {
   // The picked hospital: its view (hospital-view.mjs createView), or null for national. pending: a
   // six-digit ?h= still being checked against the list, kept in the URL until then.
   let view = null;
+  const setView = (next) => { view = next; picked = Boolean(next); labelDownloads(); };
   let pending = hospitalParam(window.location.search);
   let matches = [];
   let shown = 0;
@@ -187,11 +197,11 @@ export function start(model) {
         const prev = view;
         return transition(() => {
           try {
-            view = next;
+            setView(next);
             ui.show(next);
             update();
           } catch (error) {
-            view = prev;
+            setView(prev);
             ui.show(prev, { find: true });
             update();
             throw error;
@@ -203,7 +213,7 @@ export function start(model) {
           ui.say(next.announce);
         });
       },
-      onClear: (ui) => transition(() => { view = null; reserve(false); ui.show(null); update(); })
+      onClear: (ui) => transition(() => { setView(null); reserve(false); ui.show(null); update(); })
         .then(() => { $('#hp-q', mount)?.focus(); ui.say('Showing national rates.'); }),
       // An ?h= that names no hospital the picker offers (Maryland, unknown): national, clean URL.
       onInvalid: ({ keepUrl = false }) => { reserve(false); if (!keepUrl) { pending = ''; writeUrl(); } },

@@ -4,7 +4,8 @@ import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { hospitals, list, data, recordOf, viewOf } from './hospital-fixture.mjs';
 import { drgSeverity } from '../src/hospital-data.mjs';
-import { drgLabel, yearUpdate, addOnName } from '../src/hospital-folds.mjs';
+import { drgLabel, yearUpdate } from '../src/hospital-folds.mjs';
+import { addOnName } from '../src/hospital-words.mjs';
 import { ceiling } from '../src/hospital-words.mjs';
 
 const text = (html) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -67,6 +68,19 @@ describe('split by DRG', () => {
     assert.ok(t.startsWith('The split by DRG · operating and capital, no IME or DSH'), t.slice(0, 90));
     assert.ok(!/<th[^>]*>(IME|DSH)<\/th>/.test(fold(folds(view, '32480'), 'split')), 'no IME or DSH column');
     assert.ok(!/\$0\.00/.test(t), t);
+  });
+  test('K1: only the add-ons the hospital gets have a row, and the heading and note follow (010005 DSH only, 010018 IME only)', () => {
+    for (const [ccn, got, not] of [['010005', 'DSH', 'IME'], ['010018', 'IME', 'DSH']]) {
+      const html = fold(folds(viewOf(ccn), '32480'), 'split');
+      const t = text(html);
+      assert.ok(t.startsWith(`The split by DRG · base, ${got} `), t.slice(0, 60));
+      assert.match(html, new RegExp(`<th scope="row">${got}</th>`));
+      assert.ok(!html.includes(`<th scope="row">${not}</th>`), `${ccn}: a ${not} row`);
+      assert.ok(!/\$0\.00/.test(t), `${ccn}: a $0.00 cell`);
+      assert.ok(t.includes(`; ${got} includes its capital part.`), t);
+      assert.ok(t.includes(`payment per case at ${viewOf(ccn).name}`), 'caption without a possessive');
+      assert.ok(t.includes('with this hospital’s wage index'), t);
+    }
   });
   test('two-family codes get one table per family', () => {
     const view = viewOf('380009');
@@ -154,7 +168,15 @@ describe('per year', () => {
     assert.ok(text(html).includes('Medicare Advantage cases carry no add-on'), text(html));
     assert.match(text(html), /a case: DSH /, 'names only the add-on it gets');
     assert.ok(!text(html).includes('IME + DSH'), text(html));
+    assert.ok(text(html).includes(`DSH a year on cases in MS-DRG 163–165 at ${view.name}`), 'caption: only DSH, no possessive');
+    assert.ok(text(html).includes('DSH is paid on traditional Medicare cases only.'), text(html));
     assert.equal(view.count('32480', '163:ma', '3'), null, 'no MA count to type');
+  });
+  test('an IME-only teaching hospital (010018): the notes do not mention DSH', () => {
+    const view = viewOf('010018');
+    const t = text(fold(folds(view, '32480'), 'year'));
+    assert.ok(t.includes('IME is paid on traditional Medicare and Medicare Advantage cases: MA cases carry operating IME only'), t);
+    assert.ok(!t.includes('DSH'), t);
   });
   test('the per-case label names the add-ons the hospital actually gets', () => {
     assert.equal(addOnName(hospitals.hospitals['380009']), 'IME + DSH');

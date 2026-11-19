@@ -7,6 +7,7 @@ import { card, gapParts } from '../src/stake-card.mjs';
 import { uncoveredDrgs, staleHospitalTables } from '../src/hospital-data.mjs';
 import { hospitalIndex, findHospitals } from '../src/hospital-pick.mjs';
 import { facts, summaryHtml, hospitalLede, LEDE_NATIONAL, LEDE_HOSPITAL } from '../src/hospital-view.mjs';
+import { nationalDownload } from '../src/hospital-field.mjs';
 
 const text = (html) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
@@ -86,26 +87,51 @@ describe('summary strip', () => {
   test('OHSU: the lead reads as a finding, with the three numbers', () => {
     const view = viewOf('380009');
     const t = text(view.summaryHtml);
-    assert.match(t, /^At Ohsu Hospital And Clinics, about half of what a removed procedure loses when billed outpatient is teaching and DSH add-ons\./);
+    assert.match(t, /^At Ohsu Hospital And Clinics, about half of what a removed procedure loses when billed outpatient is teaching \(IME\) and safety-net \(DSH\) add-ons\./);
     assert.ok(t.includes('$10,478'), t);
-    assert.ok(t.includes('$5,156'), t);
+    assert.ok(t.includes('typical IME and DSH in that lowest DRG (median) $5,156'), t);
     assert.ok(t.includes('822 of 849'), t);
+    assert.ok(t.includes('The IME and DSH percentages above are CMS’s operating factors; the capital ones are applied too.'), t);
+  });
+  test('K1: a DSH-only hospital (010005) names only DSH, spelled out once in the lead', () => {
+    const t = text(viewOf('010005').summaryHtml);
+    assert.match(t, /^At Marshall Medical Centers South Campus, a small part of what a removed procedure loses when billed outpatient is a safety-net \(DSH\) add-on\./);
+    assert.ok(t.includes('typical DSH in that lowest DRG (median)'), t);
+    assert.ok(t.includes('The DSH percentage above is CMS’s operating factor; the capital one is applied too.'), t);
+    assert.ok(!/IME|teaching/.test(t), t);
+  });
+  test('K1: an IME-only hospital (010018) names only IME', () => {
+    const t = text(viewOf('010018').summaryHtml);
+    assert.match(t, /^At Uab Callahan Eye Hospital Authority, about a third of what a removed procedure loses when billed outpatient is a teaching \(IME\) add-on\./);
+    assert.ok(t.includes('typical IME in that lowest DRG (median)'), t);
+    assert.ok(!/DSH|safety-net/.test(t), t);
+  });
+  test('F4: the announcement says "rates for <name>", never a possessive of CMS’s name', () => {
+    assert.match(viewOf('380009').announce, /^Showing rates for Ohsu Hospital And Clinics\. At Ohsu Hospital And Clinics, about half/);
+    for (const ccn of ['380009', '010005', '030107']) {
+      const view = viewOf(ccn);
+      const html = [view.announce, view.summaryHtml, view.barHtml, view.card(view.data.byCode['32480'])].join(' ');
+      assert.ok(!html.includes(`${view.name}’s`), `${ccn}: a possessive of the name`);
+    }
   });
   test('Review Focus 1: a hospital with no IME and no DSH says so, never $0–$0 or NaN', () => {
     const view = viewOf('030107');
     assert.equal(view.summary.state, 'no-addons');
     const t = text(view.summaryHtml);
-    assert.match(t, /^Arizona Spine And Joint Hospital gets no teaching or DSH add-ons, so what a removed procedure loses when billed outpatient is base payment only\./);
+    assert.match(t, /^Arizona Spine And Joint Hospital gets no teaching \(IME\) or safety-net \(DSH\) add-ons, so what a removed procedure loses when billed outpatient is base payment only\./);
+    assert.ok(!t.includes('percentage'), 'no factor note when the facts line shows no percentage');
     assert.ok(!/\$0\b|NaN|undefined|null|Infinity/.test(t), t);
   });
   test('every state renders without a missing number', () => {
     const base = { codes: 849, below: 800, medianGap: 1234.5, medianAddOn: 500, ratio: 0.405 };
-    for (const s of [{ ...base, state: 'addons' }, { ...base, medianAddOn: 0, ratio: null, state: 'no-addons' }, { ...base, medianGap: -250, ratio: null, state: 'no-gap' }, { ...base, medianGap: 0, ratio: null, state: 'no-gap' }]) {
-      const t = text(summaryHtml(s, 'A <b>Hospital</b>'));
+    const h = hospitals.hospitals['380009'];
+    const none = hospitals.hospitals['030107'];
+    for (const [s, record] of [[{ ...base, state: 'addons' }, h], [{ ...base, medianAddOn: 0, ratio: null, state: 'no-addons' }, none], [{ ...base, medianGap: -250, ratio: null, state: 'no-gap' }, h], [{ ...base, medianGap: 0, ratio: null, state: 'no-gap' }, none]]) {
+      const t = text(summaryHtml(s, 'A <b>Hospital</b>', record));
       assert.ok(!/NaN|undefined|null|Infinity/.test(t), `${s.state}: ${t}`);
       assert.ok(!t.includes('<b>'), 'the name is escaped');
     }
-    assert.equal(summaryHtml({ codes: 0, below: 0, medianGap: null, medianAddOn: null, ratio: null, state: 'empty' }, 'X'), '');
+    assert.equal(summaryHtml({ codes: 0, below: 0, medianGap: null, medianAddOn: null, ratio: null, state: 'empty' }, 'X', h), '');
   });
   test('the name is escaped everywhere it appears', () => {
     const record = { ...recordOf('380009'), name: '<img src=x onerror=alert(1)>' };
@@ -126,7 +152,7 @@ describe('cards in hospital mode', () => {
     assert.ok(t.includes('$3,995'), 'wage-adjusted outpatient');
     assert.ok(t.includes('national rate $3,585'), 'the national rate beside it');
     assert.ok(t.includes('Surgery center (ASC), national: $1,585'), 'ASC stays national');
-    assert.ok(t.includes('No teaching or DSH add-on in either outpatient setting.'));
+    assert.ok(t.includes('No IME or DSH add-on in either outpatient setting.'));
     assert.ok(t.includes('$22,117–$51,459'), 'inpatient range');
     assert.ok(t.includes('Includes $6,067–$14,116 in IME and DSH'), t);
     assert.ok(t.includes('Ohsu Hospital And Clinics rates: wage index, IME and DSH (operating and capital).'));
@@ -144,9 +170,22 @@ describe('cards in hospital mode', () => {
     const t = text(html);
     assert.ok(!t.includes('Includes'), t);
     assert.ok(!html.includes('sbar__add'));
-    assert.ok(!t.includes('No teaching or DSH add-on in either outpatient setting'));
+    assert.ok(!t.includes('add-on in either outpatient setting'));
     assert.ok(t.includes('Arizona Spine And Joint Hospital rates: wage index. This hospital gets no IME or DSH.'));
     assert.ok(!/\$0–\$0|NaN/.test(t));
+  });
+  test('K1: a DSH-only hospital (010005) and an IME-only one (010018): every add-on word names only what it gets', () => {
+    for (const [ccn, got, not, range] of [['010005', 'DSH', 'IME', '$392–$912'], ['010018', 'IME', 'DSH', '$2,985–$6,945']]) {
+      const view = viewOf(ccn);
+      const html = view.card(view.data.byCode['32480']);
+      const t = text(html);
+      assert.ok(t.includes(`Includes ${range} in ${got} `), t);
+      assert.ok(t.includes(`No ${got} add-on in either outpatient setting.`), t);
+      assert.ok(t.includes(`${view.name} rates: wage index and ${got} (operating and capital).`), t);
+      assert.match(html, new RegExp(`<span class="sbar__keyed">\\(<i class="sbar__key"></i>${got}\\)</span>`));
+      const outsideFolds = t.replace(/The split by DRG[\s\S]*$/, '');
+      assert.ok(!outsideFolds.includes(not), `${ccn}: ${not} named on the card: ${outsideFolds}`);
+    }
   });
   test('an add-on that rounds to $0 draws no segment and no legend, like the Includes line', () => {
     const record = { ...recordOf('380009'), tchop: 1e-5, tchcp: 0, dshopp: 0, dshcpp: 0 };
@@ -204,5 +243,13 @@ describe('the lede after a pick', () => {
   test('the swap is about the same length, so the lede keeps its lines (no layout shift)', () => {
     assert.ok(Math.abs(LEDE_HOSPITAL.length - LEDE_NATIONAL.length) <= 2, `${LEDE_HOSPITAL} vs ${LEDE_NATIONAL}`);
     assert.equal(hospitalLede('Something else.'), 'Something else.');
+  });
+});
+
+describe('the national downloads after a pick (A52)', () => {
+  test('"Download Excel" and "Download CSV" say national; anything else is left alone', () => {
+    assert.equal(nationalDownload('Download Excel'), 'Download national Excel');
+    assert.equal(nationalDownload('Download CSV'), 'Download national CSV');
+    assert.equal(nationalDownload('download the CSV'), 'download the CSV');
   });
 });
